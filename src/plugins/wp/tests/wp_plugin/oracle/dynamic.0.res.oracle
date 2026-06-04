@@ -41,7 +41,7 @@ Assume {
   (* Heap *)
   Type: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
   (* Pre-condition *)
-  Have: (a = a_1) \/ ((a = a_2) /\ (IAbs.abs(x) <= 5)).
+  Have: (a = a_1) \/ ((a = a_2) /\ (abs(x) <= 5)).
 }
 Prove: (a = a_2) \/ (a = a_1).
 
@@ -85,7 +85,7 @@ Assume {
   (* Heap *)
   Type: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
   (* Pre-condition *)
-  Have: IAbs.abs(x) <= 5.
+  Have: abs(x) <= 5.
   (* Instance of 'f1' *)
   (* Call point f1 f2 *)
   Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_23).

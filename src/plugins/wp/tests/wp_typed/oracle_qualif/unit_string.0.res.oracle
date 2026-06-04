@@ -281,10 +281,10 @@ end
        i <= 2 ->
        linked t ->
        sconst t1 ->
+       not valid_rw t a10 1 ->
        valid_rd t a9 3 ->
        valid_rd t a11 1 ->
        not valid_rd t (shift_sint8 a8 4) 1 ->
-       not valid_rw t a10 1 ->
        get t1 (shift_sint8 a13 (3 + i)) = get t1 (shift_sint8 a8 i)
     
   end

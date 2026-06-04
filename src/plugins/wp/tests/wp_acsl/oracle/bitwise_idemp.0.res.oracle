@@ -30,7 +30,7 @@ Assume {
   (* Goal *)
   When: if (x = 0) then (c = b) else (c = a).
 }
-Prove: land(a, land(b, c)) = land(a, b).
+Prove: (a land b land c) = (a land b).
 
 ------------------------------------------------------------
 
@@ -40,7 +40,7 @@ Assume {
   (* Goal *)
   When: if (x = 0) then (c = b) else (c = a).
 }
-Prove: land(a, land(b, c)) = land(a, b).
+Prove: (a land b land c) = (a land b).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -65,7 +65,7 @@ Assume {
   (* Goal *)
   When: if (x = 0) then (c = b) else (c = a).
 }
-Prove: lor(a, lor(b, c)) = lor(a, b).
+Prove: (a lor b lor c) = (a lor b).
 
 ------------------------------------------------------------
 
@@ -75,7 +75,7 @@ Assume {
   (* Goal *)
   When: if (x = 0) then (c = b) else (c = a).
 }
-Prove: lor(a, lor(b, c)) = lor(a, b).
+Prove: (a lor b lor c) = (a lor b).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -101,7 +101,7 @@ Assume {
   (* Goal *)
   When: if (x = 0) then ((c = b) /\ (e = a)) else ((c = a) /\ (e = b)).
 }
-Prove: lxor(a, lxor(b, c)) = e.
+Prove: (a lxor b lxor c) = e.
 
 ------------------------------------------------------------
 
@@ -112,6 +112,6 @@ Assume {
   (* Goal *)
   When: if (x = 0) then ((c = b) /\ (e = a)) else ((c = a) /\ (e = b)).
 }
-Prove: lxor(a, lxor(b, c)) = e.
+Prove: (a lxor b lxor c) = e.
 
 ------------------------------------------------------------

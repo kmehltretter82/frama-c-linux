@@ -45,7 +45,7 @@ Prove: true.
 
 Goal Preservation of Invariant ("combined.c", line 17):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, 50).
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
   (* Heap *)
@@ -58,7 +58,7 @@ Assume {
   Have: (0 <= i) /\ (i <= 50).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      P_P(a_1[shift_sint32(t, i_2)]))).
+      P_P(m[shift_sint32(t, i_2)]))).
   (* Then *)
   Have: i <= 49.
   (* Call 'f' *)
@@ -66,7 +66,7 @@ Assume {
   (* Invariant *)
   Have: (-1) <= i.
 }
-Prove: P_P(a_1[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
+Prove: P_P(m[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
 
 ------------------------------------------------------------
 
@@ -102,8 +102,8 @@ Prove: A <= x.
 
 Goal Assertion ("combined.c", line 29):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, 50).
-Let a_2 = shift_sint32(t, A).
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, 50).
+Let a_1 = shift_sint32(t, A).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i_1) /\ is_sint32(j).
   (* Heap *)
@@ -116,7 +116,7 @@ Assume {
   Have: (0 <= i_1) /\ (i_1 <= 50).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      P_P(a_1[shift_sint32(t, i_2)]))).
+      P_P(m[shift_sint32(t, i_2)]))).
   (* Else *)
   Have: 50 <= i_1.
   (* Invariant *)
@@ -124,7 +124,7 @@ Assume {
   (* Else *)
   Have: 100 <= j.
 }
-Prove: P_P(memcpy(a_1, a_2, Mint_undef_1, a_2, 100 - A)[shift_sint32(t, i)]).
+Prove: P_P(memcpy(m, a_1, Mint_undef_1, a_1, 100 - A)[shift_sint32(t, i)]).
 
 ------------------------------------------------------------
 

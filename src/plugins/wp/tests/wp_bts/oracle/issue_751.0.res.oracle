@@ -40,7 +40,7 @@ Prove: true.
 
 Goal Loop assigns ("issue_751.i", line 8, characters 20-21) (2/2):
 Effect at line 12
-Let x = land(3840, R).
+Let x = 3840 land R.
 Let x_1 = lsr(x, 8).
 Let x_2 = j - 1.
 Assume {

@@ -28,8 +28,8 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 30).
 }
-Prove: (land(lor(x_1, to_uint32(lsl(x, 1))), lsl(1, 1 + i)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((x_1 lor to_uint32(lsl(x, 1))) land lsl(1, 1 + i)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 

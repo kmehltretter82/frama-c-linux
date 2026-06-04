@@ -41,7 +41,7 @@ Assume {
   (* Invariant 'ok,id_max' *)
   Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
+  Have: L_call_obs(call_seq_2) = ([ x ] ^ a).
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
@@ -98,17 +98,17 @@ Assume {
   (* Invariant 'ok,id_max' *)
   Have: i <= n.
   (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
+  Have: L_call_obs(call_seq_2) = ([ x ] ^ a).
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
-  Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ y ].
+  Have: L_call_obs(call_seq_3) = ([ x ] ^ a ^ [ y ]).
   (* Invariant 'ok,id_min' *)
   Have: (-1) <= i.
   (* Invariant 'ok,id_max' *)
   Have: 0 <= n.
 }
-Prove: ([ y ] *^ x_1) = a ^ [ y ].
+Prove: ([ y ] *^ x_1) = (a ^ [ y ]).
 
 ------------------------------------------------------------
 
@@ -195,11 +195,11 @@ Assume {
   (* Invariant 'ok,id_max' *)
   Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
+  Have: L_call_obs(call_seq_2) = ([ x ] ^ a).
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
-  Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ z ].
+  Have: L_call_obs(call_seq_3) = ([ x ] ^ a ^ [ z ]).
 }
 Prove: i = 0.
 
@@ -223,11 +223,11 @@ Assume {
   (* Invariant 'ok,id_max' *)
   Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
+  Have: L_call_obs(call_seq_2) = ([ x ] ^ a).
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
-  Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ z ].
+  Have: L_call_obs(call_seq_3) = ([ x ] ^ a ^ [ z ]).
 }
 Prove: i <= 0.
 
@@ -385,9 +385,9 @@ Assume {
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
   (* Call 'g' *)
-  Have: L_call_obs(call_seq_2) = [ x, y ].
+  Have: L_call_obs(call_seq_2) = ([ x, y ]).
   (* Call 'f' *)
-  Have: L_call_obs(call_seq_3) = [ x, y, z ].
+  Have: L_call_obs(call_seq_3) = ([ x, y, z ]).
 }
 Prove: L_call_nil = nil.
 
@@ -421,7 +421,7 @@ Assume {
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
   (* Call 'f' *)
-  Have: L_call_obs(call_seq_2) = [ x, z ].
+  Have: L_call_obs(call_seq_2) = ([ x, z ]).
 }
 Prove: L_call_nil = nil.
 

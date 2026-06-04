@@ -6,6 +6,6 @@
 ------------------------------------------------------------
 
 Goal Lemma 'AbsOp':
-Let a = IAbs.abs(n). Prove: L_fooJazzopN(x, a) = L_fooBaropN(x, a).
+Let x_1 = abs(n). Prove: L_fooJazzopN(x, x_1) = L_fooBaropN(x, x_1).
 
 ------------------------------------------------------------

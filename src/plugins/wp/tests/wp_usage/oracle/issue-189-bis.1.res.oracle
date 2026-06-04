@@ -8,8 +8,8 @@
 Goal Post-condition 'memcpy,ok' in 'memcpy_context_vars':
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
-Let a_3 = global(G_src_48).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
+Let a_2 = global(G_src_48).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Goal *)
@@ -19,16 +19,16 @@ Assume {
   (* Invariant 'ok,len' *)
   Have: len_1 <= len_0.
   (* Invariant 'ok,src' *)
-  Have: shift_uint8(a_3, len_0) = shift_uint8(src2_0, len_1).
+  Have: shift_uint8(a_2, len_0) = shift_uint8(src2_0, len_1).
   (* Invariant 'ok,dst' *)
   Have: shift_uint8(a, len_0) = shift_uint8(dst2_0, len_1).
   (* Invariant 'ok,cpy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> (((len_1 + i_1) < len_0) ->
-      (a_2[shift_uint8(a, i_1)] = Mint_0[shift_uint8(a_3, i_1)]))).
+      (m[shift_uint8(a, i_1)] = Mint_0[shift_uint8(a_2, i_1)]))).
   (* Else *)
   Have: len_1 <= 0.
 }
-Prove: a_2[shift_uint8(a, i)] = Mint_0[shift_uint8(a_3, i)].
+Prove: m[shift_uint8(a, i)] = Mint_0[shift_uint8(a_2, i)].
 
 ------------------------------------------------------------
 
@@ -45,9 +45,9 @@ Prove: true.
 Goal Preservation of Invariant 'ok,cpy' ("issue-189-bis.i", lines 56-58):
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
-Let a_3 = global(G_src_48).
-Let a_4 = a_2[dst2_0 <- a_2[src2_0]].
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
+Let a_2 = global(G_src_48).
+Let m_1 = m[dst2_0 <- m[src2_0]].
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Goal *)
@@ -57,18 +57,18 @@ Assume {
   (* Invariant 'ok,len' *)
   Have: len_1 <= len_0.
   (* Invariant 'ok,src' *)
-  Have: shift_uint8(a_3, len_0) = shift_uint8(src2_0, len_1).
+  Have: shift_uint8(a_2, len_0) = shift_uint8(src2_0, len_1).
   (* Invariant 'ok,dst' *)
   Have: shift_uint8(a, len_0) = shift_uint8(dst2_0, len_1).
   (* Invariant 'ok,cpy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> (((len_1 + i_1) < len_0) ->
-      (a_2[shift_uint8(a, i_1)] = Mint_0[shift_uint8(a_3, i_1)]))).
+      (m[shift_uint8(a, i_1)] = Mint_0[shift_uint8(a_2, i_1)]))).
   (* Then *)
   Have: 0 < len_1.
   (* Invariant 'ok,len' *)
   Have: len_1 <= (1 + len_0).
 }
-Prove: a_4[shift_uint8(a_3, i)] = a_4[shift_uint8(a, i)].
+Prove: m_1[shift_uint8(a_2, i)] = m_1[shift_uint8(a, i)].
 
 ------------------------------------------------------------
 
@@ -143,9 +143,9 @@ Goal Loop assigns ("issue-189-bis.i", line 55, characters 31-35) (4/4):
 Effect at line 62
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
-Let a_3 = a_2[tmp_0 <- a_2[src2_0]].
-Let a_4 = global(G_src_48).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
+Let m_1 = m[tmp_0 <- m[src2_0]].
+Let a_2 = global(G_src_48).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)
@@ -157,19 +157,19 @@ Assume {
   (* Invariant 'ok,len' *)
   Have: len_1 <= len_0.
   (* Invariant 'ok,src' *)
-  Have: shift_uint8(a_4, len_0) = shift_uint8(src2_0, len_1).
+  Have: shift_uint8(a_2, len_0) = shift_uint8(src2_0, len_1).
   (* Invariant 'ok,dst' *)
   Have: shift_uint8(a, len_0) = shift_uint8(tmp_0, len_1).
   (* Invariant 'ok,cpy' *)
   Have: forall i : Z. ((0 <= i) -> (((len_1 + i) < len_0) ->
-      (a_2[shift_uint8(a, i)] = Mint_0[shift_uint8(a_4, i)]))).
+      (m[shift_uint8(a, i)] = Mint_0[shift_uint8(a_2, i)]))).
   (* Then *)
   Have: 0 < len_1.
   (* Invariant 'ok,len' *)
   Have: len_1 <= (1 + len_0).
   (* Invariant 'ok,cpy' *)
   Have: forall i : Z. ((0 <= i) -> (((len_1 + i) <= len_0) ->
-      (a_3[shift_uint8(a_4, i)] = a_3[shift_uint8(a, i)]))).
+      (m_1[shift_uint8(a_2, i)] = m_1[shift_uint8(a, i)]))).
 }
 Prove: included(tmp_0, 1, a_1, len_0).
 

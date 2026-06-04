@@ -35,7 +35,7 @@ Assume {
       is_bool(retres_0).
   (* Pre-condition for 'false' *)
   Have: (a != 1) \/ (b != 1).
-  Have: (if (land(a, b) = 0) then 0 else 1) = retres_0.
+  Have: (if ((a land b) = 0) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = band_bool_0.
 }
@@ -52,7 +52,7 @@ Assume {
       is_bool(retres_0).
   (* Pre-condition for 'true' *)
   Have: (a = 1) /\ (b = 1).
-  Have: (if (land(a, b) = 0) then 0 else 1) = retres_0.
+  Have: (if ((a land b) = 0) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = band_bool_0.
 }

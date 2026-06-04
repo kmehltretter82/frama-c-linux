@@ -50,7 +50,7 @@
     (* Then *)
     Have: i < Max_0.
     (* Call 'f' *)
-    Have: (A[i] = i) /\ (L_list(LIST_2) = a ^ [ 1 ]).
+    Have: (A[i] = i) /\ (L_list(LIST_2) = (a ^ [ 1 ])).
     (* Invariant *)
     Have: i <= 41.
   }

@@ -6,13 +6,13 @@
   Goal Check Lemma 'and_modulo_u':
   Let x = lsl(1, shift_0).
   Assume { Have: 0 <= shift_0. Have: shift_0 <= 31. Have: is_uint32(us_0). }
-  Prove: (us_0 % x) = land(us_0, x - 1).
+  Prove: (us_0 % x) = (us_0 land (x - 1)).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
   Goal Check Lemma 'and_modulo_us_255':
   Assume { Have: is_uint16(us_0). }
-  Prove: (us_0 % 256) = land(255, us_0).
+  Prove: (us_0 % 256) = (255 land us_0).
   
   ------------------------------------------------------------
 [wp] [Unsuccess] typed_check_lemma_and_modulo_us_255 (Tactic) (Qed 1/2)

@@ -52,13 +52,13 @@ Prove: true.
 
 Goal Post-condition 'ko,l_precedence_xor_and' in 'bitwise':
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lxor(r, land(p, q)) = land(p, lxor(q, r)).
+Prove: (r lxor (p land q)) = (p land (q lxor r)).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'ko,r_precedence_xor_and' in 'bitwise':
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lxor(p, land(q, r)) = land(r, lxor(p, q)).
+Prove: (p lxor (q land r)) = (r land (p lxor q)).
 
 ------------------------------------------------------------
 
@@ -74,13 +74,13 @@ Prove: true.
 
 Goal Post-condition 'ko,l_precedence_or_xor' in 'bitwise':
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lxor(p, lor(q, r)) = lor(r, lxor(p, q)).
+Prove: (r lor (p lxor q)) = (p lxor (q lor r)).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'ko,r_precedence_or_xor' in 'bitwise':
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lxor(r, lor(p, q)) = lor(p, lxor(q, r)).
+Prove: (p lor (q lxor r)) = (r lxor (p lor q)).
 
 ------------------------------------------------------------
 
@@ -96,7 +96,7 @@ Prove: true.
 
 Goal Post-condition 'ko,l_precedence_implies_or' in 'bitwise':
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lor(r, lnot(lor(p, q))) = lor(p, lor(r, lnot(q))).
+Prove: (r lor lnot(p lor q)) = (p lor r lor lnot(q)).
 
 ------------------------------------------------------------
 
@@ -118,7 +118,7 @@ Prove: true.
 Goal Post-condition 'ko,l_assoc_implies' in 'bitwise':
 Let x = lnot(p).
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lor(r, lnot(lor(q, x))) = lor(r, lor(x, lnot(q))).
+Prove: (r lor lnot(q lor x)) = (r lor x lor lnot(q)).
 
 ------------------------------------------------------------
 
@@ -135,14 +135,14 @@ Prove: true.
 Goal Post-condition 'ko,r_precedence_equiv_implies' in 'bitwise':
 Let x = lnot(p).
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lxor(r, lnot(lor(q, x))) = lor(lxor(r, lnot(q)), x).
+Prove: (r lxor lnot(q lor x)) = ((r lxor lnot(q)) lor x).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'ko,l_precedence_equiv_implies' in 'bitwise':
 Let x = lnot(p).
 Assume { Type: is_sint32(p) /\ is_sint32(q) /\ is_sint32(r). }
-Prove: lor(r, lnot(lxor(q, x))) = lxor(lor(r, lnot(q)), x).
+Prove: (r lor lnot(q lxor x)) = ((r lor lnot(q)) lxor x).
 
 ------------------------------------------------------------
 

@@ -30,7 +30,7 @@ Assume {
   }
   Else { Have: u8_is_continue_0 = 0. }
 }
-Prove: (L_u8_continue_f(b)=true) <-> (u8_is_continue_0 != 0).
+Prove: L_u8_continue_f(b) <-> (u8_is_continue_0 != 0).
 
 ------------------------------------------------------------
 

@@ -16,21 +16,21 @@ Prove: true.
 Goal Lemma 'INTER_EQ':
 Assume Lemmas: 'UNION_DESCR_LIFT_BOTH' 'UNION_DESCR_LIFT_RIGHT'
   'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
-Let a = singleton(y).
-Let a_1 = inter(a, a).
-Let a_2 = singleton(x).
-Let a_3 = inter(a_2, a_2).
-Prove: ((forall i : Z. (mem(i, a_1) -> mem(i, a_3))) /\
-        (forall i : Z. (mem(i, a_3) -> mem(i, a_1)))) <-> (y = x).
+Let m = singleton(y).
+Let m_1 = inter(m, m).
+Let m_2 = singleton(x).
+Let m_3 = inter(m_2, m_2).
+Prove: ((forall i : Z. (mem(i, m_1) -> mem(i, m_3))) /\
+        (forall i : Z. (mem(i, m_3) -> mem(i, m_1)))) <-> (y = x).
 
 ------------------------------------------------------------
 
 Goal Lemma 'INTER_RANGE':
 Assume Lemmas: 'INTER_EQ' 'UNION_DESCR_LIFT_BOTH' 'UNION_DESCR_LIFT_RIGHT'
   'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
-Let a = inter(inter(range(0, 1 + k), singleton(k)), range(k - 1, n)).
+Let m = inter(inter(range(0, 1 + k), singleton(k)), range(k - 1, n)).
 Assume { Have: 0 <= k. Have: k <= n. }
-Prove: mem(k, a) /\ (forall i : Z. (mem(i, a) -> (i = k))).
+Prove: mem(k, m) /\ (forall i : Z. (mem(i, m) -> (i = k))).
 
 ------------------------------------------------------------
 

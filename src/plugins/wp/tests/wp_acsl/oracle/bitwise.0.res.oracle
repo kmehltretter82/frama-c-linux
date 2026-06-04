@@ -151,7 +151,7 @@ Assume {
   (* Pre-condition for 'false' *)
   Have: (a != 1) \/ (b != 1).
 }
-Prove: land(a, b) = 0.
+Prove: (a land b) = 0.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -486,13 +486,13 @@ Prove: (a + lnot(a)) = (-1).
 
 Goal Check 'zbit,a2' ("bitwise.i", line 109, characters 24-39):
 Assume { Type: is_uint32(a). }
-Prove: lor(a, lnot(a)) = (-1).
+Prove: (a lor lnot(a)) = (-1).
 
 ------------------------------------------------------------
 
 Goal Check 'zbit,a3' ("bitwise.i", line 110, characters 25-39):
 Assume { Type: is_uint32(a). }
-Prove: land(a, lnot(a)) = 0.
+Prove: (a land lnot(a)) = 0.
 
 ------------------------------------------------------------
 
@@ -523,7 +523,7 @@ Prove: true.
 
 Goal Check 'zbit,a4' ("bitwise.i", line 117, characters 23-62):
 Assume { Type: is_uint32(a) /\ is_uint32(b). }
-Prove: (land(a, b) % 256) = land(255, land(a, b)).
+Prove: ((a land b) % 256) = (255 land a land b).
 
 ------------------------------------------------------------
 
@@ -535,7 +535,7 @@ Prove: true.
 Goal Check 'zbit,a5' ("bitwise.i", line 123, characters 23-83):
 Let x = lsl(1, k).
 Assume { Type: is_uint32(a) /\ is_uint32(b) /\ is_uint32(k). }
-Prove: (land(77, land(a, b)) % x) = land(77, land(a, land(b, x - 1))).
+Prove: ((77 land a land b) % x) = (77 land a land b land (x - 1)).
 
 ------------------------------------------------------------
 

@@ -13,13 +13,13 @@
 Goal Lemma 'abs_neg':
 Assume Lemmas: 'abs_pos'
 Assume { Have: y <= .0. Have: x < y. }
-Prove: RAbs.abs(y) < RAbs.abs(x).
+Prove: abs(y) < abs(x).
 
 ------------------------------------------------------------
 
 Goal Lemma 'abs_pos':
 Assume { Have: .0 <= x. Have: x < y. }
-Prove: RAbs.abs(x) < RAbs.abs(y).
+Prove: abs(x) < abs(y).
 
 ------------------------------------------------------------
 
@@ -78,13 +78,13 @@ Prove: true.
 
 Goal Lemma 'max_inf':
 Assume Lemmas: 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Let r = Rg.max(x, y). Prove: (x <= r) /\ (y <= r).
+Let r = x max y. Prove: (x <= r) /\ (y <= r).
 
 ------------------------------------------------------------
 
 Goal Lemma 'max_or':
 Assume Lemmas: 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Let r = Rg.max(x, y). Prove: (r = x) \/ (r = y).
+Let r = x max y. Prove: (r = x) \/ (r = y).
 
 ------------------------------------------------------------
 
@@ -96,13 +96,13 @@ Prove: true.
 
 Goal Lemma 'min_inf':
 Assume Lemmas: 'abs_neg' 'abs_pos'
-Let r = Rg.min(x, y). Prove: (r <= x) /\ (r <= y).
+Let r = x min y. Prove: (r <= x) /\ (r <= y).
 
 ------------------------------------------------------------
 
 Goal Lemma 'min_or':
 Assume Lemmas: 'min_inf' 'abs_neg' 'abs_pos'
-Let r = Rg.min(x, y). Prove: (r = x) \/ (r = y).
+Let r = x min y. Prove: (r = x) \/ (r = y).
 
 ------------------------------------------------------------
 
@@ -261,7 +261,7 @@ Prove: exp(log(r)) = r.
 ------------------------------------------------------------
 
 Goal Post-condition 'min_plus_distrib' in 'ok':
-Prove: (r + Rg.min(r_1, r_2)) = Rg.min(r_1 + r, r_2 + r).
+Prove: (r + (r_1 min r_2)) = ((r_1 + r) min (r_2 + r)).
 
 ------------------------------------------------------------
 

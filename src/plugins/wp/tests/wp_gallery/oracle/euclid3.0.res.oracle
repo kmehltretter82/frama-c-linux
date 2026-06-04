@@ -15,16 +15,16 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition ("euclid3.c", line 11) in 'euclid_gcd':
-Let x = number.Gcd.gcd(a, b).
+Let x = gcd(a, b).
 Assume {
   Type: is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(a_2) /\ is_sint32(b) /\
       is_sint32(euclid_gcd_0).
   (* Pre-condition *)
-  Have: IAbs.abs(a) <= 2147483647.
+  Have: abs(a) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_2, 0) = x.
+  Have: gcd(a_2, 0) = x.
   If a_2 < 0
   Then { Have: a_2 = a_1. Have: (a_1 + euclid_gcd_0) = 0. }
   Else { Have: euclid_gcd_0 = a_2. }
@@ -45,21 +45,21 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant ("euclid3.c", line 19):
-Let x = number.Gcd.gcd(a_2, b).
+Let x = gcd(a_2, b).
 Let x_1 = a_1 % a.
 Assume {
   Type: is_sint32(a_2) /\ is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(b) /\
       is_sint32(x_1).
   (* Pre-condition *)
-  Have: IAbs.abs(a_2) <= 2147483647.
+  Have: abs(a_2) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_1, a) = x.
+  Have: gcd(a_1, a) = x.
   (* Then *)
   Have: a != 0.
 }
-Prove: number.Gcd.gcd(a, x_1) = x.
+Prove: gcd(a, x_1) = x.
 
 ------------------------------------------------------------
 
@@ -93,22 +93,22 @@ Prove: true.
 
 Goal Decreasing of Loop variant at loop ("euclid3.c", lines 22-26):
 Let x = a % a_1.
-Let x_1 = number.Gcd.gcd(a_2, b).
+Let x_1 = gcd(a_2, b).
 Assume {
   Type: is_sint32(a_2) /\ is_sint32(a_1) /\ is_sint32(a) /\ is_sint32(b) /\
       is_sint32(x).
   (* Pre-condition *)
-  Have: IAbs.abs(a_2) <= 2147483647.
+  Have: abs(a_2) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a, a_1) = x_1.
+  Have: gcd(a, a_1) = x_1.
   (* Then *)
   Have: a_1 != 0.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_1, x) = x_1.
+  Have: gcd(a_1, x) = x_1.
 }
-Prove: IAbs.abs(x) < IAbs.abs(a_1).
+Prove: abs(x) < abs(a_1).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -121,18 +121,18 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition ("euclid3.c", line 36) in 'minmax_gcd':
-Let x = number.Gcd.gcd(tmp_0, tmp_0_0).
+Let x = gcd(tmp_0, tmp_0_0).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(d) /\
       is_sint32(tmp_0) /\ is_sint32(tmp_0_0) /\ is_sint32(x).
   (* Pre-condition *)
-  Have: IAbs.abs(a) <= 2147483647.
+  Have: abs(a) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(c) <= 2147483647.
+  Have: abs(c) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(d) <= 2147483647.
+  Have: abs(d) <= 2147483647.
   If b < a
   Then { Have: tmp_0 = b. }
   Else { Have: tmp_0 = a. }
@@ -140,9 +140,9 @@ Assume {
   Then { Have: tmp_0_0 = c. }
   Else { Have: tmp_0_0 = d. }
   (* Call 'euclid_gcd' *)
-  Have: (IAbs.abs(tmp_0) <= 2147483647) /\ (IAbs.abs(tmp_0_0) <= 2147483647).
+  Have: (abs(tmp_0) <= 2147483647) /\ (abs(tmp_0_0) <= 2147483647).
 }
-Prove: number.Gcd.gcd(int.MinMax.min(a, b), int.MinMax.max(c, d)) = x.
+Prove: gcd(min(a, b), max(c, d)) = x.
 
 ------------------------------------------------------------
 

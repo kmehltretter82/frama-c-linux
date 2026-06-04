@@ -7,6 +7,16 @@
 [wp] [Valid] Goal for_float_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal for_float_terminates (Cfg) (Trivial)
 [wp] 20 goals scheduled
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f64)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f64)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f64)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f64)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f64)
 [wp:print-generated] 
   theory WP
     
@@ -24,18 +34,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal :
-      forall f:t. eq_f64 (add_f64 f (0x1.0p0:t)) (round_double RNE (of_f64 f))
+    goal wp_goal : forall f:t. is_finite_f64 (add_f64 f (0x1.0p0:t))
     
   end
 [wp:print-generated] 
@@ -55,18 +56,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal :
-      forall f:t. eq_f64 (add_f64 f (0x1.0p0:t)) (round_double RNA (of_f64 f))
+    goal wp_goal : forall f:t. is_infinite_f64 (add_f64 f (0x1.0p0:t))
     
   end
 [wp:print-generated] 
@@ -86,18 +78,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal :
-      forall f:t. eq_f64 (add_f64 f (0x1.0p0:t)) (round_double RTZ (of_f64 f))
+    goal wp_goal : forall f:t. is_NaN_f64 (add_f64 f (0x1.0p0:t))
     
   end
 [wp:print-generated] 
@@ -117,18 +100,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal :
-      forall f:t. eq_f64 (add_f64 f (0x1.0p0:t)) (round_double RTP (of_f64 f))
+    goal wp_goal : forall f:t. is_positive_infinite_f64 (add_f64 f (0x1.0p0:t))
     
   end
 [wp:print-generated] 
@@ -148,20 +122,21 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal :
-      forall f:t. eq_f64 (add_f64 f (0x1.0p0:t)) (round_double RTN (of_f64 f))
+    goal wp_goal : forall f:t. is_negative_infinite_f64 (add_f64 f (0x1.0p0:t))
     
   end
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f32)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f32)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f32)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f32)
+[wp] Warning: Goal Property:
+    running prover why3::generate only failed ([Why3 Error] Not a function symbol: eq_f32)
 [wp:print-generated] 
   theory WP5
     
@@ -179,17 +154,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal : forall f:t. is_finite_f64 (add_f64 f (0x1.0p0:t))
+    goal wp_goal : forall f:t1. is_finite_f32 (add_f32 f (0x1.0p0:t1))
     
   end
 [wp:print-generated] 
@@ -209,17 +176,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal : forall f:t. is_infinite_f64 (add_f64 f (0x1.0p0:t))
+    goal wp_goal : forall f:t1. is_infinite_f32 (add_f32 f (0x1.0p0:t1))
     
   end
 [wp:print-generated] 
@@ -239,17 +198,9 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal : forall f:t. is_NaN_f64 (add_f64 f (0x1.0p0:t))
+    goal wp_goal : forall f:t1. is_NaN_f32 (add_f32 f (0x1.0p0:t1))
     
   end
 [wp:print-generated] 
@@ -269,17 +220,10 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
-    goal wp_goal : forall f:t. is_positive_infinite_f64 (add_f64 f (0x1.0p0:t))
+    goal wp_goal :
+      forall f:t1. is_positive_infinite_f32 (add_f32 f (0x1.0p0:t1))
     
   end
 [wp:print-generated] 
@@ -299,320 +243,6 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal : forall f:t. is_negative_infinite_f64 (add_f64 f (0x1.0p0:t))
-    
-  end
-[wp:print-generated] 
-  theory WP10
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. eq_f32 (add_f32 f (0x1.0p0:t1)) (round_float RNE (of_f32 f))
-    
-  end
-[wp:print-generated] 
-  theory WP11
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. eq_f32 (add_f32 f (0x1.0p0:t1)) (round_float RNA (of_f32 f))
-    
-  end
-[wp:print-generated] 
-  theory WP12
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. eq_f32 (add_f32 f (0x1.0p0:t1)) (round_float RTZ (of_f32 f))
-    
-  end
-[wp:print-generated] 
-  theory WP13
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. eq_f32 (add_f32 f (0x1.0p0:t1)) (round_float RTP (of_f32 f))
-    
-  end
-[wp:print-generated] 
-  theory WP14
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. eq_f32 (add_f32 f (0x1.0p0:t1)) (round_float RTN (of_f32 f))
-    
-  end
-[wp:print-generated] 
-  theory WP15
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal : forall f:t1. is_finite_f32 (add_f32 f (0x1.0p0:t1))
-    
-  end
-[wp:print-generated] 
-  theory WP16
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal : forall f:t1. is_infinite_f32 (add_f32 f (0x1.0p0:t1))
-    
-  end
-[wp:print-generated] 
-  theory WP17
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal : forall f:t1. is_NaN_f32 (add_f32 f (0x1.0p0:t1))
-    
-  end
-[wp:print-generated] 
-  theory WP18
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
-    (* use frama_c_wp.cfloat.Cfloat *)
-    
-    goal wp_goal :
-      forall f:t1. is_positive_infinite_f32 (add_f32 f (0x1.0p0:t1))
-    
-  end
-[wp:print-generated] 
-  theory WP19
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
     goal wp_goal :
@@ -631,52 +261,62 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_RNE' in 'for_double':
-Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RNE, of_f64(x))).
+Prove: eq_f64(add_f64(x, to_fq64(1.0)), round_double(RNE, of_f64(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f64
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_RNA' in 'for_double':
-Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RNA, of_f64(x))).
+Prove: eq_f64(add_f64(x, to_fq64(1.0)), round_double(RNA, of_f64(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f64
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_RTZ' in 'for_double':
-Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RTZ, of_f64(x))).
+Prove: eq_f64(add_f64(x, to_fq64(1.0)), round_double(RTZ, of_f64(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f64
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_RTP' in 'for_double':
-Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RTP, of_f64(x))).
+Prove: eq_f64(add_f64(x, to_fq64(1.0)), round_double(RTP, of_f64(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f64
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_RTN' in 'for_double':
-Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RTN, of_f64(x))).
+Prove: eq_f64(add_f64(x, to_fq64(1.0)), round_double(RTN, of_f64(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f64
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_FIN' in 'for_double':
-Prove: is_finite_f64(add_f64(x, to_f64(1.0))).
+Prove: is_finite_f64(add_f64(x, to_fq64(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_INF' in 'for_double':
-Prove: is_infinite_f64(add_f64(x, to_f64(1.0))).
+Prove: is_infinite_f64(add_f64(x, to_fq64(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_NAN' in 'for_double':
-Prove: is_NaN_f64(add_f64(x, to_f64(1.0))).
+Prove: is_NaN_f64(add_f64(x, to_fq64(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_PINF' in 'for_double':
-Prove: is_positive_infinite_f64(add_f64(x, to_f64(1.0))).
+Prove: is_positive_infinite_f64(add_f64(x, to_fq64(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'DBL_MINF' in 'for_double':
-Prove: is_negative_infinite_f64(add_f64(x, to_f64(1.0))).
+Prove: is_negative_infinite_f64(add_f64(x, to_fq64(1.0))).
 
 ------------------------------------------------------------
 
@@ -696,52 +336,62 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RNE' in 'for_float':
-Prove: eq_f32(add_f32(x, to_f32(1.0)), round_float(Rounding.RNE, of_f32(x))).
+Prove: eq_f32(add_f32(x, to_fq32(1.0)), round_float(RNE, of_f32(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f32
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RNA' in 'for_float':
-Prove: eq_f32(add_f32(x, to_f32(1.0)), round_float(Rounding.RNA, of_f32(x))).
+Prove: eq_f32(add_f32(x, to_fq32(1.0)), round_float(RNA, of_f32(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f32
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RTZ' in 'for_float':
-Prove: eq_f32(add_f32(x, to_f32(1.0)), round_float(Rounding.RTZ, of_f32(x))).
+Prove: eq_f32(add_f32(x, to_fq32(1.0)), round_float(RTZ, of_f32(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f32
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RTP' in 'for_float':
-Prove: eq_f32(add_f32(x, to_f32(1.0)), round_float(Rounding.RTP, of_f32(x))).
+Prove: eq_f32(add_f32(x, to_fq32(1.0)), round_float(RTP, of_f32(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f32
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RTN' in 'for_float':
-Prove: eq_f32(add_f32(x, to_f32(1.0)), round_float(Rounding.RTN, of_f32(x))).
+Prove: eq_f32(add_f32(x, to_fq32(1.0)), round_float(RTN, of_f32(x))).
+Prover why3 returns Failed
+[Why3 Error] Not a function symbol: eq_f32
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_FIN' in 'for_float':
-Prove: is_finite_f32(add_f32(x, to_f32(1.0))).
+Prove: is_finite_f32(add_f32(x, to_fq32(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_INF' in 'for_float':
-Prove: is_infinite_f32(add_f32(x, to_f32(1.0))).
+Prove: is_infinite_f32(add_f32(x, to_fq32(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_NAN' in 'for_float':
-Prove: is_NaN_f32(add_f32(x, to_f32(1.0))).
+Prove: is_NaN_f32(add_f32(x, to_fq32(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_PINF' in 'for_float':
-Prove: is_positive_infinite_f32(add_f32(x, to_f32(1.0))).
+Prove: is_positive_infinite_f32(add_f32(x, to_fq32(1.0))).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_MINF' in 'for_float':
-Prove: is_negative_infinite_f32(add_f32(x, to_f32(1.0))).
+Prove: is_negative_infinite_f32(add_f32(x, to_fq32(1.0))).
 
 ------------------------------------------------------------
 

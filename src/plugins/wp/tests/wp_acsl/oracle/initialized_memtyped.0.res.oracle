@@ -35,40 +35,40 @@ Let a = global(L_y_71).
 Let a_1 = shiftfield_F3_X_x(a).
 Let m = Init_0[a_1 <- true].
 Let a_2 = global(L_z_72).
-Let a_3 = memcpy(m, a_2, m, a, 2).
-Let a_4 = global(L_x_70).
-Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
-Let m_1 = Mint_0[a_1 <- 1].
-Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
-Let a_7 = shiftfield_F3_X_y(a_2).
-Let a_8 = shiftfield_F3_X_x(a_2).
-Let a_9 = shiftfield_F3_X_y(a_4).
-Let a_10 = shiftfield_F3_X_x(a_4).
+Let m_1 = memcpy(m, a_2, m, a, 2).
+Let a_3 = global(L_x_70).
+Let m_2 = memcpy(m_1, a, m_1, a_3, 2).
+Let m_3 = Mint_0[a_1 <- 1].
+Let m_4 = memcpy(m_3, a_2, m_3, a, 2).
+Let a_4 = shiftfield_F3_X_y(a_2).
+Let a_5 = shiftfield_F3_X_x(a_2).
+Let a_6 = shiftfield_F3_X_y(a_3).
+Let a_7 = shiftfield_F3_X_x(a_3).
 Assume {
   (* Heap *)
   Type: scinit(Init_0).
   (* Initializer *)
-  Init: (Init_0[a_10]=true).
-  (* Initializer *)
-  Init: Mint_0[a_10] = 1.
-  (* Initializer *)
-  Init: (Init_0[a_9]=true).
-  (* Initializer *)
-  Init: Mint_0[a_9] = 2.
-  (* Initializer *)
-  Init: (Init_0[a_8]=true).
-  (* Initializer *)
-  Init: Mint_0[a_8] = 1.
-  (* Initializer *)
   Init: (Init_0[a_7]=true).
   (* Initializer *)
-  Init: Mint_0[a_7] = 2.
-  Have: (Load_Init_S3_X(a_2, a_3) = Load_Init_S3_X(a, m)) /\
-      (Load_S3_X(a_2, a_6) = Load_S3_X(a, m_1)).
-  Have: (Load_Init_S3_X(a, a_5) = Load_Init_S3_X(a_4, a_3)) /\
-      (Load_S3_X(a, memcpy(a_6, a, a_6, a_4, 2)) = Load_S3_X(a_4, a_6)).
+  Init: Mint_0[a_7] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_6]=true).
+  (* Initializer *)
+  Init: Mint_0[a_6] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_5]=true).
+  (* Initializer *)
+  Init: Mint_0[a_5] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_4]=true).
+  (* Initializer *)
+  Init: Mint_0[a_4] = 2.
+  Have: (Load_Init_S3_X(a_2, m_1) = Load_Init_S3_X(a, m)) /\
+      (Load_S3_X(a_2, m_4) = Load_S3_X(a, m_3)).
+  Have: (Load_Init_S3_X(a, m_2) = Load_Init_S3_X(a_3, m_1)) /\
+      (Load_S3_X(a, memcpy(m_4, a, m_4, a_3, 2)) = Load_S3_X(a_3, m_4)).
 }
-Prove: IsInit_S3_X(a_4, a_5).
+Prove: IsInit_S3_X(a_3, m_2).
 
 ------------------------------------------------------------
 
@@ -78,41 +78,41 @@ Let a_1 = global(L_y_71).
 Let a_2 = shiftfield_F3_X_x(a_1).
 Let m = Init_0[a_2 <- true].
 Let a_3 = global(L_z_72).
-Let a_4 = memcpy(m, a_3, m, a_1, 2).
-Let a_5 = memcpy(a_4, a_1, a_4, a, 2).
-Let m_1 = Mint_0[a_2 <- 1].
-Let a_6 = memcpy(m_1, a_3, m_1, a_1, 2).
-Let a_7 = shiftfield_F3_X_y(a_3).
-Let a_8 = shiftfield_F3_X_x(a_3).
-Let a_9 = shiftfield_F3_X_y(a).
-Let a_10 = shiftfield_F3_X_x(a).
+Let m_1 = memcpy(m, a_3, m, a_1, 2).
+Let m_2 = memcpy(m_1, a_1, m_1, a, 2).
+Let m_3 = Mint_0[a_2 <- 1].
+Let m_4 = memcpy(m_3, a_3, m_3, a_1, 2).
+Let a_4 = shiftfield_F3_X_y(a_3).
+Let a_5 = shiftfield_F3_X_x(a_3).
+Let a_6 = shiftfield_F3_X_y(a).
+Let a_7 = shiftfield_F3_X_x(a).
 Assume {
   (* Heap *)
   Type: scinit(Init_0).
   (* Initializer *)
-  Init: (Init_0[a_10]=true).
-  (* Initializer *)
-  Init: Mint_0[a_10] = 1.
-  (* Initializer *)
-  Init: (Init_0[a_9]=true).
-  (* Initializer *)
-  Init: Mint_0[a_9] = 2.
-  (* Initializer *)
-  Init: (Init_0[a_8]=true).
-  (* Initializer *)
-  Init: Mint_0[a_8] = 1.
-  (* Initializer *)
   Init: (Init_0[a_7]=true).
   (* Initializer *)
-  Init: Mint_0[a_7] = 2.
-  Have: (Load_Init_S3_X(a_3, a_4) = Load_Init_S3_X(a_1, m)) /\
-      (Load_S3_X(a_3, a_6) = Load_S3_X(a_1, m_1)).
-  Have: (Load_Init_S3_X(a_1, a_5) = Load_Init_S3_X(a, a_4)) /\
-      (Load_S3_X(a_1, memcpy(a_6, a_1, a_6, a, 2)) = Load_S3_X(a, a_6)).
+  Init: Mint_0[a_7] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_6]=true).
+  (* Initializer *)
+  Init: Mint_0[a_6] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_5]=true).
+  (* Initializer *)
+  Init: Mint_0[a_5] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_4]=true).
+  (* Initializer *)
+  Init: Mint_0[a_4] = 2.
+  Have: (Load_Init_S3_X(a_3, m_1) = Load_Init_S3_X(a_1, m)) /\
+      (Load_S3_X(a_3, m_4) = Load_S3_X(a_1, m_3)).
+  Have: (Load_Init_S3_X(a_1, m_2) = Load_Init_S3_X(a, m_1)) /\
+      (Load_S3_X(a_1, memcpy(m_4, a_1, m_4, a, 2)) = Load_S3_X(a, m_4)).
   (* Assertion 'provable' *)
-  Have: IsInit_S3_X(a, a_5).
+  Have: IsInit_S3_X(a, m_2).
 }
-Prove: IsInit_S3_X(a_1, a_5).
+Prove: IsInit_S3_X(a_1, m_2).
 
 ------------------------------------------------------------
 
@@ -121,44 +121,44 @@ Let a = global(L_y_71).
 Let a_1 = shiftfield_F3_X_x(a).
 Let m = Init_0[a_1 <- true].
 Let a_2 = global(L_z_72).
-Let a_3 = memcpy(m, a_2, m, a, 2).
-Let a_4 = global(L_x_70).
-Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
-Let m_1 = Mint_0[a_1 <- 1].
-Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
-Let a_7 = shiftfield_F3_X_y(a_2).
-Let a_8 = shiftfield_F3_X_x(a_2).
-Let a_9 = shiftfield_F3_X_y(a_4).
-Let a_10 = shiftfield_F3_X_x(a_4).
+Let m_1 = memcpy(m, a_2, m, a, 2).
+Let a_3 = global(L_x_70).
+Let m_2 = memcpy(m_1, a, m_1, a_3, 2).
+Let m_3 = Mint_0[a_1 <- 1].
+Let m_4 = memcpy(m_3, a_2, m_3, a, 2).
+Let a_4 = shiftfield_F3_X_y(a_2).
+Let a_5 = shiftfield_F3_X_x(a_2).
+Let a_6 = shiftfield_F3_X_y(a_3).
+Let a_7 = shiftfield_F3_X_x(a_3).
 Assume {
   (* Heap *)
   Type: scinit(Init_0).
   (* Initializer *)
-  Init: (Init_0[a_10]=true).
-  (* Initializer *)
-  Init: Mint_0[a_10] = 1.
-  (* Initializer *)
-  Init: (Init_0[a_9]=true).
-  (* Initializer *)
-  Init: Mint_0[a_9] = 2.
-  (* Initializer *)
-  Init: (Init_0[a_8]=true).
-  (* Initializer *)
-  Init: Mint_0[a_8] = 1.
-  (* Initializer *)
   Init: (Init_0[a_7]=true).
   (* Initializer *)
-  Init: Mint_0[a_7] = 2.
-  Have: (Load_Init_S3_X(a_2, a_3) = Load_Init_S3_X(a, m)) /\
-      (Load_S3_X(a_2, a_6) = Load_S3_X(a, m_1)).
-  Have: (Load_Init_S3_X(a, a_5) = Load_Init_S3_X(a_4, a_3)) /\
-      (Load_S3_X(a, memcpy(a_6, a, a_6, a_4, 2)) = Load_S3_X(a_4, a_6)).
+  Init: Mint_0[a_7] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_6]=true).
+  (* Initializer *)
+  Init: Mint_0[a_6] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_5]=true).
+  (* Initializer *)
+  Init: Mint_0[a_5] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_4]=true).
+  (* Initializer *)
+  Init: Mint_0[a_4] = 2.
+  Have: (Load_Init_S3_X(a_2, m_1) = Load_Init_S3_X(a, m)) /\
+      (Load_S3_X(a_2, m_4) = Load_S3_X(a, m_3)).
+  Have: (Load_Init_S3_X(a, m_2) = Load_Init_S3_X(a_3, m_1)) /\
+      (Load_S3_X(a, memcpy(m_4, a, m_4, a_3, 2)) = Load_S3_X(a_3, m_4)).
   (* Assertion 'provable' *)
-  Have: IsInit_S3_X(a_4, a_5).
+  Have: IsInit_S3_X(a_3, m_2).
   (* Assertion 'provable' *)
-  Have: IsInit_S3_X(a, a_5).
+  Have: IsInit_S3_X(a, m_2).
 }
-Prove: !IsInit_S3_X(a_2, a_5).
+Prove: !IsInit_S3_X(a_2, m_2).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

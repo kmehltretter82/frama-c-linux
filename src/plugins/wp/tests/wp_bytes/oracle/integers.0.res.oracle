@@ -1427,52 +1427,52 @@ Prover CFG returns Valid
 
 Goal Check ("integers.i", line 79, characters 13-31):
 Let a = global(L_m64_39). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              a, true),
-                                                            global(L_m32_40),
-                                                            true),
-                                               global(L_m16_41), true),
-                                   global(L_m8_42), true),
-                      global(L_write_43), true), a)=true).
+Prove: read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             a, true),
+                                                           global(L_m32_40),
+                                                           true),
+                                              global(L_m16_41), true),
+                                  global(L_m8_42), true), global(L_write_43),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 80, characters 14-32):
 Let a = global(L_m32_40). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_m64_39),
-                                                              true), a, true),
-                                               global(L_m16_41), true),
-                                   global(L_m8_42), true),
-                      global(L_write_43), true), a)=true).
+Prove: read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_m64_39),
+                                                             true), a, true),
+                                              global(L_m16_41), true),
+                                  global(L_m8_42), true), global(L_write_43),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 81, characters 14-32):
 Let a = global(L_m16_41). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_m64_39),
-                                                              true),
-                                                            global(L_m32_40),
-                                                            true), a, true),
-                                   global(L_m8_42), true),
-                      global(L_write_43), true), a)=true).
+Prove: read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_m64_39),
+                                                             true),
+                                                           global(L_m32_40),
+                                                           true), a, true),
+                                  global(L_m8_42), true), global(L_write_43),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 82, characters 14-31):
 Let a = global(L_m8_42). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
-                                                           write_init64(init_0,
-                                                             global(L_m64_39),
-                                                             true),
-                                                           global(L_m32_40),
-                                                           true),
-                                              global(L_m16_41), true), a,
-                                  true), global(L_write_43), true), a)=true).
+Prove: read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                          write_init64(init_0,
+                                                            global(L_m64_39),
+                                                            true),
+                                                          global(L_m32_40),
+                                                          true),
+                                             global(L_m16_41), true), a,
+                                 true), global(L_write_43), true), a).
 
 ------------------------------------------------------------
 
@@ -1577,52 +1577,52 @@ Prover CFG returns Valid
 
 Goal Check ("integers.i", line 54, characters 13-31):
 Let a = global(L_p64_32). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              a, true),
-                                                            global(L_p32_33),
-                                                            true),
-                                               global(L_p16_34), true),
-                                   global(L_p8_35), true),
-                      global(L_write_36), true), a)=true).
+Prove: read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             a, true),
+                                                           global(L_p32_33),
+                                                           true),
+                                              global(L_p16_34), true),
+                                  global(L_p8_35), true), global(L_write_36),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 55, characters 14-32):
 Let a = global(L_p32_33). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_p64_32),
-                                                              true), a, true),
-                                               global(L_p16_34), true),
-                                   global(L_p8_35), true),
-                      global(L_write_36), true), a)=true).
+Prove: read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_p64_32),
+                                                             true), a, true),
+                                              global(L_p16_34), true),
+                                  global(L_p8_35), true), global(L_write_36),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 56, characters 14-32):
 Let a = global(L_p16_34). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_p64_32),
-                                                              true),
-                                                            global(L_p32_33),
-                                                            true), a, true),
-                                   global(L_p8_35), true),
-                      global(L_write_36), true), a)=true).
+Prove: read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_p64_32),
+                                                             true),
+                                                           global(L_p32_33),
+                                                           true), a, true),
+                                  global(L_p8_35), true), global(L_write_36),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 57, characters 14-31):
 Let a = global(L_p8_35). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
-                                                           write_init64(init_0,
-                                                             global(L_p64_32),
-                                                             true),
-                                                           global(L_p32_33),
-                                                           true),
-                                              global(L_p16_34), true), a,
-                                  true), global(L_write_36), true), a)=true).
+Prove: read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                          write_init64(init_0,
+                                                            global(L_p64_32),
+                                                            true),
+                                                          global(L_p32_33),
+                                                          true),
+                                             global(L_p16_34), true), a,
+                                 true), global(L_write_36), true), a).
 
 ------------------------------------------------------------
 
@@ -1727,52 +1727,52 @@ Prover CFG returns Valid
 
 Goal Check ("integers.i", line 29, characters 13-31):
 Let a = global(L_u64_23). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              a, true),
-                                                            global(L_u32_24),
-                                                            true),
-                                               global(L_u16_25), true),
-                                   global(L_u8_26), true),
-                      global(L_write_27), true), a)=true).
+Prove: read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             a, true),
+                                                           global(L_u32_24),
+                                                           true),
+                                              global(L_u16_25), true),
+                                  global(L_u8_26), true), global(L_write_27),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 30, characters 14-32):
 Let a = global(L_u32_24). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_u64_23),
-                                                              true), a, true),
-                                               global(L_u16_25), true),
-                                   global(L_u8_26), true),
-                      global(L_write_27), true), a)=true).
+Prove: read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_u64_23),
+                                                             true), a, true),
+                                              global(L_u16_25), true),
+                                  global(L_u8_26), true), global(L_write_27),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 31, characters 14-32):
 Let a = global(L_u16_25). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
-                                                            write_init64(init_0,
-                                                              global(L_u64_23),
-                                                              true),
-                                                            global(L_u32_24),
-                                                            true), a, true),
-                                   global(L_u8_26), true),
-                      global(L_write_27), true), a)=true).
+Prove: read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_u64_23),
+                                                             true),
+                                                           global(L_u32_24),
+                                                           true), a, true),
+                                  global(L_u8_26), true), global(L_write_27),
+                     true), a).
 
 ------------------------------------------------------------
 
 Goal Check ("integers.i", line 32, characters 14-31):
 Let a = global(L_u8_26). Assume { (* Heap *) Type: scinit(init_0). }
-Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
-                                                           write_init64(init_0,
-                                                             global(L_u64_23),
-                                                             true),
-                                                           global(L_u32_24),
-                                                           true),
-                                              global(L_u16_25), true), a,
-                                  true), global(L_write_27), true), a)=true).
+Prove: read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                          write_init64(init_0,
+                                                            global(L_u64_23),
+                                                            true),
+                                                          global(L_u32_24),
+                                                          true),
+                                             global(L_u16_25), true), a,
+                                 true), global(L_write_27), true), a).
 
 ------------------------------------------------------------
 

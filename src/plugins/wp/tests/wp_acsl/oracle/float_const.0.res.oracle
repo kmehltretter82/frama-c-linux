@@ -28,14 +28,6 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
     goal wp_goal :
@@ -58,14 +50,6 @@
     (* use frama_c_wp.qed.Qed *)
     
     (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
     
     (* use frama_c_wp.cfloat.Cfloat *)
     
@@ -90,14 +74,6 @@
     (* use frama_c_wp.qed.Qed *)
     
     (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
     
     (* use frama_c_wp.cfloat.Cfloat *)
     
@@ -124,14 +100,6 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
     goal wp_goal :
@@ -157,14 +125,6 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
     goal wp_goal :
@@ -188,14 +148,6 @@
     (* use frama_c_wp.qed.Qed *)
     
     (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
     
     (* use frama_c_wp.cfloat.Cfloat *)
     
@@ -222,14 +174,6 @@
     
     (* use map.Map *)
     
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
-    
     (* use frama_c_wp.cfloat.Cfloat *)
     
     goal wp_goal :
@@ -254,14 +198,6 @@
     (* use frama_c_wp.qed.Qed *)
     
     (* use map.Map *)
-    
-    (* use real.Abs *)
-    
-    (* use frama_c_wp.cmath.Cmath *)
-    
-    (* use real.Square *)
-    
-    (* use frama_c_wp.cmath.Square1 *)
     
     (* use frama_c_wp.cfloat.Cfloat *)
     
@@ -291,7 +227,7 @@ Prover CFG returns Valid
 Goal Check ("float_const.i", line 20, characters 15-23):
 Assume {
   (* Then *)
-  Have: eq_f64(d, to_f64((3602879701896397.0/36028797018963968))).
+  Have: eq_f64(d, to_fq64((3602879701896397.0/36028797018963968))).
 }
 Prove: of_f64(d) != (1.0/10).
 
@@ -300,7 +236,7 @@ Prove: of_f64(d) != (1.0/10).
 Goal Check ("float_const.i", line 21, characters 16-32):
 Assume {
   (* Then *)
-  Have: eq_f64(d, to_f64((3602879701896397.0/36028797018963968))).
+  Have: eq_f64(d, to_fq64((3602879701896397.0/36028797018963968))).
 }
 Prove: of_f64(d) = (3602879701896397.0/36028797018963968).
 
@@ -309,7 +245,7 @@ Prove: of_f64(d) = (3602879701896397.0/36028797018963968).
 Goal Check ("float_const.i", line 22, characters 16-31):
 Assume {
   (* Then *)
-  Have: eq_f64(d, to_f64((3602879701896397.0/36028797018963968))).
+  Have: eq_f64(d, to_fq64((3602879701896397.0/36028797018963968))).
 }
 Prove: of_f64(d) != (13421773.0/134217728).
 
@@ -319,7 +255,7 @@ Goal Check ("float_const.i", line 23, characters 16-30):
 Let r = of_f32(to_f32(of_f64(d))).
 Assume {
   (* Then *)
-  Have: eq_f64(d, to_f64((3602879701896397.0/36028797018963968))).
+  Have: eq_f64(d, to_fq64((3602879701896397.0/36028797018963968))).
 }
 Prove: of_f64(to_f64(r)) = r.
 
@@ -341,26 +277,26 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Check ("float_const.i", line 11, characters 15-23):
-Assume { (* Then *) Have: eq_f32(f, to_f32((13421773.0/134217728))). }
+Assume { (* Then *) Have: eq_f32(f, to_fq32((13421773.0/134217728))). }
 Prove: of_f32(f) != (1.0/10).
 
 ------------------------------------------------------------
 
 Goal Check ("float_const.i", line 12, characters 16-31):
-Assume { (* Then *) Have: eq_f32(f, to_f32((13421773.0/134217728))). }
+Assume { (* Then *) Have: eq_f32(f, to_fq32((13421773.0/134217728))). }
 Prove: of_f32(f) = (13421773.0/134217728).
 
 ------------------------------------------------------------
 
 Goal Check ("float_const.i", line 13, characters 16-32):
-Assume { (* Then *) Have: eq_f32(f, to_f32((13421773.0/134217728))). }
+Assume { (* Then *) Have: eq_f32(f, to_fq32((13421773.0/134217728))). }
 Prove: of_f32(f) != (3602879701896397.0/36028797018963968).
 
 ------------------------------------------------------------
 
 Goal Check ("float_const.i", line 14, characters 16-30):
 Let r = of_f32(f).
-Assume { (* Then *) Have: eq_f32(f, to_f32((13421773.0/134217728))). }
+Assume { (* Then *) Have: eq_f32(f, to_fq32((13421773.0/134217728))). }
 Prove: of_f32(to_f32(of_f64(to_f64(r)))) = r.
 
 ------------------------------------------------------------

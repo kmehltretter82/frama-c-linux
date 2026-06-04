@@ -8,11 +8,11 @@
 Goal Lemma 'depends':
 Assume Lemmas: 'dependency'
 Assume {
-  Have: land(c, lxor(a, b)) != 0.
+  Have: (c land (a lxor b)) != 0.
   Have: is_uint8(a).
   Have: is_uint8(b).
   Have: is_uint8(c).
 }
-Prove: land(b, c) != land(a, c).
+Prove: (b land c) != (a land c).
 
 ------------------------------------------------------------
