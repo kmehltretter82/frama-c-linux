@@ -18,6 +18,6 @@ val prove :
   ?timeout:float ->
   ?steplimit:int ->
   ?memlimit:int ->
-  prover:Why3Provers.t -> Wpo.t -> VCS.result Task.task
+  prover:Why3Env.prover -> Wpo.t -> VCS.result Task.task
 
 (**************************************************************************)

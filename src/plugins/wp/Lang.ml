@@ -193,9 +193,9 @@ type 'a extern = {
 }
 
 let extern = function
-  | { value = Some v ; env = Some e } when e == Why3Provers.env () -> v
+  | { value = Some v ; env = Some e } when e == Why3Env.env () -> v
   | r ->
-    let env = Why3Provers.env () in
+    let env = Why3Env.env () in
     let value = r.compute env in
     r.env <- Some env ; r.value <- Some value ; value
 

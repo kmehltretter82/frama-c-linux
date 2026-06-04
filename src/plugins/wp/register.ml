@@ -880,7 +880,7 @@ let () = Cmdline.run_after_setting_files
 (* --- Prover Configuration & Detection                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Cmdline.run_after_configuring_stage Why3Provers.configure
+let () = Cmdline.run_after_configuring_stage Why3Env.configure
 
 let do_prover_detect () =
   if Wp_parameters.ListProvers.get () && not @@ Wp_parameters.is_interactive () then

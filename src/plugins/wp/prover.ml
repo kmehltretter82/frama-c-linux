@@ -13,7 +13,7 @@ let dkey_shell = Wp_parameters.register_category "shell"
 (* -------------------------------------------------------------------------- *)
 
 type t =
-  | Why3 of Why3Provers.t
+  | Why3 of Why3Env.prover
   | Qed
   | Tactical
   | CFG
@@ -23,7 +23,7 @@ let equal p q =
   | Qed,Qed -> true
   | Tactical,Tactical -> true
   | CFG,CFG -> true
-  | Why3 p, Why3 q -> Why3Provers.equal p q
+  | Why3 p, Why3 q -> Why3Env.equal p q
   | (Why3 _ | CFG | Qed | Tactical) , _ -> false
 
 let compare p q =
@@ -34,7 +34,7 @@ let compare p q =
   | CFG , CFG -> 0
   | CFG , _ -> (-1)
   | _ , CFG -> (+1)
-  | Why3 p , Why3 q -> Why3Provers.compare p q
+  | Why3 p , Why3 q -> Why3Env.compare p q
   | Why3 _ , _ -> (-1)
   | _ , Why3 _ -> (+1)
   | Tactical , Tactical -> 0
@@ -43,28 +43,28 @@ let hash = function
   | Qed -> 0
   | Tactical -> 1
   | CFG -> 2
-  | Why3 p -> Why3Provers.hash p
+  | Why3 p -> Why3Env.hash p
 
 let ident = function
-  | Why3 s -> Why3Provers.ident_wp s
+  | Why3 s -> Why3Env.ident_wp s
   | CFG -> "cfg"
   | Qed -> "qed"
   | Tactical -> "script"
 
 let name = function
-  | Why3 s -> Why3Provers.name s
+  | Why3 s -> Why3Env.name s
   | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Script"
 
 let shortcut = function
-  | Why3 s -> String.lowercase_ascii @@ Why3Provers.name s
+  | Why3 s -> String.lowercase_ascii @@ Why3Env.name s
   | CFG -> "cfg"
   | Qed -> "qed"
   | Tactical -> "script"
 
 let version = function
-  | Why3 p -> Why3Provers.version p
+  | Why3 p -> Why3Env.version p
   | _ -> System_config.Version.id_and_codename
 
 let parse = function
@@ -76,15 +76,16 @@ let parse = function
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
   | name ->
-    match Why3Provers.lookup name with
+    match Why3Env.lookup name with
     | Some p -> Some (Why3 p)
     | None -> None
 
 let title ?version = function
   | Why3 s ->
-    let version = match version with Some v -> v | None ->
-      not (Wp_parameters.has_dkey dkey_shell)
-    in Why3Provers.title ~version s
+    let version =
+      match version with Some v -> v | None ->
+        not (Wp_parameters.has_dkey dkey_shell)
+    in Why3Env.title ~version s
   | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Script"
@@ -95,7 +96,7 @@ let is_auto = function
   | Qed -> true
   | CFG -> true
   | Tactical -> false
-  | Why3 p -> Why3Provers.is_auto p
+  | Why3 p -> Why3Env.is_auto p
 
 let is_tactical = function
   | Qed | CFG | Why3 _ -> false
@@ -107,7 +108,7 @@ let is_extern = function
 
 let has_counter_examples = function
   | Qed | CFG | Tactical -> false
-  | Why3 p -> Why3Provers.with_counter_examples p <> None
+  | Why3 p -> Why3Env.with_counter_examples p <> None
 
 let sanitize_why3 s =
   let buffer = Buffer.create 80 in
@@ -124,7 +125,7 @@ let sanitize_why3 s =
   Buffer.contents buffer
 
 let filename_for = function
-  | Why3 s -> sanitize_why3 (Why3Provers.ident_wp s)
+  | Why3 s -> sanitize_why3 (Why3Env.ident_wp s)
   | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Tactical"
@@ -134,7 +135,7 @@ let of_name ?fallback = function
   | "qed" -> Some Qed
   | "script" -> Some Tactical
   | name ->
-    match Why3Provers.lookup ?fallback name with
+    match Why3Env.lookup ?fallback name with
     | None -> None
     | Some prv -> Some (Why3 prv)
 
@@ -148,8 +149,8 @@ module Pmap = Map.Make(P)
 
 let available_why3_provers () =
   List.map (fun p -> Why3 p) @@
-  List.filter Why3Provers.is_mainstream @@
-  Why3Provers.provers ()
+  List.filter Why3Env.is_mainstream @@
+  Why3Env.provers ()
 
 module PTable = Hashtbl.Make
     (struct
@@ -188,7 +189,7 @@ let parse_and_set () =
   if not (PTable.fold (fun _ v acc -> v || acc) provers false) && not !has_none
   then begin
     (* 1. take Alt-Ergo *)
-    match Why3Provers.lookup "Alt-Ergo" with
+    match Why3Env.lookup "Alt-Ergo" with
     | Some p -> PTable.replace provers (Why3 p) true
     | None ->
       (* 2. take any automatic solver  *)

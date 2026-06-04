@@ -307,7 +307,7 @@ module Env = WpContext.StaticGenerator
       type data = env
       let name = "Wp.Why3Import.Env"
       let compile () =
-        let env = create @@ Why3Provers.env () in
+        let env = create @@ Why3Env.env () in
         add_builtins env ; env
     end)
 

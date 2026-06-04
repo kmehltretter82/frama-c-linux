@@ -81,7 +81,7 @@ let fold_map map fold = function
 
 let empty_context name : context = {
   th = Why3.Theory.create_theory (Why3.Ident.id_fresh name);
-  env = Why3Provers.env () ;
+  env = Why3Env.env () ;
 }
 
 let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
@@ -1093,7 +1093,7 @@ let task_of_wpo ~ce wpo =
 (* -------------------------------------------------------------------------- *)
 
 let prover_task env prover task =
-  let config = Why3Provers.config () in
+  let config = Why3Env.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Driver.load_driver_for_prover (Why3.Whyconf.get_main config)
       env prover_config in
@@ -1104,7 +1104,7 @@ let prover_task env prover task =
 (* -------------------------------------------------------------------------- *)
 
 type prover_call = {
-  prover : Why3Provers.t ;
+  prover : Why3Env.prover ;
   call : Why3.Call_provers.prover_call ;
   steps : int option ;
   timeout : float ;
@@ -1244,7 +1244,7 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
       Format.fprintf fmt "; %s %s@\n" msg data
     | _ -> ()
   in
-  pp_header fmt "WP Task for Prover" @@ Why3Provers.ident_why3 prover ;
+  pp_header fmt "WP Task for Prover" @@ Why3Env.ident_why3 prover ;
   let old = Option.map
       (fun fscript ->
          let hash = Filesystem.digest fscript in
@@ -1267,7 +1267,7 @@ let run_batch pconf driver ~config
     prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limits =
-    let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
+    let config = Why3.Whyconf.get_main @@ Why3Env.config () in
     let config_mem = Why3.Whyconf.memlimit config in
     let config_time = Why3.Whyconf.timelimit config in
     let config_steps = Why3.Call_provers.empty_limits.limit_steps in
@@ -1306,7 +1306,7 @@ let run_batch pconf driver ~config
 let editor_mutex = Task.mutex ()
 
 let editor_command pconf =
-  let config = Why3Provers.config () in
+  let config = Why3Env.config () in
   try
     let prover = pconf.Why3.Whyconf.prover in
     let ed_id = Why3.Whyconf.get_prover_editor config prover in
@@ -1430,7 +1430,7 @@ let print_debug_task wpo drv prover task =
   if Wp_parameters.Output.exists () then
     let out_dir =
       Wp_parameters.Output.get_dir (WpContext.MODEL.id wpo.Wpo.po_model) in
-    let prover = Why3Provers.title prover in
+    let prover = Why3Env.title prover in
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in
     let file = Filepath.(out_dir / filename) in
@@ -1448,7 +1448,7 @@ let build_proof_task ?(mode=Prover.InteractiveMode.Batch) ?timeout ?steplimit ?m
     let context = Wpo.get_context wpo in
     let ce,prover =
       if Wp_parameters.CounterExamples.get () then
-        match Why3Provers.with_counter_examples prover with
+        match Why3Env.with_counter_examples prover with
         | Some prover_ce -> true,prover_ce
         | None -> false,prover
       else false, prover in
@@ -1456,8 +1456,8 @@ let build_proof_task ?(mode=Prover.InteractiveMode.Batch) ?timeout ?steplimit ?m
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
-      let env = Why3Provers.env () in
-      let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
+      let env = Why3Env.env () in
+      let config = Why3.Whyconf.get_main @@ Why3Env.config () in
       let drv , pconf , task = prover_task env prover task in
       if Wp_parameters.is_debug_key_enabled dkey_pp_task then
         print_debug_task wpo drv prover task ;

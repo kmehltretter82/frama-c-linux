@@ -118,7 +118,7 @@ let set_procs = Why3.Controller_itp.set_session_max_tasks
 (* --- Why3 Provers                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-type t = Why3.Whyconf.prover
+type prover = Why3.Whyconf.prover
 
 let ident_why3 = Why3.Whyconf.prover_parseable_format
 let ident_wp s =
@@ -136,7 +136,7 @@ let name p = p.Why3.Whyconf.prover_name
 
 let version p = p.Why3.Whyconf.prover_version
 let is_mainstream p = p.Why3.Whyconf.prover_version <> "" && p.Why3.Whyconf.prover_altern = ""
-let is_auto (p : t) =
+let is_auto (p : prover) =
   match p.prover_name with
   | "Coq" | "Isabelle" -> false
   | "Alt-Ergo" | "Z3" | "CVC4" | "CVC5" | "Colibri2" -> true
@@ -161,7 +161,7 @@ let with_counter_examples p =
     let name = p.prover_name in
     let version = p.prover_version in
     List.find_opt
-      (fun (q : t) ->
+      (fun (q : prover) ->
          q.prover_name = name &&
          q.prover_version = version &&
          has_counter_examples q)
@@ -184,9 +184,9 @@ let cmp x y =
 let scmp u v = cmp (sem u) (sem v)
 let vcmp u v =
   List.compare scmp (String.split_on_char '.' u) (String.split_on_char '.' v)
-let by_version (p:t) (q:t) = vcmp p.prover_version q.prover_version
+let by_version (p:prover) (q:prover) = vcmp p.prover_version q.prover_version
 
-let filter ~name ?version (p:t) =
+let filter ~name ?version (p:prover) =
   p.prover_altern = "" &&
   String.lowercase_ascii p.prover_name = name &&
   match version with None -> true | Some v -> p.prover_version = v

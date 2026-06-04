@@ -65,7 +65,7 @@ type verdict =
   | Invalid (* model *)
   | Failed
 
-type model = Why3Provers.model Probe.Map.t
+type model = Why3Env.model Probe.Map.t
 
 type result = {
   verdict : verdict ;
@@ -253,7 +253,7 @@ let pp_model fmt model =
   Probe.Map.iter
     (fun probe model ->
        Format.fprintf fmt "@[<hov 2>Model %a = %a@]@\n"
-         Probe.pretty probe Why3Provers.pp_model model
+         Probe.pretty probe Why3Env.pp_model model
     ) model
 
 let vrank = function
