@@ -30,7 +30,7 @@ let pp_attr fmt = function
   | `Nullable  -> Format.pp_print_string fmt "nullable"
   | `Allocated -> Format.pp_print_string fmt "allocated"
   | `Garbage   -> Format.pp_print_string fmt "garbage"
-  | `Validread  -> Format.pp_print_string fmt "validread"
+  | `Validread -> Format.pp_print_string fmt "validread"
 
 let reversed = flag `Validread
 (* flags that shall be merged with land instead of lor *)

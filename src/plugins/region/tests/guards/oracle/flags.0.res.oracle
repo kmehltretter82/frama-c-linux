@@ -26,10 +26,10 @@ void spec_allocated(int *a);
 /*@ \region::region a[0..0], \nullable, \allocated; */
 void spec_nullalloc(int *a);
 
-/*@ \region::region a[0..0], \readonly; */
-void spec_readonly(int *a);
+/*@ \region::region a[0..0], \validread; */
+void spec_validread(int *a);
 
-/*@ \region::region a[0..0], \nullable, \readonly; */
+/*@ \region::region a[0..0], \nullable, \validread; */
 void spec_nullread(int *a);
 
 /*@ \region::region a[0..0], \garbage; */
@@ -38,7 +38,7 @@ void spec_garbage(int *a);
 /*@ \region::region a[0..0], \nullable, \garbage; */
 void spec_nullgarb(int *a);
 
-/*@ \region::region a[0..0], \nullable, \allocated, \garbage, \readonly; */
+/*@ \region::region a[0..0], \nullable, \allocated, \garbage, \validread; */
 void spec_dummy(int *a);
 
 /*@ \region::region a_default[0..0]; */
@@ -64,7 +64,7 @@ void context_allocated(int *a_allocated)
   return;
 }
 
-/*@ \region::region a_allocread[0..0], \allocated, \readonly; */
+/*@ \region::region a_allocread[0..0], \allocated, \validread; */
 void context_allocread(int *a_allocread)
 {
   /*@ check region: spec_default: \valid(a_allocread); */
@@ -72,7 +72,7 @@ void context_allocread(int *a_allocread)
   return;
 }
 
-/*@ \region::region a_nullread[0..0], \nullable, \readonly; */
+/*@ \region::region a_nullread[0..0], \nullable, \validread; */
 void context_nullread(int *a_nullread)
 {
   /*@ check region: spec_default: \valid(a_nullread); */
@@ -106,7 +106,8 @@ void context_nullgarb(int *a_nullgarb)
   return;
 }
 
-/*@ \region::region a_dummy[0..0], \nullable, \allocated, \garbage, \readonly;
+/*@ \region::region a_dummy[0..0], \nullable, \allocated, \garbage,
+                      \validread;
  */
 void context_dummy(int *a_dummy)
 {
