@@ -81,6 +81,10 @@
     flex-wrap: nowrap;
 }
 
+.toolbar > .dome-xToolBar-inset:first-child {
+    display: none;
+}
+
 .toolbar-tabs {
     flex: 1 1 auto;
     min-width: 0;
