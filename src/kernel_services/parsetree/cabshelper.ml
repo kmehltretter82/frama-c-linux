@@ -47,13 +47,15 @@ struct
   (* What matters is the beginning of the comment. *)
   let add (first,last) comment =
     let state = MyState.get () in
+    Kernel.debug ~dkey:Kernel.dkey_comments
+      "Adding a comment starting at %a@." Filepos.pretty_debug first;
     let acc = try MyTable.find first state with Not_found -> [] in
     MyState.set ((MyTable.add first ((last,comment)::acc)) state)
 
   let get (first,last) =
     Kernel.debug ~dkey:Kernel.dkey_comments
-      "Searching for comments between positions %a and %a@."
-      Filepos.pretty first Filepos.pretty last;
+      "@[<hv>Searching for comments between positions@ %a@ and@ %a@.@]"
+      Filepos.pretty_debug first Filepos.pretty_debug last;
     if not (Filepos.is_known first) || not (Filepos.is_known last)
     then begin
       Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";

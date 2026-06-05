@@ -12,9 +12,9 @@ exception Non_Transposable
 
 let rec replace_formal_by_concrete vinfo = function
   | [] -> raise Non_Transposable
-  | (formal, term) :: tl ->
-    if vinfo.vid = formal.vid
-    then term
+  | (x, t) :: tl ->
+    if vinfo.vid = x.vid
+    then t
     else replace_formal_by_concrete vinfo tl
 
 (* Visitor to replace formal parameters by concrete arguments, given by the
@@ -94,32 +94,32 @@ let replacement_visitor ~arguments = object (self)
 end
 
 (* Associates each formal to a term corresponding to the concrete argument. *)
-let rec associate acc ~formals ~concretes =
-  match formals, concretes with
+let rec associate acc xs es =
+  match xs, es with
   | [], _ -> acc
   | _, [] -> raise Non_Transposable
-  | formal :: formals, concrete :: concretes ->
-    let term = Logic_utils.expr_to_term concrete in
-    associate ((formal, term) :: acc) ~formals ~concretes
+  | x :: xs, e :: es ->
+    let t = Logic_utils.expr_to_term e in
+    associate ((x, t) :: acc) xs es
 
-let term ~formals ~concretes term =
+let term xs es term =
   try
-    let arguments = associate [] ~formals ~concretes in
+    let arguments = associate [] xs es in
     let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
     Some (Cil.visitCilTerm visitor term)
   with Non_Transposable -> None
 
-let pred ~formals ~concretes pred =
+let pred xs es pred =
   try
-    let arguments = associate [] ~formals ~concretes in
+    let arguments = associate [] xs es in
     let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
     Some (Cil.visitCilPredicate visitor pred)
   with Non_Transposable -> None
 
-let ipred ~formals ~concretes id_pred =
+let ipred xs es id_pred =
   let pred = Logic_const.pred_of_id_pred id_pred in
   try
-    let arguments = associate [] ~formals ~concretes in
+    let arguments = associate [] xs es in
     let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
     let new_pred = Cil.visitCilPredicateNode visitor pred.pred_content in
     let p_named =

@@ -17,8 +17,8 @@ import * as Settings from 'dome/data/settings';
 import * as Preferences from 'ivette/prefs';
 import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
-import { LED, LEDstatus } from 'dome/controls/displays';
-import { Label, Code } from 'dome/controls/labels';
+import { Icon } from 'dome/controls/icons';
+import { Label } from 'dome/controls/labels';
 import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
 import { resolve } from 'dome/system';
@@ -194,13 +194,13 @@ export const Control = (): JSX.Element => {
         icon="RELOAD"
         enabled={reload.enabled}
         onClick={reload.onClick}
-        title="Re-start the server"
+        title="Restart the server"
       />
       <Toolbars.Button
         icon="MEDIA.STOP"
         enabled={stop.enabled}
         onClick={stop.onClick}
-        title="Shut down the server"
+        title="Stop the server"
       />
     </Toolbars.ButtonGroup>
   );
@@ -326,31 +326,31 @@ export function RenderConsole(): JSX.Element {
           display={edited}
           disabled={noTrash}
           onClick={doRemove}
-          title="Discard command from history (irreversible)"
+          title="Remove command from history (irreversible)"
         />
         <Toolbars.Space />
         <IconButton
           icon="RELOAD"
           display={edited}
           onClick={doReload}
-          title="Discard changes"
+          title="Discard command edits"
         />
         <IconButton
           icon="ANGLE.LEFT"
           display={edited}
           onClick={doPrev}
-          title="Previous command"
+          title="Show previous command"
         />
         <IconButton
           icon="ANGLE.RIGHT"
           display={edited}
           onClick={doNext}
-          title="Next command"
+          title="Show next command"
         />
         <Toolbars.Space />
         <Label
           className="component-info"
-          title="History (last command first)"
+          title="Command history (newest first)"
           display={edited}
         >
           {1 + cursor} / {n}
@@ -361,20 +361,20 @@ export function RenderConsole(): JSX.Element {
           display={edited}
           disabled={isEmpty}
           onClick={doExec}
-          title="Execute command"
+          title="Run command"
         />
         <IconButton
           icon="TERMINAL"
           selected={edited}
           onClick={doSwitch}
-          title="Toggle command line editing"
+          title="Toggle command-line editing"
         />
         <IconButton
           icon="MEDIA.NEXT"
           disabled={edited}
           selected={scrolling}
           onClick={flipScrolling}
-          title="Auto scrolling"
+          title="Auto-scroll console"
         />
       </Ivette.TitleBar>
       <TextView
@@ -411,60 +411,54 @@ Server.onStatus((s: Server.Status) => {
 export const Status = (): JSX.Element => {
   const status = Server.useStatus();
   const pending = Server.getPending();
-  let led: LEDstatus = 'inactive';
+  let icon = 'CIRC.EMPTY';
   let title = undefined;
-  let running = 'OFF';
-  let blink = false;
+  let spinning = false;
 
   switch (status) {
     case Server.Status.OFF:
       title = 'Server is off';
       break;
     case Server.Status.STARTING:
-      led = 'active';
-      blink = true;
-      running = 'BOOT';
+      icon = 'SPINNER';
+      spinning = true;
       title = 'Server is starting';
       break;
     case Server.Status.ON:
-      led = 'active';
-      blink = pending > 0;
-      running = 'ON';
+      icon = pending > 0 ? 'SPINNER' : 'CIRC.CHECK';
+      spinning = pending > 0;
       title = pending > 0
-        ? `Server running (${pending} pending requests)`
-        : 'Server running (idle)';
+        ? `Server is running (${pending} pending requests)`
+        : 'Server is running (idle)';
       break;
     case Server.Status.CMD:
-      led = 'positive';
-      blink = true;
-      running = 'CMD';
-      title = 'Command-line processing';
+      icon = 'TERMINAL';
+      title = 'Processing command-line arguments';
       break;
     case Server.Status.HALTING:
-      led = 'negative';
-      blink = true;
-      running = 'HALT';
-      title = 'Server is halting';
+      icon = 'MEDIA.STOP';
+      title = 'Server is stopping';
       break;
     case Server.Status.RESTARTING:
-      led = 'warning';
-      blink = true;
-      running = 'REBOOT';
+      icon = 'RELOAD';
+      spinning = true;
       title = 'Server is restarting';
       break;
     case Server.Status.FAILURE:
-      led = 'negative';
-      blink = true;
-      running = 'ERR';
-      title = 'Server halted because of failure';
+      icon = 'CIRC.CLOSE';
+      title = 'Server stopped due to a failure';
       break;
   }
 
   return (
-    <>
-      <LED status={led} title={title} blink={blink} />
-      <Code label={running} title={title} />
-    </>
+    <Icon
+      id={icon}
+      size={14}
+      offset={0}
+      spinning={spinning}
+      className="server-status"
+      title={title}
+    />
   );
 };
 

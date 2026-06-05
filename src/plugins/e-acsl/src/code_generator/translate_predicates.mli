@@ -60,17 +60,19 @@ val untyped_to_exp: predicate -> exp
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val translate_rte_annots_ref:
-  ((Format.formatter -> code_annotation -> unit) ->
-   code_annotation ->
-   kernel_function ->
-   Env.t ->
-   code_annotation list ->
-   Env.t) ref
+module Translate_rtes : sig
+  val translate_rte_annots_ref:
+    ((Format.formatter -> code_annotation -> unit) ->
+     code_annotation ->
+     kernel_function ->
+     Env.t ->
+     code_annotation list ->
+     Env.t) ref
 
-val translate_rte_exp_ref:
-  (?filter:(code_annotation -> bool) ->
-   kernel_function ->
-   Env.t ->
-   exp ->
-   Env.t) ref
+  val translate_rte_exp_ref:
+    (?filter:(code_annotation -> bool) ->
+     kernel_function ->
+     Env.t ->
+     exp ->
+     Env.t) ref
+end

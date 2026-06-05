@@ -213,44 +213,49 @@ let hasExportingAttribute funvar =
 *)
 
 let isExportedRoot global =
-  let name, result, reason = match global with
+  let result, reason = match global with
     | GVar ({vstorage = Static} as v, _, _) when
         Ast_attributes.contains "FC_BUILTIN" v.vattr ->
-      v.vname, true, "FC_BUILTIN attribute"
-    | GVar ({vstorage = Static; vname}, _, _) -> vname, false, "static variable"
-    | GVar (v,_,_) ->
-      v.vname, true, "non-static variable"
+      true, "FC_BUILTIN attribute"
+    | GVar ({vstorage = Static}, _, _) ->
+      false, "static variable"
+    | GVar _ ->
+      true, "non-static variable"
     | GFun ({svar = v}, _) -> begin
         if hasExportingAttribute v then
-          v.vname,true, "constructor or destructor function"
+          true, "constructor or destructor function"
         else if v.vinline && v.vstorage != Extern then
-          v.vname, false, "inline function"
+          false, "inline function"
         else if v.vstorage = Static then
-          v.vname, false, "static function"
+          false, "static function"
         else
-          v.vname, true, "other function"
+          true, "other function"
       end
     | GFunDecl(_,v,_) when Ast_attributes.contains "alias" v.vattr ->
-      v.vname, true, "has GCC alias attribute"
+      true, "has GCC alias attribute"
     | GFunDecl(_,v,_) | GVarDecl(v,_) when
         Ast_attributes.contains "FC_BUILTIN" v.vattr ->
-      v.vname, true, "has FC_BUILTIN attribute"
-    | GAnnot _ -> "", true, "global annotation"
+      true, "has FC_BUILTIN attribute"
+    | GAnnot _ -> true, "global annotation"
     | GType (t, _) when
         Ast_attributes.contains "FC_BUILTIN" t.ttype.tattr ->
-      t.tname, true, "has FC_BUILTIN attribute"
+      true, "has FC_BUILTIN attribute"
     | GCompTag (c,_) | GCompTagDecl (c,_) when
         Ast_attributes.contains "FC_BUILTIN" c.cattr ->
-      c.cname, true, "has FC_BUILTIN attribute"
+      true, "has FC_BUILTIN attribute"
     | GEnumTag (e, _) | GEnumTagDecl (e,_) when
         Ast_attributes.contains "FC_BUILTIN" e.eattr ->
-      e.ename, true, "has FC_BUILTIN attribute"
+      true, "has FC_BUILTIN attribute"
     | _ ->
-      (Format.asprintf "%a" Cil_types.pp_global global), false,
-      "neither fundef nor vardef nor annotation"
+      false, "neither fundef nor vardef nor annotation"
   in
-  Kernel.debug
-    ~dkey "isExportedRoot %s -> %B, %s"  name result reason;
+  let pp_global_name fmt g =
+    match Globals.get_name g with
+    | None -> Printer.pp_global fmt g
+    | Some name -> Format.pp_print_string fmt name
+  in
+  Kernel.debug ~dkey "isExportedRoot %a -> %B, %s"
+    pp_global_name global result reason;
   result
 
 

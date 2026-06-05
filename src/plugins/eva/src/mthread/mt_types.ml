@@ -25,6 +25,11 @@ module RW = struct
       type t = rw
       let name = "rw"
       let reprs = [Read]
+      let structural_descr =
+        Structural_descr.t_sum
+          [| [| Locations.packed_descr |];
+             [| Position.packed_descr |];
+             [| Position.packed_descr |]; |]
       let equal rw1 rw2 = match rw1, rw2 with
         | Read, Read -> true
         | Write l1, Write l2 -> Locations.equal l1 l2

@@ -40,9 +40,8 @@ val cast_float_to_int: Eval_typ.integer_range -> V.t -> V.t
 val forward_cast:
   src_type:Eval_typ.scalar_typ -> dst_type:Eval_typ.scalar_typ -> V.t -> V.t
 
-(** [make_volatile ?typ v] makes the value [v] more general (to account for
-    external modifications), whenever [typ] is [None] or when it has type
-    qualifier [volatile]. *)
-val make_volatile: ?typ:typ -> V.t -> V.t
+(** [make_volatile v] makes the value [v] more general to account for
+    possible external modifications of a volatile variable. *)
+val make_volatile: V.t -> V.t
 
 val eval_float_constant: float -> fkind -> string option -> V.t

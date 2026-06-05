@@ -230,39 +230,29 @@ void g_signed(int a, int b)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data,
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= b <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
-      __gen_e_acsl_assert_data_3.file = "bitwise.c";
-      __gen_e_acsl_assert_data_3.fct = "g_signed";
-      __gen_e_acsl_assert_data_3.line = 42;
-      __gen_e_acsl_assert_data_3.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
+    __gen_e_acsl_assert_data_3.file = "bitwise.c";
+    __gen_e_acsl_assert_data_3.fct = "g_signed";
+    __gen_e_acsl_assert_data_3.line = 42;
+    __gen_e_acsl_assert_data_3.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gmpz_init_set_si(__gen_e_acsl_,0L);
     __gen_e_acsl_a_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init(__gen_e_acsl_shiftl);
-    /*@ assert E_ACSL: a >= 0; */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
-      __gen_e_acsl_assert_data_2.file = "bitwise.c";
-      __gen_e_acsl_assert_data_2.fct = "g_signed";
-      __gen_e_acsl_assert_data_2.line = 42;
-      __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,
-                      & __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
+    __gen_e_acsl_assert_data_2.file = "bitwise.c";
+    __gen_e_acsl_assert_data_2.fct = "g_signed";
+    __gen_e_acsl_assert_data_2.line = 42;
+    __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,
+                    & __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                     __gen_e_acsl_b_shiftl_coerced);
@@ -311,39 +301,29 @@ void g_signed(int a, int b)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_4,
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
-    /*@ assert
-          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-            0 <= b <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
-      __gen_e_acsl_assert_data_6.file = "bitwise.c";
-      __gen_e_acsl_assert_data_6.fct = "g_signed";
-      __gen_e_acsl_assert_data_6.line = 44;
-      __gen_e_acsl_assert_data_6.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,
-                      & __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    }
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
+    __gen_e_acsl_assert_data_6.file = "bitwise.c";
+    __gen_e_acsl_assert_data_6.fct = "g_signed";
+    __gen_e_acsl_assert_data_6.line = 44;
+    __gen_e_acsl_assert_data_6.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_a_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_shiftr);
-    /*@ assert E_ACSL: a >= 0; */
-    {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
-      __gen_e_acsl_assert_data_5.file = "bitwise.c";
-      __gen_e_acsl_assert_data_5.fct = "g_signed";
-      __gen_e_acsl_assert_data_5.line = 44;
-      __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,
-                      & __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
+    __gen_e_acsl_assert_data_5.file = "bitwise.c";
+    __gen_e_acsl_assert_data_5.fct = "g_signed";
+    __gen_e_acsl_assert_data_5.line = 44;
+    __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,
+                    & __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                        __gen_e_acsl_b_shiftr_coerced);
@@ -385,37 +365,28 @@ void g_signed(int a, int b)
     __gmpz_init_set_str(__gen_e_acsl__3,"18446744073709551616",10);
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= 1 <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
-      __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1 <= 18446744073709551615";
-      __gen_e_acsl_assert_data_9.file = "bitwise.c";
-      __gen_e_acsl_assert_data_9.fct = "g_signed";
-      __gen_e_acsl_assert_data_9.line = 46;
-      __gen_e_acsl_assert_data_9.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,
-                      & __gen_e_acsl_assert_data_9);
-    }
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "RTE";
+    __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1 <= 18446744073709551615";
+    __gen_e_acsl_assert_data_9.file = "bitwise.c";
+    __gen_e_acsl_assert_data_9.fct = "g_signed";
+    __gen_e_acsl_assert_data_9.line = 46;
+    __gen_e_acsl_assert_data_9.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,
+                    & __gen_e_acsl_assert_data_9);
     __gen_e_acsl_cst_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gen_e_acsl_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__3),
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_shiftl_2);
-    /*@ assert E_ACSL: 18446744073709551615ULL + 1 >= 0; */
-    {
-      __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
-      __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1 >= 0";
-      __gen_e_acsl_assert_data_8.file = "bitwise.c";
-      __gen_e_acsl_assert_data_8.fct = "g_signed";
-      __gen_e_acsl_assert_data_8.line = 46;
-      __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,
-                      & __gen_e_acsl_assert_data_8);
-    }
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1 >= 0";
+    __gen_e_acsl_assert_data_8.file = "bitwise.c";
+    __gen_e_acsl_assert_data_8.fct = "g_signed";
+    __gen_e_acsl_assert_data_8.line = 46;
+    __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,
+                    & __gen_e_acsl_assert_data_8);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__3),
                     __gen_e_acsl_cst_shiftl_coerced);
@@ -452,37 +423,28 @@ void g_signed(int a, int b)
     __gmpz_init_set_str(__gen_e_acsl__6,"18446744073709551616",10);
     __gmpz_init_set_si(__gen_e_acsl__7,1L);
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
-    /*@ assert
-          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-            0 <= 1 <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1 <= 18446744073709551615";
-      __gen_e_acsl_assert_data_12.file = "bitwise.c";
-      __gen_e_acsl_assert_data_12.fct = "g_signed";
-      __gen_e_acsl_assert_data_12.line = 47;
-      __gen_e_acsl_assert_data_12.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,
-                      & __gen_e_acsl_assert_data_12);
-    }
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "RTE";
+    __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1 <= 18446744073709551615";
+    __gen_e_acsl_assert_data_12.file = "bitwise.c";
+    __gen_e_acsl_assert_data_12.fct = "g_signed";
+    __gen_e_acsl_assert_data_12.line = 47;
+    __gen_e_acsl_assert_data_12.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,
+                    & __gen_e_acsl_assert_data_12);
     __gen_e_acsl_cst_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
     __gen_e_acsl_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__6),
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gmpz_init(__gen_e_acsl_shiftr_2);
-    /*@ assert E_ACSL: 18446744073709551615ULL + 1 >= 0; */
-    {
-      __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
-      __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1 >= 0";
-      __gen_e_acsl_assert_data_11.file = "bitwise.c";
-      __gen_e_acsl_assert_data_11.fct = "g_signed";
-      __gen_e_acsl_assert_data_11.line = 47;
-      __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,
-                      & __gen_e_acsl_assert_data_11);
-    }
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "RTE";
+    __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1 >= 0";
+    __gen_e_acsl_assert_data_11.file = "bitwise.c";
+    __gen_e_acsl_assert_data_11.fct = "g_signed";
+    __gen_e_acsl_assert_data_11.line = 47;
+    __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,
+                    & __gen_e_acsl_assert_data_11);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr_2,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl__6),
                        __gen_e_acsl_cst_shiftr_coerced);
@@ -518,37 +480,28 @@ void g_signed(int a, int b)
     __gmpz_init_set_si(__gen_e_acsl__10,1L);
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= 65 <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
-      __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65 <= 18446744073709551615";
-      __gen_e_acsl_assert_data_15.file = "bitwise.c";
-      __gen_e_acsl_assert_data_15.fct = "g_signed";
-      __gen_e_acsl_assert_data_15.line = 48;
-      __gen_e_acsl_assert_data_15.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,
-                      & __gen_e_acsl_assert_data_15);
-    }
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "RTE";
+    __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65 <= 18446744073709551615";
+    __gen_e_acsl_assert_data_15.file = "bitwise.c";
+    __gen_e_acsl_assert_data_15.fct = "g_signed";
+    __gen_e_acsl_assert_data_15.line = 48;
+    __gen_e_acsl_assert_data_15.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,
+                    & __gen_e_acsl_assert_data_15);
     __gen_e_acsl_cst_shiftl_coerced_2 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init_set_si(__gen_e_acsl__12,0L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __gmpz_init(__gen_e_acsl_shiftl_3);
-    /*@ assert E_ACSL: 1 >= 0; */
-    {
-      __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
-      __gen_e_acsl_assert_data_14.pred_txt = "1 >= 0";
-      __gen_e_acsl_assert_data_14.file = "bitwise.c";
-      __gen_e_acsl_assert_data_14.fct = "g_signed";
-      __gen_e_acsl_assert_data_14.line = 48;
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,
-                      & __gen_e_acsl_assert_data_14);
-    }
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "RTE";
+    __gen_e_acsl_assert_data_14.pred_txt = "1 >= 0";
+    __gen_e_acsl_assert_data_14.file = "bitwise.c";
+    __gen_e_acsl_assert_data_14.fct = "g_signed";
+    __gen_e_acsl_assert_data_14.line = 48;
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,
+                    & __gen_e_acsl_assert_data_14);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_3,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                     __gen_e_acsl_cst_shiftl_coerced_2);
@@ -686,39 +639,29 @@ void g_unsigned(unsigned int a, unsigned int b)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data,
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= b <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
-      __gen_e_acsl_assert_data_3.file = "bitwise.c";
-      __gen_e_acsl_assert_data_3.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_3.line = 57;
-      __gen_e_acsl_assert_data_3.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
+    __gen_e_acsl_assert_data_3.file = "bitwise.c";
+    __gen_e_acsl_assert_data_3.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_3.line = 57;
+    __gen_e_acsl_assert_data_3.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gmpz_init_set_si(__gen_e_acsl_,0L);
     __gen_e_acsl_a_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init(__gen_e_acsl_shiftl);
-    /*@ assert E_ACSL: a >= 0; */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
-      __gen_e_acsl_assert_data_2.file = "bitwise.c";
-      __gen_e_acsl_assert_data_2.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_2.line = 57;
-      __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,
-                      & __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
+    __gen_e_acsl_assert_data_2.file = "bitwise.c";
+    __gen_e_acsl_assert_data_2.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_2.line = 57;
+    __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,
+                    & __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                     __gen_e_acsl_b_shiftl_coerced);
@@ -767,39 +710,29 @@ void g_unsigned(unsigned int a, unsigned int b)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_4,
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
-    /*@ assert
-          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-            0 <= b <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
-      __gen_e_acsl_assert_data_6.file = "bitwise.c";
-      __gen_e_acsl_assert_data_6.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_6.line = 59;
-      __gen_e_acsl_assert_data_6.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,
-                      & __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    }
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
+    __gen_e_acsl_assert_data_6.file = "bitwise.c";
+    __gen_e_acsl_assert_data_6.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_6.line = 59;
+    __gen_e_acsl_assert_data_6.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_a_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_shiftr);
-    /*@ assert E_ACSL: a >= 0; */
-    {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
-      __gen_e_acsl_assert_data_5.file = "bitwise.c";
-      __gen_e_acsl_assert_data_5.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_5.line = 59;
-      __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,
-                      & __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
+    __gen_e_acsl_assert_data_5.file = "bitwise.c";
+    __gen_e_acsl_assert_data_5.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_5.line = 59;
+    __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,
+                    & __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                        __gen_e_acsl_b_shiftr_coerced);
@@ -841,37 +774,28 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_str(__gen_e_acsl__3,"18446744073709551616",10);
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= 1u <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
-      __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1u <= 18446744073709551615";
-      __gen_e_acsl_assert_data_9.file = "bitwise.c";
-      __gen_e_acsl_assert_data_9.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_9.line = 61;
-      __gen_e_acsl_assert_data_9.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,
-                      & __gen_e_acsl_assert_data_9);
-    }
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "RTE";
+    __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1u <= 18446744073709551615";
+    __gen_e_acsl_assert_data_9.file = "bitwise.c";
+    __gen_e_acsl_assert_data_9.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_9.line = 61;
+    __gen_e_acsl_assert_data_9.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,
+                    & __gen_e_acsl_assert_data_9);
     __gen_e_acsl_cst_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gen_e_acsl_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__3),
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_shiftl_2);
-    /*@ assert E_ACSL: 18446744073709551615ULL + 1u >= 0; */
-    {
-      __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
-      __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1u >= 0";
-      __gen_e_acsl_assert_data_8.file = "bitwise.c";
-      __gen_e_acsl_assert_data_8.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_8.line = 61;
-      __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,
-                      & __gen_e_acsl_assert_data_8);
-    }
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1u >= 0";
+    __gen_e_acsl_assert_data_8.file = "bitwise.c";
+    __gen_e_acsl_assert_data_8.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_8.line = 61;
+    __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,
+                    & __gen_e_acsl_assert_data_8);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__3),
                     __gen_e_acsl_cst_shiftl_coerced);
@@ -908,37 +832,28 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_str(__gen_e_acsl__6,"18446744073709551616",10);
     __gmpz_init_set_si(__gen_e_acsl__7,1L);
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
-    /*@ assert
-          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-            0 <= 1u <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1u <= 18446744073709551615";
-      __gen_e_acsl_assert_data_12.file = "bitwise.c";
-      __gen_e_acsl_assert_data_12.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_12.line = 62;
-      __gen_e_acsl_assert_data_12.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,
-                      & __gen_e_acsl_assert_data_12);
-    }
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "RTE";
+    __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1u <= 18446744073709551615";
+    __gen_e_acsl_assert_data_12.file = "bitwise.c";
+    __gen_e_acsl_assert_data_12.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_12.line = 62;
+    __gen_e_acsl_assert_data_12.name = "shiftr_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,
+                    & __gen_e_acsl_assert_data_12);
     __gen_e_acsl_cst_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
     __gen_e_acsl_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__6),
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gmpz_init(__gen_e_acsl_shiftr_2);
-    /*@ assert E_ACSL: 18446744073709551615ULL + 1u >= 0; */
-    {
-      __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
-      __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1u >= 0";
-      __gen_e_acsl_assert_data_11.file = "bitwise.c";
-      __gen_e_acsl_assert_data_11.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_11.line = 62;
-      __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,
-                      & __gen_e_acsl_assert_data_11);
-    }
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "RTE";
+    __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1u >= 0";
+    __gen_e_acsl_assert_data_11.file = "bitwise.c";
+    __gen_e_acsl_assert_data_11.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_11.line = 62;
+    __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,
+                    & __gen_e_acsl_assert_data_11);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr_2,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl__6),
                        __gen_e_acsl_cst_shiftr_coerced);
@@ -974,37 +889,28 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_si(__gen_e_acsl__10,1L);
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
-    /*@ assert
-          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-            0 <= 65u <= 18446744073709551615;
-    */
-    {
-      __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
-      __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65u <= 18446744073709551615";
-      __gen_e_acsl_assert_data_15.file = "bitwise.c";
-      __gen_e_acsl_assert_data_15.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_15.line = 63;
-      __gen_e_acsl_assert_data_15.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,
-                      & __gen_e_acsl_assert_data_15);
-    }
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "RTE";
+    __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65u <= 18446744073709551615";
+    __gen_e_acsl_assert_data_15.file = "bitwise.c";
+    __gen_e_acsl_assert_data_15.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_15.line = 63;
+    __gen_e_acsl_assert_data_15.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,
+                    & __gen_e_acsl_assert_data_15);
     __gen_e_acsl_cst_shiftl_coerced_2 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init_set_si(__gen_e_acsl__12,0L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __gmpz_init(__gen_e_acsl_shiftl_3);
-    /*@ assert E_ACSL: 1u >= 0; */
-    {
-      __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
-      __gen_e_acsl_assert_data_14.pred_txt = "1u >= 0";
-      __gen_e_acsl_assert_data_14.file = "bitwise.c";
-      __gen_e_acsl_assert_data_14.fct = "g_unsigned";
-      __gen_e_acsl_assert_data_14.line = 63;
-      __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,
-                      & __gen_e_acsl_assert_data_14);
-    }
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "RTE";
+    __gen_e_acsl_assert_data_14.pred_txt = "1u >= 0";
+    __gen_e_acsl_assert_data_14.file = "bitwise.c";
+    __gen_e_acsl_assert_data_14.fct = "g_unsigned";
+    __gen_e_acsl_assert_data_14.line = 63;
+    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,
+                    & __gen_e_acsl_assert_data_14);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_3,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                     __gen_e_acsl_cst_shiftl_coerced_2);

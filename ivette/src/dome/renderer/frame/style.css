@@ -260,6 +260,16 @@
     flex: 0 1 5px ;
 }
 
+/* The leading inset is first; remove the second child's stacked margin. */
+.dome-xToolBar > :nth-child(2) {
+    margin-left: 0 ;
+}
+
+/* The trailing inset is last; remove the penultimate child's stacked margin. */
+.dome-xToolBar > :nth-last-child(2) {
+    margin-right: 0 ;
+}
+
 .dome-xToolBar-space {
     flex: 0 1 20px ;
 }
@@ -746,6 +756,10 @@
   .dome-xTree-subtree.dome-xTree-subtree-hidden *{
     height: 0;
     visibility: hidden;
+  }
+
+  .dome-xTree-node-container.dome-xTree-node-hidden {
+    display: none;
   }
 
   .dome-xTree-node {

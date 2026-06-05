@@ -31,6 +31,9 @@ module PLoc = struct
 
   let size loc = Precise_locs.loc_size loc
 
+  let is_volatile ploc =
+    Locations.is_volatile (Precise_locs.imprecise_location ploc)
+
   let enumerate_valid_bits access loc =
     Precise_locs.enumerate_valid_bits access loc
 

@@ -22,6 +22,14 @@ module type S = sig
 
   include Monad.S
 
+  module Option : Monad.Iterators
+    with type 'a iterable = 'a option
+     and type 'a monad = 'a t
+
+  module List : Monad.Iterators
+    with type 'a iterable = 'a list
+     and type 'a monad = 'a t
+
   val run : env:env -> state:state -> 'a t -> 'a * out * state
 
   (* Reader *)
@@ -49,7 +57,7 @@ module Make (C : Conf)
   type state = C.state
   type out = C.out
 
-  include Monad.Make_based_on_bind (struct
+  module M = Monad.Make_based_on_bind (struct
       type 'a t = C.env -> C.state -> 'a * C.out * C.state
       let return x = fun _env state -> x, C.empty_out (), state
       let bind f m =
@@ -58,6 +66,8 @@ module Make (C : Conf)
         let y, f_out, state = f x env state in
         y, C.merge_out m_out f_out, state
     end)
+
+  include M
 
   let run ~env ~state f = f env state
 
@@ -78,4 +88,7 @@ module Make (C : Conf)
   let get = fun _env state -> state, C.empty_out (), state
   let set state = fun _env _state -> (), C.empty_out (), state
   let modify f = fun _env state -> (), C.empty_out (), f state
+
+  module Option = Option.Make_monadic_iterators (M)
+  module List = List.Make_monadic_iterators (M)
 end

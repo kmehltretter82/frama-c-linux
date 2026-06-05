@@ -53,6 +53,8 @@ let map_no_copy f o =
     if x' != x then Some x' else o
 
 module Make_monadic_iterators (M : Monad.S) = struct
+  type 'a iterable = 'a option
+  type 'a monad = 'a M.t
 
   let fold f acc = function
     | None -> M.return acc

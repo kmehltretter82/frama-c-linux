@@ -47,6 +47,287 @@ void test(int a, int b, int c, int d, int e, int f, int g, int h, int i,
   return;
 }
 
+void simple_loop(void)
+{
+  int sum = 0;
+  int x = 11;
+  {
+    int i = 0;
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"x",0,x);
+      /*@ assert E_ACSL: "division by zero": x != 0; */
+      {
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "x != 0";
+        __gen_e_acsl_assert_data_2.file = "rte.i";
+        __gen_e_acsl_assert_data_2.fct = "simple_loop";
+        __gen_e_acsl_assert_data_2.line = 35;
+        __gen_e_acsl_assert_data_2.name = "division by zero";
+        __e_acsl_assert(x != 0,& __gen_e_acsl_assert_data_2);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      }
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,i);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"x",0,x);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Invariant";
+      __gen_e_acsl_assert_data.pred_txt = "0 <= i / x";
+      __gen_e_acsl_assert_data.file = "rte.i";
+      __gen_e_acsl_assert_data.fct = "simple_loop";
+      __gen_e_acsl_assert_data.line = 35;
+      __e_acsl_assert(0L <= i / (long)x,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    }
+    /*@ loop invariant 0 <= i / x; */
+    while (i < 10) {
+      /*@ assert Eva: signed_overflow: sum + i <= 2147483647; */
+      sum += i;
+      x --;
+      {
+        i ++;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"x",0,x);
+        /*@ assert E_ACSL: "division by zero": x != 0; */
+        {
+          __gen_e_acsl_assert_data_4.blocking = 1;
+          __gen_e_acsl_assert_data_4.kind = "RTE";
+          __gen_e_acsl_assert_data_4.pred_txt = "x != 0";
+          __gen_e_acsl_assert_data_4.file = "rte.i";
+          __gen_e_acsl_assert_data_4.fct = "simple_loop";
+          __gen_e_acsl_assert_data_4.line = 35;
+          __gen_e_acsl_assert_data_4.name = "division by zero";
+          __e_acsl_assert(x != 0,& __gen_e_acsl_assert_data_4);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+        }
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,i);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"x",0,x);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "Invariant";
+        __gen_e_acsl_assert_data_3.pred_txt = "0 <= i / x";
+        __gen_e_acsl_assert_data_3.file = "rte.i";
+        __gen_e_acsl_assert_data_3.fct = "simple_loop";
+        __gen_e_acsl_assert_data_3.line = 35;
+        __e_acsl_assert(0L <= i / (long)x,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      }
+    }
+  }
+  return;
+}
+
+void nested_loop(void)
+{
+  int a[10];
+  int k;
+  {
+    int i = 0;
+    while (i < 10) {
+      a[i] = i;
+      i ++;
+    }
+  }
+  k = 1;
+  {
+    int __gen_e_acsl_forall;
+    int __gen_e_acsl_i;
+    int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_forall = 1;
+    __gen_e_acsl_i = 1;
+    while (1) {
+      if (__gen_e_acsl_i < k) ; else break;
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,
+                                     __gen_e_acsl_i);
+        /*@ assert E_ACSL: "division by zero": i != 0; */
+        {
+          __gen_e_acsl_assert_data_2.blocking = 1;
+          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.pred_txt = "i != 0";
+          __gen_e_acsl_assert_data_2.file = "rte.i";
+          __gen_e_acsl_assert_data_2.fct = "nested_loop";
+          __gen_e_acsl_assert_data_2.line = 51;
+          __gen_e_acsl_assert_data_2.name = "division by zero";
+          __e_acsl_assert(__gen_e_acsl_i != 0,& __gen_e_acsl_assert_data_2);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                     "__gen_e_acsl_i",0,__gen_e_acsl_i);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "__gen_e_acsl_i < 10";
+        __gen_e_acsl_assert_data_3.file = "rte.i";
+        __gen_e_acsl_assert_data_3.fct = "nested_loop";
+        __gen_e_acsl_assert_data_3.line = 51;
+        __gen_e_acsl_assert_data_3.name = "index_bound";
+        __e_acsl_assert(__gen_e_acsl_i < 10,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                     "__gen_e_acsl_i",0,__gen_e_acsl_i);
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "0 <= __gen_e_acsl_i";
+        __gen_e_acsl_assert_data_4.file = "rte.i";
+        __gen_e_acsl_assert_data_4.fct = "nested_loop";
+        __gen_e_acsl_assert_data_4.line = 51;
+        __gen_e_acsl_assert_data_4.name = "index_bound";
+        __e_acsl_assert(0 <= __gen_e_acsl_i,& __gen_e_acsl_assert_data_4);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+        if (a[__gen_e_acsl_i] / (long)__gen_e_acsl_i == 1L) ;
+        else {
+          __gen_e_acsl_forall = 0;
+          goto e_acsl_end_loop1;
+        }
+      }
+      __gen_e_acsl_i ++;
+    }
+    e_acsl_end_loop1: ;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\\forall integer i; 1 <= i < k ==> a[i] / i == 1",
+                                 0,__gen_e_acsl_forall);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Invariant";
+    __gen_e_acsl_assert_data.pred_txt = "\\forall integer i; 1 <= i < k ==> a[i] / i == 1";
+    __gen_e_acsl_assert_data.file = "rte.i";
+    __gen_e_acsl_assert_data.fct = "nested_loop";
+    __gen_e_acsl_assert_data.line = 51;
+    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,k);
+    if (1 <= k) {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,k);
+      __gen_e_acsl_and = k <= 10;
+    }
+    else __gen_e_acsl_and = 0;
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Invariant";
+    __gen_e_acsl_assert_data_5.pred_txt = "1 <= k <= 10";
+    __gen_e_acsl_assert_data_5.file = "rte.i";
+    __gen_e_acsl_assert_data_5.fct = "nested_loop";
+    __gen_e_acsl_assert_data_5.line = 50;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+  }
+  /*@ loop invariant 1 <= k <= 10;
+      loop invariant \forall integer i; 1 <= i < k ==> a[i] / i == 1;
+  */
+  while (k < 10) {
+    /*@ assert Eva: initialization: \initialized(&a[k]); */
+    a[k] = a[k];
+    {
+      int __gen_e_acsl_and_2;
+      int __gen_e_acsl_forall_2;
+      int __gen_e_acsl_i_2;
+      k ++;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",0,k);
+      if (1 <= k) {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",0,k);
+        __gen_e_acsl_and_2 = k <= 10;
+      }
+      else __gen_e_acsl_and_2 = 0;
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "Invariant";
+      __gen_e_acsl_assert_data_6.pred_txt = "1 <= k <= 10";
+      __gen_e_acsl_assert_data_6.file = "rte.i";
+      __gen_e_acsl_assert_data_6.fct = "nested_loop";
+      __gen_e_acsl_assert_data_6.line = 50;
+      __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+        {.values = (void *)0};
+      __gen_e_acsl_forall_2 = 1;
+      __gen_e_acsl_i_2 = 1;
+      while (1) {
+        if (__gen_e_acsl_i_2 < k) ; else break;
+        {
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+            {.values = (void *)0};
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"i",0,
+                                       __gen_e_acsl_i_2);
+          /*@ assert E_ACSL: "division by zero": i != 0; */
+          {
+            __gen_e_acsl_assert_data_8.blocking = 1;
+            __gen_e_acsl_assert_data_8.kind = "RTE";
+            __gen_e_acsl_assert_data_8.pred_txt = "i != 0";
+            __gen_e_acsl_assert_data_8.file = "rte.i";
+            __gen_e_acsl_assert_data_8.fct = "nested_loop";
+            __gen_e_acsl_assert_data_8.line = 51;
+            __gen_e_acsl_assert_data_8.name = "division by zero";
+            __e_acsl_assert(__gen_e_acsl_i_2 != 0,
+                            & __gen_e_acsl_assert_data_8);
+            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+          }
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+            {.values = (void *)0};
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                       "__gen_e_acsl_i_2",0,__gen_e_acsl_i_2);
+          __gen_e_acsl_assert_data_9.blocking = 1;
+          __gen_e_acsl_assert_data_9.kind = "RTE";
+          __gen_e_acsl_assert_data_9.pred_txt = "__gen_e_acsl_i_2 < 10";
+          __gen_e_acsl_assert_data_9.file = "rte.i";
+          __gen_e_acsl_assert_data_9.fct = "nested_loop";
+          __gen_e_acsl_assert_data_9.line = 51;
+          __gen_e_acsl_assert_data_9.name = "index_bound";
+          __e_acsl_assert(__gen_e_acsl_i_2 < 10,& __gen_e_acsl_assert_data_9);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+            {.values = (void *)0};
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                       "__gen_e_acsl_i_2",0,__gen_e_acsl_i_2);
+          __gen_e_acsl_assert_data_10.blocking = 1;
+          __gen_e_acsl_assert_data_10.kind = "RTE";
+          __gen_e_acsl_assert_data_10.pred_txt = "0 <= __gen_e_acsl_i_2";
+          __gen_e_acsl_assert_data_10.file = "rte.i";
+          __gen_e_acsl_assert_data_10.fct = "nested_loop";
+          __gen_e_acsl_assert_data_10.line = 51;
+          __gen_e_acsl_assert_data_10.name = "index_bound";
+          __e_acsl_assert(0 <= __gen_e_acsl_i_2,
+                          & __gen_e_acsl_assert_data_10);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+          /*@ assert Eva: initialization: \initialized(&a[__gen_e_acsl_i_2]);
+          */
+          if (a[__gen_e_acsl_i_2] / (long)__gen_e_acsl_i_2 == 1L) ;
+          else {
+            __gen_e_acsl_forall_2 = 0;
+            goto e_acsl_end_loop2;
+          }
+        }
+        __gen_e_acsl_i_2 ++;
+      }
+      e_acsl_end_loop2: ;
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                   "\\forall integer i; 1 <= i < k ==> a[i] / i == 1",
+                                   0,__gen_e_acsl_forall_2);
+      __gen_e_acsl_assert_data_7.blocking = 1;
+      __gen_e_acsl_assert_data_7.kind = "Invariant";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\forall integer i; 1 <= i < k ==> a[i] / i == 1";
+      __gen_e_acsl_assert_data_7.file = "rte.i";
+      __gen_e_acsl_assert_data_7.fct = "nested_loop";
+      __gen_e_acsl_assert_data_7.line = 51;
+      __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_7);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    }
+  }
+  return;
+}
+
 int main(void)
 {
   int __retres;
@@ -59,77 +340,102 @@ int main(void)
   long z = 2L;
   int w = 12;
   {
-    int __gen_e_acsl_or;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"y",0,y);
-    /*@ assert E_ACSL: "division by zero": y != 0; */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "y != 0";
-      __gen_e_acsl_assert_data_2.file = "rte.i";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 37;
-      __gen_e_acsl_assert_data_2.name = "division by zero";
-      __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"y",0,y);
-    if (4 / y == 2) __gen_e_acsl_or = 1;
-    else {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"w",0,w);
-      /*@ assert E_ACSL: "division by zero": w != 0; */
-      {
-        __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "w != 0";
-        __gen_e_acsl_assert_data_3.file = "rte.i";
-        __gen_e_acsl_assert_data_3.fct = "main";
-        __gen_e_acsl_assert_data_3.line = 37;
-        __gen_e_acsl_assert_data_3.name = "division by zero";
-        __e_acsl_assert(w != 0,& __gen_e_acsl_assert_data_3);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-      }
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"w",0,w);
-      __gen_e_acsl_or = 1 / w > 0;
-    }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "4 / y == 2 || 1 / w > 0";
+    __gen_e_acsl_assert_data.pred_txt = "4 / 2 == 2";
     __gen_e_acsl_assert_data.file = "rte.i";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 37;
-    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __gen_e_acsl_assert_data.line = 62;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data);
   }
-  /*@ assert 4 / y == 2 || 1 / w > 0; */ ;
+  /*@ assert 4 / 2 == 2; */ ;
   {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "1 == 1 || 1 / y < 2";
+    __gen_e_acsl_assert_data_2.file = "rte.i";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 63;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+  }
+  /*@ assert 1 == 1 || 1 / y < 2; */ ;
+  {
+    int __gen_e_acsl_or;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    /*@ assert E_ACSL: "division by zero": (12 + 3) - 6 != 0; */
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"y",0,y);
+    /*@ assert E_ACSL: "division by zero": y != 0; */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "(12 + 3) - 6 != 0";
+      __gen_e_acsl_assert_data_5.pred_txt = "y != 0";
       __gen_e_acsl_assert_data_5.file = "rte.i";
       __gen_e_acsl_assert_data_5.fct = "main";
-      __gen_e_acsl_assert_data_5.line = 38;
+      __gen_e_acsl_assert_data_5.line = 64;
       __gen_e_acsl_assert_data_5.name = "division by zero";
-      __e_acsl_assert(1,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"y",0,y);
+    if (4 / y == 2) __gen_e_acsl_or = 1;
+    else {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"w",0,w);
+      /*@ assert E_ACSL: "division by zero": w != 0; */
+      {
+        __gen_e_acsl_assert_data_6.blocking = 1;
+        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.pred_txt = "w != 0";
+        __gen_e_acsl_assert_data_6.file = "rte.i";
+        __gen_e_acsl_assert_data_6.fct = "main";
+        __gen_e_acsl_assert_data_6.line = 64;
+        __gen_e_acsl_assert_data_6.name = "division by zero";
+        __e_acsl_assert(w != 0,& __gen_e_acsl_assert_data_6);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      }
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"w",0,w);
+      __gen_e_acsl_or = 1 / w > 0;
     }
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "4 / ((12 + 3) - 6) < 2";
+    __gen_e_acsl_assert_data_4.pred_txt = "4 / y == 2 || 1 / w > 0";
     __gen_e_acsl_assert_data_4.file = "rte.i";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 38;
-    __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_4.line = 64;
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+  }
+  /*@ assert 4 / y == 2 || 1 / w > 0; */ ;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    /*@ assert E_ACSL: "division by zero": (12 + 3) - 6 != 0; */
+    {
+      __gen_e_acsl_assert_data_8.blocking = 1;
+      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.pred_txt = "(12 + 3) - 6 != 0";
+      __gen_e_acsl_assert_data_8.file = "rte.i";
+      __gen_e_acsl_assert_data_8.fct = "main";
+      __gen_e_acsl_assert_data_8.line = 65;
+      __gen_e_acsl_assert_data_8.name = "division by zero";
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_8);
+    }
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "4 / ((12 + 3) - 6) < 2";
+    __gen_e_acsl_assert_data_7.file = "rte.i";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 65;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_7);
   }
   /*@ assert 4 / ((12 + 3) - 6) < 2; */ ;
   {
@@ -139,23 +445,23 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_sub;
     __e_acsl_mpz_t __gen_e_acsl_div;
     long __gen_e_acsl__2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"y",0,y);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"y",0,y);
     /*@ assert E_ACSL: "division by zero": y - 123456789123456789 != 0; */
     {
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "y - 123456789123456789 != 0";
-      __gen_e_acsl_assert_data_7.file = "rte.i";
-      __gen_e_acsl_assert_data_7.fct = "main";
-      __gen_e_acsl_assert_data_7.line = 40;
-      __gen_e_acsl_assert_data_7.name = "division by zero";
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.pred_txt = "y - 123456789123456789 != 0";
+      __gen_e_acsl_assert_data_10.file = "rte.i";
+      __gen_e_acsl_assert_data_10.fct = "main";
+      __gen_e_acsl_assert_data_10.line = 67;
+      __gen_e_acsl_assert_data_10.name = "division by zero";
       __e_acsl_assert(y - 123456789123456789L != 0L,
-                      & __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+                      & __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __gmpz_init_set_si(__gen_e_acsl_z,z);
     __gmpz_init_set_si(__gen_e_acsl_,1L);
@@ -169,18 +475,18 @@ int main(void)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
     __gen_e_acsl__2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div));
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_6,"z",0,z);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"y",0,y);
-    __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "Assertion";
-    __gen_e_acsl_assert_data_6.pred_txt = "1 + (z + 1) / (y - 123456789123456789) == 1";
-    __gen_e_acsl_assert_data_6.file = "rte.i";
-    __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 40;
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_9,"z",0,z);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"y",0,y);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "1 + (z + 1) / (y - 123456789123456789) == 1";
+    __gen_e_acsl_assert_data_9.file = "rte.i";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 67;
     /*@ assert Eva: signed_overflow: -2147483648 <= 1 + __gen_e_acsl__2; */
     /*@ assert Eva: signed_overflow: 1 + __gen_e_acsl__2 <= 2147483647; */
-    __e_acsl_assert(1 + __gen_e_acsl__2 == 1,& __gen_e_acsl_assert_data_6);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert(1 + __gen_e_acsl__2 == 1,& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     __gmpz_clear(__gen_e_acsl_z);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_add);
@@ -192,70 +498,70 @@ int main(void)
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
     int __gen_e_acsl_j;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_i = 0;
     while (1) {
       {
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
           {.values = (void *)0};
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"y",0,y);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"y",0,y);
         /*@ assert E_ACSL: "division by zero": y != 0; */
         {
-          __gen_e_acsl_assert_data_10.blocking = 1;
-          __gen_e_acsl_assert_data_10.kind = "RTE";
-          __gen_e_acsl_assert_data_10.pred_txt = "y != 0";
-          __gen_e_acsl_assert_data_10.file = "rte.i";
-          __gen_e_acsl_assert_data_10.fct = "main";
-          __gen_e_acsl_assert_data_10.line = 42;
-          __gen_e_acsl_assert_data_10.name = "division by zero";
-          __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_10);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+          __gen_e_acsl_assert_data_13.blocking = 1;
+          __gen_e_acsl_assert_data_13.kind = "RTE";
+          __gen_e_acsl_assert_data_13.pred_txt = "y != 0";
+          __gen_e_acsl_assert_data_13.file = "rte.i";
+          __gen_e_acsl_assert_data_13.fct = "main";
+          __gen_e_acsl_assert_data_13.line = 69;
+          __gen_e_acsl_assert_data_13.name = "division by zero";
+          __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_13);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
         }
         if (__gen_e_acsl_i < 5 / y) ; else break;
       }
       __gen_e_acsl_j = 4;
       while (1) {
         {
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
             {.values = (void *)0};
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"y",0,y);
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"y",0,y);
           /*@ assert E_ACSL: "division by zero": y != 0; */
           {
-            __gen_e_acsl_assert_data_9.blocking = 1;
-            __gen_e_acsl_assert_data_9.kind = "RTE";
-            __gen_e_acsl_assert_data_9.pred_txt = "y != 0";
-            __gen_e_acsl_assert_data_9.file = "rte.i";
-            __gen_e_acsl_assert_data_9.fct = "main";
-            __gen_e_acsl_assert_data_9.line = 42;
-            __gen_e_acsl_assert_data_9.name = "division by zero";
-            __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_9);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+            __gen_e_acsl_assert_data_12.blocking = 1;
+            __gen_e_acsl_assert_data_12.kind = "RTE";
+            __gen_e_acsl_assert_data_12.pred_txt = "y != 0";
+            __gen_e_acsl_assert_data_12.file = "rte.i";
+            __gen_e_acsl_assert_data_12.fct = "main";
+            __gen_e_acsl_assert_data_12.line = 69;
+            __gen_e_acsl_assert_data_12.name = "division by zero";
+            __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_12);
+            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
           }
           if (__gen_e_acsl_j < 100 % y) ; else break;
         }
         if (__gen_e_acsl_j + __gen_e_acsl_i < 10) ;
         else {
           __gen_e_acsl_forall = 0;
-          goto e_acsl_end_loop1;
+          goto e_acsl_end_loop3;
         }
         __gen_e_acsl_j ++;
       }
       __gen_e_acsl_i ++;
     }
-    e_acsl_end_loop1: ;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+    e_acsl_end_loop3: ;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                  "\\forall integer i, integer j;\n  0 <= i < 5 / y && 4 <= j < 100 % y ==> j + i < 10",
                                  0,__gen_e_acsl_forall);
-    __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "\\forall integer i, integer j;\n  0 <= i < 5 / y && 4 <= j < 100 % y ==> j + i < 10";
-    __gen_e_acsl_assert_data_8.file = "rte.i";
-    __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 42;
-    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data_8);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\forall integer i, integer j;\n  0 <= i < 5 / y && 4 <= j < 100 % y ==> j + i < 10";
+    __gen_e_acsl_assert_data_11.file = "rte.i";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 69;
+    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
   /*@
   assert
@@ -268,143 +574,145 @@ int main(void)
   __e_acsl_full_init((void *)(& d));
   {
     double __gen_e_acsl_f2_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
       {.values = (void *)0};
     __gen_e_acsl_f2_2 = __gen_e_acsl_f2(d);
-    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_11,"d",d);
-    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_11,"f2(d)",
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_14,"d",d);
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_14,"f2(d)",
                                     __gen_e_acsl_f2_2);
-    __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "f2(d) > 0";
-    __gen_e_acsl_assert_data_11.file = "rte.i";
-    __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 45;
-    __e_acsl_assert(__gen_e_acsl_f2_2 > 0.,& __gen_e_acsl_assert_data_11);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "Assertion";
+    __gen_e_acsl_assert_data_14.pred_txt = "f2(d) > 0";
+    __gen_e_acsl_assert_data_14.file = "rte.i";
+    __gen_e_acsl_assert_data_14.fct = "main";
+    __gen_e_acsl_assert_data_14.line = 72;
+    __e_acsl_assert(__gen_e_acsl_f2_2 > 0.,& __gen_e_acsl_assert_data_14);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
   }
   /*@ assert f2(d) > 0; */ ;
   __gen_e_acsl_test(2,3,4,5,6,7,8,9,10,11,12,13);
+  simple_loop();
+  nested_loop();
   unsigned int v = 1U;
   {
     int __gen_e_acsl_aligned;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-      {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_14,"v",0,v);
-    /*@ assert E_ACSL: "division by zero": v != 0; */
-    {
-      __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
-      __gen_e_acsl_assert_data_14.pred_txt = "v != 0";
-      __gen_e_acsl_assert_data_14.file = "rte.i";
-      __gen_e_acsl_assert_data_14.fct = "main";
-      __gen_e_acsl_assert_data_14.line = 51;
-      __gen_e_acsl_assert_data_14.name = "division by zero";
-      __e_acsl_assert(v != 0U,& __gen_e_acsl_assert_data_14);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
-    }
-    /*@ assert Eva: initialization: \initialized(&x); */
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)x,(size_t)v);
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_13,"v",0,v);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"x",(void *)x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
-                                 "\\aligned(x,v)",0,__gen_e_acsl_aligned);
-    __gen_e_acsl_assert_data_13.blocking = 1;
-    __gen_e_acsl_assert_data_13.kind = "Assertion";
-    __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(x,v)";
-    __gen_e_acsl_assert_data_13.file = "rte.i";
-    __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 51;
-    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_13);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
-  }
-  /*@ assert \aligned(x,v); */ ;
-  {
-    int __gen_e_acsl_aligned_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)x,_Alignof(char));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
-                                   "alignof(char)",0,_Alignof(char));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,"x",(void *)x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
-                                 "\\aligned(x,alignof(char))",0,
-                                 __gen_e_acsl_aligned_2);
-    __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(x,alignof(char))";
-    __gen_e_acsl_assert_data_15.file = "rte.i";
-    __gen_e_acsl_assert_data_15.fct = "main";
-    __gen_e_acsl_assert_data_15.line = 52;
-    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_15);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
-  }
-  /*@ assert \aligned(x,alignof(char)); */ ;
-  {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
       {.values = (void *)0};
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_17,"z",0,z);
-    /*@ assert E_ACSL: "division by zero": z != 0; */
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_17,"v",0,v);
+    /*@ assert E_ACSL: "division by zero": v != 0; */
     {
       __gen_e_acsl_assert_data_17.blocking = 1;
       __gen_e_acsl_assert_data_17.kind = "RTE";
-      __gen_e_acsl_assert_data_17.pred_txt = "z != 0";
+      __gen_e_acsl_assert_data_17.pred_txt = "v != 0";
       __gen_e_acsl_assert_data_17.file = "rte.i";
       __gen_e_acsl_assert_data_17.fct = "main";
-      __gen_e_acsl_assert_data_17.line = 54;
+      __gen_e_acsl_assert_data_17.line = 81;
       __gen_e_acsl_assert_data_17.name = "division by zero";
-      __e_acsl_assert(z != 0L,& __gen_e_acsl_assert_data_17);
+      __e_acsl_assert(v != 0U,& __gen_e_acsl_assert_data_17);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     }
+    /*@ assert Eva: initialization: \initialized(&x); */
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)x,(size_t)v);
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"v",0,v);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"x",(void *)x);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+                                 "\\aligned(x,v)",0,__gen_e_acsl_aligned);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(x,v)";
+    __gen_e_acsl_assert_data_16.file = "rte.i";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 81;
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+  }
+  /*@ assert \aligned(x,v); */ ;
+  {
+    int __gen_e_acsl_aligned_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"y",0,y);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_18,"z",0,z);
-    /*@ assert E_ACSL: "division by zero": y / z != 0; */
-    {
-      __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
-      __gen_e_acsl_assert_data_18.pred_txt = "y / z != 0";
-      __gen_e_acsl_assert_data_18.file = "rte.i";
-      __gen_e_acsl_assert_data_18.fct = "main";
-      __gen_e_acsl_assert_data_18.line = 54;
-      __gen_e_acsl_assert_data_18.name = "division by zero";
-      __e_acsl_assert(y / z != 0L,& __gen_e_acsl_assert_data_18);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
-    }
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)x,_Alignof(char));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_18,
+                                   "alignof(char)",0,_Alignof(char));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,"x",(void *)x);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
+                                 "\\aligned(x,alignof(char))",0,
+                                 __gen_e_acsl_aligned_2);
+    __gen_e_acsl_assert_data_18.blocking = 1;
+    __gen_e_acsl_assert_data_18.kind = "Assertion";
+    __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(x,alignof(char))";
+    __gen_e_acsl_assert_data_18.file = "rte.i";
+    __gen_e_acsl_assert_data_18.fct = "main";
+    __gen_e_acsl_assert_data_18.line = 82;
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_18);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
+  }
+  /*@ assert \aligned(x,alignof(char)); */ ;
+  {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_20,"z",0,z);
+    /*@ assert E_ACSL: "division by zero": z != 0; */
+    {
+      __gen_e_acsl_assert_data_20.blocking = 1;
+      __gen_e_acsl_assert_data_20.kind = "RTE";
+      __gen_e_acsl_assert_data_20.pred_txt = "z != 0";
+      __gen_e_acsl_assert_data_20.file = "rte.i";
+      __gen_e_acsl_assert_data_20.fct = "main";
+      __gen_e_acsl_assert_data_20.line = 84;
+      __gen_e_acsl_assert_data_20.name = "division by zero";
+      __e_acsl_assert(z != 0L,& __gen_e_acsl_assert_data_20);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,"y",0,y);
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_21,"z",0,z);
+    /*@ assert E_ACSL: "division by zero": y / z != 0; */
+    {
+      __gen_e_acsl_assert_data_21.blocking = 1;
+      __gen_e_acsl_assert_data_21.kind = "RTE";
+      __gen_e_acsl_assert_data_21.pred_txt = "y / z != 0";
+      __gen_e_acsl_assert_data_21.file = "rte.i";
+      __gen_e_acsl_assert_data_21.fct = "main";
+      __gen_e_acsl_assert_data_21.line = 84;
+      __gen_e_acsl_assert_data_21.name = "division by zero";
+      __e_acsl_assert(y / z != 0L,& __gen_e_acsl_assert_data_21);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_22,"v",0,v);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,"y",0,y);
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_22,"z",0,z);
+    /*@ assert E_ACSL: "division by zero": v / (y / z) != 0; */
+    {
+      __gen_e_acsl_assert_data_22.blocking = 1;
+      __gen_e_acsl_assert_data_22.kind = "RTE";
+      __gen_e_acsl_assert_data_22.pred_txt = "v / (y / z) != 0";
+      __gen_e_acsl_assert_data_22.file = "rte.i";
+      __gen_e_acsl_assert_data_22.fct = "main";
+      __gen_e_acsl_assert_data_22.line = 84;
+      __gen_e_acsl_assert_data_22.name = "division by zero";
+      __e_acsl_assert(v / (y / z) != 0L,& __gen_e_acsl_assert_data_22);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
+    }
     __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_19,"v",0,v);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"y",0,y);
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_19,"z",0,z);
-    /*@ assert E_ACSL: "division by zero": v / (y / z) != 0; */
-    {
-      __gen_e_acsl_assert_data_19.blocking = 1;
-      __gen_e_acsl_assert_data_19.kind = "RTE";
-      __gen_e_acsl_assert_data_19.pred_txt = "v / (y / z) != 0";
-      __gen_e_acsl_assert_data_19.file = "rte.i";
-      __gen_e_acsl_assert_data_19.fct = "main";
-      __gen_e_acsl_assert_data_19.line = 54;
-      __gen_e_acsl_assert_data_19.name = "division by zero";
-      __e_acsl_assert(v / (y / z) != 0L,& __gen_e_acsl_assert_data_19);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
-    }
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"v",0,v);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"y",0,y);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_16,"z",0,z);
-    __gen_e_acsl_assert_data_16.blocking = 1;
-    __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "12 / (v / (y / z)) > 0";
-    __gen_e_acsl_assert_data_16.file = "rte.i";
-    __gen_e_acsl_assert_data_16.fct = "main";
-    __gen_e_acsl_assert_data_16.line = 54;
+    __gen_e_acsl_assert_data_19.blocking = 1;
+    __gen_e_acsl_assert_data_19.kind = "Assertion";
+    __gen_e_acsl_assert_data_19.pred_txt = "12 / (v / (y / z)) > 0";
+    __gen_e_acsl_assert_data_19.file = "rte.i";
+    __gen_e_acsl_assert_data_19.fct = "main";
+    __gen_e_acsl_assert_data_19.line = 84;
     __e_acsl_assert((int)(12L / (v / (y / z))) > 0,
-                    & __gen_e_acsl_assert_data_16);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+                    & __gen_e_acsl_assert_data_19);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
   }
   /*@ assert 12 / (v / (y / z)) > 0; */ ;
   int c = 98;
@@ -413,88 +721,88 @@ int main(void)
   int ff = 1;
   {
     int __gen_e_acsl_if;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,"c",0,c);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"c",0,c);
     /*@ assert E_ACSL: "division by zero": c != 0; */
     {
-      __gen_e_acsl_assert_data_21.blocking = 1;
-      __gen_e_acsl_assert_data_21.kind = "RTE";
-      __gen_e_acsl_assert_data_21.pred_txt = "c != 0";
-      __gen_e_acsl_assert_data_21.file = "rte.i";
-      __gen_e_acsl_assert_data_21.fct = "main";
-      __gen_e_acsl_assert_data_21.line = 60;
-      __gen_e_acsl_assert_data_21.name = "division by zero";
-      __e_acsl_assert(c != 0,& __gen_e_acsl_assert_data_21);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
+      __gen_e_acsl_assert_data_24.blocking = 1;
+      __gen_e_acsl_assert_data_24.kind = "RTE";
+      __gen_e_acsl_assert_data_24.pred_txt = "c != 0";
+      __gen_e_acsl_assert_data_24.file = "rte.i";
+      __gen_e_acsl_assert_data_24.fct = "main";
+      __gen_e_acsl_assert_data_24.line = 90;
+      __gen_e_acsl_assert_data_24.name = "division by zero";
+      __e_acsl_assert(c != 0,& __gen_e_acsl_assert_data_24);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
     }
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"c",0,c);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"c",0,c);
     if (12 / c != 0) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,"t",0,t);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"t",0,t);
       /*@ assert E_ACSL: "division by zero": t != 0; */
       {
-        __gen_e_acsl_assert_data_22.blocking = 1;
-        __gen_e_acsl_assert_data_22.kind = "RTE";
-        __gen_e_acsl_assert_data_22.pred_txt = "t != 0";
-        __gen_e_acsl_assert_data_22.file = "rte.i";
-        __gen_e_acsl_assert_data_22.fct = "main";
-        __gen_e_acsl_assert_data_22.line = 60;
-        __gen_e_acsl_assert_data_22.name = "division by zero";
-        __e_acsl_assert(t != 0,& __gen_e_acsl_assert_data_22);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
+        __gen_e_acsl_assert_data_25.blocking = 1;
+        __gen_e_acsl_assert_data_25.kind = "RTE";
+        __gen_e_acsl_assert_data_25.pred_txt = "t != 0";
+        __gen_e_acsl_assert_data_25.file = "rte.i";
+        __gen_e_acsl_assert_data_25.fct = "main";
+        __gen_e_acsl_assert_data_25.line = 90;
+        __gen_e_acsl_assert_data_25.name = "division by zero";
+        __e_acsl_assert(t != 0,& __gen_e_acsl_assert_data_25);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
       }
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"t",0,t);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"t",0,t);
       __gen_e_acsl_if = 1 / t < 3;
     }
     else {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"ff",0,ff);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"ff",0,ff);
       /*@ assert E_ACSL: "division by zero": ff != 0; */
       {
-        __gen_e_acsl_assert_data_23.blocking = 1;
-        __gen_e_acsl_assert_data_23.kind = "RTE";
-        __gen_e_acsl_assert_data_23.pred_txt = "ff != 0";
-        __gen_e_acsl_assert_data_23.file = "rte.i";
-        __gen_e_acsl_assert_data_23.fct = "main";
-        __gen_e_acsl_assert_data_23.line = 60;
-        __gen_e_acsl_assert_data_23.name = "division by zero";
-        __e_acsl_assert(ff != 0,& __gen_e_acsl_assert_data_23);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
+        __gen_e_acsl_assert_data_26.blocking = 1;
+        __gen_e_acsl_assert_data_26.kind = "RTE";
+        __gen_e_acsl_assert_data_26.pred_txt = "ff != 0";
+        __gen_e_acsl_assert_data_26.file = "rte.i";
+        __gen_e_acsl_assert_data_26.fct = "main";
+        __gen_e_acsl_assert_data_26.line = 90;
+        __gen_e_acsl_assert_data_26.name = "division by zero";
+        __e_acsl_assert(ff != 0,& __gen_e_acsl_assert_data_26);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
       }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"f",0,f);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"ff",0,ff);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"f",0,f);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"ff",0,ff);
       /*@ assert E_ACSL: "division by zero": f / ff - 1 != 0; */
       {
-        __gen_e_acsl_assert_data_24.blocking = 1;
-        __gen_e_acsl_assert_data_24.kind = "RTE";
-        __gen_e_acsl_assert_data_24.pred_txt = "f / ff - 1 != 0";
-        __gen_e_acsl_assert_data_24.file = "rte.i";
-        __gen_e_acsl_assert_data_24.fct = "main";
-        __gen_e_acsl_assert_data_24.line = 60;
-        __gen_e_acsl_assert_data_24.name = "division by zero";
+        __gen_e_acsl_assert_data_27.blocking = 1;
+        __gen_e_acsl_assert_data_27.kind = "RTE";
+        __gen_e_acsl_assert_data_27.pred_txt = "f / ff - 1 != 0";
+        __gen_e_acsl_assert_data_27.file = "rte.i";
+        __gen_e_acsl_assert_data_27.fct = "main";
+        __gen_e_acsl_assert_data_27.line = 90;
+        __gen_e_acsl_assert_data_27.name = "division by zero";
         __e_acsl_assert(f / (long)ff - 1L != 0L,
-                        & __gen_e_acsl_assert_data_24);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
+                        & __gen_e_acsl_assert_data_27);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
       }
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"f",0,f);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"ff",0,ff);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"f",0,f);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"ff",0,ff);
       __gen_e_acsl_if = (int)(1L / (f / (long)ff - 1L)) > 0;
     }
-    __gen_e_acsl_assert_data_20.blocking = 1;
-    __gen_e_acsl_assert_data_20.kind = "Assertion";
-    __gen_e_acsl_assert_data_20.pred_txt = "12 / c != 0 ? 1 / t < 3 : 1 / (f / ff - 1) > 0";
-    __gen_e_acsl_assert_data_20.file = "rte.i";
-    __gen_e_acsl_assert_data_20.fct = "main";
-    __gen_e_acsl_assert_data_20.line = 60;
-    __e_acsl_assert(__gen_e_acsl_if,& __gen_e_acsl_assert_data_20);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
+    __gen_e_acsl_assert_data_23.blocking = 1;
+    __gen_e_acsl_assert_data_23.kind = "Assertion";
+    __gen_e_acsl_assert_data_23.pred_txt = "12 / c != 0 ? 1 / t < 3 : 1 / (f / ff - 1) > 0";
+    __gen_e_acsl_assert_data_23.file = "rte.i";
+    __gen_e_acsl_assert_data_23.fct = "main";
+    __gen_e_acsl_assert_data_23.line = 90;
+    __e_acsl_assert(__gen_e_acsl_if,& __gen_e_acsl_assert_data_23);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
   }
   /*@ assert 12 / c != 0 ? 1 / t < 3 : 1 / (f / ff - 1) > 0; */ ;
   int *n = & y;
@@ -505,89 +813,89 @@ int main(void)
     int __gen_e_acsl_and;
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_29 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_30 =
       {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& n),
                                                     sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_27,"&n",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_30,"&n",
                                  (void *)(& n));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_27,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_30,
                                    "sizeof(int *)",0,sizeof(int *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)n,sizeof(int),
                                                     (void *)n,(void *)(& n));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_27,"n",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_30,"n",
                                    (void *)n);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_27,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_30,
                                      "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
-    __gen_e_acsl_assert_data_27.blocking = 1;
-    __gen_e_acsl_assert_data_27.kind = "RTE";
-    __gen_e_acsl_assert_data_27.pred_txt = "\\valid_read(n)";
-    __gen_e_acsl_assert_data_27.file = "rte.i";
-    __gen_e_acsl_assert_data_27.fct = "main";
-    __gen_e_acsl_assert_data_27.line = 63;
-    __gen_e_acsl_assert_data_27.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_27);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"*n",0,*n);
+    __gen_e_acsl_assert_data_30.blocking = 1;
+    __gen_e_acsl_assert_data_30.kind = "RTE";
+    __gen_e_acsl_assert_data_30.pred_txt = "\\valid_read(n)";
+    __gen_e_acsl_assert_data_30.file = "rte.i";
+    __gen_e_acsl_assert_data_30.fct = "main";
+    __gen_e_acsl_assert_data_30.line = 93;
+    __gen_e_acsl_assert_data_30.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_30);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_30);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,"*n",0,*n);
     /*@ assert E_ACSL: "division by zero": *n != 0; */
     {
-      __gen_e_acsl_assert_data_26.blocking = 1;
-      __gen_e_acsl_assert_data_26.kind = "RTE";
-      __gen_e_acsl_assert_data_26.pred_txt = "*n != 0";
-      __gen_e_acsl_assert_data_26.file = "rte.i";
-      __gen_e_acsl_assert_data_26.fct = "main";
-      __gen_e_acsl_assert_data_26.line = 63;
-      __gen_e_acsl_assert_data_26.name = "division by zero";
-      __e_acsl_assert(*n != 0,& __gen_e_acsl_assert_data_26);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
+      __gen_e_acsl_assert_data_29.blocking = 1;
+      __gen_e_acsl_assert_data_29.kind = "RTE";
+      __gen_e_acsl_assert_data_29.pred_txt = "*n != 0";
+      __gen_e_acsl_assert_data_29.file = "rte.i";
+      __gen_e_acsl_assert_data_29.fct = "main";
+      __gen_e_acsl_assert_data_29.line = 93;
+      __gen_e_acsl_assert_data_29.name = "division by zero";
+      __e_acsl_assert(*n != 0,& __gen_e_acsl_assert_data_29);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_29);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_31 =
       {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& n),
                                                       sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_28,"&n",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_31,"&n",
                                  (void *)(& n));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_28,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
                                    "sizeof(int *)",0,sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_read_2;
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)n,sizeof(int),
                                                       (void *)n,
                                                       (void *)(& n));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_28,"n",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_31,"n",
                                    (void *)n);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_28,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
                                      "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and_2 = 0;
+    __gen_e_acsl_assert_data_31.blocking = 1;
+    __gen_e_acsl_assert_data_31.kind = "RTE";
+    __gen_e_acsl_assert_data_31.pred_txt = "\\valid_read(n)";
+    __gen_e_acsl_assert_data_31.file = "rte.i";
+    __gen_e_acsl_assert_data_31.fct = "main";
+    __gen_e_acsl_assert_data_31.line = 93;
+    __gen_e_acsl_assert_data_31.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_31);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_31);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,"*n",0,*n);
     __gen_e_acsl_assert_data_28.blocking = 1;
-    __gen_e_acsl_assert_data_28.kind = "RTE";
-    __gen_e_acsl_assert_data_28.pred_txt = "\\valid_read(n)";
+    __gen_e_acsl_assert_data_28.kind = "Assertion";
+    __gen_e_acsl_assert_data_28.pred_txt = "12 / *n > 0";
     __gen_e_acsl_assert_data_28.file = "rte.i";
     __gen_e_acsl_assert_data_28.fct = "main";
-    __gen_e_acsl_assert_data_28.line = 63;
-    __gen_e_acsl_assert_data_28.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_28);
+    __gen_e_acsl_assert_data_28.line = 93;
+    __e_acsl_assert(12 / *n > 0,& __gen_e_acsl_assert_data_28);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_28);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"*n",0,*n);
-    __gen_e_acsl_assert_data_25.blocking = 1;
-    __gen_e_acsl_assert_data_25.kind = "Assertion";
-    __gen_e_acsl_assert_data_25.pred_txt = "12 / *n > 0";
-    __gen_e_acsl_assert_data_25.file = "rte.i";
-    __gen_e_acsl_assert_data_25.fct = "main";
-    __gen_e_acsl_assert_data_25.line = 63;
-    __e_acsl_assert(12 / *n > 0,& __gen_e_acsl_assert_data_25);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
   }
   /*@ assert 12 / *n > 0; */ ;
   __retres = 0;
@@ -819,12 +1127,12 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
           if (__gen_e_acsl_var_2 % k == __gen_e_acsl_var_2) ;
           else {
             __gen_e_acsl_forall = 0;
-            goto e_acsl_end_loop2;
+            goto e_acsl_end_loop4;
           }
         }
         __gen_e_acsl_var_2 ++;
       }
-      e_acsl_end_loop2: ;
+      e_acsl_end_loop4: ;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                    "bhvr: \\forall integer var; 0 <= var < k ==> var % k == var",
                                    0,__gen_e_acsl_forall);
@@ -853,12 +1161,12 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
           if (! (__gen_e_acsl_var_3 % l == __gen_e_acsl_var_3)) ;
           else {
             __gen_e_acsl_exists = 1;
-            goto e_acsl_end_loop3;
+            goto e_acsl_end_loop5;
           }
         }
         __gen_e_acsl_var_3 ++;
       }
-      e_acsl_end_loop3: ;
+      e_acsl_end_loop5: ;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                    "bhvr: \\exists integer var; 0 <= var < l && var % l == var",
                                    0,__gen_e_acsl_exists);
@@ -1116,19 +1424,19 @@ double __gen_e_acsl_f2(double x)
   __e_acsl_mpq_t __gen_e_acsl_x;
   __e_acsl_mpq_t __gen_e_acsl_div_2;
   double __gen_e_acsl__4;
-  __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 = {.values = (void *)0};
-  __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_12,"x",x);
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 = {.values = (void *)0};
+  __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_15,"x",x);
   /*@ assert E_ACSL: "division by zero": x != 0; */
   {
-    __gen_e_acsl_assert_data_12.blocking = 1;
-    __gen_e_acsl_assert_data_12.kind = "RTE";
-    __gen_e_acsl_assert_data_12.pred_txt = "x != 0";
-    __gen_e_acsl_assert_data_12.file = "rte.i";
-    __gen_e_acsl_assert_data_12.fct = "f2";
-    __gen_e_acsl_assert_data_12.line = 13;
-    __gen_e_acsl_assert_data_12.name = "division by zero";
-    __e_acsl_assert(x != 0.,& __gen_e_acsl_assert_data_12);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "RTE";
+    __gen_e_acsl_assert_data_15.pred_txt = "x != 0";
+    __gen_e_acsl_assert_data_15.file = "rte.i";
+    __gen_e_acsl_assert_data_15.fct = "f2";
+    __gen_e_acsl_assert_data_15.line = 13;
+    __gen_e_acsl_assert_data_15.name = "division by zero";
+    __e_acsl_assert(x != 0.,& __gen_e_acsl_assert_data_15);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
   __gmpq_init(__gen_e_acsl__3);
   __gmpq_set_str(__gen_e_acsl__3,"1",10);

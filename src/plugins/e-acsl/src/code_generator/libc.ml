@@ -320,7 +320,7 @@ let process_strcat ~loc ?result env kf ?size_e dest_e src_e =
      start pointer and the size. *)
   let initialize = Smart_stmt.rtl_call ~loc "initialize" [ dest_e; n ] in
   let initialize_blk, env =
-    Env.pop_and_get env initialize ~global_clear:false Env.Middle
+    Env.pop_and_get ~kf env initialize ~global_clear:false Env.Middle
   in
 
   let initialize_blk = Smart_stmt.block_stmt initialize_blk in
@@ -377,7 +377,7 @@ let update_memory_model ~loc ?result env kf caller args =
     in
     let initialize = Smart_stmt.rtl_call ~loc "initialize" [buffer_e; n] in
     let initialize_blk, env =
-      Env.pop_and_get env initialize ~global_clear:false Env.Middle
+      Env.pop_and_get ~kf env initialize ~global_clear:false Env.Middle
     in
     let env =
       Env.add_stmt ~post env (Smart_stmt.block_stmt initialize_blk)
@@ -401,7 +401,7 @@ let update_memory_model ~loc ?result env kf caller args =
     in
     let initialize = Smart_stmt.rtl_call ~loc "initialize" [ dest_e; n ] in
     let initialize_blk, env =
-      Env.pop_and_get env initialize ~global_clear:false Env.Middle
+      Env.pop_and_get ~kf env initialize ~global_clear:false Env.Middle
     in
     let initialize_blk = Smart_stmt.block_stmt initialize_blk in
     let env = Env.add_stmt env src_size_stmt in
@@ -438,7 +438,7 @@ let update_memory_model ~loc ?result env kf caller args =
     in
     let initialize = Smart_stmt.rtl_call ~loc "initialize" [ buffer_e; n ] in
     let then_blk, env =
-      Env.pop_and_get env initialize ~global_clear:false Env.Middle
+      Env.pop_and_get ~kf env initialize ~global_clear:false Env.Middle
     in
     let if_res_pos_stmt =
       Smart_stmt.if_stmt
@@ -483,7 +483,7 @@ let update_memory_model ~loc ?result env kf caller args =
       Smart_stmt.assigns ~loc ~result:(Cil.var n_vi) res_plus_one_e
     in
     let assigns_res_plus_one_blk, env =
-      Env.pop_and_get
+      Env.pop_and_get ~kf
         env
         assigns_res_plus_one_stmt
         ~global_clear:false
@@ -504,7 +504,7 @@ let update_memory_model ~loc ?result env kf caller args =
       ]
     in
     let blk, env =
-      Env.pop_and_get env blk_stmt ~global_clear:false Env.Middle
+      Env.pop_and_get ~kf env blk_stmt ~global_clear:false Env.Middle
     in
     let res_pos = Misc.make_binop ~loc Ge result_e (Cil.zero ~loc) in
     let size_strict_pos = Misc.make_binop ~loc Gt size_e (Cil.zero ~loc) in

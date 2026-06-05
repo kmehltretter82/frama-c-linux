@@ -118,9 +118,7 @@ let requires ~spec node p =
 (* -------------------------------------------------------------------------- *)
 
 let subst ~loc kf es t =
-  match
-    Logic_subst.term
-      ~formals:(Kernel_function.get_formals kf) ~concretes:es t
+  match Logic_subst.term (Kernel_function.get_formals kf) es t
   with Some t -> t | None ->
     Options.abort ~source:(fst loc)
       "Can not evaluate term (%a)@ from function %a at call site"

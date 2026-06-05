@@ -34,7 +34,7 @@ module ComputationState = struct
     | Aborted -> `String "aborted"
 end
 
-let computation_signal =
+let _signal =
   States.register_framac_value ~package
     ~name:"computationState"
     ~descr:(Markdown.plain "The current computation state of the analysis.")
@@ -56,10 +56,6 @@ let () = Request.register ~package
     ~input:(module Data.Junit)
     ~output:(module Data.Junit)
     Analysis.abort
-
-let register_computation_hook f =
-  Self.ComputationState.add_hook_on_change (fun _ -> f ());
-  Self.ComputationState.add_hook_on_update (fun _ -> f ())
 
 let clear () =
   if Self.ComputationState.get () <> Computing then
@@ -151,5 +147,5 @@ let () = Request.register ~package
     ~input:(module Data.Jpair (Kernel_ast.Marker) (Data.Jbool))
     ~output:(module Data.Jlist
           (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
-    ~signals:[computation_signal]
+    ~signals:Update.signals
     get_states

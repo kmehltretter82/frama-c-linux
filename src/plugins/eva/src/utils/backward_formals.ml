@@ -17,7 +17,7 @@ let safe_argument expr =
   let is_safe_lval ~visitor:_ (lval : Eva_ast.lval) =
     match lval.node with
     | Var vi, NoOffset ->
-      not (vi.vaddrof || Ast_types.has_qualifier "volatile" vi.vtype || vi.vglob)
+      not (vi.vaddrof || Ast_types.is_volatile vi.vtype || vi.vglob)
     | _, _ -> false
   in
   let open Eva_ast_visitor.Observe in

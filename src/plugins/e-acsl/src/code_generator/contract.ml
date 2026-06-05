@@ -378,7 +378,7 @@ let check_other_requires kf env contract =
       let requires = Smart_stmt.block_from_stmts stmts in
       (* Pop the env to build the requires check *)
       let requires_blk, env =
-        Env.pop_and_get
+        Env.pop_and_get ~kf
           env
           requires
           ~global_clear:false
@@ -705,7 +705,7 @@ let check_post_conds kf env contract =
       let post_cond = Smart_stmt.block_from_stmts stmts in
       (* Pop the env to build the post_cond check *)
       let post_cond_blk, env =
-        Env.pop_and_get
+        Env.pop_and_get ~kf
           env
           post_cond
           ~global_clear:false

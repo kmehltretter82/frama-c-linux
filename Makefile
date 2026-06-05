@@ -51,7 +51,7 @@ ifneq ($(DISABLED_PLUGINS),)
 endif
 	dune build ${WORKSPACE_OPT} ${DUNE_BUILD_OPTS} @install
 
-clean:: purge-tests # to be done before a "dune" command
+clean:: purge-ptests # to be done before a "dune" command
 ifeq (${FRAMAC_DEVELOPER},yes)
 	dune clean --no-print-directory --root ${FRAMAC_LINTCK_SRC}
 	dune clean --no-print-directory --root ${FRAMAC_HDRCK_SRC}

@@ -90,7 +90,7 @@ let mk_function name =
 let mk_init_function () =
   (* Create and register [__e_acsl_globals_init] function with definition
      for initialization of global variables *)
-  let vi, fundec, _ = mk_function function_init_name in
+  let vi, fundec, kf = mk_function function_init_name in
   (* Now generate the statements. The generation is done only now because it
      depends on the local variable [already_run] whose generation required the
      existence of [fundec] *)
@@ -146,7 +146,7 @@ let mk_init_function () =
   let b, stmts = match stmts with
     | [] -> assert false
     | stmt :: stmts ->
-      let b, _env = Env.pop_and_get env stmt ~global_clear:true Env.Before in
+      let b, _env = Env.pop_and_get ~kf env stmt ~global_clear:true Env.Before in
       b, stmts
   in
   let stmts = Smart_stmt.block_stmt b :: stmts in

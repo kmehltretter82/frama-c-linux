@@ -266,10 +266,10 @@
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:59 (for interrupt_received_b)
+  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
+  interrupt.c:59 (for interrupt_received_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -413,10 +413,10 @@
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:59 (for interrupt_received_b)
+  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
+  interrupt.c:59 (for interrupt_received_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -562,10 +562,10 @@
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:59 (for interrupt_received_b)
+  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
+  interrupt.c:59 (for interrupt_received_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 5
 [mt] *** Computing thread <main>, iteration 5 (shared vars values changed and
@@ -715,10 +715,10 @@
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:59 (for interrupt_received_b)
+  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
+  interrupt.c:59 (for interrupt_received_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
@@ -828,9 +828,9 @@
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:59 (for interrupt_received_b)
+  interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
+  interrupt.c:59 (for interrupt_received_b)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 6 iterations

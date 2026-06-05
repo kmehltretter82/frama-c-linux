@@ -26,7 +26,7 @@ type call_result =
 
 type builtin = Cvalue.Model.t -> (Eva_ast.exp * Cvalue.V.t) list -> call_result
 
-(* Table of all registered builtins; filled by [register_builtin] calls.  *)
+(* Table of all registered builtins; filled by [register_builtin] calls. *)
 let table = Hashtbl.create 17
 
 (* Table binding each kernel function to their builtin for a given analysis.
@@ -43,29 +43,20 @@ module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
 let register_builtin name ?replace ?typ f =
   Parameters.register_builtin name;
-  let builtin = (name, f, typ) in
-  Hashtbl.replace table name builtin;
-  match replace with
-  | None -> ()
-  | Some fname -> Hashtbl.replace table fname builtin
+  Hashtbl.replace table name (f, typ, replace)
 
 let unregister_builtin name =
   Parameters.unregister_builtin name;
   Hashtbl.remove table name
 
-let is_builtin name =
-  try
-    let bname, _, _ = Hashtbl.find table name in
-    name = bname
-  with Not_found -> false
+let is_builtin = Hashtbl.mem table
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
     Hashtbl.fold
-      (fun name (builtin_name, _, _) (acc1, acc2) ->
-         if name = builtin_name
-         then name :: acc1, acc2
-         else acc1, (name, builtin_name) :: acc2)
+      (fun name (_, _, replace) (acc1, acc2) ->
+         name :: acc1,
+         Option.fold replace ~none:acc2 ~some:(fun r -> (r, name) :: acc2))
       table ([], [])
   in
   List.sort String.compare stand_alone,
@@ -176,7 +167,10 @@ let inconsistent_builtin_typ kf = function
       || List.exists2 (fun (_, t, _) u -> need_cast t u) args expected_args
     | _ -> assert false
 
-let prepare_builtin kf (name, builtin, expected_typ) =
+(* Registers builtin [builtin] of name [name] to be used for the analysis of
+   function [kf], if its type is compatible with [expected_typ] and it has a
+   suitable specification. *)
+let prepare_builtin kf name builtin expected_typ =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
   then warn_incompatible_type ~source name kf
@@ -193,19 +187,24 @@ let prepare_builtins () =
   BuiltinsOverride.clear ();
   Hashtbl.clear builtins_table;
   let autobuiltins = Parameters.BuiltinsAuto.get () in
-  (* Links kernel functions to the registered builtins. *)
+  (* Links function [name] (if it exists) to the registered [builtin]. *)
+  let prepare_if_exist builtin expected_typ name =
+    try
+      let kf = Globals.Functions.find_by_name name in
+      prepare_builtin kf name builtin expected_typ
+    with Not_found -> ()
+  in
   Hashtbl.iter
-    (fun name (bname, f, typ) ->
-       if autobuiltins || name = bname
-       then
-         try
-           let kf = Globals.Functions.find_by_name name in
-           prepare_builtin kf (name, f, typ)
-         with Not_found -> ())
+    (fun name (builtin, typ, replace) ->
+       prepare_if_exist builtin typ name;
+       if autobuiltins then Option.iter (prepare_if_exist builtin typ) replace)
     table;
   (* Overrides builtins attribution according to the -eva-builtin option. *)
-  Parameters.BuiltinsOverrides.iter
-    (fun (kf, name) -> prepare_builtin kf (Hashtbl.find table name));
+  let prepare_overridden (kf, name) =
+    let builtin, typ, _ = Hashtbl.find table name in
+    prepare_builtin kf name builtin typ
+  in
+  Parameters.BuiltinsOverrides.iter prepare_overridden;
   BuiltinsOverride.mark_as_computed ()
 
 (* Emits warning if builtin [name] overrides function definition [kf], or if

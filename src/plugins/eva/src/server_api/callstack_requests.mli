@@ -6,21 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Smart constructors for building expressions of the intermediate language. *)
+module JCallsite : Server.Data.S with type t = Callstack.call
+module JCallstack : Server.Data.S with type t = Callstack.t
 
-open Cil_types
-
-module Exp : sig
-  val of_exp_node :
-    ?origin:term -> Interlang.exp_node -> Interlang.exp
-
-  val of_lval :
-    ?origin:term -> Interlang.lval -> Interlang.exp
-
-  val of_integer : origin:term -> Z.t -> Interlang.exp
-  val of_sizeof : origin:term -> typ -> Interlang.exp
-end
-
-module Lhost : sig
-  val of_varinfo : ?name:string -> varinfo -> Interlang.lhost
-end
+val compatible_filter: unit -> (Callstack.t -> bool) option

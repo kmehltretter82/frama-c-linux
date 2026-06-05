@@ -61,7 +61,7 @@ module Make
 
   module PreviousCalls =
     Kernel_function.Make_Table
-      (ArgsToStoredCalls)
+      (Eva_utils.Do_Not_Marshal (ArgsToStoredCalls))
       (struct
         let size = 17
         let dependencies = [Self.state]

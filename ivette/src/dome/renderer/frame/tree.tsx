@@ -95,12 +95,13 @@ export interface NodeProps {
   icon?: string;
   label?: string;
   title?: string;
+  visible?: boolean; /* default to true */
   actions?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export function Node(props: NodeProps): JSX.Element {
-  const { id, icon, label, title, actions, children } = props;
+  const { id, icon, label, title, visible = true, actions, children } = props;
 
   const context = React.useContext(CONTEXT);
   const countChildren = React.Children.count(children);
@@ -123,7 +124,11 @@ export function Node(props: NodeProps): JSX.Element {
     if(context.unfoldAll !== undefined) setUnfold(context.unfoldAll);
   }, [context.unfoldAll]);
 
-  const className = classes(
+  const classContainer = classes(
+    'dome-xTree-node-container',
+    !visible && 'dome-xTree-node-hidden'
+  );
+  const classNode = classes(
     'dome-xTree-node',
     hasSubTree ? "dome-xTree-has-subtree" : "",
     unfold ? 'dome-xTree-show-children' : 'dome-xTree-hide-children',
@@ -157,15 +162,13 @@ export function Node(props: NodeProps): JSX.Element {
       depth: context.depth+1,
       heightSticky: context.heightSticky+height
     }}>
-      <div>
-        <div ref={ref} className={className} style={style}
+      <div className={classContainer}>
+        <div ref={ref} className={classNode} style={style} title={title}
           onClick={() => context.onClick ? context.onClick(id) : flipUnfold() }
         >
-            <div>
+            <div >
               { foldIconPosition === 'left' && foldIcon }
-              <Label icon={icon} title={title}
-                label={label}
-              ></Label>
+              <Label icon={icon} label={label} ></Label>
             </div>
             <Actions>
               { actions && actions }

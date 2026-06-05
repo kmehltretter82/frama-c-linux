@@ -29,11 +29,38 @@ double avg(double a, double b) {
 void test(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
           int k, int l) {}
 
+void simple_loop() {
+  int sum = 0;
+  int x = 11;
+  /*@ loop invariant 0 <= i / x; */
+  for (int i = 0; i < 10; i++) {
+    sum += i;
+    x -= 1;
+  }
+}
+
+void nested_loop() {
+  int a[10];
+
+  for (int i = 0; i < 10; i++) {
+    a[i] = i;
+  }
+
+  int k;
+  /*@ loop invariant 1 <= k <= 10;
+    @ loop invariant \forall integer i; 1 <= i < k ==> a[i] / i == 1; */
+  for (k = 1; k < 10; k++) {
+    a[k] = a[k] / 1;
+  }
+}
+
 int main(void) {
   int y = 2;
   long z = 2L;
   int w = 12;
 
+  /*@ assert 4 / 2 == 2; */               // trivial case for division by zero
+  /*@ assert (1 == 1) || (1 / y) < 2 ; */ // pathologic case for item #287
   /*@ assert 4 / y == 2 || 1 / w > 0; */
   /*@ assert 4 / (12 + 3 - 6) < 2; */
 
@@ -45,6 +72,9 @@ int main(void) {
   /*@ assert f2(d) > 0; */
 
   test(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+
+  simple_loop();
+  nested_loop();
 
   char *x;
   unsigned int v = 1;

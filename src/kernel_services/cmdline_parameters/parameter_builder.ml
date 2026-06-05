@@ -713,7 +713,8 @@ struct
 
   exception Cannot_build of string
 
-  let cannot_build msg = raise (Cannot_build msg)
+  let cannot_build format =
+    Format.kasprintf (fun msg -> raise (Cannot_build msg)) format
 
   module Custom
       (V: Parameter_sig.Value_datatype)
@@ -798,7 +799,7 @@ struct
 
     module Custom_value =
     struct
-      include Datatype.Make_with_set_and_map (struct
+      include Datatype.Make (struct
           include Datatype.Serializable_undefined
           let name = "Parameter_builder.Enum(" ^ X.option_name ^ ")"
           type t = X.t
@@ -816,7 +817,7 @@ struct
       let of_string s =
         match of_string_opt s with
         | Some s -> s
-        | None -> cannot_build ("possible values are " ^ string_list ~sep:",")
+        | None -> cannot_build "possible values are %s" (string_list ~sep:",")
 
       let to_string x =
         try
@@ -1326,7 +1327,7 @@ struct
     if list = [] then
       if Cmdline.permissive && not (must_exist || require_fundecl)
       then P.L.warning "ignoring non-existing function%s '%s'." specific_msg s
-      else cannot_build (Format.asprintf "no function%s '%s'" specific_msg s);
+      else cannot_build "no function%s '%s'" specific_msg s;
     list
 
   module Kernel_function_string(
@@ -1494,7 +1495,7 @@ struct
 
     let of_string s =
       try int_of_string s
-      with Failure _ -> raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
+      with Failure _ -> cannot_build "'%s' is not an integer" s
 
     let to_string = string_of_int
   end
@@ -1520,7 +1521,7 @@ struct
     let of_val k v =
       try V.of_string v
       with Cannot_build s ->
-        cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
+        cannot_build "@[value bound to '%s':@ %s@]" k s
 
     module Pair = struct
       include Datatype.Pair(K)(V)
@@ -1569,7 +1570,7 @@ struct
           | [ Str.Text t1; Str.Delim _; ] -> (t1, empty_string)
           | [ Str.Text t1; Str.Delim _; Str.Text t2 ] -> (t1, t2)
           | _ -> (* impossible case *)
-            raise (Cannot_build ("delimiter="^d))
+            cannot_build "delimiter=%s" d
         in
         fun s ->
           let (keys, value) =
@@ -1577,8 +1578,8 @@ struct
               K.Set.of_list (K.of_string k), of_val k v_opt
             in
             match Str.bounded_full_split r s 2 with
-            | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-            | [ Str.Text k ] -> cannot_build ("no value bound to '" ^ k ^ "'")
+            | [] -> cannot_build "cannot interpret '%s'" s
+            | [ Str.Text k ] -> cannot_build "no value bound to '%s'" k
             | [ Str.Delim d ] ->
               let (f,s) = split_delim d in
               get_pairing f s
@@ -1695,7 +1696,7 @@ struct
     let of_val k v =
       try V.of_string v
       with Cannot_build s ->
-        cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
+        cannot_build "@[value bound to '%s':@ %s@]" k s
 
     module Pair = struct
       include Datatype.Pair(K)(Datatype.List(V))
@@ -1757,8 +1758,8 @@ struct
         fun s ->
           let (keys, values) =
             match Str.full_split r s with
-            | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-            | [Str.Text k] -> cannot_build ("no value bound to '" ^ k ^ "'")
+            | [] -> cannot_build "cannot interpret '%s'" s
+            | [Str.Text k] -> cannot_build "no value bound to '%s'" k
             | Str.Delim d :: l ->
               let (f,s) = split_delim d in
               get_pairing f s l

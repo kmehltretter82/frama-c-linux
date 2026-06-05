@@ -381,7 +381,7 @@ module DynamicHintDatatype = Datatype.Make(struct
     type t = dynamic_hint
     let name = "Widen.DynamicHintDatatype"
     let structural_descr =
-      Structural_descr.t_tuple
+      Structural_descr.t_record
         [| Base.Hptset.packed_descr;
            ExpOffset.packed_descr;
            IntSet.packed_descr;

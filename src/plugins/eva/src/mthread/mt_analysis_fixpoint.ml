@@ -290,6 +290,9 @@ let post_iteration analysis =
     let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
     let need_sync = Mt_mutexes.need_sync ill_protected in
     if need_sync <> [] then begin
+      (* Sort statements before printing *)
+      let cmp (stmt1, _) (stmt2, _) = Cil_datatype.Stmt.compare stmt1 stmt2 in
+      let need_sync = List.sort cmp need_sync in
       let pp fmt (stmt, z) =
         Format.fprintf fmt "@[%a (for %a)@]"
           Fileloc.pretty (Cil_datatype.Stmt.loc stmt)

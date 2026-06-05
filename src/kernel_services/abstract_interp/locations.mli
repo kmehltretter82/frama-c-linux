@@ -36,6 +36,12 @@ val addr_bytes : t -> Addresses.Bytes.t
 
 val size : t -> Z_or_top.t
 
+
+(** [is_volatile loc] returns false if none of the concrete locations
+    represented by [loc] are volatile. It returns true if at least one
+    of the represented locations may be volatile. *)
+val is_volatile : t -> bool
+
 (** Kind of memory access. *)
 type access = Read | Write | Object_pointer | Any_pointer
 
