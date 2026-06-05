@@ -835,7 +835,7 @@ open F
 let extern_data et ts = E.(t_data !@et ts)
 let extern_tau name = mk_extern (fun env -> t_data (extern_c name env) [])
 let extern_val name = mk_extern (fun env -> e_fun (extern_l name env) [])
-let extern_map f e = mk_extern (fun env -> f @@ e.compute env)
+let extern_map f e = mk_extern (fun _env -> E.(f !@e))
 let extern_const c = mk_extern (fun _env -> c)
 let extern_lfun ef es = E.(e_fun !@ef es)
 let extern_pred ef es = E.(p_call !@ef es)

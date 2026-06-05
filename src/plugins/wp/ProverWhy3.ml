@@ -100,7 +100,10 @@ let lfun_wname (lfun:Lang.lfun) =
   | QFUN _ -> assert false
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | LFUN l -> Qed.Engine.F_call l.m_name
+  | LFUN l ->
+    match l.m_category with
+    | Operator op when op.associative -> Qed.Engine.F_assoc l.m_name
+    | _ -> Qed.Engine.F_call l.m_name
 
 let coerce ~cnv sort expected r =
   match sort, expected with
@@ -449,9 +452,19 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     (* Generic *)
     | Fun (QFUN f,ls), tau, expected ->
       coerce ~cnv sort expected $
-      Why3.Term.t_app
-        (Qed.Symbol.Fun.symbol f.e_symbol)
-        (List.map (of_term' cnv) ls) (of_tau ~cnv tau)
+      let r = of_tau ~cnv tau in
+      let es = List.map (of_term' cnv) ls in
+      let ls = Qed.Symbol.Fun.symbol f.e_symbol in
+      begin
+        match f.e_category with
+        | Operator op when op.associative ->
+          let rec foldop = function
+            | [] -> why3_failure "Empty associative operator"
+            | [a] -> a
+            | a::ops -> Why3.Term.t_app ls [a;foldop ops] r
+          in foldop es
+        | _ -> Why3.Term.t_app ls es r
+      end
     | Fun (f,l), _, _ -> begin
         let t_app ls l r  =
           Why3.Term.t_app ls l r
@@ -470,8 +483,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
         match lfun_wname f, expected with
-        | F_call s, _
-        | F_proj s, _
+        | F_call s, _ | F_proj s, _
           -> apply_from_ns' s l sort
         | F_assoc s, _ ->
           let rec aux = function

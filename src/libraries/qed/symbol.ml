@@ -6,28 +6,76 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Operator Names                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let infixes = ["infix ";"prefix ";"mixfix "]
+let rec unwrap_infix s = function
+  | [] -> s
+  | prefix::others ->
+    if String.starts_with ~prefix s then
+      let n = String.length s in
+      let p = String.length prefix in
+      Printf.sprintf "(%s)" @@ String.sub s p (n-p)
+    else unwrap_infix s others
+
+let of_infix s = unwrap_infix s infixes
+
+let to_infix s =
+  let n = String.length s in
+  if n > 2 && s.[0] = '(' && s.[n-1] = ')' then
+    if String.index_opt s '[' <> None
+    then "mixfix " ^ String.sub s 1 (n-2) else
+    if n > 3 && s.[n-2] = '_'
+    then "prefix " ^ String.sub s 1 (n-3)
+    else "infix " ^ String.sub s 1 (n-2)
+  else s
+
+(* -------------------------------------------------------------------------- *)
+(* --- Full Names                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let fullname id =
+  let ps,m,ns = Why3.Theory.restore_path id in
+  let buffer = Buffer.create 80 in
+  List.iter (Printf.bprintf buffer "%s.") ps ;
+  Buffer.add_string buffer m ;
+  List.iter (fun x -> Printf.bprintf buffer ".%s" @@ of_infix x) ns ;
+  Buffer.contents buffer
+
+(* -------------------------------------------------------------------------- *)
+(* --- Why3 Symbol Generic Lookup                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
 let capitalized a =
   match a.[0] with 'A'..'Z' -> true | _ | exception Invalid_argument _ -> false
 
-let fullname (th : Why3.Theory.theory) (id : Why3.Ident.ident) =
-  let buffer = Buffer.create 80 in
-  List.iter (Printf.bprintf buffer "%s.") th.th_path ;
-  Printf.bprintf buffer "%s.%s" th.th_name.id_string id.id_string ;
-  Buffer.contents buffer
-
 let find ~kind ~lookup env name fn =
-  let rec parse lp = function
-    | [] ->
-      Format.kasprintf invalid_arg "Qed.Symbol.find(%S)" name
-    | p::ps ->
-      if capitalized p then
-        try
-          let t = Why3.Env.read_theory env (List.rev lp) p in
-          fn t @@ lookup t.th_export ps
-        with Not_found ->
-          Format.kasprintf invalid_arg "Qed.Symbol.find_%s(%S)" kind name
-      else parse (p::lp) ps
-  in parse [] @@ String.split_on_char '.' name
+  let rec rsplit rp k =
+    if name.[k] = '(' then
+      rp, to_infix (String.sub name k (String.length name - k))
+    else
+      try
+        let k' = String.index_from name k '.' in
+        rsplit (String.sub name k (k'-k) :: rp) (k'+1)
+      with Not_found ->
+        rp , String.sub name k (String.length name - k)
+  in
+  let rec resolve ns m = function
+    | a::rp when capitalized a -> resolve (if m = "" then ns else m::ns) a rp
+    | lp ->
+      try
+        let th = Why3.Env.read_theory env (List.rev lp) m in
+        fn th @@ lookup th.th_export ns
+      with Not_found ->
+        Format.kasprintf invalid_arg "Qed.Symbol.find_%s(%S)" kind name
+  in
+  let rp,a = rsplit [] 0 in resolve [a] "" rp
+
+(* -------------------------------------------------------------------------- *)
+(* --- Why3 Symbol Lookup                                                 --- *)
+(* -------------------------------------------------------------------------- *)
 
 let find_ts e = find ~kind:"type" ~lookup:Why3.Theory.ns_find_ts e
 let find_ls e = find ~kind:"function" ~lookup:Why3.Theory.ns_find_ls e
@@ -174,9 +222,9 @@ struct
   let hash a = Why3.Ident.id_hash (ident a)
   let equal a b = Why3.Ident.id_equal (ident a) (ident b)
   let compare a b = Why3.Ident.id_compare (ident a) (ident b)
-  let name a = (ident a).id_string
-  let fullname a = fullname (theory a) (ident a)
-  let pretty fmt a = Format.pp_print_string fmt (fullname a)
+  let name a = of_infix (ident a).id_string
+  let fullname a = fullname (ident a)
+  let pretty fmt a = Format.pp_print_string fmt @@ name a
 end
 
 module Data = Make

@@ -25,7 +25,7 @@ let f_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.base"
 let f_offset = Lang.extern_f "frama_c_wp.memaddr.MemAddr.offset"
 let f_shift  = Lang.extern_f "frama_c_wp.memaddr.MemAddr.shift"
 let f_global = Lang.extern_f ~category:Injection "frama_c_wp.memaddr.MemAddr.global"
-let f_null   = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
+let f_null = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
 
 let p_addr_lt = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_lt"
 let p_addr_le = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_le"
@@ -339,7 +339,6 @@ let () = Context.register
       let p_valid_rd = !@p_valid_rd in
       let p_valid_rw = !@p_valid_rw in
       let ext = { f_null ; f_shift ; f_global ; f_addr_of_int } in
-
       set_builtin_1   f_base   (phi_base ext) ;
       set_builtin_1   f_offset (phi_offset ext) ;
       set_builtin_2   f_shift  (phi_shift f_shift) ;
