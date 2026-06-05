@@ -136,7 +136,7 @@ function Selector(props: SelectorProps): JSX.Element {
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
-    selectorSelected === id && 'sidebar-selector-selected',
+    selectorSelected === id && visible && 'sidebar-selector-selected',
   );
   const onClick = React.useCallback(() => {
     if (selectorSelected === id) {
