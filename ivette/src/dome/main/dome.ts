@@ -386,7 +386,6 @@ function createBrowserWindow(
   const browserArguments = isAppWindow
     ? SYS.WINDOW_APPLICATION_ARGV
     : SYS.WINDOW_PREFERENCES_ARGV;
-  console.log('[Dome] Browser Arguments', browserArguments);
 
   const iconPath = path.join(__dirname, '../../static/icon.png');
   const appIcon = nativeImage.createFromPath(iconPath);

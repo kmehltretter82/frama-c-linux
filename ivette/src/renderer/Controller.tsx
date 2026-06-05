@@ -54,7 +54,7 @@ function dumpServerConfig(sc: Server.Configuration): string {
         } else
           buffer += ' ';
       }
-      buffer += v;
+      buffer += quote(v);
     });
   }
   return buffer;
@@ -96,8 +96,33 @@ function buildServerConfig(argv: string[], cwd?: string): Server.Configuration {
   };
 }
 
+function tokenizer(cmd: string): string[] {
+  const tokens: string[] = [];
+  let inString = false;
+  let token = 0, offset = 0; // start and current offsets
+  const newToken = (): void => {
+    if (token < offset) tokens.push(cmd.slice(token, offset));
+    token = offset + 1;
+  };
+  for (; offset < cmd.length; offset++) {
+    switch (cmd.charAt(offset)) {
+      case ' ':
+      case '\t':
+      case '\n':
+        if (!inString) newToken();
+        break;
+      case '"':
+        newToken();
+        inString = !inString;
+        break;
+    }
+  }
+  newToken();
+  return tokens;
+}
+
 function buildServerCommand(cmd: string): Server.Configuration {
-  return buildServerConfig(cmd.trim().split(/[ \t\n]+/));
+  return buildServerConfig(tokenizer(cmd));
 }
 
 /* -------------------------------------------------------------------------- */
