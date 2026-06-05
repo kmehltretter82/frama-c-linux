@@ -11,10 +11,10 @@ char array[1024];
 
 int main(void) {
   int *p;
-  /*@ assert ! \freeable(p); */
+  /*@ assert ! (\initialized(&p) && \freeable(p)); */
   /*@ assert ! \freeable((void*)0); */
   p = (int *)malloc(4 * sizeof(int));
-  /*@ assert ! \freeable(p+1); */
+  /*@ assert ! (\initialized(&p+1) && \freeable(p+1)); */
   /*@ assert \freeable(p); */
   free(p);
   /*@ assert ! \freeable(p); */

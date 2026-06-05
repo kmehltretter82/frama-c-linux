@@ -78,7 +78,7 @@ int main(void)
   (*P) ++;
   {
     int __gen_e_acsl_initialized;
-    int __gen_e_acsl_and;
+    int __gen_e_acsl_valid_read;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -90,33 +90,41 @@ int main(void)
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int *)",0,sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\\initialized(&q)",0,
+                                 "uninitialized: \\initialized(&q)",0,
                                  __gen_e_acsl_initialized);
-    if (__gen_e_acsl_initialized) {
-      int __gen_e_acsl_valid_read;
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int),
-                                                    (void *)q,(void *)(& q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"q",
-                                   (void *)q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                   "\"memory access\": \\valid_read(q)",0,
-                                   __gen_e_acsl_valid_read);
-      __gen_e_acsl_and = __gen_e_acsl_valid_read;
-    }
-    else __gen_e_acsl_and = 0;
-    /*@ assert E_ACSL: "memory access": \valid_read(q); */
+    /*@ assert E_ACSL: uninitialized: \initialized(&q); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(q)";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&q)";
       __gen_e_acsl_assert_data_4.file = "ghost.i";
       __gen_e_acsl_assert_data_4.fct = "main";
       __gen_e_acsl_assert_data_4.line = 19;
-      __gen_e_acsl_assert_data_4.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
+      __gen_e_acsl_assert_data_4.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int),
+                                                  (void *)q,(void *)(& q));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"q",(void *)q);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                 "\"memory access\": \\valid_read(q)",0,
+                                 __gen_e_acsl_valid_read);
+    /*@ assert E_ACSL: "memory access": \valid_read(q); */
+    {
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(q)";
+      __gen_e_acsl_assert_data_5.file = "ghost.i";
+      __gen_e_acsl_assert_data_5.fct = "main";
+      __gen_e_acsl_assert_data_5.line = 19;
+      __gen_e_acsl_assert_data_5.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"*q",0,*q);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"G",0,G);

@@ -43,40 +43,48 @@ int main(void)
   p = & s;
   {
     int __gen_e_acsl_initialized;
-    int __gen_e_acsl_and;
+    int __gen_e_acsl_valid_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
                                                     sizeof(struct toto *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&p",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&p",
                                  (void *)(& p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(struct toto *)",0,
                                    sizeof(struct toto *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\\initialized(&p)",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "uninitialized: \\initialized(&p)",0,
                                  __gen_e_acsl_initialized);
-    if (__gen_e_acsl_initialized) {
-      int __gen_e_acsl_valid_2;
-      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto),
-                                            (void *)p,(void *)(& p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",
-                                   (void *)p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(struct toto)",0,
-                                     sizeof(struct toto));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\valid(p)",
-                                   0,__gen_e_acsl_valid_2);
-      __gen_e_acsl_and = __gen_e_acsl_valid_2;
+    /*@ assert E_ACSL: uninitialized: \initialized(&p); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&p)";
+      __gen_e_acsl_assert_data_3.file = "bts1700.i";
+      __gen_e_acsl_assert_data_3.fct = "main";
+      __gen_e_acsl_assert_data_3.line = 12;
+      __gen_e_acsl_assert_data_3.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
-    else __gen_e_acsl_and = 0;
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto),
+                                          (void *)p,(void *)(& p));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",(void *)p);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(struct toto)",0,
+                                   sizeof(struct toto));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\valid(p)",0,
+                                 __gen_e_acsl_valid_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(p)";
     __gen_e_acsl_assert_data_2.file = "bts1700.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 12;
-    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(p); */ ;

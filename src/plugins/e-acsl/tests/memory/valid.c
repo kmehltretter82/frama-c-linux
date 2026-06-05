@@ -10,7 +10,7 @@ int *X, Z;
   @ ensures \valid(\result); */
 int *f(int *x) {
   int *y;
-  /*@ assert ! \valid(y); */
+  /*@ assert ! (\initialized(&y) && \valid(y)); */
   y = x;
   /*@ assert \valid(x); */
   return y;
@@ -28,11 +28,13 @@ void g(void) {
 
 int main(void) {
   int *a, *b, **c, ***d, n = 0;
-  /*@ assert ! \valid(a) && ! \valid(b) && ! \valid(X); */
+  /*@ assert ! (\initialized(&a) && \valid(a)) &&
+             ! (\initialized(&b) && \valid(b)) &&
+             ! (\initialized(&X) && \valid(X)); */
   a = malloc(sizeof(int));
-  /*@ assert \valid(a) && ! \valid(b) && ! \valid(X); */
+  /*@ assert \valid(a) && ! (\initialized(&b) && \valid(b)) && ! (\initialized(&X) && \valid(X)); */
   X = a;
-  /*@ assert \valid(a) && ! \valid(b) && \valid(X); */
+  /*@ assert \valid(a) && ! (\initialized(&b) && \valid(b)) && \valid(X); */
   b = f(&n);
   /*@ assert \valid(a) && \valid(b) && \valid(X); */
   X = b;
@@ -42,7 +44,7 @@ int main(void) {
   /*@ assert \valid(*c); */
   /*@ assert \valid(**d); */
   free(a);
-  /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
+  /*@ assert ! (\initialized(&a) && \valid(a)) && \valid(b) && \valid(X); */
   /*@ assert \valid(&Z); */
   g();
   int i = 3;

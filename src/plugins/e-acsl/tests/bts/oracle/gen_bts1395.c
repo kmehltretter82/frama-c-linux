@@ -13,14 +13,21 @@ int fact(int n)
 {
   int __retres;
   int tmp;
+  __e_acsl_store_block((void *)(& __retres),4UL);
   if (n == 1) {
+    __e_acsl_full_init((void *)(& __retres));
     __retres = 1;
     goto return_label;
   }
   tmp = __gen_e_acsl_fact(n - 1);
   ;
+  __e_acsl_full_init((void *)(& __retres));
   __retres = n * tmp;
-  return_label: return __retres;
+  return_label:
+  {
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
 }
 
 int main(void)
@@ -28,8 +35,34 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = __gen_e_acsl_fact(5);
+  __e_acsl_store_block((void *)(& x),4UL);
+  __e_acsl_full_init((void *)(& x));
   {
+    int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
+                                                    sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&x",
+                                 (void *)(& x));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&x)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&x); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&x)";
+      __gen_e_acsl_assert_data_2.file = "bts1395.i";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 15;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"x",0,x);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
@@ -42,6 +75,7 @@ int main(void)
   }
   /*@ assert x == 120; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
 }
@@ -50,6 +84,7 @@ int main(void)
 int __gen_e_acsl_fact(int n)
 {
   int __retres;
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"n",0,n);
@@ -63,6 +98,7 @@ int __gen_e_acsl_fact(int n)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   __retres = fact(n);
+  __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }
 

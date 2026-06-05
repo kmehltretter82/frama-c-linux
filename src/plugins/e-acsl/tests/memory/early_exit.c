@@ -15,7 +15,7 @@ int goto_bts() {
   }
 
 L:
-  /*@ assert ! \valid(p); */
+  /*@ assert ! (\initialized(&p) && \valid(p)); */
   return 0;
 }
 
@@ -44,8 +44,8 @@ int goto_valid() {
     /* at this point 'a1' is still in scope, while 'a2' and 'a3 are not,
        thus 'q' and 'r' become invalid, whereas 'p' is still valid. */
     /*@ assert   \valid(p); */
-    /*@ assert ! \valid(q); */
-    /*@ assert ! \valid(r); */
+    /*@ assert ! (\initialized(&q) && \valid(q)); */
+    /*@ assert ! (\initialized(&r) && \valid(r)); */
     /* the following 'goto' invalidates 'p' */
     goto SECOND;
     /* dead code */
@@ -53,9 +53,9 @@ int goto_valid() {
   }
 
 SECOND:
-  /*@ assert ! \valid(p); */
-  /*@ assert ! \valid(q); */
-  /*@ assert ! \valid(r); */
+  /*@ assert ! (\initialized(&p) && \valid(p)); */
+  /*@ assert ! (\initialized(&q) && \valid(q)); */
+  /*@ assert ! (\initialized(&r) && \valid(r)); */
   return 0;
 }
 
@@ -84,8 +84,8 @@ int switch_valid() {
     }
     }
     /* [break] invalidates 'p' and 'q' but 's' is still in scope. */
-    /*@ assert ! \valid(q); */
-    /*@ assert ! \valid(p); */
+    /*@ assert ! (\initialized(&q) && \valid(q)); */
+    /*@ assert ! (\initialized(&p) && \valid(p)); */
     /*@ assert \valid(s); */
   }
   return 0;
@@ -113,8 +113,8 @@ int while_valid() {
         }
       }
     }
-    /*@ assert ! \valid(p); */
-    /*@ assert ! \valid(q); */
+    /*@ assert ! (\initialized(&p) && \valid(p)); */
+    /*@ assert ! (\initialized(&q) && \valid(q)); */
     /*@ assert   \valid(r); */
   }
   return 0;
@@ -127,13 +127,13 @@ void continue_valid() {
   int *p, *q;
 
   while (i++) {
-    /*@ assert ! \valid(p); */
-    /*@ assert ! \valid(q); */
+    /*@ assert ! (\initialized(&p) && \valid(p)); */
+    /*@ assert ! (\initialized(&q) && \valid(q)); */
     int a1 = 1;
     p = &a1;
 
     /*@ assert \valid(p); */
-    /*@ assert ! \valid(q); */
+    /*@ assert ! (\initialized(&q) && \valid(q)); */
 
     {
       int a2 = 1;
@@ -147,8 +147,8 @@ void continue_valid() {
       break;
   }
 
-  /*@ assert ! \valid(p); */
-  /*@ assert ! \valid(q); */
+  /*@ assert ! (\initialized(&p) && \valid(p)); */
+  /*@ assert ! (\initialized(&q) && \valid(q)); */
 }
 
 int main(int argc, const char *argv[]) {

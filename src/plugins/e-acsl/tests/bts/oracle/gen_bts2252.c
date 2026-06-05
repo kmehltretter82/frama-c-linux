@@ -346,6 +346,7 @@ int main(void)
   int i;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
+  __e_acsl_store_block((void *)(& i),4UL);
   char *srcbuf = (char *)(__fc_lit_string1);
   __e_acsl_store_block((void *)(& srcbuf),8UL);
   __e_acsl_full_init((void *)(& srcbuf));
@@ -355,12 +356,63 @@ int main(void)
   __e_acsl_full_init((void *)(& destbuf));
   char ch = (char)111;
   if (destbuf != (char *)0) {
+    __e_acsl_full_init((void *)(& i));
     i = -1;
     while (i < 0) {
       {
+        int __gen_e_acsl_initialized;
+        int __gen_e_acsl_initialized_2;
         int __gen_e_acsl_valid_read;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
+        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& srcbuf),
+                                                        sizeof(char *));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&srcbuf",
+                                     (void *)(& srcbuf));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                       "sizeof(char *)",0,sizeof(char *));
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                     "uninitialized: \\initialized(&srcbuf)",
+                                     0,__gen_e_acsl_initialized);
+        /*@ assert E_ACSL: uninitialized: \initialized(&srcbuf); */
+        {
+          __gen_e_acsl_assert_data_2.blocking = 1;
+          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&srcbuf)";
+          __gen_e_acsl_assert_data_2.file = "bts2252.c";
+          __gen_e_acsl_assert_data_2.fct = "main";
+          __gen_e_acsl_assert_data_2.line = 17;
+          __gen_e_acsl_assert_data_2.name = "uninitialized";
+          __e_acsl_assert(__gen_e_acsl_initialized,
+                          & __gen_e_acsl_assert_data_2);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& i),
+                                                          sizeof(int));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&i",
+                                     (void *)(& i));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                       "sizeof(int)",0,sizeof(int));
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                     "uninitialized: \\initialized(&i)",0,
+                                     __gen_e_acsl_initialized_2);
+        /*@ assert E_ACSL: uninitialized: \initialized(&i); */
+        {
+          __gen_e_acsl_assert_data_3.blocking = 1;
+          __gen_e_acsl_assert_data_3.kind = "RTE";
+          __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&i)";
+          __gen_e_acsl_assert_data_3.file = "bts2252.c";
+          __gen_e_acsl_assert_data_3.fct = "main";
+          __gen_e_acsl_assert_data_3.line = 17;
+          __gen_e_acsl_assert_data_3.name = "uninitialized";
+          __e_acsl_assert(__gen_e_acsl_initialized_2,
+                          & __gen_e_acsl_assert_data_3);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+        }
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
                                                       sizeof(char),
                                                       (void *)srcbuf,
@@ -385,6 +437,7 @@ int main(void)
       /*@ assert !\valid_read(srcbuf + i); */ ;
       /*@ assert Eva: mem_access: \valid_read(srcbuf + i); */
       if ((int)*(srcbuf + i) == (int)ch) loc = i;
+      __e_acsl_full_init((void *)(& i));
       i ++;
     }
     __gen_e_acsl_strncpy(destbuf + loc,(char const *)(srcbuf + loc),1UL);
@@ -392,6 +445,7 @@ int main(void)
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& destbuf));
+  __e_acsl_delete_block((void *)(& i));
   __e_acsl_delete_block((void *)(& srcbuf));
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();

@@ -706,6 +706,8 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& empty_str));
   char *const_str = (char *)"abcd";
   char *src = eacsl_test_strdup("abcd",5UL);
+  __e_acsl_store_block((void *)(& src),8UL);
+  __e_acsl_full_init((void *)(& src));
   char *dest1 = malloc(5UL);
   char *dest2 = malloc(4UL);
   char dest3[256] =
@@ -1234,6 +1236,7 @@ int main(int argc, char const **argv)
   test_memory_tracking();
   __retres = 0;
   __e_acsl_delete_block((void *)(dest3));
+  __e_acsl_delete_block((void *)(& src));
   __e_acsl_delete_block((void *)(empty_str));
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();

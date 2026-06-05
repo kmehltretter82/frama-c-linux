@@ -255,27 +255,12 @@ end = struct
       | Some p -> Some p
 end
 
-let preprocess_pred ~loc p =
+let preprocess_pred ~loc:_ p =
   Here_inliner.(bind preprocess_pred) p @@
   match p.pred_content with
   | Papp (li, labels, args) when Inductive.is_inductive li ->
     Inductive_extractions.extract_predicate li |> Option.map @@ fun li ->
     {p with pred_content = Papp (li, labels, args)}
-  | Pvalid_read(BuiltinLabel Here as llabel, t)
-  | Pvalid(BuiltinLabel Here as llabel, t)
-  | Pobject_pointer(BuiltinLabel Here as llabel, t) -> begin
-      match t.term_node, t.term_type with
-      | TLval tlv, lty ->
-        let init =
-          Logic_const.pinitialized
-            ~loc
-            (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
-        in
-        (* copy p, since p appearing in its preprocessed form may induce loops *)
-        let p_copy = {p with pred_content = p.pred_content} in
-        Some (Logic_const.pand ~loc (init, p_copy))
-      | _ -> None
-    end
   | _ -> None
 
 let preprocess_term ~loc t =
