@@ -1417,7 +1417,7 @@ export function Tabs(): JSX.Element {
         layout={layout}
       />
     ));
-  return <>{items}</>;
+  return <div className='toolbar-tabs'>{items}</div>;
 }
 
 export function switchToView(id: string): void {

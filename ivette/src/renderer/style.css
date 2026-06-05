@@ -75,6 +75,29 @@
     font-size: smaller;
 }
 
+.toolbar {
+    height: 34px;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+}
+
+.toolbar-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-self: stretch;
+    background: var(--background);
+    border-right: solid 1px var(--border-discrete);
+}
+
+.toolbar-tools {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
 .statusbar {
     height: 26px;
 }

@@ -46,16 +46,6 @@ export default function Application(): JSX.Element {
 
   return (
     <Vfill>
-      <Toolbar.ToolBar>
-        <>{ToolBar}</>
-        <Toolbar.Filler />
-        <Laboratory.Tabs />
-        <Toolbar.Filler />
-        <IvettePrefs.ThemeSwitchTool />
-        <IvettePrefs.FontTools />
-        <Search.SearchField />
-        <Toolbar.IconPinnedMessage />
-      </Toolbar.ToolBar>
       <Hfill>
         <Sidebar.Selectors {...sidebarState} />
         <LSplit
@@ -64,7 +54,19 @@ export default function Application(): JSX.Element {
           unfold={sidebarState.panel.visible}
         >
           <Sidebar.Panels {...sidebarState.selection} />
-          <Laboratory.LabView />
+          <Vfill>
+            <Toolbar.ToolBar className="toolbar">
+              <Laboratory.Tabs />
+              <div className="toolbar-tools">
+                <>{ToolBar}</>
+                <IvettePrefs.FontTools />
+                <Search.SearchField />
+                <Toolbar.IconPinnedMessage />
+                <IvettePrefs.ThemeSwitchTool />
+              </div>
+            </Toolbar.ToolBar>
+            <Laboratory.LabView />
+          </Vfill>
         </LSplit>
       </Hfill>
       <Toolbar.ToolBar className="statusbar">
