@@ -15,7 +15,7 @@ module D = Datatype
 (* --- Proof Strategy Engine                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a loc = { loc : location ; value : 'a }
+type 'a loc = { loc : Fileloc.t ; value : 'a }
 
 let localize ~loc value = { loc ; value }
 

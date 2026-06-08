@@ -335,7 +335,7 @@ val get_typer_block:
   plugin:string ->
   string ->
   typing_context:typing_context ->
-  loc:Logic_ptree.location ->
+  loc:Fileloc.t ->
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
@@ -346,7 +346,7 @@ val get_importer:
   plugin:string ->
   string ->
   builder:module_builder ->
-  loc:Logic_ptree.location ->
+  loc:Fileloc.t ->
   string list -> unit
 
 (** / **)

@@ -490,7 +490,7 @@ type typing_context = {
   assigns_env:Lenv.t;
   silent: bool;
   logic_type:
-    typing_context -> location -> Lenv.t ->
+    typing_context -> Fileloc.t -> Lenv.t ->
     Logic_ptree.logic_type -> Cil_types.logic_type ;
   type_predicate:
     typing_context -> Lenv.t -> Logic_ptree.lexpr -> predicate;
@@ -501,13 +501,13 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
-  error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
-  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+  error: 'a 'b. Fileloc.t -> ('a,Format.formatter,unit,'b) format4 -> 'a;
+  on_error: 'a 'b. ('a -> 'b) -> ((Fileloc.t * string) -> unit) -> 'a -> 'b
 }
 
 type module_builder = {
-  add_logic_type : location -> logic_type_info -> unit ;
-  add_logic_function : location -> logic_info -> unit ;
+  add_logic_type : Fileloc.t -> logic_type_info -> unit ;
+  add_logic_function : Fileloc.t -> logic_info -> unit ;
 }
 
 module Extensions = struct
@@ -581,7 +581,7 @@ let logic_coerce t e =
   if is_same_type e.term_type t then e else aux e
 
 
-exception Typing_error of location * string
+exception Typing_error of Fileloc.t * string
 
 let typing_error loc =
   Format.kasprintf (fun error -> raise (Typing_error(loc, error)))
@@ -789,7 +789,7 @@ let mk_cast =
 module type S =
 sig
   val type_of_field:
-    location -> string -> Cil_types.logic_type ->
+    Fileloc.t -> string -> Cil_types.logic_type ->
     (term_offset * Cil_types.logic_type)
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
@@ -801,8 +801,8 @@ sig
   val code_annot :
     Fileloc.t -> string list ->
     Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
-  val type_annot : location -> Logic_ptree.type_annot -> logic_info
-  val model_annot : location -> Logic_ptree.model_annot -> model_info
+  val type_annot : Fileloc.t -> Logic_ptree.type_annot -> logic_info
+  val model_annot : Fileloc.t -> Logic_ptree.model_annot -> model_info
   val annot : Logic_ptree.decl -> global_annotation option
   val funspec :
     string list ->
@@ -822,8 +822,8 @@ module Make
        val find_type : type_namespace -> string -> typ
        val find_label : string -> stmt ref
        val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
-       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
-       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+       val error: Fileloc.t -> ('a,Format.formatter,unit, 'b) format4 -> 'a
+       val on_error: ('a -> 'b) -> ((Fileloc.t * string) -> unit) -> 'a -> 'b
      end) =
 struct
 

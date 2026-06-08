@@ -13,7 +13,7 @@ open Logic_ptree
 (* --- Pattern Engine                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a loc = { loc : location ; value : 'a }
+type 'a loc = { loc : Fileloc.t ; value : 'a }
 
 type pvar = string loc
 type ast = node loc
