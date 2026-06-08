@@ -16,7 +16,7 @@ val add_alarm : t -> stmt -> Alarms.alarm -> node
 val add_annotation : t -> stmt -> code_annotation -> node option
 val add_stmt : t -> stmt -> node option
 val add_property : t -> Property.t -> node option
-val add_localizable : t -> Printer_tag.localizable -> node option
+val add_localizable : t -> Server.Printer_tag.localizable -> node option
 
 val explore_forward : depth:int -> t -> node -> unit
 val explore_backward : depth:int -> t -> node -> unit

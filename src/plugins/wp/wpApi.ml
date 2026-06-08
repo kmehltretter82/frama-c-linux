@@ -16,6 +16,7 @@ module R = Server.Request
 module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
+module Printer_tag = Server.Printer_tag
 
 module WP_Prover = Prover
 

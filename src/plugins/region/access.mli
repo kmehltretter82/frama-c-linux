@@ -30,7 +30,7 @@ val pp_access : Format.formatter -> acs -> unit
 val pp_source : Format.formatter -> acs -> unit
 
 val rank : acs -> int
-val marker : acs -> Printer_tag.localizable
+val marker : acs -> Server.Printer_tag.localizable
 val location : clause -> Fileloc.t
 
 module Set : Set.S with type elt = acs
