@@ -39,7 +39,7 @@ val pop_context: unit -> unit
 val annot_char : char ref
 (** The character to recognize logic formulae in comments *)
 
-val currentLoc : unit -> Cabs.cabsloc
+val currentLoc : unit -> Fileloc.t
 
 val is_c_keyword: string -> bool
 (** [true] if the given string is a C keyword.

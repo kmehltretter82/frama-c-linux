@@ -67,9 +67,3 @@ val visitCabsAttributes: cabsVisitor -> Cabs.attribute list
 val visitCabsName: cabsVisitor -> nameKind
   -> Cabs.specifier -> Cabs.name -> Cabs.name
 val visitCabsFile: cabsVisitor -> Cabs.file -> Cabs.file
-
-
-(*
-(** Set by the visitor to the current location *)
-val visitorLocation: Cabs.cabsloc ref
-*)

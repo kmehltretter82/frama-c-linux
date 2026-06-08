@@ -10,7 +10,7 @@
 open Cabs
 open Format
 
-let pp_cabsloc fmt (pos1 , _pos2 : cabsloc) =
+let pp_cabsloc fmt (pos1 , _pos2 : Fileloc.t) =
   Filepos.pretty fmt pos1
 
 let pp_storage  fmt = function

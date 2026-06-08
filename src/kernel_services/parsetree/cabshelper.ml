@@ -118,7 +118,7 @@ let rec isTypedef = function
   | _ :: rest -> isTypedef rest
 
 
-let get_definitionloc (d : definition) : cabsloc =
+let get_definitionloc (d : definition) : Fileloc.t =
   match d with
   | FUNDEF(_,_, _, l, _) -> l
   | DECDEF(_,_, l) -> l
@@ -131,7 +131,7 @@ let get_definitionloc (d : definition) : cabsloc =
   | GLOBANNOT({Logic_ptree.decl_loc = l }::_) -> l
   | GLOBANNOT [] -> assert false
 
-let get_statementloc (s : statement) : cabsloc =
+let get_statementloc (s : statement) : Fileloc.t =
   begin
     match s.stmt_node with
     | NOP(_, loc) -> loc

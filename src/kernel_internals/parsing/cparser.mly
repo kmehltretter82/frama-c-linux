@@ -100,7 +100,7 @@ let register_symbol_class nl =
   in
   List.iter (fun ((n, _, _, _), _) -> add n) nl
 
-let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_name list)  =
+let doDeclaration logic_spec (loc: Fileloc.t) (specs: spec_elem list) (nl: init_name list)  =
   if isTypedef specs then begin
     TYPEDEF ((specs, List.map (fun (n, _) -> n) nl), loc)
   end else
@@ -145,8 +145,8 @@ let in_ghost =
 
 let ghost_global = ref false
 
-let doFunctionDef spec (loc: cabsloc)
-    (lend: cabsloc)
+let doFunctionDef spec (loc: Fileloc.t)
+    (lend: Fileloc.t)
     (specs: spec_elem list)
     (n: name)
     (b: block) : definition =
@@ -297,75 +297,75 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 
 %token <Filepos.t * string> SPEC
 %token <Logic_ptree.decl list> DECL
-%token <Logic_ptree.code_annot * Cabs.cabsloc> CODE_ANNOT
-%token <Logic_ptree.code_annot list * Cabs.cabsloc> LOOP_ANNOT
+%token <Logic_ptree.code_annot * Fileloc.t> CODE_ANNOT
+%token <Logic_ptree.code_annot list * Fileloc.t> LOOP_ANNOT
 
 %token <string> IDENT
-%token <int64 list * Cabs.cabsloc> CST_CHAR
-%token <int64 list * Cabs.cabsloc> CST_WCHAR
-%token <string * Cabs.cabsloc> CST_INT
-%token <string * Cabs.cabsloc> CST_FLOAT
+%token <int64 list * Fileloc.t> CST_CHAR
+%token <int64 list * Fileloc.t> CST_WCHAR
+%token <string * Fileloc.t> CST_INT
+%token <string * Fileloc.t> CST_FLOAT
 %token <string> NAMED_TYPE
 
 /* Each character is its own list element, and the terminating nul is not
    included in this list. */
-%token <int64 list * Cabs.cabsloc> CST_STRING
-%token <int64 list * Cabs.cabsloc> CST_WSTRING
+%token <int64 list * Fileloc.t> CST_STRING
+%token <int64 list * Fileloc.t> CST_WSTRING
 
 %token EOF
-%token<Cabs.cabsloc> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID
-%token<Cabs.cabsloc> INT64 INT128
-%token<Cabs.cabsloc> FLOAT32 FLOAT64 ENUM STRUCT TYPEDEF UNION
-%token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
-%token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
-%token<Cabs.cabsloc> THREAD THREAD_LOCAL
-%token<Cabs.cabsloc> GHOST
+%token<Fileloc.t> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID
+%token<Fileloc.t> INT64 INT128
+%token<Fileloc.t> FLOAT32 FLOAT64 ENUM STRUCT TYPEDEF UNION
+%token<Fileloc.t> SIGNED UNSIGNED LONG SHORT
+%token<Fileloc.t> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
+%token<Fileloc.t> THREAD THREAD_LOCAL
+%token<Fileloc.t> GHOST
 
-%token<Cabs.cabsloc> SIZEOF ALIGNOF ALIGNAS GENERIC
-%token<Cabs.cabsloc> GCC_ALIGNOF
+%token<Fileloc.t> SIZEOF ALIGNOF ALIGNAS GENERIC
+%token<Fileloc.t> GCC_ALIGNOF
 
 %token EQ PLUS_EQ MINUS_EQ STAR_EQ SLASH_EQ PERCENT_EQ
 %token AND_EQ PIPE_EQ CIRC_EQ INF_INF_EQ SUP_SUP_EQ
 %token ARROW DOT
 
 %token EQ_EQ EXCLAM_EQ INF SUP INF_EQ SUP_EQ
-%token<Cabs.cabsloc> PLUS MINUS STAR
+%token<Fileloc.t> PLUS MINUS STAR
 %token SLASH PERCENT
-%token<Cabs.cabsloc> TILDE AND
+%token<Fileloc.t> TILDE AND
 %token PIPE CIRC
-%token<Cabs.cabsloc> EXCLAM AND_AND
+%token<Fileloc.t> EXCLAM AND_AND
 %token PIPE_PIPE
 %token INF_INF SUP_SUP
-%token<Cabs.cabsloc> PLUS_PLUS MINUS_MINUS
+%token<Fileloc.t> PLUS_PLUS MINUS_MINUS
 
 %token RPAREN
-%token<Cabs.cabsloc> LPAREN RBRACE
-%token<Cabs.cabsloc> LBRACE
+%token<Fileloc.t> LPAREN RBRACE
+%token<Fileloc.t> LBRACE
 %token LBRACKET RBRACKET
 %token COLON COLON2
-%token<Cabs.cabsloc> SEMICOLON
+%token<Fileloc.t> SEMICOLON
 %token COMMA ELLIPSIS QUEST
 
-%token<Cabs.cabsloc> BREAK CONTINUE GOTO RETURN
-%token<Cabs.cabsloc> SWITCH CASE DEFAULT
-%token<Cabs.cabsloc> WHILE DO FOR
-%token<Cabs.cabsloc> IF
+%token<Fileloc.t> BREAK CONTINUE GOTO RETURN
+%token<Fileloc.t> SWITCH CASE DEFAULT
+%token<Fileloc.t> WHILE DO FOR
+%token<Fileloc.t> IF
 %token ELSE
 
-%token<Cabs.cabsloc> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Fileloc.t> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
-%token<Cabs.cabsloc> BUILTIN_VA_ARG
+%token<Fileloc.t> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
-%token<Cabs.cabsloc> BUILTIN_TYPES_COMPAT BUILTIN_OFFSETOF
-%token<Cabs.cabsloc> DECLSPEC
-%token<string * Cabs.cabsloc> MSATTR
-%token<string * Cabs.cabsloc> PRAGMA_LINE
-%token<Cabs.cabsloc> PRAGMA
+%token<Fileloc.t> BUILTIN_TYPES_COMPAT BUILTIN_OFFSETOF
+%token<Fileloc.t> DECLSPEC
+%token<string * Fileloc.t> MSATTR
+%token<string * Fileloc.t> PRAGMA_LINE
+%token<Fileloc.t> PRAGMA
 %token PRAGMA_EOL
 
 /*Frama-C: ghost bracketing */
 %token LGHOST RGHOST
-%token<Cabs.cabsloc> LGHOST_ELSE
+%token<Fileloc.t> LGHOST_ELSE
 
 /* operator precedence */
 %nonassoc   if_no_else
@@ -383,8 +383,8 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 
 
 %type <Cabs.attribute list> attributes attributes_with_asm asmattr
-%type <Cabs.constant * cabsloc> constant
-%type <string * cabsloc> string_constant
+%type <Cabs.constant * Fileloc.t> constant
+%type <string * Fileloc.t> string_constant
 %type <Cabs.expression> expression
 %type <Cabs.expression> opt_expression
 %type <Cabs.init_expression> init_expression
@@ -397,8 +397,8 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %type <(Cabs.initwhat * Cabs.init_expression) list> initializer_list
 %type <Cabs.initwhat> init_designators init_designators_opt
 
-%type <spec_elem list * cabsloc> decl_spec_list
-%type <typeSpecifier * cabsloc> type_spec
+%type <spec_elem list * Fileloc.t> decl_spec_list
+%type <typeSpecifier * Fileloc.t> type_spec
 %type <Cabs.field_group list> struct_decl_list
 
 
@@ -407,9 +407,9 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %type <Cabs.enum_item> enumerator
 %type <Cabs.enum_item list> enum_list
 %type <Cabs.definition> declaration function_def
-%type <cabsloc * spec_elem list * name> function_def_start
+%type <Fileloc.t * spec_elem list * name> function_def_start
 %type <Cabs.spec_elem list * Cabs.decl_type> type_name
-%type <Cabs.block * cabsloc * cabsloc> block
+%type <Cabs.block * Fileloc.t * Fileloc.t> block
 %type <Cabs.statement list> block_element_list
 %type <string list> local_labels local_label_names
 %type <string list> old_parameter_list_ne
@@ -419,13 +419,13 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %type <Cabs.name> declarator
 %type <Cabs.name * expression option> field_decl
 %type <(Cabs.name * expression option) list> field_decl_list
-%type <string * Cabs.decl_type * cabsloc> direct_decl
+%type <string * Cabs.decl_type * Fileloc.t> direct_decl
 %type <Cabs.decl_type> abs_direct_decl abs_direct_decl_opt
 %type <Cabs.decl_type * Cabs.attribute list> abstract_decl
 
  /* (* Each element is a "* <type_quals_opt>". *) */
 %type <attribute list list> pointer pointer_opt
-%type <Cabs.spec_elem * cabsloc> cvspec
+%type <Cabs.spec_elem * Fileloc.t> cvspec
 %type <(Cabs.spec_elem list * Cabs.decl_type) option * expression> generic_association
 %type <((Cabs.spec_elem list * Cabs.decl_type) option * expression) list> generic_association_list
 %%

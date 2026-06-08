@@ -632,7 +632,7 @@ let gotoTargetNextAddr: int ref = ref 0
 let transparentUnionArgs : (int * typ) list ref = ref []
 
 let debugLoc = false
-let convLoc (l : cabsloc) =
+let convLoc (l : Fileloc.t) =
   if debugLoc then
     Kernel.debug "convLoc at %a\n" Fileloc.pretty l;
   l
@@ -9006,7 +9006,7 @@ and createLocal ghost ((_, sto, _, _, _) as specs)
     end
 
 and doAliasFun ghost vtype (thisname:string) (othername:string)
-    (sname:single_name) (loc: cabsloc) : unit =
+    (sname:single_name) (loc: Fileloc.t) : unit =
   (* This prototype declares that name is an alias for
      othername, which must be defined in this file *)
   (*   E.log "%s is alias for %s at %a\n" thisname othername  *)
