@@ -89,9 +89,61 @@
     flex: 1 1 auto;
     min-width: 0;
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
     align-self: stretch;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 0px;
     background: var(--background);
     border-right: solid 1px var(--border-discrete);
+}
+
+/* Clipped horizontal viewport for the laboratory tab strip. */
+.labview-tabs-viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: flex-end;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.labview-tabs-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+/* Long non-wrapping row containing the actual laboratory tab buttons. */
+.labview-tabs-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    width: max-content;
+    min-width: 100%;
+    padding-top: 2px;
+    margin-bottom: -1px;
+}
+
+/* Fixed scroll controls at both ends of the tab area. */
+.dome-xIcon.labview-tab-scroll {
+    flex: 0 0 21px;
+    align-self: center;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 21px;
+    height: 21px;
+    margin: 0px 2px;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.dome-xIcon.labview-tab-scroll > svg {
+    position: static;
 }
 
 .toolbar-tools {

@@ -682,7 +682,7 @@ Settings.onWindowSettings(() => {
         if (updateDock(newDock, dock)) modified = true;
       });
       if (modified) LAB.setValue({ ...state, tabs: newTabs, docked: newDock });
-      if (!state.tabKey) updateIndex( settings );
+      if (!state.tabKey) updateIndex(settings);
     } finally {
       synchronize = true;
     }
@@ -1407,6 +1407,69 @@ function TabView(props: TabViewProps): JSX.Element | null {
 export function Tabs(): JSX.Element {
   const [{ tabKey, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
+
+  // Holds the DOM node whose scrollLeft position is controlled by arrows.
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  // Holds the DOM node whose width grows with the rendered tab buttons.
+  const tabsRowRef = React.useRef<HTMLDivElement>(null);
+  // Tracks whether the viewport has hidden tab content on its left side.
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  // Tracks whether the viewport has hidden tab content on its right side.
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
+
+  // Keep the arrow buttons enabled only when hidden tabs exist in that
+  // direction. The one-pixel tolerance avoids subpixel rounding artifacts.
+  const updateScrollButtons = React.useCallback((): void => {
+    const node = viewportRef.current;
+    if (!node) return;
+    // Maximum useful horizontal scroll distance for the current content width.
+    const max = Math.max(0, node.scrollWidth - node.clientWidth);
+    // Enable the left arrow only after the viewport has moved from the origin.
+    setCanScrollLeft(node.scrollLeft > 0);
+    // Enable the right arrow until the viewport reaches the far right edge.
+    setCanScrollRight(node.scrollLeft < max - 1);
+  }, []);
+
+  // Scroll by a viewport-relative distance so the control feels consistent
+  // across narrow and wide toolbar layouts.
+  const scrollTabs = React.useCallback((direction: number): void => {
+    const node = viewportRef.current;
+    if (!node) return;
+    // Move by 60% of the visible area, but keep a useful minimum step.
+    const distance = Math.max(120, Math.floor(node.clientWidth * 0.6));
+    // Negative distances scroll left; positive distances scroll right.
+    node.scrollBy({ left: direction * distance, behavior: 'smooth' });
+  }, []);
+
+  // Recompute arrow states when either the available viewport size or the tab
+  // content width changes.
+  React.useEffect(() => {
+    // The viewport determines the visible width and current scroll position.
+    const viewport = viewportRef.current;
+    // The tabsrow node determines the full width occupied by tab buttons.
+    const tabsrow = tabsRowRef.current;
+    if (!viewport) return undefined;
+    // Initialize button states immediately after the DOM nodes are available.
+    updateScrollButtons();
+    // Window resizing changes how many tabs fit in the viewport.
+    window.addEventListener('resize', updateScrollButtons);
+    // ResizeObserver catches layout and tab-content changes without polling.
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateScrollButtons)
+        : undefined;
+    // Observe viewport size changes.
+    observer?.observe(viewport);
+    // Observe tabsrow width changes, such as opening or closing tabs.
+    if (tabsrow) observer?.observe(tabsrow);
+    return () => {
+      // Remove the global listener when the effect is rebuilt or unmounted.
+      window.removeEventListener("resize", updateScrollButtons);
+      // Stop observing DOM nodes that belong to this render.
+      observer?.disconnect();
+    };
+  }, [tabs, updateScrollButtons]);
+
   const items: JSX.Element[] = [];
   tabs.forEach((tab: TabViewState) =>
     items.push(
@@ -1417,7 +1480,36 @@ export function Tabs(): JSX.Element {
         layout={layout}
       />
     ));
-  return <div className='toolbar-tabs'>{items}</div>;
+
+  return (
+    <div className="toolbar-tabs">
+      <IconButton
+        className="labview-tab-scroll"
+        icon="ANGLE.LEFT"
+        title="Scroll tabs left"
+        disabled={!canScrollLeft}
+        onClick={() => scrollTabs(-1)}
+      />
+      <div
+        // The clipped element that actually scrolls horizontally.
+        ref={viewportRef}
+        className="labview-tabs-viewport"
+        onScroll={updateScrollButtons}
+      >
+        {/* Long non-wrapping row containing the tab buttons. */}
+        <div ref={tabsRowRef} className="labview-tabs-content">
+          {items}
+        </div>
+      </div>
+      <IconButton
+        className="labview-tab-scroll"
+        icon="ANGLE.RIGHT"
+        title="Scroll tabs right"
+        disabled={!canScrollRight}
+        onClick={() => scrollTabs(1)}
+      />
+    </div>
+  );
 }
 
 export function switchToView(id: string): void {
