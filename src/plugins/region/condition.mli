@@ -14,7 +14,7 @@ val lvalid_region : string
 val is_valid_region : logic_info -> bool
 
 val pvalid_region :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
+  ?loc:Fileloc.t -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
 (* -------------------------------------------------------------------------- *)
@@ -57,7 +57,7 @@ val g_separated : addr -> addr -> guard
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_guard : Format.formatter -> guard -> unit
 
-val of_addr  : ?loc:location -> addr -> term
-val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
+val of_addr  : ?loc:Fileloc.t -> addr -> term
+val of_guard : ?loc:Fileloc.t -> ?names:string list -> guard -> predicate
 
 (* -------------------------------------------------------------------------- *)

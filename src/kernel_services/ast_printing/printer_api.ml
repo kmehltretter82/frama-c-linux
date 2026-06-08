@@ -191,7 +191,7 @@ class type extensible_printer_type = object
 
 
   method line_directive:
-    ?forcefile:bool ->  Format.formatter -> location -> unit
+    ?forcefile:bool ->  Format.formatter -> Fileloc.t -> unit
   (** Print a line-number. This is assumed to come always on an empty line. If
       the forcefile argument is present and is true then the file name will be
       printed always. Otherwise the file name is printed only if it is
@@ -407,7 +407,7 @@ module type S_pp = sig
   (** {3 Printer for C constructs} *)
   (* ********************************************************************* *)
 
-  val pp_location: Format.formatter -> location -> unit
+  val pp_location: Format.formatter -> Fileloc.t -> unit
   [@@deprecated "Use Fileloc.pretty instead"]
   [@@migrate { repl = Fileloc.pretty }]
 

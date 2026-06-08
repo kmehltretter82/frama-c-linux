@@ -67,7 +67,7 @@ type 'vertex edge = {
   edge_key : int;
   edge_kinstr : Cil_types.kinstr;
   edge_transition : 'vertex transition;
-  edge_loc : location;
+  edge_loc : Fileloc.t;
 }
 
 (* --- Dummy representatives --- *)
@@ -94,12 +94,12 @@ let dummy_edge = {
 
 module type Vertex = sig
   include Datatype.S_with_collections
-  val loc : t -> location option
+  val loc : t -> Fileloc.t option
 end
 
 module type Edge = sig
   include Datatype.S_with_collections
-  val loc : t -> location option
+  val loc : t -> Fileloc.t option
 end
 
 (* --- Datatypes --- *)

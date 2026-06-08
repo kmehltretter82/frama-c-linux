@@ -14,7 +14,7 @@ open Cil_types
 
 (** exception raised when a parsed logic expression is
     syntactically not well-formed. *)
-exception Not_well_formed of location * string
+exception Not_well_formed of Fileloc.t * string
 
 (** exception raised when an unknown extension is called. *)
 exception Unknown_ext
@@ -104,7 +104,7 @@ val mk_logic_StartOf : term -> term
 (** creates an AddrOf from a TLval. The given logic type is the
     type of the lval.
     @since Neon-20140301 *)
-val mk_logic_AddrOf: ?loc:location -> term_lval -> logic_type -> term
+val mk_logic_AddrOf: ?loc:Fileloc.t -> term_lval -> logic_type -> term
 
 (** [true] if the term is a pointer. *)
 val isLogicPointer : term -> bool
@@ -117,7 +117,7 @@ val mk_logic_pointer_or_StartOf : term -> term
     be inserted. Otherwise (which is the default), [mk_cast typ t] will return
     [t] if it is already of type [typ]
 *)
-val mk_cast: ?loc:location -> ?force:bool -> typ -> term -> term
+val mk_cast: ?loc:Fileloc.t -> ?force:bool -> typ -> term -> term
 
 
 (** [array_with_range arr size] returns the logic term [array'+{0..(size-1)}],
@@ -145,7 +145,7 @@ val numeric_coerce: logic_type -> term -> term
 (** {2 Predicates} *)
 
 val pointer_comparable:
-  ?loc:location -> ?label:logic_label -> term -> term -> predicate
+  ?loc:Fileloc.t -> ?label:logic_label -> term -> term -> predicate
 (** \pointer_comparable. [label] defaults to {!Logic_const.here_label}
     @since Fluorine-20130401
     @before 27.0-Cobalt no [label] argument, as the builtin did not take a label
@@ -235,7 +235,7 @@ val lconstant_to_constant: logic_constant-> constant
     Unsuffixed literals are considered as real numbers.
     Literals suffixed by [f|d|l] or [F|D|L] are considered
     as float constants of the associated kind. *)
-val parse_float : ?loc:location -> string -> term
+val parse_float : ?loc:Fileloc.t -> string -> term
 
 (** {2 Various Utilities} *)
 
@@ -400,14 +400,15 @@ val concat_allocation: allocation -> allocation -> allocation
 val merge_allocation : allocation -> allocation -> allocation
 
 val merge_behaviors :
-  ?oldloc:location -> silent:bool -> funbehavior list -> funbehavior list -> funbehavior list
+  ?oldloc:Fileloc.t -> silent:bool -> funbehavior list -> funbehavior list ->
+  funbehavior list
 
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
     {!Kernel_function.set_spec} after merging.
 *)
 val merge_funspec :
-  ?oldloc:location -> ?silent_about_merging_behav:bool ->
+  ?oldloc:Fileloc.t -> ?silent_about_merging_behav:bool ->
   funspec -> funspec -> unit
 
 (** Reset the given funspec to empty.

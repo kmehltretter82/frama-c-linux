@@ -56,7 +56,7 @@ module Translate_predicates = struct
   let to_exp_il p = !to_exp_il_ref p
 
   let rte_guards_to_exp_old_ref
-    : (loc:location ->
+    : (loc:Fileloc.t ->
        kf:kernel_function ->
        term ->
        Env.t ->

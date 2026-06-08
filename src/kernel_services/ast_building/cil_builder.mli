@@ -228,22 +228,22 @@ sig
   val cil_logic_label : label -> Cil_types.logic_label
   val cil_constant : [< const] -> Cil_types.constant
   val cil_varinfo : [< var] -> Cil_types.varinfo
-  val cil_lhost: loc:Cil_types.location -> [< lhost] -> Cil_types.lhost
-  val cil_lval : loc:Cil_types.location -> [< lval] -> Cil_types.lval
-  val cil_exp : loc:Cil_types.location -> [< exp] -> Cil_types.exp
-  val cil_term_lval : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+  val cil_lhost: loc:Fileloc.t -> [< lhost] -> Cil_types.lhost
+  val cil_lval : loc:Fileloc.t -> [< lval] -> Cil_types.lval
+  val cil_exp : loc:Fileloc.t -> [< exp] -> Cil_types.exp
+  val cil_term_lval : loc:Fileloc.t -> ?restyp:Cil_types.typ ->
     [< lval] -> Cil_types.term_lval
-  val cil_term_lhost: loc:Cil_types.location -> ?restyp: Cil_types.typ ->
+  val cil_term_lhost: loc:Fileloc.t -> ?restyp: Cil_types.typ ->
     [< lhost] -> Cil_types.term_lhost
-  val cil_term : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+  val cil_term : loc:Fileloc.t -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.term
-  val cil_iterm : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+  val cil_iterm : loc:Fileloc.t -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.identified_term
-  val cil_pred : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+  val cil_pred : loc:Fileloc.t -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.predicate
-  val cil_ipred : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+  val cil_ipred : loc:Fileloc.t -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.identified_predicate
-  val cil_init : loc:Cil_types.location -> [< init] -> Cil_types.init
+  val cil_init : loc:Fileloc.t -> [< init] -> Cil_types.init
 
   val cil_typeof : [< var] -> Cil_types.typ
 end
@@ -301,11 +301,11 @@ sig
   (* for the three following function into is mandatory if the built ast
      contains locals declarations *)
   val cil_instr : ?into:Cil_types.fundec ->
-    loc:Cil_types.location -> instr -> Cil_types.instr
+    loc:Fileloc.t -> instr -> Cil_types.instr
   val cil_stmtkind : ?into:Cil_types.fundec ->
-    loc:Cil_types.location -> stmt -> Cil_types.stmtkind
+    loc:Fileloc.t -> stmt -> Cil_types.stmtkind
   val cil_stmt : ?into:Cil_types.fundec ->
-    loc:Cil_types.location -> stmt -> Cil_types.stmt
+    loc:Fileloc.t -> stmt -> Cil_types.stmt
 
   (* Operators *)
   val (let+) : var * stmt -> (var -> stmt list) -> stmt list
@@ -335,7 +335,7 @@ sig
 
   (* Functions *)
   val open_function :
-    ?loc:Cil_types.location -> ?ghost:bool -> ?vorig_name:string ->
+    ?loc:Fileloc.t -> ?ghost:bool -> ?vorig_name:string ->
     string -> [> var]
   val set_return_type : ('s,'v) typ -> unit
   val set_return_type' : Cil_types.typ -> unit
@@ -358,16 +358,16 @@ sig
   val of_stmt : Cil_types.stmt -> unit
   val of_stmts : Cil_types.stmt list -> unit
   val open_block :
-    ?loc:Cil_types.location -> ?into:Cil_types.fundec -> ?ghost:bool ->
+    ?loc:Fileloc.t -> ?into:Cil_types.fundec -> ?ghost:bool ->
     unit -> unit
   val open_ghost :
-    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    ?loc:Fileloc.t -> ?into:Cil_types.fundec ->
     unit -> unit
   val open_switch :
-    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    ?loc:Fileloc.t -> ?into:Cil_types.fundec ->
     [< exp] -> unit
   val open_if :
-    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    ?loc:Fileloc.t -> ?into:Cil_types.fundec ->
     [< exp] -> unit
   val open_else : ?ghost:bool -> unit -> unit
   val close : unit -> unit

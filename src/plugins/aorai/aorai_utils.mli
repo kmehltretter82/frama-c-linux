@@ -57,7 +57,7 @@ val host_state_term: unit -> Cil_types.term_lval
 val is_state_pred: state -> predicate
 
 (** Returns the boolean expression saying the state is affected *)
-val is_state_exp: state -> location -> Cil_types.exp
+val is_state_exp: state -> Fileloc.t -> Cil_types.exp
 
 (** Returns the predicate saying that automaton is NOT
     in corresponding state. *)
@@ -70,11 +70,11 @@ val is_out_of_state_pred: state -> predicate
     in the (unique by definition) state currently active
 *)
 val is_out_of_state_stmt:
-  state * Cil_types.varinfo -> location -> Cil_types.stmt
+  state * Cil_types.varinfo -> Fileloc.t -> Cil_types.stmt
 
 (** Returns the expression testing that automaton is NOT
     in the corresponding state.*)
-val is_out_of_state_exp: state -> location -> Cil_types.exp
+val is_out_of_state_exp: state -> Fileloc.t -> Cil_types.exp
 
 (** returns assigns clause corresponding to updating automaton's state, and
     assigning auxiliary variable depending on the possible transitions made
@@ -83,20 +83,20 @@ val is_out_of_state_exp: state -> location -> Cil_types.exp
     @since Neon-20140301 adds kf argument
 *)
 val aorai_assigns:
-  Data_for_aorai.state -> Cil_types.location -> Cil_types.assigns
+  Data_for_aorai.state -> Fileloc.t -> Cil_types.assigns
 
 (** returns the list of predicates expressing that for each current state
     the automaton currently is in, there is at least one transition that is
     crossed.
 *)
 val force_transition:
-  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
+  Fileloc.t -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.identified_predicate list
 
 (** return list of preconditions for the given auxiliary function
     (f_pre_func or f_post_func). *)
 val auto_func_preconditions:
-  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
+  Fileloc.t -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.identified_predicate list
 
 (** auto_func_behaviors f st (st_status, tr_status)
@@ -105,7 +105,7 @@ val auto_func_preconditions:
     @since Nitrogen-20111001
 *)
 val auto_func_behaviors:
-  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
+  Fileloc.t -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.funbehavior list
 
 (** [auto_func_block current_kf loc f status st res]
@@ -123,7 +123,7 @@ val auto_func_behaviors:
 *)
 val auto_func_block:
   Kernel_function.t ->
-  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
+  Fileloc.t -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.varinfo option ->
   Cil_datatype.Varinfo.Set.t * Cil_types.block * Cil_types.varinfo list
 

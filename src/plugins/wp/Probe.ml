@@ -16,7 +16,7 @@ type probe = {
   id : int;
   name : string ;
   stmt : stmt option ;
-  loc : location ;
+  loc : Fileloc.t ;
 }
 
 let create =

@@ -12,7 +12,7 @@ open Cil_types
 val nul_exp : exp
 
 (* exception raised when the program tries to access a memory location directly. *)
-exception Explicit_pointer_address of location
+exception Explicit_pointer_address of Fileloc.t
 
 module LvalOrRef : sig
   type t = Lval of lval | Ref of lval

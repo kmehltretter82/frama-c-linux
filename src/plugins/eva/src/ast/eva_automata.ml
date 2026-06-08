@@ -39,7 +39,7 @@ type edge = {
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : transition;
-  edge_loc : location;
+  edge_loc : Fileloc.t;
 }
 
 let dummy_vertex = {

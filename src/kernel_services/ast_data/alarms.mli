@@ -59,7 +59,7 @@ include Datatype.S_with_collections with type t = alarm
 val self: State.t
 
 val register:
-  Emitter.t -> ?kf:kernel_function -> kinstr -> ?loc:location ->
+  Emitter.t -> ?kf:kernel_function -> kinstr -> ?loc:Fileloc.t ->
   ?status:Property_status.emitted_status -> alarm ->
   code_annotation * bool
 (** Register the given alarm on the given statement. By default, no status is
@@ -70,7 +70,7 @@ val register:
     the emitter).
 *)
 
-val to_annot: kinstr -> ?loc:location -> alarm -> code_annotation * bool
+val to_annot: kinstr -> ?loc:Fileloc.t -> alarm -> code_annotation * bool
 (** Conversion of an alarm to a [code_annotation], without any registration.
     The returned boolean indicates that the alarm has not been registered
     in the kernel yet. *)
@@ -111,7 +111,7 @@ val remove: ?filter:(alarm -> bool) -> ?kinstr:kinstr -> Emitter.t -> unit
     [filter a] is [true].
     @since Fluorine-20130401 *)
 
-val create_predicate: ?loc:location -> t -> predicate
+val create_predicate: ?loc:Fileloc.t -> t -> predicate
 (** Generate the predicate corresponding to a given alarm.
     @since Fluorine-20130401 *)
 

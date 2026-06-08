@@ -54,7 +54,7 @@ val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
     @before the function took one less argument, [~plugin] which is now
     used to set the [ext_plugin] field.
 *)
-val new_acsl_extension: plugin:string -> string -> location -> bool ->
+val new_acsl_extension: plugin:string -> string -> Fileloc.t -> bool ->
   acsl_extension_kind -> acsl_extension
 
 (** Gives a new id to an existing predicate.
@@ -99,10 +99,10 @@ val init_label: logic_label
 (** makes a predicate with the given names and location. Default name is empty
     and default location is unknown.
     @since 33.0-Arsenic *)
-val pred: ?loc:location -> ?names:string list -> predicate_node -> predicate
+val pred: ?loc:Fileloc.t -> ?names:string list -> predicate_node -> predicate
 
 (** makes a predicate with no name. Default location is unknown.*)
-val unnamed: ?loc:location -> predicate_node -> predicate
+val unnamed: ?loc:Fileloc.t -> predicate_node -> predicate
 
 (** prepend the given [names] to the the predicate's names.
     @since 33.0-Arsenic *)
@@ -115,28 +115,28 @@ val ptrue: predicate
 val pfalse: predicate
 
 (** \old *)
-val pold: ?loc:location -> ?names:string list -> predicate -> predicate
+val pold: ?loc:Fileloc.t -> ?names:string list -> predicate -> predicate
 
 (** application of predicate*)
 val papp:
-  ?loc:location -> ?names:string list ->
+  ?loc:Fileloc.t -> ?names:string list ->
   logic_info * logic_label list * term list ->
   predicate
 
 (** && *)
 val pand:
-  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * predicate -> predicate
 
 (** || *)
 val por:
-  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * predicate -> predicate
 
 (** ^^ *)
 val pxor:
-  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * predicate -> predicate
 
 (** ! *)
-val pnot: ?loc:location -> ?names:string list -> predicate -> predicate
+val pnot: ?loc:Fileloc.t -> ?names:string list -> predicate -> predicate
 
 (** Folds && over a list of predicates. *)
 val pands: ?names:string list -> predicate list -> predicate
@@ -146,88 +146,88 @@ val pors: ?names:string list -> predicate list -> predicate
 
 (** local binding *)
 val plet:
-  ?loc:location -> ?names:string list -> logic_info -> predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_info -> predicate -> predicate
 
 (** ==> *)
 val pimplies :
-  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * predicate -> predicate
 
 (** ? : *)
 val pif:
-  ?loc:location -> ?names:string list ->
+  ?loc:Fileloc.t -> ?names:string list ->
   predicate * predicate * predicate -> predicate
 
 (** <==> *)
 val piff:
-  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * predicate -> predicate
 
 (** Binary relation.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val prel:
-  ?loc:location -> ?names:string list -> relation * term * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> relation * term * term -> predicate
 
 (** \forall *)
 val pforall:
-  ?loc:location -> ?names:string list -> quantifiers * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> quantifiers * predicate -> predicate
 
 (** \exists *)
 val pexists:
-  ?loc:location -> ?names:string list -> quantifiers * predicate -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> quantifiers * predicate -> predicate
 
 (** \fresh(pt,size) *)
 val pfresh:
-  ?loc:location -> ?names:string list ->
+  ?loc:Fileloc.t -> ?names:string list ->
   logic_label * logic_label * term * term -> predicate
 
 (** \allocable *)
 val pallocable:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \freeable *)
 val pfreeable:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid_read *)
 val pvalid_read:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid *)
 val pvalid:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \object_pointer *)
 val pobject_pointer:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid_function *)
-val pvalid_function: ?loc:location -> ?names:string list -> term -> predicate
+val pvalid_function: ?loc:Fileloc.t -> ?names:string list -> term -> predicate
 
 (** \initialized *)
 val pinitialized:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \dangling *)
 val pdangling:
-  ?loc:location -> ?names:string list -> logic_label * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term -> predicate
 
 (** \aligned *)
-val paligned: ?loc:location -> ?names:string list -> term * term -> predicate
+val paligned: ?loc:Fileloc.t -> ?names:string list -> term * term -> predicate
 
 (** \at *)
 val pat:
-  ?loc:location -> ?names:string list -> predicate * logic_label -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> predicate * logic_label -> predicate
 
 (** \valid_index: requires index having integer type or set of integers *)
 val pvalid_index:
-  ?loc:location -> ?names:string list -> logic_label * term * term -> predicate
+  ?loc:Fileloc.t -> ?names:string list -> logic_label * term * term -> predicate
 
 (** \valid_range: requires bounds having integer type *)
 val pvalid_range:
-  ?loc:location -> ?names:string list ->
+  ?loc:Fileloc.t -> ?names:string list ->
   logic_label * term * term * term -> predicate
 
 (** \separated *)
-val pseparated: ?loc:location -> ?names:string list -> term list -> predicate
+val pseparated: ?loc:Fileloc.t -> ?names:string list -> term list -> predicate
 
 (* ************************************************************************** *)
 (** {2 Logic types} *)

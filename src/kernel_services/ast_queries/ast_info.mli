@@ -162,8 +162,8 @@ val merge_assigns: ?warn:bool -> funbehavior list -> assigns
     Optional [warn] argument can be used to force emitting or cancelation of
     warnings. *)
 
-val variable_term: location -> logic_var -> term
-val constant_term: location -> Z.t -> term
+val variable_term: Fileloc.t -> logic_var -> term
+val constant_term: Fileloc.t -> Z.t -> term
 val is_null_term: term -> bool
 
 
@@ -174,8 +174,8 @@ val is_null_term: term -> bool
 val is_loop_statement: stmt -> bool
 val get_sid: kinstr -> int
 
-val mkassign: lval -> exp -> location -> instr
-val mkassign_statement: lval -> exp -> location -> stmt
+val mkassign: lval -> exp -> Fileloc.t -> instr
+val mkassign_statement: lval -> exp -> Fileloc.t -> stmt
 
 (** determines if a var is local to a block. *)
 val is_block_local: varinfo -> block -> bool

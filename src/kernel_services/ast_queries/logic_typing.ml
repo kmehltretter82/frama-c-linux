@@ -794,12 +794,12 @@ sig
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
   val conditional_conversion:
-    Cil_types.location -> Logic_ptree.relation option ->
+    Fileloc.t -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
   val term : Lenv.t -> Logic_ptree.lexpr -> term
   val predicate : Lenv.t -> Logic_ptree.lexpr -> predicate
   val code_annot :
-    Cil_types.location -> string list ->
+    Fileloc.t -> string list ->
     Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
   val type_annot : location -> Logic_ptree.type_annot -> logic_info
   val model_annot : location -> Logic_ptree.model_annot -> model_info

@@ -9,7 +9,7 @@
 
 (* Logic parse trees *)
 
-type location = Cil_types.location
+type location = Fileloc.t
 [@@deriving show { with_path = false } ]
 
 (** comparison operators. *)

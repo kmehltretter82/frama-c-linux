@@ -20,29 +20,29 @@ type t = contract
 (** Module to ease the access to the C API for contracts *)
 module Rtl_call: sig
   val init:
-    loc:location -> result_name:string -> Env.t -> kernel_function -> int ->
+    loc:Fileloc.t -> result_name:string -> Env.t -> kernel_function -> int ->
     varinfo * exp * Env.t
   (** Call the C function [__e_acsl_contract_init] *)
 
   val cleanup:
-    loc:location -> Env.t -> exp -> Env.t
+    loc:Fileloc.t -> Env.t -> exp -> Env.t
   (** Call the C function [__e_acsl_contract_cleanup] *)
 
   val set_assumes:
-    loc:location -> Env.t -> kernel_function -> exp -> int -> predicate ->
+    loc:Fileloc.t -> Env.t -> kernel_function -> exp -> int -> predicate ->
     Env.t
   (** Call the C function [__e_acsl_contract_set_behavior_assumes] *)
 
   val get_assumes:
-    loc:location -> result:varinfo -> Env.t -> exp -> int -> Env.t
+    loc:Fileloc.t -> result:varinfo -> Env.t -> exp -> int -> Env.t
   (** Call the C function [__e_acsl_contract_get_behavior_assumes] *)
 
   val partial_count_behaviors:
-    loc:location -> result:varinfo -> Env.t -> exp -> int list -> Env.t
+    loc:Fileloc.t -> result:varinfo -> Env.t -> exp -> int list -> Env.t
   (** Call the C function [__e_acsl_contract_partial_count_behaviors] *)
 
   val partial_count_all_behaviors:
-    loc:location -> result:varinfo -> Env.t -> exp -> Env.t
+    loc:Fileloc.t -> result:varinfo -> Env.t -> exp -> Env.t
     (** Call the C function [__e_acsl_contract_partial_count_all_behaviors] *)
 
 end = struct

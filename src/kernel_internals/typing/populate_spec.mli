@@ -73,5 +73,5 @@ val register :
     By default [do_body] is false, meaning only specification of prototypes will
     be generated.
 *)
-val populate_funspec : ?loc:Cil_types.location -> ?do_body:bool ->
+val populate_funspec : ?loc:Fileloc.t -> ?do_body:bool ->
   kernel_function -> clause list ->unit

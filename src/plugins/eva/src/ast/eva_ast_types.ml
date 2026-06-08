@@ -104,7 +104,7 @@ and binop =
   | LOr
 
 type init =
-  | SingleInit of (exp * Cil_types.location)
+  | SingleInit of (exp * Fileloc.t)
   | CompoundInit of typ * (offset * init) list
 
 type init_or_str =

@@ -13,7 +13,7 @@ module Term = Cil_datatype.Term
 module Conf = struct
   type env =
     {kf : kernel_function;
-     loc : location;
+     loc : Fileloc.t;
      vars : exp Term.Map.t;
      env : Env.t;
      rte : bool}

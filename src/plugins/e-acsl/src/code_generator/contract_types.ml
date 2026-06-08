@@ -10,7 +10,7 @@ open Cil_types
 
 (** Represent a function or statement contract. *)
 type contract = {
-  location: location;
+  location: Fileloc.t;
   (** Location of the function or statement attached to the contract. *)
 
   named_behaviors_count: int;

@@ -152,7 +152,7 @@ val empty_local_env: local_env
 val ghost_local_env: bool -> local_env
 
 (** Applies [mkAddrOf] after marking variable whose address is taken. *)
-val mkAddrOfAndMark : Cil_types.location -> Cil_types.lval -> Cil_types.exp
+val mkAddrOfAndMark : Fileloc.t -> Cil_types.lval -> Cil_types.exp
 
 (** Raise Failure *)
 val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term

@@ -16,7 +16,7 @@ module Md = Markdown
 type diagnostic = {
   message : string ;
   severity : [ `Ok | `Ignored | `Warning | `Error ] ;
-  location : Cil_types.location option ;
+  location : Fileloc.t option ;
 }
 
 let valid ~loc ~message =
@@ -40,7 +40,7 @@ type field = {
 }
 
 type alternative = {
-  location: Cil_types.location option ;
+  location: Fileloc.t option ;
   diagnostic: diagnostic list ;
   fields: field list ;
 }
@@ -60,9 +60,9 @@ let package =
     ~name:"strategydebugger"
     ~title:"WP Strategy Debugger" ()
 
-module Range : Data.S with type t = Cil_types.location =
+module Range : Data.S with type t = Fileloc.t =
 struct
-  type t = Cil_types.location
+  type t = Fileloc.t
   let jtype =
     Data.declare ~package ~name:"range" @@
     Jrecord [ "offset", Jnumber ; "length", Jnumber ]
@@ -199,7 +199,7 @@ module Alternatives = Data.Jlist(Alternative)
 (* --- Local tokenizer                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception ParseError of Cil_types.location * string
+exception ParseError of Fileloc.t * string
 
 let set_initial_position dest_lexbuf src_pos =
   dest_lexbuf.Lexing.lex_curr_p <- src_pos;

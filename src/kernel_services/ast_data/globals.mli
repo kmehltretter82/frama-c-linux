@@ -33,7 +33,7 @@ module Vars: sig
       @return the newly created varinfo
       @since 32.0-Germanium
   *)
-  val add_string_literal: loc:location -> str_literal -> varinfo
+  val add_string_literal: loc:Fileloc.t -> str_literal -> varinfo
 
   val find_from_astinfo: string -> syntactic_scope -> varinfo
   (** Finds a variable from its [vname] according to its localisation (which
@@ -162,13 +162,13 @@ module Functions: sig
       @since 18.0-Argon
   *)
 
-  val replace_by_declaration: funspec -> varinfo -> location -> unit
+  val replace_by_declaration: funspec -> varinfo -> Fileloc.t -> unit
   (** Note: if the varinfo is already registered and bound to a definition,
       the definition will be erased only if [vdefined] is false. Otherwise,
       you're trying to register a declaration for a varinfo that is supposed
       to be defined, which does not look very good. *)
 
-  val replace_by_definition: funspec -> fundec -> location -> unit
+  val replace_by_definition: funspec -> fundec -> Fileloc.t -> unit
   (**TODO: do not take a funspec as argument *)
 
   val register: kernel_function -> unit

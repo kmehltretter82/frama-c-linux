@@ -40,24 +40,24 @@ module Mk: sig
      - [store_nblock(lhs, rhs)], or
      - [store_nreferent(lhs, rhs)]
        function call based on the value of [flow] *)
-  val store_reference: loc:location -> flow -> lval -> exp -> stmt
+  val store_reference: loc:Fileloc.t -> flow -> lval -> exp -> stmt
 
   (* Generate a [save_*_parameter] call *)
-  val save_param: loc:location -> flow -> exp -> int -> stmt
+  val save_param: loc:Fileloc.t -> flow -> exp -> int -> stmt
 
   (* Generate [pull_parameter] call *)
-  val pull_param: loc:location -> varinfo -> int -> stmt
+  val pull_param: loc:Fileloc.t -> varinfo -> int -> stmt
 
   (* Generate [(save|pull)_return(lhs, param_no)] call *)
-  val handle_return_referent: save:bool -> loc:location -> exp -> stmt
+  val handle_return_referent: save:bool -> loc:Fileloc.t -> exp -> stmt
 
   (* Generate [reset_return()] call *)
-  val reset_return_referent: loc:location -> stmt
+  val reset_return_referent: loc:Fileloc.t -> stmt
 
   (* Generate [memcpy(lhs, rhs, size)] function call assuming that [lhs = rhs]
      represents an assignment of struct to a struct, that is, both sides are
      left values and we need to use addressof for both sides *)
-  val temporal_memcpy_struct: loc:location -> lval -> exp -> stmt
+  val temporal_memcpy_struct: loc:Fileloc.t -> lval -> exp -> stmt
 end = struct
 
   let store_reference ~loc flow lhs rhs =
@@ -222,7 +222,7 @@ let set_instr ?(post=false) loc lhs rhs env kf =
 module Function_call: sig
   (* Top-level handler for Call instructions *)
   val instr:
-    lval option -> lhost -> exp list -> location -> Env.t -> kernel_function ->
+    lval option -> lhost -> exp list -> Fileloc.t -> Env.t -> kernel_function ->
     Env.t
 end = struct
 
@@ -350,7 +350,7 @@ end
 module Local_init: sig
   (* Top-level handler for Local_init instructions *)
   val instr:
-    varinfo -> local_init -> location -> Env.t -> kernel_function -> Env.t
+    varinfo -> local_init -> Fileloc.t -> Env.t -> kernel_function -> Env.t
 end = struct
 
   let rec handle_init offset loc vi init env kf = match init with

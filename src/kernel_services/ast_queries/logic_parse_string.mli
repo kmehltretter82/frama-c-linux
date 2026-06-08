@@ -8,7 +8,7 @@
 
 open Cil_types
 
-exception Error of Cil_types.location * string
+exception Error of Fileloc.t * string
 exception Unbound of string
 
 (** For the three functions below, [env] can be used to specify which
@@ -20,11 +20,11 @@ exception Unbound of string
 
 val code_annot : kernel_function -> stmt -> string -> code_annotation
 val term_lval :
-  kernel_function -> ?loc:location -> ?env:Logic_typing.Lenv.t -> string ->
+  kernel_function -> ?loc:Fileloc.t -> ?env:Logic_typing.Lenv.t -> string ->
   Cil_types.term_lval
 val term :
-  kernel_function -> ?loc:location -> ?env:Logic_typing.Lenv.t -> string ->
+  kernel_function -> ?loc:Fileloc.t -> ?env:Logic_typing.Lenv.t -> string ->
   Cil_types.term
 val predicate :
-  kernel_function -> ?loc:location -> ?env:Logic_typing.Lenv.t -> string ->
+  kernel_function -> ?loc:Fileloc.t -> ?env:Logic_typing.Lenv.t -> string ->
   Cil_types.predicate

@@ -244,9 +244,9 @@ val pp_filepath_position : Format.formatter -> Filepos.t -> unit
 val pp_lexing_position : Format.formatter -> Lexing.position -> unit
 [@@deprecated "Use standard printers instead."]
 
-val pp_location : Format.formatter -> Cil_types.location -> unit
-[@@deprecated "Use Cil_types.pp_location instead."]
-[@@migrate { repl = Cil_types.pp_location } ]
+val pp_location : Format.formatter -> Fileloc.t -> unit
+[@@deprecated "Use Fileloc.pp instead."]
+[@@migrate { repl = Fileloc.pp } ]
 
 val pp_logic_constant : Format.formatter -> Cil_types.logic_constant -> unit
 [@@deprecated "Use Cil_types.pp_logic_constant instead."]

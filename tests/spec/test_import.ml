@@ -20,7 +20,7 @@ module Plugin2 =
 
 let () = Format.printf "[test-import] Linking.@."
 
-let loader (ctxt: module_builder) (loc: location) (m: string list) =
+let loader (ctxt: module_builder) (loc: Fileloc.t) (m: string list) =
   begin
     Format.printf "[test-import:%d] Loading %s.@."
       (Fileloc.line loc) (String.concat "::" m) ;

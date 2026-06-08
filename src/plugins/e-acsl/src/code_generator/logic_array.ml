@@ -23,7 +23,7 @@ end
 
 module Translate_utils = struct
   let comparison_to_exp_ref:
-    (loc:location -> kernel_function -> Env.t -> Analyses_types.number_ty ->
+    (loc:Fileloc.t -> kernel_function -> Env.t -> Analyses_types.number_ty ->
      binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t) ref =
     let func ~loc:_ _kf _env _ity _binop _e1 _e2 ?name:_ _topt =
       Extlib.mk_labeled_fun "utils_comparison_to_exp_ref"

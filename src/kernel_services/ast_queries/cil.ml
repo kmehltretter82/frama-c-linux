@@ -6397,7 +6397,7 @@ let pushGlobal (g: global)
       (* Collect a list of variables that are referred from the type. Return
        * Some if the global should go with the types and None if it should go
        * to the variables. *)
-      let varsintype : (varinfo list * location) option =
+      let varsintype : (varinfo list * Fileloc.t) option =
         match g with
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
         | GEnumTag (_, l) | GPragma (("pack", _), l)

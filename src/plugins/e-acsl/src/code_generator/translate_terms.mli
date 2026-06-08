@@ -65,7 +65,7 @@ module Translate_predicates : sig
     (rte:bool -> predicate Interlang_trans.il_compiler) ref
 
   val rte_guards_to_exp_old_ref:
-    ( loc:location ->
+    ( loc:Fileloc.t ->
       kf:kernel_function ->
       term ->
       Env.t ->

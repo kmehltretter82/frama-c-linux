@@ -17,7 +17,7 @@ type rw = Read | Write of Locations.t
 module RW: sig
   include Datatype.S with type t = rw
 
-  val loc : t -> location
+  val loc : t -> Fileloc.t
   (** [loc op] returns the source location of the operation *)
 
   val is_read : t -> bool

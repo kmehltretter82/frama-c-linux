@@ -24,7 +24,7 @@ val reset: unit -> unit
 
 val app_to_exp:
   adata:Assert.t ->
-  loc:location ->
+  loc:Fileloc.t ->
   ?tapp:term ->
   kernel_function ->
   Env.t ->

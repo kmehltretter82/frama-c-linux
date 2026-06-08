@@ -11,7 +11,7 @@ open Analyses_types
 open Analyses_datatype
 open Contract_types
 
-val gmp_clear_ref : (location -> exp -> stmt) ref
+val gmp_clear_ref : (Fileloc.t -> exp -> stmt) ref
 
 (** Environments.
 
@@ -36,7 +36,7 @@ type localized_scope =
   | LLocal_block of kernel_function
 
 val new_var:
-  loc:location -> ?scope:Varname.scope -> ?name:string ->
+  loc:Fileloc.t -> ?scope:Varname.scope -> ?name:string ->
   t -> kernel_function -> term option -> typ ->
   (varinfo -> exp (* the var as exp *) -> stmt list) ->
   varinfo * exp * t
@@ -47,7 +47,7 @@ val new_var:
     initialized by applying it to [mk_stmts]. *)
 
 val rtl_call_to_new_var:
-  loc:location -> ?scope:Varname.scope -> ?name:string ->
+  loc:Fileloc.t -> ?scope:Varname.scope -> ?name:string ->
   t -> kernel_function -> term option -> typ ->
   string -> exp list ->
   exp * t

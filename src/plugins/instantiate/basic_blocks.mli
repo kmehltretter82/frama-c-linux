@@ -52,27 +52,27 @@ val call_function: lval option -> varinfo -> exp list -> instr
 val cvar_to_tvar: varinfo -> term
 
 (** [tunref_range ~loc ptr len] builds [*(ptr + (0 .. len-1))] *)
-val tunref_range: ?loc:location -> term -> term -> term
+val tunref_range: ?loc:Fileloc.t -> term -> term -> term
 
 (** [tunref_range ~loc ptr bytes_len] same as [tunref_range] except that length
     is provided in bytes.
 *)
-val tunref_range_bytes_len: ?loc:location -> term -> term -> term
+val tunref_range_bytes_len: ?loc:Fileloc.t -> term -> term -> term
 
 (** [tplus ~loc t1 t2] builds [t1+t2] *)
-val tplus: ?loc:location -> term -> term -> term
+val tplus: ?loc:Fileloc.t -> term -> term -> term
 
 (** [tminus ~loc t1 t2] builds [t1-t2] *)
-val tminus: ?loc:location -> term -> term -> term
+val tminus: ?loc:Fileloc.t -> term -> term -> term
 
 (** [tdivide ~loc t1 t2] builds [t1/t2] *)
-val tdivide: ?loc:location -> term -> term -> term
+val tdivide: ?loc:Fileloc.t -> term -> term -> term
 
 
 (** {2 Predicates} *)
 
 (** [pbounds_incl_excl ~loc low v up] builds [low <= v < up]. *)
-val pbounds_incl_excl: ?loc:location -> term -> term -> term -> predicate
+val pbounds_incl_excl: ?loc:Fileloc.t -> term -> term -> term -> predicate
 
 (** [plet_len_div_size ~loc ~name_ext ltyp bytes_len pred] builds a predicate:
     - [\let name = bytes_len / sizeof(ltyp) ; < pred name >]
@@ -93,7 +93,7 @@ val pbounds_incl_excl: ?loc:location -> term -> term -> term -> predicate
     - if the elements contains structures they cannot have flexible array member
 *)
 val plet_len_div_size:
-  ?loc:location -> ?name_ext:string ->
+  ?loc:Fileloc.t -> ?name_ext:string ->
   logic_type -> term -> (term -> predicate) -> predicate
 
 (** [punfold_all_elems_eq ~loc p1 p2 len] builds a predicate:
@@ -105,7 +105,7 @@ val plet_len_div_size:
     Parameters:
     - [p1] and [p2] must be pointers to the same type
 *)
-val punfold_all_elems_eq: ?loc:location -> term -> term -> term -> predicate
+val punfold_all_elems_eq: ?loc:Fileloc.t -> term -> term -> term -> predicate
 
 (** [punfold_all_elems_pred ~loc ptr len pred] builds a predicate:
     - [\forall integer j ; 0 <= j1 < len ==> < pred (\*(ptr + j1)) >].
@@ -119,8 +119,8 @@ val punfold_all_elems_eq: ?loc:location -> term -> term -> term -> predicate
     - if the elements contains structures they cannot have flexible array member
 *)
 val punfold_all_elems_pred:
-  ?loc:location -> term -> term ->
-  (?loc: location -> term -> predicate) -> predicate
+  ?loc:Fileloc.t -> term -> term ->
+  (?loc: Fileloc.t -> term -> predicate) -> predicate
 
 (** [punfold_flexible_struct_pred ~loc struct bytes_len pred].
 
@@ -138,8 +138,8 @@ val punfold_all_elems_pred:
     - [pred] must be applicable on simple types or pointers
 *)
 val punfold_flexible_struct_pred:
-  ?loc:location -> term -> term ->
-  (?loc: location -> term -> predicate) -> predicate
+  ?loc:Fileloc.t -> term -> term ->
+  (?loc: Fileloc.t -> term -> predicate) -> predicate
 
 (** [pobject_pointer ~loc label ptr] generates a predicate
     - [\object_pointer{label}(ptr)].
@@ -147,7 +147,7 @@ val punfold_flexible_struct_pred:
     Parameters:
     - [ptr] must be a term of pointer type.
 *)
-val pobject_pointer: ?loc:location -> logic_label -> term -> predicate
+val pobject_pointer: ?loc:Fileloc.t -> logic_label -> term -> predicate
 
 (** [pvalid_len_bytes ~loc label ptr bytes_len] generates a predicate
     - [\valid{label}(ptr + (0 .. (len_bytes/sizeof(\*ptr))))].
@@ -157,7 +157,7 @@ val pobject_pointer: ?loc:location -> logic_label -> term -> predicate
 
     @since 31.0-Gallium
 *)
-val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
+val pvalid_len_bytes: ?loc:Fileloc.t -> logic_label -> term -> term -> predicate
 
 (** [pvalid_read_len_bytes ~loc label ptr bytes_len] generates a predicate
     - [\valid_read{label}(ptr + (0 .. (len_bytes/sizeof(\*ptr))))].
@@ -166,12 +166,12 @@ val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
     - [ptr] must be a term of pointer type.
 *)
 val pvalid_read_len_bytes:
-  ?loc:location -> logic_label -> term -> term -> predicate
+  ?loc:Fileloc.t -> logic_label -> term -> term -> predicate
 
 (** [pcorrect_len_bytes ~loc ltyp bytes_len] returns a predicate
     [bytes_len % sizeof(ltyp) == 0].
 *)
-val pcorrect_len_bytes: ?loc:location -> logic_type -> term -> predicate
+val pcorrect_len_bytes: ?loc:Fileloc.t -> logic_type -> term -> predicate
 
 (** [pseparated_memories ~loc p1 len1 p2 len2] returns a predicate:
     - [\separated(p1 + (0 .. len1), p2 + (0 .. len2))]
@@ -180,7 +180,7 @@ val pcorrect_len_bytes: ?loc:location -> logic_type -> term -> predicate
     - [p1] and [p2] must be of pointer type
 *)
 val pseparated_memories:
-  ?loc:location -> term -> term -> term -> term -> predicate
+  ?loc:Fileloc.t -> term -> term -> term -> term -> predicate
 
 (** {2 Specification} *)
 

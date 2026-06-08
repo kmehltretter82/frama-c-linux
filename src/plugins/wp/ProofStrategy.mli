@@ -13,7 +13,7 @@ open Pattern
 (* --- Proof Strategy Engine                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a loc = { loc : Cil_types.location ; value : 'a }
+type 'a loc = { loc : Fileloc.t ; value : 'a }
 
 (* Abstract Syntax Tree: must be stdlib-marshallable *)
 type strategy = {
@@ -52,7 +52,7 @@ val typecheck_auto : env -> string loc -> unit
 val typecheck_tactic : env -> tactic -> unit
 
 val name : strategy -> string
-val loc : strategy -> Cil_types.location
+val loc : strategy -> Fileloc.t
 val find : string -> strategy option
 val hints : ?node:ProofEngine.node -> Wpo.t -> strategy list
 val has_hint : Wpo.t -> bool

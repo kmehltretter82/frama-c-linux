@@ -64,8 +64,8 @@ let pp_id fmt (id: W.Ident.ident) = Format.pp_print_string fmt id.id_string
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
-  types : (C.logic_type_info * C.location) list;
-  logics : (C.logic_info * C.location) list;
+  types : (C.logic_type_info * Fileloc.t) list;
+  logics : (C.logic_info * Fileloc.t) list;
 }
 
 type env = {
@@ -79,8 +79,8 @@ type env = {
 }
 
 type menv = {
-  mutable lti : (C.logic_type_info * C.location) list;
-  mutable li : (C.logic_info * C.location) list;
+  mutable lti : (C.logic_type_info * Fileloc.t) list;
+  mutable li : (C.logic_info * Fileloc.t) list;
 }
 
 let create wenv =
@@ -119,7 +119,7 @@ let add_builtins env =
 (* ---    Location handling                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let convert_location (wloc : Why3.Loc.position option) : C.location =
+let convert_location (wloc : Why3.Loc.position option) : Fileloc.t =
   match wloc with
   | Some loc ->
     let (file,lstart,cstart,lend,cend) = Why3.Loc.get loc in
@@ -327,7 +327,7 @@ module Env = WpContext.StaticGenerator
         add_builtins env ; env
     end)
 
-let importer (ctxt: LT.module_builder) (_: C.location) (m: string list) =
+let importer (ctxt: LT.module_builder) (_: Fileloc.t) (m: string list) =
   begin
     L.debug ~dkey "Importing Why3 theory %s.@." (String.concat "::" m) ;
     let thname = String.concat "." m in

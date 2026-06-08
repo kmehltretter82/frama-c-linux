@@ -23,7 +23,7 @@ type 'a il_compiler = 'a -> Interlang.exp Interlang_gen.m
 
 (** a direct-to-Cil compiler that compiles E-ACSL predicates directly to Cil. *)
 type 'a compiler =
-  loc:location ->
+  loc:Fileloc.t ->
   adata:Assert.t ->
   env:Env.t ->
   kf:kernel_function ->

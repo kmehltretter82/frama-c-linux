@@ -16,7 +16,7 @@ type tag =
   | DEFAULT of stmt
   | ASSERT of identified_predicate * int * int (* part / Npart *)
 
-val loc : tag -> location
+val loc : tag -> Fileloc.t
 val pretty : Format.formatter -> tag -> unit
 
 val if_then : stmt -> tag

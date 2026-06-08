@@ -12,7 +12,7 @@ open Cil_types
    Partial support for ranges is provided. *)
 
 val call:
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   string ->
   typ ->
@@ -26,7 +26,7 @@ val call:
 
 val call_with_size:
   adata:Assert.t ->
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   typ ->
   Env.t ->
@@ -39,7 +39,7 @@ val call_with_size:
 
 val call_valid:
   adata:Assert.t ->
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   typ ->
   Env.t ->
@@ -71,7 +71,7 @@ end
 
 val gmp_to_sizet_ref:
   (adata:Assert.t ->
-   loc:location ->
+   loc:Fileloc.t ->
    name:string ->
    ?check_lower_bound:bool ->
    ?pp:term ->

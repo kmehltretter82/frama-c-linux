@@ -84,7 +84,7 @@ val declaration_of_localizable : localizable -> declaration option
 
 val definition_of_localizable : localizable -> localizable option
 
-val loc_of_declaration : declaration -> location
+val loc_of_declaration : declaration -> Fileloc.t
 
 val name_of_declaration : declaration -> string
 val name_of_localizable : localizable -> string option
@@ -99,7 +99,7 @@ val localizable_of_declaration : declaration -> localizable
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
-val loc_of_localizable : localizable -> location
+val loc_of_localizable : localizable -> Fileloc.t
 (** Might return [Fileloc.unknown] *)
 
 val pos_to_localizable: ?precise_col:bool -> Filepos.t -> localizable option

@@ -31,6 +31,6 @@ val pp_source : Format.formatter -> acs -> unit
 
 val rank : acs -> int
 val marker : acs -> Printer_tag.localizable
-val location : clause -> location
+val location : clause -> Fileloc.t
 
 module Set : Set.S with type elt = acs

@@ -39,7 +39,7 @@ val arithmetic_conversion:
 [@@deprecated "Use Ast_types.Acsl.arithmetic_conversion instead"]
 [@@migrate { repl = Ast_types.Acsl.arithmetic_conversion }]
 
-exception Typing_error of location * string
+exception Typing_error of Fileloc.t * string
 
 (** @param explicit defaults to false, when true it means that the coercion must
            be explicitly introduced (when possible) e.g. we really want the
@@ -121,7 +121,7 @@ type typing_context = {
   assigns_env: Lenv.t;
   silent: bool;
   logic_type:
-    typing_context -> location -> Lenv.t ->
+    typing_context -> Fileloc.t -> Lenv.t ->
     Logic_ptree.logic_type -> Cil_types.logic_type ;
   type_predicate:
     typing_context -> Lenv.t -> Logic_ptree.lexpr -> predicate;
@@ -136,8 +136,8 @@ type typing_context = {
     typing_context ->
     accept_formal:bool ->
     Lenv.t -> Logic_ptree.assigns -> assigns;
-  error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
-  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+  error: 'a 'b. Fileloc.t -> ('a,Format.formatter,unit,'b) format4 -> 'a;
+  on_error: 'a 'b. ('a -> 'b) -> ((Fileloc.t * string) -> unit) -> 'a -> 'b
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
       an error while in [-kernel-warn-key annot-error] mode, [rollback
       (loc,cause)] will be executed (where [loc] is the location of the error
@@ -154,8 +154,8 @@ type typing_context = {
     @since 30.0-Zinc
 *)
 type module_builder = {
-  add_logic_type : location -> logic_type_info -> unit ;
-  add_logic_function : location -> logic_info -> unit ;
+  add_logic_type : Fileloc.t -> logic_type_info -> unit ;
+  add_logic_function : Fileloc.t -> logic_info -> unit ;
 }
 
 module type S =
@@ -163,7 +163,7 @@ sig
 
   (** @since Nitrogen-20111001 *)
   val type_of_field:
-    location -> string -> logic_type -> (term_offset * logic_type)
+    Fileloc.t -> string -> logic_type -> (term_offset * logic_type)
 
   (**
      @param explicit true if the cast is present in original source.
@@ -187,7 +187,7 @@ sig
       @since 27.0-Cobalt
   *)
   val conditional_conversion:
-    Cil_types.location -> Logic_ptree.relation option ->
+    Fileloc.t -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
 
   (** type-checks a term. *)
@@ -202,14 +202,14 @@ sig
       @param annot the annotation
   *)
   val code_annot :
-    Cil_types.location -> string list ->
+    Fileloc.t -> string list ->
     Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
 
   val type_annot :
-    location -> Logic_ptree.type_annot -> logic_info
+    Fileloc.t -> Logic_ptree.type_annot -> logic_info
 
   val model_annot :
-    location -> Logic_ptree.model_annot -> model_info
+    Fileloc.t -> Logic_ptree.model_annot -> model_info
 
   (** Some logic declaration might not introduce new global annotations
       (eg. already imported external modules).
@@ -258,10 +258,10 @@ module Make
 
        (** raises an error at the given location and with the given message.
            @since Magnesium-20151001 *)
-       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
+       val error: Fileloc.t -> ('a,Format.formatter,unit, 'b) format4 -> 'a
 
        (** see {!Logic_typing.typing_context}. *)
-       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+       val on_error: ('a -> 'b) -> ((Fileloc.t * string) -> unit) -> 'a -> 'b
 
      end) : S
 
@@ -300,12 +300,12 @@ val post_state_env: termination_kind -> logic_type -> Lenv.t
 
 val set_extension_handler:
   is_extension:(plugin:string -> string -> bool) ->
-  typer: (plugin:string -> string -> typing_context -> location ->
+  typer: (plugin:string -> string -> typing_context -> Fileloc.t ->
           Logic_ptree.lexpr list -> (bool * acsl_extension_kind)) ->
-  typer_block:(plugin:string -> string -> typing_context -> location ->
+  typer_block:(plugin:string -> string -> typing_context -> Fileloc.t ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
-  importer: (plugin:string -> string -> module_builder -> location ->
+  importer: (plugin:string -> string -> module_builder -> Fileloc.t ->
              string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
@@ -324,7 +324,7 @@ val get_typer :
   plugin:string ->
   string ->
   typing_context:typing_context ->
-  loc:location ->
+  loc:Fileloc.t ->
   Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
 
 (** Type the given extension block.

@@ -10,7 +10,7 @@ open Cil_types
 
 val prel :
   ?smart:bool ->
-  ?loc:location ->
+  ?loc:Fileloc.t ->
   ?names:string list ->
   relation ->
   term ->

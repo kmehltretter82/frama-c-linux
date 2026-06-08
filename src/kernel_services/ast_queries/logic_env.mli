@@ -100,13 +100,13 @@ module Lemmas: State_builder.Hashtbl
 
 (** @since 23.0-Vanadium *)
 module Axiomatics: State_builder.Hashtbl
-  with type key = string and type data = Cil_types.location
+  with type key = string and type data = Fileloc.t
 
 (** @since 30.0-Zinc *)
 module Modules: State_builder.Hashtbl
   with type key = string
    (* loader (name, plugin), location *)
-   and type data = (string * string) option * Cil_types.location
+   and type data = (string * string) option * Fileloc.t
 
 val builtin_states: State.t list
 

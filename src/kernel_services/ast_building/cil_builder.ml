@@ -1080,7 +1080,7 @@ struct
 
   type scope =
     {
-      loc: Cil_types.location;
+      loc: Fileloc.t;
       scope_type: scope_type;
       ghost: bool;
       mutable stmts: stmt list; (* In reverse order *)

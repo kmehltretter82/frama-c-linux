@@ -75,7 +75,7 @@ module Instantiator_builder: sig
         [Transform] visitor. Note that it must return a [funspec] but should
         {b not} register it in [Annotations] tables.
     *)
-    val generate_spec: override_key -> location -> fundec -> funspec
+    val generate_spec: override_key -> Fileloc.t -> fundec -> funspec
   end
 end = Instantiator_builder
 

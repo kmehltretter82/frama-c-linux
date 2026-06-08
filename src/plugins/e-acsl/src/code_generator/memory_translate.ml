@@ -39,7 +39,7 @@ end
 
 let gmp_to_sizet_ref
   : (adata:Assert.t ->
-     loc:location ->
+     loc:Fileloc.t ->
      name:string ->
      ?check_lower_bound:bool ->
      ?pp:term ->

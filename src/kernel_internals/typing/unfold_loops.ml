@@ -739,7 +739,7 @@ let () =
            (module Kernel.UnfoldingForce:Parameter_sig.S)]
     transform compute
 
-let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
+let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:Fileloc.t) args =
   let open Logic_typing in
   let env =
     Lenv.empty () |> append_here_label |> append_pre_label

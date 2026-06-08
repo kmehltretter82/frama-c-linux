@@ -36,13 +36,13 @@ module Make (_: Function) : sig
 end
 
 (** location -> key -> s1 -> s2 -> len -> spec_result *)
-type 'a spec_gen = location -> typ -> term -> term -> term -> 'a
+type 'a spec_gen = Fileloc.t -> typ -> term -> term -> term -> 'a
 
 val mem2s_spec:
   requires: (identified_predicate list) spec_gen ->
   assigns: assigns spec_gen ->
   ensures: (termination_kind * identified_predicate) list spec_gen ->
-  typ -> location -> fundec -> funspec
+  typ -> Fileloc.t -> fundec -> funspec
 
 val mem2s_typing: typ option -> typ list -> bool
 

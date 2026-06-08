@@ -122,7 +122,7 @@ type identified_reachable = {
 type other_loc =
   | OLContract of kernel_function
   | OLStmt of kernel_function * stmt
-  | OLGlob of location
+  | OLGlob of Fileloc.t
 
 type extended_loc =
   | ELContract of kernel_function
@@ -152,7 +152,7 @@ and identified_lemma = {
   il_args : string list;
   il_pred : toplevel_predicate;
   il_attrs : attributes;
-  il_loc : location
+  il_loc : Fileloc.t
 }
 
 (** Specialization of a property at a given point, identified by a statement
@@ -169,13 +169,13 @@ and identified_type_invariant = {
   iti_name : string;
   iti_type : typ;
   iti_pred : predicate;
-  iti_loc : location
+  iti_loc : Fileloc.t
 }
 
 and identified_global_invariant = {
   igi_name : string;
   igi_pred : predicate;
-  igi_loc : location
+  igi_loc : Fileloc.t
 }
 
 and identified_other = {
@@ -514,7 +514,7 @@ val get_behavior: identified_property -> funbehavior option
 val get_names: identified_property -> string list
 val get_for_behaviors: identified_property -> string list
 
-val location: identified_property -> location
+val location: identified_property -> Fileloc.t
 (** returns the location of the property.
     @since Oxygen-20120901 *)
 

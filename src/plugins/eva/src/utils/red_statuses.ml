@@ -113,7 +113,7 @@ let get_all () =
 
 (* Information to print on the csv file for each property with a red status. *)
 type information = {
-  loc: location; (* Source-code location of the property. *)
+  loc: Fileloc.t; (* Source-code location of the property. *)
   kf: kernel_function; (* Function including the property. *)
   alarm: bool;  (* Is the property an Eva alarm or another logic property? *)
   kind: string; (* Name of the property. *)

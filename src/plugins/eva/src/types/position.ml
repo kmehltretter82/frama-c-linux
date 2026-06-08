@@ -10,7 +10,7 @@ open Cil_datatype
 
 module type S = sig
   include Datatype.S_with_collections
-  val loc : t -> Cil_types.location
+  val loc : t -> Fileloc.t
   val pos : t -> Filepos.t
   val kinstr : t -> Cil_types.kinstr
   val pretty_loc : Format.formatter -> t -> unit

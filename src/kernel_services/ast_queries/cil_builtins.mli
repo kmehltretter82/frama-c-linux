@@ -98,4 +98,4 @@ val init_gcc_builtin_templates : unit -> unit
 val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 
 (** This is used as the location of the prototypes of builtin functions. *)
-val builtinLoc: location
+val builtinLoc: Fileloc.t

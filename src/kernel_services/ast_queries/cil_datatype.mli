@@ -65,7 +65,7 @@ end
 
 (** Cil locations. *)
 module Location: sig
-  include S_with_collections with type t = location
+  include S_with_collections with type t = Fileloc.t
   val unknown: t
   [@@migrate { repl = Fileloc.unknown }]
 
@@ -98,10 +98,10 @@ module Location: sig
   val to_lexing_loc : t -> Lexing.position * Lexing.position
   [@@migrate { repl = Fileloc.to_lexing_loc }]
 
-  val compare_start_semantic : location -> location -> int
+  val compare_start_semantic : Fileloc.t -> Fileloc.t -> int
   [@@migrate { repl = Fileloc.Original.compare }]
 
-  val equal_start_semantic : location -> location -> bool
+  val equal_start_semantic : Fileloc.t -> Fileloc.t -> bool
   [@@migrate { repl = Fileloc.Original.equal }]
 end
 [@@deprecated "Use Fileloc module directly, which is its own datatype."]
@@ -180,7 +180,7 @@ module File: S with type t = file
 
 module Global: sig
   include S_with_collections_pretty with type t = global
-  val loc: t -> location
+  val loc: t -> Fileloc.t
   val attr: t -> attributes
   (** @since Phosphorus-20170501-beta1 *)
 end
@@ -189,7 +189,7 @@ module Initinfo: S_with_pretty with type t = initinfo
 
 module Instr: sig
   include S_with_pretty with type t = instr
-  val loc: t -> location
+  val loc: t -> Fileloc.t
 end
 
 module Kinstr: sig
@@ -239,8 +239,8 @@ module Stmt: sig
                       and type 'a map = 'a Hptmap.Shape(Stmt_Id).t
     val self: State.t
   end
-  val loc_skind: stmtkind -> location
-  val loc: t -> location
+  val loc_skind: stmtkind -> Fileloc.t
+  val loc: t -> Fileloc.t
   val pretty_sid: Format.formatter -> t -> unit
   (** Pretty print the sid of the statement
       @since Nitrogen-20111001 *)
@@ -297,7 +297,7 @@ module Builtin_logic_info: S_with_collections_pretty with type t = builtin_logic
 
 module Code_annotation: sig
   include S_with_collections_pretty with type t = code_annotation
-  val loc: t -> location option
+  val loc: t -> Fileloc.t option
 end
 
 module Funbehavior: S_with_pretty with type t = funbehavior
@@ -311,7 +311,7 @@ module Fundec: S_with_collections_pretty with type t = fundec
 
 module Global_annotation: sig
   include S_with_collections_pretty with type t = global_annotation
-  val loc: t -> location
+  val loc: t -> Fileloc.t
 
   val attr: t -> attributes
   (** attributes tied to the global annotation.
