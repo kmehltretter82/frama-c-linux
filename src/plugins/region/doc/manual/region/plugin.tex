@@ -303,7 +303,7 @@ analyzed.
     &$\mid$& \verb+\nullable+ & \\
     &$\mid$& \verb+\allocated+ & \\
     &$\mid$& \verb+\garbage+ & \\
-    &$\mid$& \verb+\readonly+ & \\
+    &$\mid$& \verb+\validread+ & \\
 
     &&& \\
     \hline
@@ -408,7 +408,8 @@ object specification \verb+a[p..q]+ are:
   valid or not valid at all;
   \item \verb+\garbage+ allows element \verb+a[k]+ to be partially initialized
   or not initialized at all;
-  \item \verb+\readonly+ requires \verb+a[p..q]+ to have read-only access only.
+  \item \verb+\validread+ requires \verb+a[p..q]+ to have read access (instead
+  of full read-write access).
 \end{itemize}
 Flags can be combined with each other and apply to all objects that appears in
 the same (named or anonymous) region clause. If a region clause introduces

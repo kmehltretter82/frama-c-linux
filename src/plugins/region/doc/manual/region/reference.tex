@@ -81,24 +81,21 @@ are generated as specified in Figure~\ref{fig:callsite-attributes} with respect
 to attributes of the call site region call, here given for an object
 specification \verb+A: a[p..q]+ at call site.
 
-Any invalid side condition (eg. write access on a readonly region) is assigned
-an \emph{Invalid-If-Reachable} status by the \Region plug-in.
-
 \begin{figure}[htbp]
 \begin{center}
   \begin{tabular}{|c|l|}
     \hline
-    \textbf{Object} & \textbf{Condition} (\verb+<condition>+)\\
+    \textbf{Object}   & \textbf{Condition} (\verb+<condition>+)\\
     \hline
     \verb+\allocated+ & \verb+<valid-read> ==> <initialized>+ \\
     \verb+\nullable+  & \verb+<non-null>   ==> <accessible>+ \\
     default           & \verb+                 <accessible>+ \\
     \hline
-    \textbf{Object} & \textbf{Accessibility} (\verb+<accessible>+)\\
+    \textbf{Object}   & \textbf{Accessibility} (\verb+<accessible>+)\\
     \hline
-    \verb+\garbage & \readonly+   & \verb+<valid-read>+ \\
+    \verb+\garbage    & \validread+   & \verb+<valid-read>+ \\
     \verb+\garbage+   & \verb+<valid-write>+ \\
-    \verb+\readonly+  & \verb+<valid-read>  && <initialized>+ \\
+    \verb+\validread+ & \verb+<valid-read>  && <initialized>+ \\
     default           & \verb+<valid-write> && <initialized>+ \\
     \hline
   \end{tabular}
@@ -125,7 +122,7 @@ an \emph{Invalid-If-Reachable} status by the \Region plug-in.
      \hline
      \textbf{Call Site} & \textbf{Write Access} (\verb+<valid-write>+)\\
      \hline
-     \verb+\readonly+   & \color{red}{\tt invalid:} \verb$\valid(a + (p..q))$ \\
+     \verb+\validread+  & \verb$\valid(a + (p..q))$ \\
      \verb+\allocated+  & \verb$\valid(a + (p..q))$ \\
      \verb+\nullable+   & \verb$a != \null$ \\
      default            & none (\verb+\true+) \\
