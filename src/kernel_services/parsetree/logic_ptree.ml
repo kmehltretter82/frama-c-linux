@@ -9,9 +9,6 @@
 
 (* Logic parse trees *)
 
-type location = Fileloc.t
-[@@deriving show { with_path = false } ]
-
 (** comparison operators. *)
 type relation = Lt | Gt | Le | Ge | Eq | Neq
 [@@deriving show { with_path = false } ]
@@ -66,7 +63,7 @@ and quantifiers = (logic_type * string) list
 *)
 and lexpr = {
   lexpr_node : lexpr_node; (** kind of expression. *)
-  lexpr_loc : location (** position in the source code. *)
+  lexpr_loc : Fileloc.t (** position in the source code. *)
 }
 
 (* PL is for Parsed Logic *)
@@ -203,7 +200,7 @@ type loader = {
 (** global declarations. *)
 type decl = {
   decl_node : decl_node; (** kind of declaration. *)
-  decl_loc : location (** position in the source code. *)
+  decl_loc : Fileloc.t (** position in the source code. *)
 }
 (* This attribute is common for all types in the mutually recursive group of
    types so we only need to mention it once. *)
@@ -320,7 +317,7 @@ and global_extension =
 
 and extended_decl = {
   extended_node : global_extension;
-  extended_loc : location
+  extended_loc : Fileloc.t
 }
 
 (** Behavior in a specification. This type shares the name of its constructors
@@ -401,25 +398,28 @@ type annot =
               See cparser.mly (grammar rules involving SPEC) for
               more details.
            *) (** function specification. *)
-  | Acode_annot of location * code_annot (** code annotation. *)
-  | Aloop_annot of location * code_annot list (** loop annotation. *)
+  | Acode_annot of Fileloc.t * code_annot (** code annotation. *)
+  | Aloop_annot of Fileloc.t * code_annot list (** loop annotation. *)
 [@@deriving show { with_path = false } ]
 
 (** ACSL extension for external spec file **)
 type ext_decl =
   | Ext_decl of decl            (* decl contains a location *)
   | Ext_macro of bool * string * lexpr (* lexpr contains a location *)
-  | Ext_include of bool * string * location
+  | Ext_include of bool * string * Fileloc.t
 [@@deriving show { with_path = false } ]
 
 type ext_function =
-  | Ext_spec of spec * location (* function spec *)
-  | Ext_stmt of string list * annot * location (* loop/code annotation. *)
+  | Ext_spec of spec * Fileloc.t (* function spec *)
+  | Ext_stmt of string list * annot * Fileloc.t (* loop/code annotation. *)
   | Ext_glob of ext_decl
 [@@deriving show { with_path = false } ]
 
-type ext_module = string option * ext_decl list * ((string * location) option * ext_function list) list
+type ext_module = string option * ext_decl list * ((string * Fileloc.t) option * ext_function list) list
 [@@deriving show { with_path = false } ]
 
 type ext_spec = ext_module list
 [@@deriving show { with_path = false } ]
+
+type location = Fileloc.t
+[@@deprecated "Use Fileloc.t instead."]
