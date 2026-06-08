@@ -361,6 +361,7 @@
     font-weight: normal;
     line-height: 1;
     height: 28px;
+    min-width: 120px;
     margin: 0px 1px 0px 0px;
     padding: 5px 8px 5px 10px;
     border: solid 1px var(--border-discrete);
@@ -406,6 +407,7 @@
 }
 
 .labview-tab-closing {
+    margin-left: auto;
     fill: var(--info-text-discrete);
 }
 
