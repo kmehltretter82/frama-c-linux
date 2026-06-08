@@ -23,6 +23,10 @@
 open Cabs
 open Cabshelper
 
+(* Avoid deprecated warning from Logic_ptree.location, remove this type when
+   removing Logic_ptree.location. *)
+type location = Fileloc.t
+
 (*
 ** Expression building
 *)
