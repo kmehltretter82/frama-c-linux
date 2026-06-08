@@ -86,7 +86,7 @@
     display: none;
 }
 
-.toolbar-tabs {
+.labview-tabs {
     flex: 1 1 auto;
     min-width: 0;
     display: flex;

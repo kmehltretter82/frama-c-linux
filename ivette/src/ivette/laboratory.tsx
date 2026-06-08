@@ -1554,7 +1554,7 @@ export function Tabs(): JSX.Element {
     ));
 
   return (
-    <div className="toolbar-tabs">
+    <div className="labview-tabs">
       <IconButton
         className="labview-tab-scroll"
         icon="ANGLE.LEFT"
