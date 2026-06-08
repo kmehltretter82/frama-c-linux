@@ -97,18 +97,61 @@ let find_use ~context id =
     Format.kasprintf invalid_arg "Qed.Symbol.find_use(%S)" id.id_string
 
 (* -------------------------------------------------------------------------- *)
+(* --- Context                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type context =
+  | Theory of Why3.Theory.theory
+  | Cluster of { mutable closed : Why3.Theory.theory option }
+
+type cluster = {
+  cluster : context ;
+  mutable uc : Why3.Theory.theory_uc ;
+}
+
+let cluster ?(path=["qed";"generated"]) ?loc name =
+  let cluster = Cluster { closed = None } in
+  let uc = Why3.Theory.create_theory ~path @@ Why3.Ident.id_fresh ?loc name in
+  { cluster ; uc }
+
+let close = function
+  | { cluster = Theory _ } -> assert false
+  | { uc ; cluster = Cluster c } ->
+    let th = Why3.Theory.close_theory uc in
+    c.closed <- Some th ; th
+
+let context = function
+  | Theory th | Cluster { closed = Some th } -> th
+  | Cluster { closed = None } -> invalid_arg "Qed.Symbol.theory"
+
+let iter fn = function
+  | Theory th -> fn th
+  | Cluster { closed } -> Option.iter fn closed
+
+let use cluster (thy : Why3.Theory.theory) =
+  if not @@ Why3.Ident.Sid.mem thy.th_name cluster.uc.uc_used then
+    let name = "use'" ^ thy.th_name.id_string in
+    let uc = Why3.Theory.open_scope cluster.uc name in
+    let uc = Why3.Theory.use_export uc thy in
+    let uc = Why3.Theory.close_scope uc ~import:false in
+    cluster.uc <- uc
+
+let add cluster decl =
+  cluster.uc <- Why3.Theory.add_decl cluster.uc decl
+
+(* -------------------------------------------------------------------------- *)
 (* --- Abstract Data Types                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
 type data = Data of {
-    th : Why3.Theory.theory ;
+    ct : context ;
     ts : Why3.Ty.tysymbol ;
     mutable cs : Why3.Decl.constructor list option ; (* Memoized *)
     mutable fs : field list option ; (* Memoized *)
   }
 
 and field = Field of {
-    th : Why3.Theory.theory ;
+    ct : context ;
     ls : Why3.Term.lsymbol ;
     rank : int ;
     data : data ;
@@ -123,9 +166,9 @@ let hds = Why3.Env.Wenv.memoize 0 (fun _env -> Hashtbl.create 0)
 
 let of_ts context (ts : Why3.Ty.tysymbol) =
   try Why3.Ty.Hts.find hts ts with Not_found ->
-    let d = Data {
-        ts ; th = find_use ~context ts.ts_name ; cs = None ; fs = None
-      } in Why3.Ty.Hts.add hts ts d ; d
+    let ct = Theory (find_use ~context ts.ts_name) in
+    let d = Data { ts ; ct ; cs = None ; fs = None } in
+    Why3.Ty.Hts.add hts ts d ; d
 
 let find_data env name =
   let hs = hds env in
@@ -137,8 +180,12 @@ let constructors (Data a) =
   match a.cs with
   | Some cs -> cs
   | None ->
-    let cs = try Why3.Decl.find_constructors a.th.th_known a.ts with _ -> [] in
+    let th = context a.ct in
+    let cs = try Why3.Decl.find_constructors th.th_known a.ts with _ -> [] in
     a.cs <- Some cs ; cs
+
+let use_data cluster (Data d) = iter (use cluster) d.ct
+let new_data { cluster = ct } ts = Data { ct ; ts ; cs = None ; fs = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Records                                                            --- *)
@@ -153,7 +200,7 @@ let fields (Data a as data) =
         | [_,ps] when a.ts.ts_args = [] ->
           List.mapi
             (fun rank p -> match p with None -> raise Not_found | Some ls ->
-                 Field { th = a.th ; ls ; rank ; data }
+                 Field { ct = a.ct ; ls ; rank ; data }
             ) ps
         | _ -> []
       with Not_found -> []
@@ -169,7 +216,7 @@ let by_field_rank (Field a) (Field b) = b.rank - a.rank
 (* -------------------------------------------------------------------------- *)
 
 type lfun = Fun of {
-    th : Why3.Theory.theory ;
+    ct : context ;
     ls : Why3.Term.lsymbol ;
     mutable def : (Why3.Term.vsymbol list * Why3.Term.term) option option ;
   }
@@ -179,7 +226,8 @@ let hfs = Why3.Env.Wenv.memoize 0 (fun _env -> Hashtbl.create 0)
 
 let of_ls context (ls : Why3.Term.lsymbol) =
   try Why3.Term.Hls.find hls ls with Not_found ->
-    let lfun = Fun { ls ; th = find_use ~context ls.ls_name ; def = None } in
+    let ct = Theory (find_use ~context ls.ls_name) in
+    let lfun = Fun { ls ; ct ; def = None } in
     Why3.Term.Hls.add hls ls lfun ; lfun
 
 let find_lfun env name =
@@ -187,6 +235,9 @@ let find_lfun env name =
   try Hashtbl.find hs name with Not_found ->
     let lfun = find_ls env name of_ls in
     Hashtbl.add hs name lfun ; lfun
+
+let use_lfun context (Fun f) = iter (use context) f.ct
+let new_lfun { cluster = ct } ls = Fun { ct ; ls ; def = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generic Symbols                                                    --- *)
@@ -231,7 +282,7 @@ module Data = Make
     (struct
       type t = data
       type symbol = Why3.Ty.tysymbol
-      let theory (Data a) = a.th
+      let theory (Data a) = context a.ct
       let symbol (Data a) = a.ts
       let ident (Data a) = a.ts.ts_name
     end)
@@ -240,7 +291,7 @@ module Field = Make
     (struct
       type t = field
       type symbol = Why3.Term.lsymbol
-      let theory (Field fd) = fd.th
+      let theory (Field fd) = context fd.ct
       let symbol (Field fd) = fd.ls
       let ident (Field fd) = fd.ls.ls_name
     end)
@@ -249,7 +300,7 @@ module Fun = Make
     (struct
       type t = lfun
       type symbol = Why3.Term.lsymbol
-      let theory (Fun fn) = fn.th
+      let theory (Fun fn) = context fn.ct
       let symbol (Fun fn) = fn.ls
       let ident (Fun fn) = fn.ls.ls_name
     end)
@@ -334,7 +385,7 @@ let apply (Fun f) ?result ts =
   let s = ref Why3.Ty.Mtv.empty in
   unify_all s f.ls.ls_args ts ;
   Option.iter (unify_opt s f.ls.ls_value) result ;
-  of_oty ~sigma:!s f.th f.ls.ls_value
+  of_oty ~sigma:!s (context f.ct) f.ls.ls_value
 
 let signature (Fun f) =
   let r = ref 0 in
@@ -349,8 +400,9 @@ let signature (Fun f) =
     | Tyapp(_,ts) -> List.iter addt ts in
   Option.iter addt f.ls.ls_value ;
   List.iter addt f.ls.ls_args ;
-  !r, of_oty ~sigma:!s f.th f.ls.ls_value,
-  List.map (of_ty ~sigma:!s f.th) f.ls.ls_args
+  let th = context f.ct in
+  !r, of_oty ~sigma:!s th f.ls.ls_value,
+  List.map (of_ty ~sigma:!s th) f.ls.ls_args
 
 let definition (Fun f) =
   match f.def with
@@ -359,7 +411,7 @@ let definition (Fun f) =
     let def =
       try
         Option.map Why3.Decl.open_ls_defn @@
-        Why3.Decl.find_logic_definition f.th.th_known f.ls
+        Why3.Decl.find_logic_definition (context f.ct).th_known f.ls
       with _ -> None
     in f.def <- Some def ; def
 
