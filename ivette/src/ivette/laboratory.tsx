@@ -14,6 +14,7 @@ import * as States from 'dome/data/states';
 import * as Settings from 'dome/data/settings';
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Toolbar from 'dome/frame/toolbars';
+import * as DnD from 'dome/dnd';
 import { Icon } from 'dome/controls/icons';
 import { IconButton } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
@@ -341,6 +342,24 @@ function changeTabIndex(
   return newTabs;
 }
 
+function changeTabOrder(
+  tabs: Map<tabKey, TabViewState>,
+  keys: tabKey[],
+): Map<tabKey, TabViewState> {
+  // Build a new map as Map insertion order is the persisted tab order.
+  const newTabs = new Map<tabKey, TabViewState>();
+  // First insert tabs in the exact order reported by the DnD list.
+  keys.forEach((key) => {
+    const tab = tabs.get(key);
+    if (tab) newTabs.set(key, tab);
+  });
+  // Append tabs missing from the DnD order as a defensive fallback.
+  tabs.forEach((tab, key) => {
+    if (!newTabs.has(key)) newTabs.set(key, tab);
+  });
+  return newTabs;
+}
+
 function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number {
   let custom = 0;
   tabs.forEach(tab => {
@@ -494,6 +513,17 @@ function restoreDefault(key: tabKey): void {
   } else {
     LAB.setValue({ ...state, tabs });
   }
+}
+
+function reorderTabs(keys: tabKey[]): void {
+  const state = LAB.getValue();
+  // The current map insertion order is the current tab order.
+  const current = Array.from(state.tabs.keys());
+  // Avoid forcing a state update when DnD reports the same order.
+  if (equal(current, keys)) return;
+  // Rebuild the tabs map so its insertion order follows the DnD order.
+  const tabs = changeTabOrder(state.tabs, keys);
+  LAB.setValue({ ...state, tabs }, true);
 }
 
 function applyView(view: Ivette.ViewLayoutProps): void {
@@ -1407,6 +1437,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
 export function Tabs(): JSX.Element {
   const [{ tabKey, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
+  // Shared ordered key list for rendering, resize updates, and DnD control.
+  // Memoization gives DnD.List a stable array until the tab map changes.
+  const keys = React.useMemo(() => Array.from(tabs.keys()), [tabs]);
 
   // Holds the DOM node whose scrollLeft position is controlled by arrows.
   const viewportRef = React.useRef<HTMLDivElement>(null);
@@ -1468,17 +1501,18 @@ export function Tabs(): JSX.Element {
       // Stop observing DOM nodes that belong to this render.
       observer?.disconnect();
     };
-  }, [tabs, updateScrollButtons]);
+  }, [keys, updateScrollButtons]);
 
   const items: JSX.Element[] = [];
   tabs.forEach((tab: TabViewState) =>
     items.push(
-      <TabView
-        key={tab.key}
-        tab={tab}
-        tabKey={tabKey}
-        layout={layout}
-      />
+      <DnD.Item key={tab.key} id={tab.key} className="labview-tab-item">
+        <TabView
+          tab={tab}
+          tabKey={tabKey}
+          layout={layout}
+        />
+      </DnD.Item>
     ));
 
   return (
@@ -1496,9 +1530,10 @@ export function Tabs(): JSX.Element {
         className="labview-tabs-viewport"
         onScroll={updateScrollButtons}
       >
-        {/* Long non-wrapping row containing the tab buttons. */}
         <div ref={tabsRowRef} className="labview-tabs-content">
-          {items}
+          <DnD.List items={keys} setItems={reorderTabs}>
+            {items}
+          </DnD.List>
         </div>
       </div>
       <IconButton

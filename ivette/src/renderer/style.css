@@ -127,6 +127,17 @@
     margin-bottom: -1px;
 }
 
+/* DnD wrapper around each tab; keep it sized like a regular tab item. */
+.labview-tab-item {
+    flex: 0 0 auto;
+    display: flex;
+}
+
+/* DnD.DragSource adds an inner div; keep that wrapper in the flex row too. */
+.labview-tab-item > div {
+    display: flex;
+}
+
 /* Fixed scroll controls at both ends of the tab area. */
 .dome-xIcon.labview-tab-scroll {
     flex: 0 0 21px;
