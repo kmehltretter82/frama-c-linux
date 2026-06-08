@@ -138,6 +138,11 @@
     display: flex;
 }
 
+/* Ref anchor used for measuring whether a tab is clipped by the viewport. */
+.labview-tab-anchor {
+    display: flex;
+}
+
 /* Fixed scroll controls at both ends of the tab area. */
 .dome-xIcon.labview-tab-scroll {
     flex: 0 0 21px;

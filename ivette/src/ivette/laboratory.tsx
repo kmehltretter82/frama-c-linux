@@ -1445,10 +1445,21 @@ export function Tabs(): JSX.Element {
   const viewportRef = React.useRef<HTMLDivElement>(null);
   // Holds the DOM node whose width grows with the rendered tab buttons.
   const tabsRowRef = React.useRef<HTMLDivElement>(null);
+  // Holds the rendered DOM node for each tab, indexed by tab key.
+  const tabRefs = React.useRef(new Map<tabKey, HTMLDivElement>());
   // Tracks whether the viewport has hidden tab content on its left side.
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   // Tracks whether the viewport has hidden tab content on its right side.
   const [canScrollRight, setCanScrollRight] = React.useState(false);
+
+  // Register and unregister tab DOM nodes during mounts or unmounts.
+  const setTabRef = React.useCallback(
+    (key: tabKey) => (node: HTMLDivElement | null): void => {
+      if (node) tabRefs.current.set(key, node);
+      else tabRefs.current.delete(key);
+    },
+    [],
+  );
 
   // Keep the arrow buttons enabled only when hidden tabs exist in that
   // direction. The one-pixel tolerance avoids subpixel rounding artifacts.
@@ -1503,15 +1514,42 @@ export function Tabs(): JSX.Element {
     };
   }, [keys, updateScrollButtons]);
 
+  // When selection changes, reveal the selected tab if it is clipped by the
+  // horizontal viewport.
+  React.useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const selected = tabRefs.current.get(tabKey);
+    if (!viewport || !selected) return;
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    // Keep a small visual gap between the selected tab and scroll controls.
+    const margin = 4;
+
+    if (selectedRect.left < viewportRect.left + margin) {
+      // Selected tab is clipped on the left; move the viewport leftward.
+      viewport.scrollLeft -= viewportRect.left + margin - selectedRect.left;
+      // Programmatic scrolling does not always fire before the next render.
+      updateScrollButtons();
+    } else if (selectedRect.right > viewportRect.right - margin) {
+      // Selected tab is clipped on the right; move the viewport rightward.
+      viewport.scrollLeft += selectedRect.right - viewportRect.right + margin;
+      // Programmatic scrolling does not always fire before the next render.
+      updateScrollButtons();
+    }
+  }, [tabKey, keys, updateScrollButtons]);
+
   const items: JSX.Element[] = [];
   tabs.forEach((tab: TabViewState) =>
     items.push(
       <DnD.Item key={tab.key} id={tab.key} className="labview-tab-item">
-        <TabView
-          tab={tab}
-          tabKey={tabKey}
-          layout={layout}
-        />
+        <div ref={setTabRef(tab.key)} className="labview-tab-anchor">
+          <TabView
+            tab={tab}
+            tabKey={tabKey}
+            layout={layout}
+          />
+        </div>
       </DnD.Item>
     ));
 
