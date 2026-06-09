@@ -40,6 +40,57 @@ export function textToString(text: KernelData.text): string {
 }
 
 // --------------------------------------------------------------------------
+// --- Semantic tags inserted in OCaml
+// --------------------------------------------------------------------------
+
+// A semantic tag inserted in OCaml is represented in Typescript by an array of
+// KernelData.text where the first element is the tag and the rest is the text.
+
+// Prefix for code markers.
+// Synchronized with marker_namespace in kernel_ast.ml
+const CODE_TAG_PREFIX = "code:";
+// Prefix for HTML tags
+const HTML_TAG_PREFIX = "html:";
+
+export interface HtmlTag {
+  kind: "html";
+  tag: string;
+}
+
+export interface CodeTag {
+  kind: "code";
+  marker: string;
+}
+
+export type SemanticTag = HtmlTag | CodeTag | null;
+
+// Extract the semantic tag from the given kernel text array.
+// - If a semantic tag is found then it is returned as the first element
+//   of the tuple, and the second element contains the rest of the array.
+// - If no semantic tag is found, or the semantic tag is unknown, then
+//   `null` is returned as the first element of the tuple, and the
+//   second element contains the original array.
+export function extractSemanticTag(text: KernelData.text[]):
+  [SemanticTag, KernelData.text[]] {
+  const tag = text[0];
+  const isTag = tag && typeof (tag) === 'string';
+  if (isTag) {
+    const rest = text.slice(1);
+    if (tag.startsWith(HTML_TAG_PREFIX)) {
+      return [{ kind: "html", tag: tag.substring(HTML_TAG_PREFIX.length) },
+        rest];
+    } else if (tag.startsWith(CODE_TAG_PREFIX)) {
+      return [{ kind: "code", marker: tag }, rest];
+    } else {
+      return [null, text];
+    }
+  } else {
+    return [null, text];
+  }
+
+}
+
+// --------------------------------------------------------------------------
 // --- Text Tag Tree
 // --------------------------------------------------------------------------
 
@@ -153,7 +204,7 @@ export function findTag(
 export type Modifier = 'NORMAL' | 'DOUBLE' | 'META';
 
 export interface MarkerProps {
-  marker: string;
+  tag: CodeTag;
   onSelected?: (marker: string, meta: Modifier) => void;
   onHovered?: (marker: string | undefined) => void;
   onContextMenu?: (marker: string) => void;
@@ -161,7 +212,8 @@ export interface MarkerProps {
 }
 
 export function Marker(props: MarkerProps): JSX.Element {
-  const { marker, onSelected, onHovered, onContextMenu, children } = props;
+  const { tag, onSelected, onHovered, onContextMenu, children } = props;
+  const marker = tag.marker;
   const className = classes(
     (onSelected || onHovered) && 'kernel-text-marker'
   );
@@ -190,6 +242,24 @@ export function Marker(props: MarkerProps): JSX.Element {
   );
 }
 
+export function htmlFragment(tag: HtmlTag, contents: React.ReactNode):
+  JSX.Element {
+  switch (tag.tag) {
+    case "sup":
+      return <sup>{contents}</sup>;
+    case "sub":
+      return <sub>{contents}</sub>;
+    case "strong":
+      return <strong>{contents}</strong>;
+    case "em":
+      return <em>{contents}</em>;
+    case "code":
+      return <code>{contents}</code>;
+    default:
+      return <>{contents}</>;
+  }
+}
+
 export interface TextProps {
   text: KernelData.text;
   onSelected?: (marker: string, meta: Modifier) => void;
@@ -202,22 +272,27 @@ export function Text(props: TextProps): JSX.Element {
   const className = classes('kernel-text', 'dome-text-code', props.className);
   const makeContents = (text: KernelData.text): React.ReactNode => {
     if (Array.isArray(text)) {
-      const tag = text[0];
-      const marker = tag && typeof (tag) === 'string';
-      const array = marker ? text.slice(1) : text;
+      const [tag, array] = extractSemanticTag(text);
       const contents = React.Children.toArray(array.map(makeContents));
-      if (marker)
-        return (
-          <Marker
-            marker={tag}
-            onSelected={props.onSelected}
-            onHovered={props.onHovered}
-            onContextMenu={props.onContextMenu}
-          >
-            {contents}
-          </Marker>
-        );
-      return <>{contents}</>;
+      if (tag !== null) {
+        switch (tag.kind) {
+          case "html":
+            return htmlFragment(tag, contents);
+          case "code":
+            return (
+              <Marker
+                tag={tag}
+                onSelected={props.onSelected}
+                onHovered={props.onHovered}
+                onContextMenu={props.onContextMenu}
+              >
+                {contents}
+              </Marker>
+            );
+        }
+      } else {
+        return <>{contents}</>;
+      }
     }
     return text;
   };

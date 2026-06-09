@@ -12,6 +12,9 @@ module Js = Yojson.Basic.Util
 module Pkg = Package
 open Cil_types
 
+(* Namespace used to prefix the markers before sending them to Ivette *)
+let marker_namespace = "code:"
+
 let package = Pkg.package ~title:"Ast Services" ~name:"ast" ~readme:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
@@ -154,6 +157,7 @@ struct
     try T.H.find tags item
     with Not_found ->
       let tag = T.create item in
+      let tag = Format.sprintf "%s%s" marker_namespace tag in
       T.H.add tags item tag ;
       Hashtbl.add items tag item ;
       List.iter (fun fn -> fn (item,tag)) !hooks ; tag
