@@ -42,13 +42,12 @@ module Prototype = struct
   let generator name = StringHashtbl.memo generators name (fun name -> name)
 
   let generated ?pos generator_name =
-    let generator = generator generator_name in
+    let origin = Generated (generator generator_name) in
     match pos with
-    | None ->
-      make ~origin:(Generated generator) ()
+    | None -> make ~origin ()
     | Some pos ->
       let pos = original pos in
-      { pos with origin = (Generated generator) }
+      { pos with origin }
 
   let rec pretty_generic pp fmt pos =
     match pos.origin with

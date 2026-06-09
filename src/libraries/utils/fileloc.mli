@@ -14,7 +14,6 @@
     - [hash] only hashes the first position.
 
     @before 33.0-Arsenic This module was {!Cil_datatype.Location}.
-    @since Frama-C+dev
 *)
 
 type t = Filepos.t * Filepos.t [@@deriving show]
@@ -24,8 +23,11 @@ include Datatype.S_with_collections with type t := t
 (** Special representation of an unknown location. *)
 val unknown : t
 
-(** Creates a location from an existing one, changing only its origin. *)
-val of_existing_loc: origin:string -> t -> t
+(** Make a new location for a generated input. The generator name is given as a
+    string. If the location is provided, it is copied (except for its origin),
+    else it is unknown.
+*)
+val generated: ?loc:t -> string -> t
 
 
 (** {2 Pretty printing } *)

@@ -166,19 +166,15 @@ let is_frama_c_builtin kf =
 
 (* Logic_const shortcuts to extract kf location. *)
 
-let pred_true kf =
+let pred node kf =
   let loc =
-    Kernel_function.get_location kf
-    |> Fileloc.of_existing_loc ~origin:"kernel"
+    Fileloc.generated ~loc:(Kernel_function.get_location kf) "kernel"
   in
-  Logic_const.(new_predicate (unnamed ~loc Ptrue))
+  Logic_const.(new_predicate (unnamed ~loc node))
 
-let pred_false kf =
-  let loc =
-    Kernel_function.get_location kf
-    |> Fileloc.of_existing_loc ~origin:"kernel"
-  in
-  Logic_const.(new_predicate (unnamed ~loc Pfalse))
+let pred_true = pred Ptrue
+let pred_false = pred Pfalse
+
 
 (* This module is used to define clauses generators. *)
 module type Generator =
