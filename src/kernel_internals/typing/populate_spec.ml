@@ -164,6 +164,18 @@ let compare_it it1 it2 =
 let is_frama_c_builtin kf =
   Kernel_function.get_vi kf |> Cil_builtins.is_builtin
 
+(* Logic_const shortcuts to extract kf location. *)
+
+let pred node kf =
+  let loc =
+    Fileloc.generated ~loc:(Kernel_function.get_location kf) "kernel"
+  in
+  Logic_const.(new_predicate (unnamed ~loc node))
+
+let pred_true = pred Ptrue
+let pred_false = pred Pfalse
+
+
 (* This module is used to define clauses generators. *)
 module type Generator =
 sig
@@ -283,12 +295,12 @@ struct
 
   let get_clauses = get_clauses_generic
 
-  let acsl_default _kf =
-    [ Exits, Logic_const.(new_predicate pfalse) ]
+  let acsl_default kf =
+    [ Exits, pred_false kf ]
 
   let safe_default kf =
     if Kernel_function.has_definition kf
-    then [ Exits, Logic_const.(new_predicate pfalse) ]
+    then [ Exits, pred_false kf ]
     else []
 
   let frama_c_default kf =
@@ -501,7 +513,7 @@ struct
   let safe_default kf =
     if Kernel_function.has_definition kf
     then []
-    else [ Logic_const.(new_predicate pfalse) ]
+    else [ pred_false kf ]
 
   let frama_c_default kf =
     acsl_default kf
@@ -668,14 +680,14 @@ struct
 
   let acsl_default kf =
     if Kernel_function.has_noreturn_attr kf then
-      Some(Logic_const.(new_predicate pfalse))
+      Some (pred_false kf)
     else
-      Some(Logic_const.(new_predicate ptrue))
+      Some (pred_true kf)
 
   let safe_default kf =
     if Kernel_function.has_noreturn_attr kf || not (Kernel_function.has_definition kf) then
-      Some(Logic_const.(new_predicate pfalse))
-    else Some(Logic_const.(new_predicate ptrue))
+      Some (pred_false kf)
+    else Some (pred_true kf)
 
   let frama_c_default kf =
     acsl_default kf
