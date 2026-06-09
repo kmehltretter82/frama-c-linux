@@ -99,6 +99,11 @@ include Datatype.Make_with_collections (struct
 
 include Prototype
 
+let generated ?loc generator_name =
+  let pos1 = Option.map fst loc
+  and pos2 = Option.map snd loc in
+  Filepos.generated ?pos:pos1 generator_name,
+  Filepos.generated ?pos:pos2 generator_name
 
 (* --- Conversion from/to Lexing.position  --- *)
 

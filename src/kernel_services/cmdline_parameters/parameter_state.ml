@@ -225,7 +225,7 @@ struct
     if is_dynamic then
       let ty = D.func ty1 ty2 in
       Dynamic.register
-        ~plugin:""
+        ~plugin:"kernel"
         (Dynamic.Parameter.get_name X.functor_name name X.option_name)
         ty
         f

@@ -15,8 +15,8 @@ let () = Plugin.register_kernel ()
 let () = Plugin.is_session_visible ()
 module P = Plugin.Register
     (struct
-      let name = ""
-      let shortname = ""
+      let name = "Frama-C kernel"
+      let shortname = "kernel"
       let help = "General options provided by the Frama-C kernel"
     end)
 
@@ -768,7 +768,7 @@ module SaveState =
 let () =
   Cmdline.add_option_without_action
     "-compress-saved-session"
-    ~plugin:""
+    ~plugin:"kernel"
     ~group:saveload
     ~help:"at exit, the session saved by the -save option is compressed. \
            No effect if the -save option is not used. \
@@ -1755,7 +1755,7 @@ let seq = add_group "Sequencing Options"
 let () =
   Cmdline.add_option_without_action
     "-then"
-    ~plugin:""
+    ~plugin:"kernel"
     ~group:seq
     ~help:"parse options before `-then' and execute Frama-C \
            accordingly, then parse options after `-then' and re-execute Frama-C"
@@ -1766,7 +1766,7 @@ let () =
 let () =
   Cmdline.add_option_without_action
     "-then-last"
-    ~plugin:""
+    ~plugin:"kernel"
     ~group:seq
     ~help:"like `-then', but the second group of actions is executed \
            on the last project created by a program transformer."
@@ -1777,7 +1777,7 @@ let () =
 let () =
   Cmdline.add_option_without_action
     "-then-replace"
-    ~plugin:""
+    ~plugin:"kernel"
     ~group:seq
     ~help:"like `-then-last', but also remove the previous current project."
     ~visible:true
@@ -1787,7 +1787,7 @@ let () =
 let () =
   Cmdline.add_option_without_action
     "-then-on"
-    ~plugin:""
+    ~plugin:"kernel"
     ~argname:"p"
     ~group:seq
     ~help:"like `-then', but the second group of actions is executed \
@@ -1799,7 +1799,7 @@ let () =
 let () =
   Cmdline.add_option_without_action
     "-commands-file"
-    ~plugin:""
+    ~plugin:"kernel"
     ~argname:"filename"
     ~group:seq
     ~help:"read the next command line arguments from the given file. \
