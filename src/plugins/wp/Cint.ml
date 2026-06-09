@@ -814,8 +814,8 @@ let smp_leq_with_lsr x y =
     smp_leq_improved !@f_lsr x y
 
 
-(* Rewriting at export *)
-let export_eq_with_land a b =
+(* TODO[LC]: Rewriting at export *)
+let _export_eq_with_land a b =
   let es = match_fun !@f_land a in
   if b == e_zero then
     let k,_,es = match_binop_one_extraction !@f_lsl es in
@@ -853,17 +853,15 @@ let () =
         List.iter
           begin fun (_name, { f; eq; leq; smp }) ->
             F.set_builtin f smp ;
-            (match eq with
-             | None -> ()
-             | Some eq -> F.set_builtin_eq f eq);
-            (match leq with
-             | None -> ()
-             | Some leq -> F.set_builtin_leq f leq)
+            Option.iter (F.set_builtin_eq f) eq ;
+            Option.iter (F.set_builtin_leq f) leq ;
           end
-          [bi_lbit; bi_lnot;
-           bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
+          begin [
+            bi_lbit; bi_lnot;
+            bi_lxor; bi_lor; bi_land;
+            bi_lsl; bi_lsr;
+          ] end ;
 
-        Lang.For_export.set_builtin_eq !@f_land export_eq_with_land
       end
     end
 

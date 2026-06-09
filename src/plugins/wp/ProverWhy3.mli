@@ -6,12 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Equality used in the goal, simpler to prove than polymorphic equality *)
-val add_specific_equality:
-  for_tau:(Lang.tau -> bool) ->
-  mk_new_eq:Lang.F.binop ->
-  unit
-
 (** Return NoResult if it is already proved by Qed *)
 val prove :
   ?mode:Prover.InteractiveMode.t ->

@@ -17,100 +17,72 @@ let dkey_model =
     ~help:"Counter examples model variable"
     "why3:model"
 
-let why3_failure msg =
-  Format.kasprintf failwith msg
+let failwith msg = Format.kasprintf failwith msg
+
+type global = {
+  env: Why3.Env.env;
+  hts: (string, Why3.Ty.tysymbol) Hashtbl.t; (* types *)
+  hls: (string, Why3.Term.lsymbol) Hashtbl.t; (* logics *)
+  hfs: (string, Why3.Term.lsymbol) Hashtbl.t; (* fields *)
+  hcs: (string, Why3.Term.lsymbol) Hashtbl.t; (* records *)
+}
 
 type context = {
-  mutable th : Why3.Theory.theory_uc ;
-  env: Why3.Env.env ;
+  global : global ;
+  cluster : Qed.Symbol.cluster ;
 }
 
-type convert = {
-  th : Why3.Theory.theory_uc;
-  env: Why3.Env.env;
-  subst: Why3.Term.term Lang.F.Tmap.t;
-  pool: Lang.F.pool;
-  polarity: Cvalues.polarity;
-  incomplete_types: (string, Why3.Ty.tysymbol) Hashtbl.t;
-  incomplete_symbols: (string, Why3.Term.lsymbol) Hashtbl.t;
-  mutable convert_for_export: Lang.F.term Lang.F.Tmap.t;
+type env = {
+  context : context ;
+  pool : Lang.F.pool ;
+  locals : Why3.Term.term Lang.F.Tmap.t ;
 }
-
-(** The reason for the rebuild *)
-let specific_equalities: Lang.For_export.specific_equality list ref =
-  ref [Vlist.specialize_eq_list]
-
-let add_specific_equality ~for_tau ~mk_new_eq =
-  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
 
 (** get symbols *)
 
-let get_ls ~cnv ~f ~l ~p =
-  let th = Why3.Env.read_theory cnv.env f l in
-  let ls =
-    try
-      Why3.Theory.ns_find_ls th.th_export p
-    with Not_found ->
-      why3_failure "The symbol %a can't be found in %a.%s"
-        Why3.Pp.(print_list dot string) p
-        Why3.Pp.(print_list dot string) f l
-  in ls
+let get_ts ctxt name =
+  let data = Qed.Symbol.find_data ctxt.global.env name in
+  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Data.theory data ;
+  Qed.Symbol.Data.symbol data
 
-let get_ts ~cnv ~f ~l ~p =
-  let th = Why3.Env.read_theory cnv.env f l in
-  let ls =
-    try
-      Why3.Theory.ns_find_ts th.th_export p
-    with Not_found ->
-      why3_failure "The type %a can't be found in %a.%s"
-        Why3.Pp.(print_list dot string) p
-        Why3.Pp.(print_list dot string) f l
-  in ls
+let get_ls ctxt name =
+  let lfun  = Qed.Symbol.find_lfun ctxt.global.env name in
+  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
+  Qed.Symbol.Fun.symbol lfun
 
-let t_app ~cnv ~f ~l ~p tl =
-  Why3.Term.t_app_infer (get_ls ~cnv ~f ~l ~p) tl
+let t_app env name tl = Why3.Term.t_app_infer (get_ls env name) tl
 
-let t_app' ~cnv ~f ~l ~p tl ty =
-  Why3.Term.t_app (get_ls ~cnv ~f ~l ~p) tl ty
+let is_prop x =
+  match x.Why3.Term.t_ty with
+  | None -> false
+  | Some _ -> true
 
-(** fold map list of at least one element *)
-let fold_map map fold = function
-  | [] -> assert false (* absurd: forbidden by qed  *)
-  | a::tl ->
-    List.fold_left (fun acc a -> fold acc (map a)) (map a) tl
+let is_ty ty x =
+  match x.Why3.Term.t_ty with
+  | None -> false
+  | Some tx -> Why3.Ty.ty_equal ty tx
 
-let empty_context name : context = {
-  th = Why3.Theory.create_theory (Why3.Ident.id_fresh name);
-  env = Why3Env.env () ;
+let is_int = is_ty Why3.Ty.ty_int
+let is_real = is_ty Why3.Ty.ty_real
+let is_bool = is_ty Why3.Ty.ty_bool
+
+let global env = {
+  env ;
+  hls = Hashtbl.create 0 ;
+  hts = Hashtbl.create 0 ;
+  hfs = Hashtbl.create 0 ;
+  hcs = Hashtbl.create 0 ;
 }
 
-let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
-  th = ctx.th;
-  subst = Lang.F.Tmap.empty;
-  pool = Lang.F.pool ();
-  env = ctx.env;
-  polarity;
-  incomplete_symbols = Hashtbl.create 3;
-  incomplete_types = Hashtbl.create 3;
-  convert_for_export = Lang.F.Tmap.empty;
+let context global name = {
+  global ; cluster = Qed.Symbol.cluster ~path:["wp";"generated"] name ;
 }
 
-let lfun_wname (lfun:Lang.lfun) =
-  match lfun with
-  | QFUN _ -> assert false
-  | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
-  | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | LFUN l ->
-    match l.m_category with
-    | Operator op when op.associative -> Qed.Engine.F_assoc l.m_name
-    | _ -> Qed.Engine.F_call l.m_name
-
-let coerce ~cnv sort expected r =
-  match sort, expected with
-  | Qed.Logic.Bool, Qed.Logic.Prop -> Why3.Term.(t_equ r t_bool_true)
-  | Qed.Logic.Int, Qed.Logic.Real ->
-    t_app ~cnv ~f:["real"] ~l:"FromInt" ~p:["from_int"] [r]
-  | _ -> r
+let gamma context = {
+  context ;
+  pool = Lang.F.pool () ;
+  locals = Lang.F.Tmap.empty ;
+}
 
 let tvar =
   let tvar = Datatype.Int.Hashtbl.create 10 in
@@ -120,8 +92,9 @@ let tvar =
          let id = Why3.Ident.id_fresh (Printf.sprintf "a%i" i) in
          Why3.Ty.create_tvsymbol id)
 
-
-(** Sharing *)
+(* -------------------------------------------------------------------------- *)
+(* --- Sharing                                                            --- *)
+(* -------------------------------------------------------------------------- *)
 
 let shared (_ : Lang.F.term) = false
 
@@ -145,113 +118,90 @@ let subterms f e =
     end
   | _ -> Lang.F.lc_iter f e
 
-(* path splitting *)
-
-let cut_path s = String.split_on_char '.' s
-
-let wp_why3_lib library = [ "frama_c_wp" ; library ]
-
 (* conversion *)
 
-let adt_wname = function
-  | Lang.Qdata _ -> assert false
-  | Comp (c, KValue) -> Lang.comp_id c
-  | Comp (c, KInit) -> Lang.comp_init_id c
-  | Atype lt -> Lang.type_id lt
+let cc_adt global (adt : Lang.adt) =
+  try match adt with
+    | Qdata a -> Qed.Symbol.Data.symbol a
+    | Atype lt -> Hashtbl.find global.hts (Lang.type_id lt)
+    | Comp(c,KValue) -> Hashtbl.find global.hts (Lang.comp_id c)
+    | Comp(c,KInit) -> Hashtbl.find global.hts (Lang.comp_init_id c)
+  with Not_found -> failwith "Unknown logic type %S" @@ Lang.ADT.fullname adt
 
-let of_adt ~cnv = function
-  | Lang.Qdata a -> Qed.Symbol.Data.symbol a
-  | adt ->
-    let s = adt_wname adt in
-    try Hashtbl.find cnv.incomplete_types s
-    with Not_found ->
-    try Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s))
-    with Not_found ->
-      why3_failure "Can't find type '%s' in why3 namespace" s
+let cc_lfun global (lf : Lang.lfun) =
+  try match lf with
+    | Lang.QFUN f -> Qed.Symbol.Fun.symbol f.e_symbol
+    | LFUN f -> Hashtbl.find global.hls f.m_name
+    | ACSL f -> Hashtbl.find global.hls (Lang.logic_id f)
+    | CTOR c -> Hashtbl.find global.hls (Lang.ctor_id c)
+  with Not_found -> failwith "Unknown logic symbol %S" @@ Lang.Fun.fullname lf
 
-let rec of_tau ~cnv (t:Lang.F.tau) =
+let is_cassoc = function Qed.Logic.Operator op -> op.associative | _ -> false
+
+let is_assoc = function
+  | Lang.QFUN f -> is_cassoc f.e_category
+  | LFUN f -> is_cassoc f.m_category
+  | ACSL _ | CTOR _ -> false
+
+let rec cc_tau ctxt (t:Lang.F.tau) =
   match t with
   | Prop -> None
   | Bool -> Some Why3.Ty.ty_bool
   | Int -> Some Why3.Ty.ty_int
   | Real -> Some Why3.Ty.ty_real
   | Array(k,v) ->
-    let ts = get_ts ~cnv ~f:["map"] ~l:"Map" ~p:["map"] in
-    Some (Why3.Ty.ty_app ts [Option.get (of_tau ~cnv k); Option.get (of_tau ~cnv v)])
+    let ts = get_ts ctxt "map.Map.map" in
+    Some (Why3.Ty.ty_app ts [Option.get (cc_tau ctxt k); Option.get (cc_tau ctxt v)])
   | Data(adt,l) ->
-    let ts = of_adt ~cnv adt in
-    Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (of_tau ~cnv e)) l))
+    let ts = cc_adt ctxt.global adt in
+    Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
   | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
-  | Record _ ->
-    why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
+  | Record _ -> failwith "Type %a not (yet) convertible" Lang.F.pp_tau t
 
-module Literal =
-struct
+let const_int z =
+  let k = Why3.BigInt.of_string (Z.to_string z) in
+  Why3.Term.t_const (Why3.Constant.int_const k) Why3.Ty.ty_int
 
-  open Why3
+let const_real ty ~radix ~neg ~int ?(frac="") ?exp () =
+  let rc = Why3.Number.real_literal ~radix ~neg ~int ~frac ~exp in
+  Why3.Term.t_const (Why3.Constant.ConstReal rc) ty
 
-  let const_int (z:Z.t) =
-    let k = BigInt.of_string (Z.to_string z) in
-    Term.t_const (Constant.int_const k) Ty.ty_int
+let const_rint z =
+  let neg = Z.sign z < 0 in
+  let int = Z.to_string (Z.abs z) in
+  const_real Why3.Ty.ty_real ~radix:10 ~neg ~int ()
 
-  let why3_real ty ~radix ~neg ~int ?(frac="") ?exp () =
-    let rc = Number.real_literal ~radix ~neg ~int ~frac ~exp in
-    Term.t_const (Constant.ConstReal rc) ty
+let const_qint env (q:Q.t) =
+  let rnum = const_rint q.num in
+  if Z.is_one q.den
+  then rnum
+  else t_app env "real.Real.(/)" [ rnum ; const_rint q.den ]
 
-  let const_real ~cnv (q:Q.t) =
-    let mk_real_int z =
-      let neg = Z.sign z < 0 in
-      let int = Z.to_string (Z.abs z) in
-      why3_real Why3.Ty.ty_real ~radix:10 ~neg ~int ()
+let re_float = Str.regexp
+    "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
+
+let const_float env fk q =
+  let use_hex = true in
+  let qf = Q.to_float q in
+  let qf =
+    match fk with
+    | Ctypes.Float64 -> qf
+    | Ctypes.Float32 -> Floating_point.round_to_single_precision qf
+  in
+  let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) qf in
+  let s = String.lowercase_ascii s in
+  if Str.string_match re_float s 0 then
+    let group n r = try Str.matched_group n r with Not_found -> "" in
+    let neg = Q.sign q < 0 in
+    let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
+    let exp = if String.equal exp "" then None else Some exp in
+    let ts = match fk with
+      | Ctypes.Float32 -> get_ts env "frama_c_wp.cfloat.Cfloat.f32"
+      | Ctypes.Float64 -> get_ts env "frama_c_wp.cfloat.Cfloat.f64"
     in
-    if Z.is_one q.den
-    then mk_real_int q.num
-    else
-      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"]
-        [mk_real_int q.num;mk_real_int q.den]
-
-  let cfloat_of_tau tau =
-    let open Lang.E in
-    if      Lang.F.Tau.equal tau !@Cfloat.f32 then Ctypes.Float32
-    else if Lang.F.Tau.equal tau !@Cfloat.f64 then Ctypes.Float64
-    else raise Not_found
-
-  let re_float = Str.regexp
-      "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
-
-  let float_literal_from_q ~cnv tau q =
-    let use_hex = true in
-    let qf = Q.to_float q in
-    let f = match cfloat_of_tau tau with
-      | Float32 -> Floating_point.round_to_single_precision qf
-      | Float64 -> qf
-    in
-    let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) f in
-    let s = String.lowercase_ascii s in
-    if Str.string_match re_float s 0 then
-      let group n r = try Str.matched_group n r with Not_found -> "" in
-      let neg = Q.sign q < 0 in
-      let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
-      let exp = if String.equal exp "" then None else Some exp in
-      let ty = Option.get (of_tau ~cnv tau) in
-      why3_real ty ~radix:16 ~neg ~int ~frac ?exp ()
-    else raise Not_found
-
-  let const_float ~cnv tau (repr:Lang.F.QED.repr) =
-    let open Lang.E in
-    match repr with
-    | Fun(f, [x]) when Cfloat.fq32 @= f || Cfloat.fq64 @= f ->
-      begin match Lang.F.repr x with
-        | Kreal q -> float_literal_from_q ~cnv tau q
-        | _ -> raise Not_found
-      end
-    | _ -> raise Not_found
-
-  let is_float_literal ~cnv tau repr =
-    try (ignore (const_float ~cnv tau repr) ; true)
-    with Not_found | Why3.Number.NonRepresentableFloat _ -> false
-
-end
+    let ty = Why3.Ty.ty_app ts [] in
+    const_real ty ~radix:16 ~neg ~int ~frac ?exp ()
+  else invalid_arg "Wp.ProverWhy3.const_float"
 
 let rec full_trigger = function
   | Qed.Engine.TgAny -> false
@@ -267,382 +217,208 @@ let rec full_triggers = function
     | [] -> full_triggers tgs
     | ts -> ts :: full_triggers tgs
 
-let rec of_trigger ~cnv t =
+let rec cc_trigger env t =
   match t with
   | Qed.Engine.TgAny -> assert false (* absurd: filter by full_triggers *)
   | Qed.Engine.TgVar v -> begin
-      try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
-      with Not_found -> why3_failure "Unbound variable %a" Lang.F.pp_var v
+      try Lang.F.Tmap.find (Lang.F.e_var v) env.locals
+      with Not_found -> failwith "Unbound variable %a" Lang.F.pp_var v
     end
   | Qed.Engine.TgGet(m,k) ->
-    t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_trigger ~cnv m;of_trigger ~cnv k]
+    t_app env.context "map.Map.get" [cc_trigger env m;cc_trigger env k]
   | TgSet(m,k,v) ->
-    t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_trigger ~cnv m;of_trigger ~cnv k;of_trigger ~cnv v]
-  | TgFun (f,l) -> begin
-      match lfun_wname f with
-      | F_call s ->
-        let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
-        Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
-      | _ -> why3_failure "can not convert extended calls in triggers"
+    t_app env.context "mapMap.set" [cc_trigger env m;cc_trigger env k;cc_trigger env v]
+  | TgFun (f,ts) | TgProp(f,ts) ->
+    Why3.Term.t_app_infer (cc_lfun env.context.global f) (List.map (cc_trigger env) ts)
+
+let t_real env u =
+  if is_int u then t_app env "real.FromInt.from_int" [u] else u
+
+let t_bool u =
+  if is_prop u then u else Why3.Term.(t_equ u t_bool_true)
+
+let t_prop u =
+  if is_bool u then u else Why3.Term.(t_if u t_bool_true t_bool_false)
+
+let rec cc env t : Why3.Term.term =
+  try Lang.F.Tmap.find t env.locals with Not_found ->
+  match Lang.F.repr t with
+  | Fvar _ -> invalid_arg "missing free variable"
+  | Bvar _ -> invalid_arg "missing bound variable"
+  | Bind(q,_,_) ->
+    let xs, t = cc_binders env q t in
+    let quant = match q with
+      | Forall -> Why3.Term.Tforall
+      | Exists -> Why3.Term.Texists
+      | Lambda -> assert false
+    in
+    Why3.Term.t_quant quant (Why3.Term.t_close_quant xs [] t)
+  | True -> Why3.Term.t_true
+  | False -> Why3.Term.t_false
+  | Kint z -> const_int z
+  | Kreal q -> const_qint env.context q
+  | Times(z,t) ->
+    let u = cc env t in
+    if is_int u then
+      t_app env.context "int.Int.(*)" [const_int z; u]
+    else
+      t_app env.context "real.Real.(*)" [const_rint z ; u]
+  | Add ts ->
+    cc_arith env ~i:"int.Int.(+)" ~r:"real.Real.(+)" ts
+  | Mul ts ->
+    cc_arith env ~i:"int.Int.(*)" ~r:"real.Real.(*)" ts
+  | Mod(a,b) ->
+    t_app env.context "int.ComputerDivision.mod" [ cc_term env a; cc_term env b ]
+  | Div(a,b) ->
+    cc_binop env ~i:"int.ComputerDivision.div" ~r:"real.Real.(/)" a b
+  | Lt (a,b) ->
+    cc_binop env ~i:"int.Int.(<)" ~r:"real.Real.(<)" a b
+  | Leq (a,b) ->
+    cc_binop env ~i:"int.Int.(<=)" ~r:"real.Real.(<=)" a b
+  | And ts -> cc_logic env Why3.Term.Tand ts
+  | Or ts -> cc_logic env Why3.Term.Tor ts
+  | Imply (hs,p) -> Why3.Term.t_implies (cc_logic env Tand hs) (cc_prop env p)
+  | Not e -> Why3.Term.t_not @@ cc_prop env e
+  | Eq(a,b) -> cc_equal env a b
+  | Neq (a,b) -> Why3.Term.t_not @@ cc_equal env a b
+  | If(p,a,b) ->
+    let p = cc_prop env p in
+    let a = cc env a in
+    let b = cc env b in
+    if is_real a || is_real b then
+      Why3.Term.t_if p (t_real env.context a) (t_real env.context b)
+    else if is_prop a || is_prop b then
+      Why3.Term.t_if p (t_prop a) (t_prop b)
+    else Why3.Term.t_if p a b
+  | Aget(m,k) ->
+    t_app env.context "map.Map.get" [cc_term env m; cc_term env k]
+  | Aset(m,k,v) ->
+    t_app env.context "map.Map.set" [cc_term env m; cc_term env k; cc_term env v]
+  | Acst(_,v) ->
+    t_app env.context "map.Const.const" [cc_term env v]
+  | Fun(f, [x]) when Lang.E.(Cfloat.fq32 @= f) ->
+    begin match Lang.F.repr x with
+      | Kreal q -> const_float env.context Float32 q
+      | _ -> raise Not_found
     end
-  | TgProp (f,l) ->
-    begin
-      match lfun_wname f with
-      | F_call s ->
-        let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
-        Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
-      | _ -> why3_failure "can not convert extended calls in triggers"
+  | Fun(f, [x]) when Lang.E.(Cfloat.fq64 @= f) ->
+    begin match Lang.F.repr x with
+      | Kreal q -> const_float env.context Float32 q
+      | _ -> raise Not_found
     end
+  | Fun (fn,ts) ->
+    let tr = cc_tau env.context @@ Lang.F.typeof t in
+    let ts = List.map (cc_term env) ts in
+    let ls = cc_lfun env.context.global fn in
+    if is_assoc fn then
+      let rec foldop = function
+        | [] -> failwith "Empty associative operator"
+        | [a] -> a
+        | a::ops -> Why3.Term.t_app ls [a;foldop ops] tr
+      in foldop ts
+    else
+      Why3.Term.t_app ls ts tr
+  | Apply _ -> assert false
+  | Rget _ -> assert false
+  | Rdef _ -> assert false
 
-let rec of_term ~cnv expected t : Why3.Term.term =
-  let sort =
-    try Lang.F.typeof t
-    with Not_found ->
-      why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
-  in
-  Wp_parameters.debug ~dkey:dkey_compile
-    "of_term %a:%a (expected %a)@."
-    Lang.F.pp_term t Lang.F.Tau.pretty sort Lang.F.Tau.pretty expected
-  ;
+and cc_equal env a b =
+  let a = cc env a in
+  let b = cc env b in
+  if is_real a || is_real b then
+    Why3.Term.t_equ (t_real env.context a) (t_real env.context b)
+  else if is_prop a || is_prop b then
+    Why3.Term.t_iff (t_prop a) (t_prop b)
+  else Why3.Term.t_equ a b
 
-  let ($) f x = f x in
-  let r =
-    try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst
-    with Not_found ->
-    match Lang.F.repr t, sort, expected with
-    | (Fvar _, _, _) -> invalid_arg "unbound variable in of_term"
-    | (Bvar _, _, _) -> invalid_arg "bound variable in of_term"
-    | Bind((Forall|Exists) as q,_,_), _, _ -> begin
-        coerce ~cnv Prop expected $
-        let why3_vars, t = successive_binders cnv q t in
-        let quant = match q with
-          | Qed.Logic.Forall -> Why3.Term.Tforall
-          | Qed.Logic.Exists -> Why3.Term.Texists
-          | _ -> assert false
-        in
-        Why3.Term.t_quant quant (Why3.Term.t_close_quant why3_vars [] t)
-      end
-    | True, _, Prop -> Why3.Term.t_true
-    | True, _, Bool -> Why3.Term.t_bool_true
-    | False, _, Prop -> Why3.Term.t_false
-    | False, _, Bool -> Why3.Term.t_bool_false
-    | Kint z, Int, _ -> coerce ~cnv sort expected $ Literal.const_int z
-    | Kreal q, Real, _ -> coerce ~cnv sort expected $ Literal.const_real ~cnv q
-    | repr, t, _ when Literal.is_float_literal ~cnv t repr ->
-      coerce ~cnv sort expected $ Literal.const_float ~cnv t repr
-    | Times(z,t), Int, _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["int"] ~l:"Int" ~p:["infix *"] [Literal.const_int z; of_term ~cnv sort t]
-    | Times(z,t), Real, _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix *"]
-        [Literal.const_real ~cnv (Q.of_bigint z); of_term ~cnv sort t]
-    | Add l, Int, _ ->
-      coerce ~cnv sort expected $
-      t_app_fold ~f:["int"] ~l:"Int" ~p:["infix +"] ~cnv sort l
-    | Add l, Real, _ ->
-      coerce ~cnv sort expected $
-      t_app_fold ~f:["real"] ~l:"Real" ~p:["infix +"] ~cnv sort l
-    | Mul l, Int, _ ->
-      coerce ~cnv sort expected $
-      t_app_fold ~f:["int"] ~l:"Int" ~p:["infix *"] ~cnv sort l
-    | Mul l, Real, _ ->
-      coerce ~cnv sort expected $
-      t_app_fold ~f:["real"] ~l:"Real" ~p:["infix *"] ~cnv sort l
-    | Leq (a,b), _, Prop ->
-      int_or_real ~cnv
-        ~fint:["int"] ~lint:"Int" ~pint:["infix <="]
-        ~freal:["real"] ~lreal:"Real" ~preal:["infix <="]
-        a b
-    | Div(a,b), Int, _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["int"] ~l:"ComputerDivision" ~p:["div"]
-        [of_term ~cnv sort a; of_term ~cnv sort b]
-    | Mod(a,b), Int, _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["int"] ~l:"ComputerDivision" ~p:["mod"]
-        [of_term ~cnv sort a; of_term ~cnv sort b]
-    | Div(a,b), Real, _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"]
-        [of_term ~cnv sort a; of_term ~cnv sort b]
-    | Lt (a,b), _, Prop ->
-      int_or_real ~cnv
-        ~fint:["int"] ~lint:"Int" ~pint:["infix <"]
-        ~freal:["real"] ~lreal:"Real" ~preal:["infix <"]
-        a b
-    | Leq (a,b), _, Bool ->
-      int_or_real ~cnv
-        ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zleq"]
-        ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rleq"]
-        a b
-    | Lt (a,b), _, Bool ->
-      int_or_real ~cnv
-        ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zlt"]
-        ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rlt"]
-        a b
-    | And l, _, Bool ->
-      t_app_fold ~f:["bool"] ~l:"Bool" ~p:["andb"] ~cnv expected l
-    | And l, _, Prop ->
-      fold_map (of_term ~cnv expected) Why3.Term.t_and l
-    | Or l, _, Bool ->
-      t_app_fold ~f:["bool"] ~l:"Bool" ~p:["orb"] ~cnv expected l
-    | Or l, _, Prop ->
-      fold_map (of_term ~cnv expected) Why3.Term.t_or l
-    | Not e, _, Bool ->
-      let cnv = {cnv with polarity = Cvalues.negate cnv.polarity} in
-      t_app ~cnv ~f:["bool"] ~l:"Bool" ~p:["notb"] [of_term ~cnv expected e]
-    | Not e, _, Prop ->
-      let cnv = {cnv with polarity = Cvalues.negate cnv.polarity} in
-      Why3.Term.t_not (of_term ~cnv expected e)
-    | Imply (l,e), _, _ ->
-      let e = (of_term ~cnv expected) e in
-      let cnv' = {cnv with polarity = Cvalues.negate cnv.polarity} in
-      let fold acc a =
-        let a = of_term ~cnv:cnv' expected a in
-        match expected with
-        | Prop -> Why3.Term.t_implies a acc
-        | _ (* Bool *) ->
-          t_app ~cnv:cnv' ~f:["bool"] ~l:"Bool" ~p:["implb"] [a;acc]
-      in
-      List.fold_left fold e (List.rev l)
-    | Eq (a,b), _, Prop -> begin
-        match Lang.F.typeof a with
-        | Prop | Bool ->
-          Why3.Term.t_iff (of_term ~cnv Prop a) (of_term ~cnv Prop b)
-        | tau ->
-          match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
-          | spe when cnv.polarity = `Positive -> of_term ~cnv expected (spe.mk_new_eq a b)
-          | exception Not_found -> poly ~cnv Why3.Term.t_equ a b
-          | _                   -> poly ~cnv Why3.Term.t_equ a b
-      end
-    | Neq (a,b), _, Prop ->
-      begin
-        match Lang.F.typeof a with
-        | Prop | Bool ->
-          Why3.Term.t_not (Why3.Term.t_iff (of_term ~cnv Prop a) (of_term ~cnv Prop b))
-        | tau ->
-          match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
-          | spe when cnv.polarity = `Negative ->
-            Why3.Term.t_not (of_term ~cnv expected (spe.mk_new_eq a b))
-          | exception Not_found -> poly ~cnv Why3.Term.t_neq a b
-          | _                   -> poly ~cnv Why3.Term.t_neq a b
-      end
-    | Eq (a,b), _, Bool ->
-      poly ~cnv (fun a b -> t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["eqb"] [a;b]) a b
-    | Neq (a,b), _, Bool ->
-      poly ~cnv (fun a b -> t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["neqb"] [a;b]) a b
-    | If(a,b,c), _, _ ->
-      let cnv' = {cnv with polarity = `NoPolarity} in
-      Why3.Term.t_if (of_term ~cnv:cnv' Prop a) (of_term ~cnv expected b) (of_term ~cnv expected c)
-    | Aget(m,k), _, _ -> begin
-        coerce ~cnv sort expected $
-        let mtau = Lang.F.typeof m in
-        let ksort = match mtau with
-          | Array(ksort,_) -> ksort
-          | _ -> assert false (* absurd: by qed typing *)in
-        t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_term ~cnv mtau m;of_term ~cnv ksort k]
-      end
-    | Aset(m,k,v), Array(ksort,vsort), _ ->
-      coerce ~cnv sort expected $
-      t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_term ~cnv sort m;of_term ~cnv ksort k;of_term ~cnv vsort v]
-    | Acst(_,v), Array(_,vsort), _ ->
-      coerce ~cnv sort expected $
-      t_app' ~cnv ~f:["map"] ~l:"Const" ~p:["const"] [of_term ~cnv vsort v] (of_tau ~cnv sort)
-    (* Generic *)
-    | Fun (QFUN f,ls), tau, expected ->
-      coerce ~cnv sort expected $
-      let r = of_tau ~cnv tau in
-      let es = List.map (of_term' cnv) ls in
-      let ls = Qed.Symbol.Fun.symbol f.e_symbol in
-      begin
-        match f.e_category with
-        | Operator op when op.associative ->
-          let rec foldop = function
-            | [] -> why3_failure "Empty associative operator"
-            | [a] -> a
-            | a::ops -> Why3.Term.t_app ls [a;foldop ops] r
-          in foldop es
-        | _ -> Why3.Term.t_app ls es r
-      end
-    | Fun (f,l), _, _ -> begin
-        let t_app ls l r  =
-          Why3.Term.t_app ls l r
-        in
-        let apply_from_ns s l sort =
-          let find s =
-            try Hashtbl.find cnv.incomplete_symbols s
-            with Not_found ->
-              Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s))
-          in
-          match find s, expected with
-          | ls, _ -> coerce ~cnv sort expected $ t_app ls l (of_tau ~cnv sort)
-          | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
-        in
-        let apply_from_ns' s l =
-          apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
-        in
-        match lfun_wname f, expected with
-        | F_call s, _ | F_proj s, _
-          -> apply_from_ns' s l sort
-        | F_assoc s, _ ->
-          let rec aux = function
-            | [] -> why3_failure "Empty application"
-            | [a] -> of_term ~cnv expected a
-            | a::l ->
-              apply_from_ns s [of_term' cnv a; aux l] sort
-          in aux l
-      end
-    | Rget(a, (Cfield(_,KInit) as f)), _ , tau -> begin
-        let s = Lang.Field.name f in
-        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
-        | ls ->
-          begin match tau with
-            | Prop ->
-              Why3.Term.t_equ
-                (Why3.Term.t_app ls [of_term' cnv a] (Some Why3.Ty.ty_bool))
-                (Why3.Term.t_bool_true)
-            | _ ->
-              Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv tau)
-          end
-        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
-      end
+and cc_prop env a = t_prop @@ cc env a
+and cc_term env a = t_bool @@ cc env a
+and cc_real env a = t_real env.context @@ cc env a
 
-    | Rget(a,f), _ , _ -> begin
-        let s = Lang.Field.name f in
-        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
-        | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv expected)
-        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
-      end
-    | Rdef(l), Data(Comp (c, k),_) , _ -> begin
-        (* l is already sorted by field *)
-        let s = match k with
-          | KValue -> Lang.comp_id c
-          | KInit -> Lang.comp_init_id c
-        in
-        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
-        | ls ->
-          let l = List.map (fun (_,t) -> of_term' cnv t) l in
-          Why3.Term.t_app ls l (of_tau ~cnv expected)
-        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
-      end
-    | (Rdef _, Data ((Qdata _|Atype _), _), _)
-    | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
-    | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
-    | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Eq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Not _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Or _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (And _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Lt (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Leq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Div (_, _), (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Mod (_, _), (Prop|Bool|Real|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Mul _, (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Add _, (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Times (_, _), (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Kreal _, (Prop|Bool|Int|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (Kint _, (Prop|Bool|Real|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
-    | (False, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (True, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
-    | (Acst (_, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
-      -> assert false (* absurd: by typing *)
-    | (Bind (Lambda, _, _), _, _)
-    | Apply _ , _, _
-    | Rdef _, Record _, _ ->
-      why3_failure
-        "Can't convert to why3 the qed term %a of type %a"
-        Lang.F.pp_term t Lang.F.pp_tau sort
-  in
-  r
+and cc_arith env ~i ~r = function
+  | [] -> assert false
+  | [x] -> cc env x
+  | (y::ys) as xs ->
+    if List.for_all Lang.F.is_int xs then
+      let op = get_ls env.context i in
+      let tr = Some Why3.Ty.ty_int in
+      List.fold_left
+        (fun acc y -> Why3.Term.t_app op [acc;cc env y] tr)
+        (cc env y) ys
+    else
+      let op = get_ls env.context r in
+      let tr = Some Why3.Ty.ty_real in
+      List.fold_left
+        (fun acc y -> Why3.Term.t_app op [acc;cc_real env y] tr)
+        (cc_real env y) ys
 
-and t_app_fold  ~cnv ~f ~l ~p expected lt =
-  let fold acc a =
-    t_app ~cnv ~f ~l ~p [acc;a]
-  in
-  fold_map (of_term ~cnv expected) fold lt
+and cc_binop env ~i ~r a b =
+  let a = cc env a in
+  let b = cc env b in
+  if is_int a && is_int b then
+    t_app env.context i [a;b]
+  else
+    t_app env.context r [ t_real env.context a; t_real env.context b ]
 
-and of_term' cnv t =
-  of_term ~cnv (Lang.F.typeof t) t
+and cc_logic env op = function
+  | [] -> assert false
+  | [x] -> cc_prop env x
+  | x::xs -> Why3.Term.t_binary op (cc_prop env x) @@ cc_logic env op xs
 
-and share cnv expected t =
-  let l = Lang.F.QED.shared ~shareable ~shared ~subterms [t] in
-  let cnv,lets = mk_lets cnv l in
-  let t = of_term ~cnv expected t in
-  let t = List.fold_left (fun t (x,e') ->
-      Why3.Term.t_let_close x e' t
-    ) t lets
-  in t
+and cc_lets env ts =
+  List.fold_left
+    (fun (env,lets) e ->
+       let e' = cc_term env e in
+       match e'.t_ty with
+       | None -> ({env with locals = Lang.F.Tmap.add e e' env.locals},lets)
+       | Some ty ->
+         let x = Why3.Ident.id_fresh (Lang.F.basename e) in
+         let x = Why3.Term.create_vsymbol x ty in
+         let env = {env with locals = Lang.F.Tmap.add e (Why3.Term.t_var x) env.locals } in
+         let lets = (x,e')::lets in
+         env,lets
+    ) (env,[]) ts
 
-and mk_lets cnv l =
-  List.fold_left (fun (cnv,lets) e ->
-      let cnv' = {cnv with polarity = `NoPolarity} in
-      let e' = of_term ~cnv:cnv' (Lang.F.typeof e) e in
-      match e'.t_ty with
-      | None -> ({cnv with subst = Lang.F.Tmap.add e e' cnv.subst},lets)
-      | Some ty ->
-        let x = Why3.Ident.id_fresh (Lang.F.basename e) in
-        let x = Why3.Term.create_vsymbol x ty in
-        (* Format.printf "lets %a = %a : %a@."
-            Why3.Pretty.print_vsty x
-            Why3.Pretty.print_term e'
-            Why3.Pretty.print_ty (Why3.Term.t_type e'); *)
-        let cnv = {cnv with subst = Lang.F.Tmap.add e (Why3.Term.t_var x) cnv.subst } in
-        let lets = (x,e')::lets in
-        cnv,lets
-    ) (cnv,[]) l
-
-and successive_binders cnv q t =
+and cc_binders env q t =
   match Lang.F.repr t with
   | Bind((Forall|Exists) as q',tau,t) when q' = q ->
-    let x = Lang.F.fresh cnv.pool tau in
+    let x = Lang.F.fresh env.pool tau in
     let x' = Why3.Ident.id_fresh (Lang.F.Tau.basename tau) in
-    let x' = Why3.Term.create_vsymbol x' (Option.get (of_tau ~cnv tau)) in
-    let cnv = {cnv with subst = Lang.F.Tmap.add (Lang.F.e_var x) (Why3.Term.t_var x') cnv.subst} in
+    let x' = Why3.Term.create_vsymbol x' (Option.get (cc_tau env.context tau)) in
+    let locals = Lang.F.Tmap.add (Lang.F.e_var x) (Why3.Term.t_var x') env.locals in
+    let env = { env with locals } in
     let t = Lang.F.QED.e_unbind x t in
-    let why3_vars, t = successive_binders cnv q t in
-    x'::why3_vars, t
+    let xs, t = cc_binders env q t in
+    x'::xs, t
   | _ ->
-    [], share cnv Prop t
+    [], compile env Qed.Logic.Prop t
 
-and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
-  match (Lang.F.typeof a), (Lang.F.typeof b) with
-  | Int, Int ->
-    t_app_fold ~f:fint ~l:lint ~p:pint ~cnv Int [a; b]
-  | Real, Int | Real, Real | Int, Real ->
-    t_app_fold ~f:freal ~l:lreal ~p:preal ~cnv Real [a; b]
-  | _ -> assert false
+and compile env tr term =
+  let ts = Lang.F.QED.shared ~shareable ~shared ~subterms [term] in
+  let env,letdefs = cc_lets env ts in
+  let def =
+    match (tr : Lang.tau) with
+    | Prop -> cc_prop env term
+    | Real -> cc_real env term
+    | _ -> cc_term env term
+  in
+  List.fold_left
+    (fun t (x,e') -> Why3.Term.t_let_close x e' t)
+    def letdefs
 
-and poly ~cnv f a b =
-  match Lang.F.typeof a, Lang.F.typeof b with
-  | Int,Int ->
-    f (of_term ~cnv Int a) (of_term ~cnv Int b)
-  | Int,Real | Real,Int | Real,Real ->
-    f (of_term ~cnv Real a) (of_term ~cnv Real b)
-  | ta,tb ->
-    f (of_term ~cnv ta a) (of_term ~cnv tb b)
-
-let rebuild cnv t =
-  let t, cache = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
-  cnv.convert_for_export <- cache;
-  t
-
-let convert cnv expected t =
-  Lang.For_export.in_state (share cnv expected) (rebuild cnv t)
-
-let mk_binders cnv l =
-  List.fold_left (fun (cnv,lets) v ->
-      match of_tau ~cnv (Lang.F.tau_of_var v) with
-      | None -> why3_failure "Quantification on prop"
+let cc_params env xs =
+  List.fold_left (fun (env,lets) v ->
+      match cc_tau env.context (Lang.F.tau_of_var v) with
+      | None -> failwith "Quantification on prop"
       | Some ty ->
         let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
         let x = Why3.Term.create_vsymbol x ty in
         let ex = Lang.F.e_var v in
         let tx = Why3.Term.t_var x in
-        let cnv = { cnv with subst = Lang.F.Tmap.add ex tx cnv.subst } in
+        let env = { env with locals = Lang.F.Tmap.add ex tx env.locals } in
         let lets = x::lets in
-        cnv,lets
-    ) (cnv,[]) (List.rev l)
+        env,lets
+    ) (env,[]) (List.rev xs)
 
 (** visit definitions and add them in the task *)
 
@@ -655,7 +431,7 @@ module CLUSTERS = WpContext.Index
       let pretty = Definitions.pp_cluster
     end)
 
-class visitor (ctx:context) c =
+class visitor ctxt c =
   object(self)
 
     inherit Definitions.visitor c
@@ -663,338 +439,238 @@ class visitor (ctx:context) c =
 
     (* --- Files, Theories and Clusters --- *)
 
-    method add_builtin_lib =
-      self#add_import_file ["bool"] "Bool" ;
-      self#add_import_file ["int"] "Int" ;
-      self#add_import_file ["int"] "ComputerDivision" ;
-      self#add_import_file ["real"] "RealInfix" ;
-      self#add_import_file ["frama_c_wp";"qed"] "Qed" ;
-      self#add_import_file ["map"] "Map"
-
     method on_cluster c =
-      let name = Definitions.cluster_id c in
-      Wp_parameters.debug ~dkey:dkey_compile "Start on_cluster %s@." name;
-      let th_name = String.capitalize_ascii name in
-      let thy =
-        let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
-        if age < Definitions.cluster_age c then
-          let ctx = empty_context th_name in
-          let v = new visitor ctx c in
-          v#add_builtin_lib;
-          v#vself;
-          let th = Why3.Theory.close_theory ctx.th in
-          if Wp_parameters.has_print_generated () then
-            Log.print_on_output
-              begin fun fmt ->
-                Format.fprintf fmt "---------------------------------------------@\n" ;
-                Format.fprintf fmt "--- Context '%s' Cluster '%s' @\n"
-                  (WpContext.get_context () |> WpContext.S.id) name;
-                Format.fprintf fmt "---------------------------------------------@\n" ;
-                Why3.Pretty.print_theory fmt th;
-              end ;
-          CLUSTERS.update c (Definitions.cluster_age c, th);
-          th
-        else
-          snd (CLUSTERS.find c)
-      in
-      let th = ctx.th in
-      let th = Why3.Theory.open_scope th name in
-      let th = Why3.Theory.use_export th thy in
-      let th = Why3.Theory.close_scope th ~import:true in
-      Wp_parameters.debug ~dkey:dkey_compile "End  on_cluster %s@." name;
-      ctx.th <- th
-
-    method on_theory file thy =
-      self#add_import_use ~import:false file thy ("W_" ^ thy)
+      begin
+        let name = Definitions.cluster_id c in
+        Wp_parameters.debug ~dkey:dkey_compile "Start on_cluster %s@." name;
+        let th_name = String.capitalize_ascii name in
+        let thy =
+          let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
+          if age < Definitions.cluster_age c then
+            let ctxt = context ctxt.global th_name in
+            let v = new visitor ctxt c in v#vself;
+            let th = Qed.Symbol.close ctxt.cluster in
+            if Wp_parameters.(has_dkey print_generated) then
+              Log.print_on_output
+                begin fun fmt ->
+                  Format.fprintf fmt "---------------------------------------------@\n" ;
+                  Format.fprintf fmt "--- Context '%s' Cluster '%s' @\n"
+                    (WpContext.get_context () |> WpContext.S.id) name;
+                  Format.fprintf fmt "---------------------------------------------@\n" ;
+                  Why3.Pretty.print_theory fmt th;
+                end ;
+            CLUSTERS.update c (Definitions.cluster_age c, th); th
+          else
+            snd (CLUSTERS.find c)
+        in
+        Qed.Symbol.use ctxt.cluster thy ;
+        Wp_parameters.debug ~dkey:dkey_compile "End  on_cluster %s@." name ;
+      end
 
     method section _ = ()
 
-    method add_import ?was thy =
-      match cut_path thy with
-      | [] -> why3_failure "[driver] empty import option"
-      | l ->
-        let file, thy = Why3.Lists.chop_last l in
-        self#add_import_use file thy (Option.value ~default:thy was) ~import:true
-
-    method add_import_file file thy =
-      self#add_import_use ~import:true file thy thy
-
-    method add_import_file_as file thy name =
-      self#add_import_use ~import:false file thy name
-
-    method private add_use thy =
-      let th = ctx.th in
-      if not @@ Why3.Ident.Sid.mem thy.Why3.Theory.th_name th.uc_used then
-        begin
-          let name = "use'" ^ thy.th_name.id_string in
-          Wp_parameters.debug ~dkey:dkey_compile "%s" name ;
-          let th = Why3.Theory.open_scope th name in
-          let th = Why3.Theory.use_export th thy in
-          let th = Why3.Theory.close_scope th ~import:false in
-          ctx.th <- th
-        end
-
-    method add_import_use ~import file thy name =
-      Wp_parameters.debug ~dkey:dkey_compile
-        "%s %a.%s as %s"
-        (if import then "use import" else "use")
-        (Pretty_utils.pp_list ~sep:"." Format.pp_print_string) file
-        thy name ;
-      let th = ctx.th in
-      let thy = Why3.Env.read_theory ctx.env file thy in
-      let th = Why3.Theory.open_scope th name in
-      let th = Why3.Theory.use_export th thy in
-      let th = Why3.Theory.close_scope th ~import:false in
-      ctx.th <- th
-
-    method on_data d = self#add_use (Qed.Symbol.Data.theory d)
-    method on_lfun f = self#add_use (Qed.Symbol.Fun.theory f)
+    method on_data = Qed.Symbol.use_data ctxt.cluster
+    method on_lfun = Qed.Symbol.use_lfun ctxt.cluster
 
     method on_type lt def =
       match def with
       | Tabs ->
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let map i _ = tvar i in
-        let tv_args = List.mapi map lt.lt_params in
-        let id = Why3.Ty.create_tysymbol id tv_args NoDef in
-        let decl = Why3.Decl.create_ty_decl id in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+        let tvs = List.mapi map lt.lt_params in
+        let tys = Why3.Ty.create_tysymbol id tvs NoDef in
+        let decl = Why3.Decl.create_ty_decl tys in
+        Qed.Symbol.add ctxt.cluster decl
       | Tdef t ->
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let map i _ = tvar i in
-        let tv_args = List.mapi map lt.lt_params in
-        let cnv = empty_cnv ctx in
-        let t = Option.get (of_tau ~cnv t) in
-        let id = Why3.Ty.create_tysymbol id tv_args (Alias t) in
-        let decl = Why3.Decl.create_ty_decl id in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+        let tvs = List.mapi map lt.lt_params in
+        let tdef = Option.get (cc_tau ctxt t) in
+        let tys = Why3.Ty.create_tysymbol id tvs (Alias tdef) in
+        let decl = Why3.Decl.create_ty_decl tys in
+        Qed.Symbol.add ctxt.cluster decl
       | Tsum cases ->
         let name = Lang.type_id lt in
         let id = Why3.Ident.id_fresh name in
         let map i _ = tvar i in
-        let tv_args = List.mapi map lt.lt_params in
-        let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
-        let cnv = empty_cnv ctx in
-        Hashtbl.add cnv.incomplete_types name tys ;
-        let tv_args = List.map Why3.Ty.ty_var tv_args in
-        let return_ty = Why3.Ty.ty_app tys tv_args in
+        let tvs = List.mapi map lt.lt_params in
+        let tys = Why3.Ty.create_tysymbol id tvs NoDef in
+        Hashtbl.add ctxt.global.hts name tys ;
+        let tvs = List.map Why3.Ty.ty_var tvs in
+        let rty = Why3.Ty.ty_app tys tvs in
         let constr = List.length cases in
-        let cases = List.map (fun (c,targs) ->
-            let name = match c with | Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
-            let id = Why3.Ident.id_fresh name in
-            let targs = List.map (fun t -> Option.get (of_tau ~cnv t)) targs in
-            let ls = Why3.Term.create_fsymbol ~constr id targs return_ty in
-            let proj = List.map (fun _ -> None) targs in
-            (ls,proj)
-          ) cases in
+        let cases =
+          List.map
+            (fun (c,targs) ->
+               let name = match c with Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
+               let id = Why3.Ident.id_fresh name in
+               let ts = List.map (fun t -> Option.get (cc_tau ctxt t)) targs in
+               let ls = Why3.Term.create_fsymbol ~constr id ts rty in
+               Hashtbl.add ctxt.global.hls name ls ;
+               ls, List.map (fun _ -> None) ts
+            ) cases in
         let decl = Why3.Decl.create_data_decl [tys,cases] in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+        Qed.Symbol.add ctxt.cluster decl
       | Trec fields ->
         let name = Lang.type_id lt in
         let id = Why3.Ident.id_fresh name in
         let map i _ = tvar i in
-        let tv_args = List.mapi map lt.lt_params in
-        let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
-        let cnv = empty_cnv ctx in
-        Hashtbl.add cnv.incomplete_types name tys ;
-        let tv_args = List.map Why3.Ty.ty_var tv_args in
-        let return_ty = Why3.Ty.ty_app tys tv_args in
-        let fields,args = List.split @@ List.map (fun (f,ty) ->
-            let name = Lang.Field.name f in
-            let id = Why3.Ident.id_fresh name in
-            let ty = Option.get (of_tau ~cnv ty) in
-            let ls = Why3.Term.create_fsymbol ~proj:true id [return_ty] ty in
-            Some ls,ty
-          ) fields in
+        let tvs = List.mapi map lt.lt_params in
+        let tys = Why3.Ty.create_tysymbol id tvs NoDef in
+        Hashtbl.add ctxt.global.hts name tys ;
+        let tvs = List.map Why3.Ty.ty_var tvs in
+        let rty = Why3.Ty.ty_app tys tvs in
+        let fields,args =
+          List.split @@ List.map (fun (f,ty) ->
+              let name = Lang.Field.name f in
+              let id = Why3.Ident.id_fresh name in
+              let ty = Option.get (cc_tau ctxt ty) in
+              let ls = Why3.Term.create_fsymbol ~proj:true id [rty] ty in
+              Hashtbl.add ctxt.global.hfs name ls ;
+              Some ls,ty
+            ) fields in
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
-        let cstr = Why3.Term.create_fsymbol ~constr:1 id args return_ty in
-        let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+        let ctor = Why3.Term.create_fsymbol ~constr:1 id args rty in
+        let decl = Why3.Decl.create_data_decl [tys,[ctor,fields]] in
+        Hashtbl.add ctxt.global.hcs name ctor ;
+        Qed.Symbol.add ctxt.cluster decl
 
     method private on_comp_gen kind c fts =
       begin
-        let make_id = match kind with
-          | Lang.KValue -> Lang.comp_id
-          | Lang.KInit -> Lang.comp_init_id
-        in
+        let name = match kind with
+          | Lang.KValue -> Lang.comp_id c
+          | Lang.KInit -> Lang.comp_init_id c in
         let compare_field (f,_) (g,_) =
           let cmp = Lang.Field.compare f g in
           if cmp = 0 then assert false (* by definition *) else cmp
         in
         let fts = Option.map (List.sort compare_field) fts in
-        (*TODO:NUPW: manage UNIONS *)
-        let id = Why3.Ident.id_fresh (make_id c) in
+        let id = Why3.Ident.id_fresh name in
         let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
         let ty = Why3.Ty.ty_app ts [] in
-        let id = Why3.Ident.id_fresh (make_id c) in
-        let cnv = empty_cnv ctx in
-        let map (f,tau) =
-          let ty_ctr = of_tau ~cnv tau in
-          let id = Why3.Ident.id_fresh (Lang.Field.name f) in
-          let ls = Why3.Term.create_lsymbol ~proj:true id [ty] ty_ctr in
-          (Some ls,Option.get ty_ctr)
-        in
-        let fields = Option.map (List.map map) fts in
-        let decl = match fields with
+        let field (fd,tau) =
+          let tf = cc_tau ctxt tau in
+          let name = Lang.Field.name fd in
+          let id = Why3.Ident.id_fresh name in
+          let ls = Why3.Term.create_lsymbol ~proj:true id [ty] tf in
+          Hashtbl.add ctxt.global.hfs name ls ;
+          (Some ls,Option.get tf) in
+        let decl =
+          match fts with
           | None -> Why3.Decl.create_ty_decl ts
-          | Some fields ->
-            let constr =
-              Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty
-            in
-            Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]]
-        in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+          | Some fts ->
+            let projs,fields = List.split @@ List.map field fts in
+            let id = Why3.Ident.id_fresh name in
+            let ctor = Why3.Term.create_fsymbol ~constr:1 id fields ty in
+            Hashtbl.add ctxt.global.hcs name ctor ;
+            Why3.Decl.create_data_decl [ts,[ctor,projs]]
+        in Qed.Symbol.add ctxt.cluster decl
       end
 
     method on_comp = self#on_comp_gen KValue
     method on_icomp = self#on_comp_gen KInit
 
-    method private make_lemma cnv ?prefix (l: Definitions.dlemma) =
+    method private make_lemma env ?prefix (l: Definitions.dlemma) =
       let name = match prefix with
         | None -> l.l_name
         | Some p -> p ^ "_" ^ l.l_name
       in
       let id = Why3.Ident.id_fresh (Lang.lemma_id name) in
       let id = Why3.Decl.create_prsymbol id in
-      List.iter (Lang.F.add_var cnv.pool) l.l_forall;
-      let cnv, vars = Lang.For_export.in_state (mk_binders cnv) l.l_forall in
-      let t = convert cnv Prop (Lang.F.e_prop l.l_lemma) in
+      List.iter (Lang.F.add_var env.pool) l.l_forall;
+      let env, vars = cc_params env l.l_forall in
+      let t = cc_prop env @@ Lang.F.e_prop l.l_lemma in
       let triggers = full_triggers l.l_triggers in
-      let triggers = Lang.For_export.in_state (List.map (List.map (of_trigger ~cnv))) triggers in
+      let triggers = List.map (List.map (cc_trigger env)) triggers in
       let t = Why3.Term.t_forall_close vars triggers t in
       id, t
 
     method on_dlemma l =
       if l.l_kind <> Check then
         let kind = Why3.Decl.(if l.l_kind = Admit then Paxiom else Plemma) in
-        let cnv = empty_cnv ctx in
-        let id, t = self#make_lemma cnv l in
-        let decl = Why3.Decl.create_prop_decl kind id t in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+        let env = gamma ctxt in
+        let pr, t = self#make_lemma env l in
+        let decl = Why3.Decl.create_prop_decl kind pr t in
+        Qed.Symbol.add ctxt.cluster decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_compile "Define %a@." Lang.Fun.pretty d.d_lfun ;
-      let cnv = empty_cnv ctx in
-      List.iter (Lang.F.add_var cnv.pool) d.d_params;
+      let name = Lang.Fun.name d.d_lfun in
+      let id = Why3.Ident.id_fresh name in
+      let map e = Option.get (cc_tau ctxt (Lang.F.tau_of_var e)) in
+      let tvs = List.map map d.d_params in
+      let env = gamma ctxt in
+      List.iter (Lang.F.add_var env.pool) d.d_params;
       begin
         match d.d_definition with
         | Logic t ->
-          let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
-          let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-          let ty_args = List.map map d.d_params in
-          let id = Why3.Term.create_lsymbol id ty_args (of_tau ~cnv t) in
-          let decl = Why3.Decl.create_param_decl id in
-          ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-        | Function(t,mu,v) -> begin
+          let ls = Why3.Term.create_lsymbol id tvs (cc_tau ctxt t) in
+          Hashtbl.add ctxt.global.hls name ls ;
+          let decl = Why3.Decl.create_param_decl ls in
+          Qed.Symbol.add ctxt.cluster decl
+        | Function(tr,mu,def) ->
+          begin
+            let tyr = cc_tau ctxt tr in
+            let ls = Why3.Term.create_lsymbol id tvs tyr in
+            Hashtbl.add ctxt.global.hls name ls ;
+            let env, vars = cc_params env d.d_params in
+            let value = compile env tr def in
             match mu with
+            | Def ->
+              let defn = Why3.Decl.make_ls_defn ls vars value in
+              let decl = Why3.Decl.create_logic_decl [defn] in
+              Qed.Symbol.add ctxt.cluster decl
             | Rec -> (* transform recursive function into an axioms *)
-              let name = Qed.Export.link_name (lfun_wname d.d_lfun) in
-              let id = Why3.Ident.id_fresh name in
-              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-              let ty_args = List.map map d.d_params in
-              let result = of_tau ~cnv t in
-              let id = Why3.Term.create_lsymbol id ty_args result in
-              let decl = Why3.Decl.create_param_decl id in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-              let cnv = empty_cnv ctx in
-              List.iter (Lang.F.add_var cnv.pool) d.d_params;
-              let cnv, vars = mk_binders cnv d.d_params in
-              let t = share cnv t v in
-              let t =
-                Why3.Term.t_forall_close vars []
-                  (Why3.Term.t_equ
-                     (Why3.Term.t_app id (List.map Why3.Term.t_var vars) result)
-                     t)
-              in
+              let decl = Why3.Decl.create_param_decl ls in
+              Qed.Symbol.add ctxt.cluster decl ;
+              let call = Why3.Term.t_app ls (List.map Why3.Term.t_var vars) tyr in
               let decl =
                 Why3.Decl.create_prop_decl Why3.Decl.Paxiom
-                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"_def")))
-                  t in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-            | Def ->
-              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
-              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-              let ty_args = List.map map d.d_params in
-              let result = of_tau ~cnv t in
-              let id = Why3.Term.create_lsymbol id ty_args result in
-              let cnv, vars = mk_binders cnv d.d_params in
-              let t = share cnv t v in
-              let decl = Why3.Decl.make_ls_defn id vars t in
-              let decl = Why3.Decl.create_logic_decl [decl] in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name ^ "'def")))
+                  (Why3.Term.t_forall_close vars [] (Why3.Term.t_equ call value)) in
+              Qed.Symbol.add ctxt.cluster decl
           end
-        | Predicate(mu,p) -> begin
+        | Predicate(mu,def) ->
+          begin
+            let ls = Why3.Term.create_lsymbol id tvs None in
+            Hashtbl.add ctxt.global.hls name ls ;
+            let env, vars = cc_params env d.d_params in
+            let value = compile env Qed.Logic.Prop @@ Lang.F.e_prop def in
             match mu with
+            | Def ->
+              let defn = Why3.Decl.make_ls_defn ls vars value in
+              let decl = Why3.Decl.create_logic_decl [defn] in
+              Qed.Symbol.add ctxt.cluster decl
             | Rec ->
-              let name = Qed.Export.link_name (lfun_wname d.d_lfun) in
-              let id = Why3.Ident.id_fresh name in
-              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-              let ty_args = List.map map d.d_params in
-              let result = None in
-              let id = Why3.Term.create_lsymbol id ty_args result in
-              let decl = Why3.Decl.create_param_decl id in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-              let cnv = empty_cnv ctx in
-              List.iter (Lang.F.add_var cnv.pool) d.d_params;
-              let cnv, vars = mk_binders cnv d.d_params in
-              let t = share cnv Prop (Lang.F.e_prop p) in
-              let t =
-                Why3.Term.t_forall_close vars []
-                  (Why3.Term.t_iff t
-                     (Why3.Term.t_app id (List.map Why3.Term.t_var vars) result))
-              in
+              let decl = Why3.Decl.create_param_decl ls in
+              Qed.Symbol.add ctxt.cluster decl ;
+              let call = Why3.Term.t_app_infer ls (List.map Why3.Term.t_var vars) in
               let decl =
                 Why3.Decl.create_prop_decl Why3.Decl.Paxiom
-                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"_def")))
-                  t in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-            | Def ->
-              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
-              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-              let ty_args = List.map map d.d_params in
-              let id = Why3.Term.create_lsymbol id ty_args None in
-              let cnv, vars = mk_binders cnv d.d_params in
-              let t = share cnv Prop (Lang.F.e_prop p) in
-              let decl = Why3.Decl.make_ls_defn id vars t in
-              let decl = Why3.Decl.create_logic_decl [decl] in
-              ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"'def")))
+                  (Why3.Term.t_forall_close vars [] (Why3.Term.t_iff call value))
+              in Qed.Symbol.add ctxt.cluster decl
           end
-        | Inductive dl ->
+        | Inductive dcs ->
           (* create predicate symbol *)
-          let fname = Qed.Export.link_name (lfun_wname d.d_lfun) in
-          let id = Why3.Ident.id_fresh fname in
-          let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
-          let ty_args = List.map map d.d_params in
-          let fid = Why3.Term.create_lsymbol id ty_args None in
-          let make_case (l:Definitions.dlemma) =
-            let cnv = empty_cnv ctx in
-            Hashtbl.add cnv.incomplete_symbols fname fid ;
-            self#make_lemma cnv ~prefix:fname l
-          in
-          let ind_decl = (fid, List.map make_case dl) in
+          let ls = Why3.Term.create_lsymbol id tvs None in
+          Hashtbl.add ctxt.global.hls name ls ;
+          let cases =
+            List.map
+              (fun (lemma:Definitions.dlemma) ->
+                 let env = gamma ctxt in
+                 self#make_lemma env ~prefix:name lemma
+              ) dcs in
           begin
             try
-              ctx.th <- Why3.Theory.add_ind_decl ctx.th Why3.Decl.Ind [ind_decl] ;
+              let decl = Why3.Decl.(create_ind_decl Ind) [ls,cases] in
+              Qed.Symbol.add ctxt.cluster decl
             with
             | Why3.Decl.InvalidIndDecl _
             | Why3.Decl.NonPositiveIndDecl _ ->
-              begin match d.d_lfun with
-                | Lang.ACSL li ->
-                  Wp_parameters.abort
-                    "After simplification inductive %s appear ill-formed \
-                     (hint: check cases premises)"
-                    li.l_var_info.lv_name
-                | Lang.CTOR ci ->
-                  Wp_parameters.fatal
-                    "Constructor (%s) in inductive compilation"
-                    ci.ctor_name
-                  [@ coverage off] (* should not happen *)
-                | extern ->
-                  Wp_parameters.fatal
-                    "Generated symbol %s is an ill-formed inductive"
-                    (Qed.Export.link_name @@ lfun_wname extern)
-                  [@ coverage off] (* should not happen *)
-              end
+              Wp_parameters.abort
+                "Ill-formed inductive declaration (non-positive premises)"
+                Lang.Fun.pretty d.d_lfun
           end
       end
 
@@ -1004,9 +680,9 @@ class visitor (ctx:context) c =
 (* --- Goal Compilation                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
+let goal_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp")
 
-let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
+let add_model_trace (probes: Lang.F.term Probe.Map.t) env t =
   let open Why3 in
   if Probe.Map.is_empty probes then t else
     let task = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
@@ -1021,68 +697,64 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
         Why3.Loc.user_position path l1 c1 l2 c2
       in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
-    let fold (p:Probe.t) (term:Lang.F.term) task =
-      let term' = share cnv (Lang.F.typeof term) term in
-      let id = create_id p term'.t_ty in
+    let fold (p:Probe.t) (t:Lang.F.term) task =
+      let t = cc_term env t in
+      let id = create_id p t.t_ty in
       let task = Task.add_param_decl task id in
       let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
-      let eq = Term.t_equ (Term.t_app id [] term'.t_ty) term' in
+      let eq = Term.t_equ (Term.t_app id [] t.t_ty) t in
       let decl = Why3.Decl.create_prop_decl Paxiom eq_id eq in
       Task.add_decl task decl
     in
     Probe.Map.fold fold probes task
 
-let convert_freevariables ~probes ~cnv t =
+let convert_freevariables ~probes env t =
   let freevars = Probe.Map.fold
       (fun _ t vars -> Lang.F.Vars.union vars (Lang.F.vars t))
       probes (Lang.F.vars t) in
-  let cnv,lss =
-    Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
-        let ty = of_tau ~cnv @@ Lang.F.tau_of_var v in
+  let env,lss =
+    Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (env,lss) ->
+        let ty = cc_tau env.context @@ Lang.F.tau_of_var v in
         let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
         let ls = Why3.Term.create_lsymbol x [] ty in
         let ex = Lang.F.e_var v in
         let tx = Why3.Term.t_app ls [] ty in
-        let cnv = { cnv with subst = Lang.F.Tmap.add ex tx cnv.subst } in
-        (cnv,ls::lss)) freevars (cnv,[])
+        let env = { env with locals = Lang.F.Tmap.add ex tx env.locals } in
+        (env,ls::lss)) freevars (env,[])
   in
-  cnv,lss
+  env,lss
 
-let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
+let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) goal =
   (* Format.printf "why3_of_qed start@."; *)
-  let goal = Definitions.cluster ~id ~title () in
-  let ctx = empty_context name in
-  let v = new visitor ctx goal in
+  let cg = Definitions.cluster ~id ~title () in
+  let global = global @@ Why3Env.env () in
+  let context = context global name in
   Wp_parameters.debug ~dkey:dkey_compile "%t"
     begin fun fmt ->
       Format.fprintf fmt "---------------------------------------------@\n" ;
       Format.fprintf fmt "EXPORT GOAL %s@." id ;
-      Format.fprintf fmt "PROP @[<hov 2>%a@]@." Lang.F.pp_pred t ;
+      Format.fprintf fmt "PROP @[<hov 2>%a@]@." Lang.F.pp_pred goal ;
       Format.fprintf fmt "---------------------------------------------@\n" ;
     end ;
-  v#add_builtin_lib;
-  v#vgoal axioms t;
-  let cnv = empty_cnv ~polarity:`Positive ctx in
-  let t = rebuild cnv (Lang.F.e_prop t) in
-  let probes = Probe.Map.map (rebuild cnv) probes in
-  Lang.For_export.in_state
-    begin fun () ->
-      let cnv,lss = convert_freevariables ~probes ~cnv t in
-      let goal = share cnv Prop t in
-      let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
-      let th = Why3.Theory.close_theory ctx.th in
-      if Wp_parameters.has_print_generated () then begin
-        let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
-        let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
-        Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
-          Why3.Pretty.print_theory th_tmp
-      end;
-      let t = None in
-      let t = Why3.Task.use_export t th in
-      let t = List.fold_left Why3.Task.add_param_decl t lss in
-      let t = add_model_trace probes cnv t in
-      Why3.Task.add_decl t decl
-    end ()
+  let v = new visitor context cg in
+  v#vgoal axioms goal;
+  let env = gamma context in
+  let goal = Lang.F.e_prop goal in
+  let env,lss = convert_freevariables ~probes env goal in
+  let goal = compile env Prop goal in
+  let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
+  let th = Qed.Symbol.close context.cluster in
+  if Wp_parameters.(has_dkey print_generated) then begin
+    Wp_parameters.debug
+      ~dkey:Wp_parameters.print_generated "%a@\n%a"
+      Why3.Pretty.print_theory th
+      Why3.Pretty.print_decl decl
+  end;
+  let t = None in
+  let t = Why3.Task.use_export t th in
+  let t = List.fold_left Why3.Task.add_param_decl t lss in
+  let t = add_model_trace probes env t in
+  Why3.Task.add_decl t decl
 
 let prove_prop ?probes ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in

@@ -106,12 +106,12 @@ let do_print_clusters fmt model scope =
 
 let do_wp_print_axiomatics fmt model ax =
   Wpo.pp_axiomatics fmt ax ;
-  if ax = None && Wp_parameters.has_print_generated () then
+  if ax = None && Wp_parameters.(has_dkey print_generated) then
     do_print_clusters fmt model WpContext.Global
 
 let do_wp_print_behavior fmt model fct bhv =
   Wpo.pp_function fmt fct bhv ;
-  if bhv = None && Wp_parameters.has_print_generated () then
+  if bhv = None && Wp_parameters.(has_dkey print_generated) then
     do_print_clusters fmt model (WpContext.Kf fct)
 
 let do_wp_print model =

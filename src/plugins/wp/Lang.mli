@@ -680,26 +680,6 @@ class type simplifier =
 
 (* -------------------------------------------------------------------------- *)
 
-(** For why3_api but circular dependency *)
-module For_export : sig
-
-  type specific_equality = {
-    for_tau:(tau -> bool);
-    mk_new_eq:F.binop;
-  }
-
-  val rebuild : ?cache:term Tmap.t -> term -> term * term Tmap.t
-
-  val set_builtin : Fun.t -> (term list -> term) -> unit
-  val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
-
-  val set_builtin_eq : Fun.t -> (term -> term -> term) -> unit
-  val set_builtin_leq : Fun.t -> (term -> term -> term) -> unit
-
-  val in_state: ('a -> 'b) -> 'a -> 'b
-
-end
-
 (**/**)
 val hacked_types : (string -> tau list -> tau) Context.value
 (**/**)

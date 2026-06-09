@@ -45,7 +45,8 @@ let f_concat =
   Lang.extern_f ~category "frama_c_wp.vlist.Vlist.concat"
 let f_repeat = Lang.extern_f "frama_c_wp.vlist.Vlist.repeat"
 
-let f_vlist_eq = Lang.extern_f "frama_c_wp.vlist.Vlist.vlist_eq"
+(* TODO[LC] specialized list equality *)
+let _vlist_eq = Lang.extern_f "frama_c_wp.vlist.Vlist.vlist_eq"
 
 (*--- ACSL Builtins ---*)
 
@@ -438,12 +439,6 @@ let elist (t : tau) =
   | L.Data(a,[e]) when check_adt a -> Some e
   | _ -> None
 
-let specialize_eq_list =
-  Lang.{
-    For_export.for_tau = check_tau;
-    mk_new_eq = (fun a b -> e_fun ~result:Qed.Logic.Prop !@f_vlist_eq [a;b])
-  }
-
 (* -------------------------------------------------------------------------- *)
 (* --- Export                                                             --- *)
 (* -------------------------------------------------------------------------- *)
@@ -478,8 +473,8 @@ and apply (engine : #engine) fmt f x es =
     Format.fprintf fmt "@[<hov 2>(%s@ %a@ %a)@]"
       f engine#pp_atom x (export engine) es
 
-
-let export_rewriter_concat es tau =
+(* TODO[LC] specialized export of concat and elements *)
+let _rewriter_concat es tau =
   match es with
   | [] -> v_nil (Option.get tau)
   | e::es ->
@@ -488,9 +483,6 @@ let export_rewriter_concat es tau =
         e_fun ?result:tau !@f_cons [x;e_fun ?result:tau !@f_concat es]
       | _ -> raise Not_found
     end
-
-let () =
-  Lang.For_export.set_builtin' !@f_concat export_rewriter_concat
 
 (* -------------------------------------------------------------------------- *)
 

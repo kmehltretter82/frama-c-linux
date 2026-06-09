@@ -395,8 +395,6 @@ class virtual visitor main =
     val mutable dlemmas  = DS.empty
     val mutable lemmas   = DS.empty
     val mutable clusters = DC.empty
-    val mutable libraries = DS.empty
-    val mutable theories = DW.empty
     val mutable locals = DC.add main DC.empty
 
     method set_local c = locals <- DC.add c locals
@@ -613,13 +611,6 @@ class virtual visitor main =
           self#on_cluster c ;
         end
 
-    method vtheory p m =
-      if not (DW.mem (p,m) theories) then
-        begin
-          theories <- DW.add (p,m) theories ;
-          self#on_theory p m
-        end
-
     method vgoal (axioms : axioms option) prop =
       match axioms with
       | None ->
@@ -657,7 +648,6 @@ class virtual visitor main =
       end
 
     method virtual section : string -> unit
-    method virtual on_theory : string list -> string -> unit
     method virtual on_cluster : cluster -> unit
     method virtual on_data : Qed.Symbol.data -> unit
     method virtual on_lfun : Qed.Symbol.lfun -> unit

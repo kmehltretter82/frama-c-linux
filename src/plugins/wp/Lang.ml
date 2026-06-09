@@ -961,49 +961,6 @@ let filter_hypotheses xs =
   let hs_with_vars , hs_without_vars = List.partition matches d.hyps in
   d.hyps <- hs_without_vars ; hs_with_vars
 
-(** For why3_api but circular dependency *)
-
-module For_export = struct
-
-  type specific_equality = {
-    for_tau:(tau -> bool);
-    mk_new_eq:F.binop;
-  }
-
-  (** delay the create at most as possible (due to constants handling in qed) *)
-  let state = ref None
-
-  let init = ref (fun () -> ())
-
-  let add_init f =
-    let old = !init in
-    init := (fun () -> old (); f ())
-
-  let get_state () =
-    match !state with
-    | None ->
-      let st = QZERO.create () in
-      QZERO.in_state st !init ();
-      state := Some st;
-      st
-    | Some st -> st
-
-  let rebuild ?cache t = QZERO.rebuild_in_state (get_state ()) ?cache t
-
-  let set_builtin f c =
-    add_init (fun () -> QZERO.set_builtin ~force:true f c)
-
-  let set_builtin' f c =
-    add_init (fun () -> QZERO.set_builtin' ~force:true f c)
-  let set_builtin_eq f c =
-    add_init (fun () -> QZERO.set_builtin_eq ~force:true f c)
-  let set_builtin_leq f c =
-    add_init (fun () -> QZERO.set_builtin_leq ~force:true f c)
-
-  let in_state f v = QZERO.in_state (get_state ()) f v
-
-end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier                                                         --- *)
 (* -------------------------------------------------------------------------- *)
