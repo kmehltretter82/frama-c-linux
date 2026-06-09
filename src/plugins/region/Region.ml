@@ -12,7 +12,7 @@
 
 type map = Memory.map
 type node = Memory.node
-let map kf = Analysis.get kf
+let get_map kf = Analysis.get kf
 let id = Memory.id
 let of_id = Memory.of_id
 let pretty = Memory.pp_node
@@ -32,8 +32,8 @@ let typed = Memory.typed
 let parents = Memory.parents
 let points_to = Memory.points_to
 let pointed_by = Memory.pointed_by
-let lval = Memory.lval
-let exp m e = Option.map Memory.find @@ Memory.exp m e
+let lval = Lookup.lval
+let exp m e = Option.map Memory.find @@ Lookup.exp m e
 let cvar = Memory.cvar
 let field = Memory.field
 let index = Memory.index

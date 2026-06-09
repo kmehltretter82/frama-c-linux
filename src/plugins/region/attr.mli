@@ -11,7 +11,7 @@ type attr = [
   | `Nullable (** Might be null *)
   | `Allocated  (** Might be dynamically allocated *)
   | `Garbage  (** Might be non-initialized *)
-  | `Readonly (** Contains only readonly memory *)
+  | `Validread (** Might have no write access  *)
 ]
 
 val empty : flags
@@ -25,10 +25,10 @@ val bottom : flags
 
 val merge : flags -> flags -> flags
 (** Combine flags:
-    - [`Nullable] if {i either} is readonly
+    - [`Nullable] if {i either} is nullable
     - [`Allocated] if {i either} is allocated
     - [`Garbage] if {i either} is garbage
-    - [`Readonly] if {i both} are readonly
+    - [`Validread] if {i both} are validread
 *)
 
 val iter : (attr -> unit) -> flags -> unit
@@ -42,19 +42,3 @@ val cvar : garbage:bool -> varinfo -> flags
 val is_local : varinfo -> bool
 val is_const : varinfo -> bool
 val is_initialized : garbage:bool -> varinfo -> bool
-
-val readable :
-  loc:location -> ?label:logic_label ->
-  from:flags -> term -> predicate
-(** Whether the address is readable wrt. [~from] attributes *)
-
-val writable :
-  loc:location -> ?label:logic_label ->
-  from:flags -> term -> predicate
-(** Whether the address is writable wrt. [~from] attributes *)
-
-val requires :
-  loc:location -> ?label:logic_label ->
-  ?readonly:bool -> from:flags -> target:flags -> term -> predicate
-(** Whether the address satisfying [~from] attributes
-    satisfies [~target] attributes. *)

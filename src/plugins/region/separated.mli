@@ -6,16 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+open Memory
 
-(** @raises Not_found *)
-val find : kernel_function -> Memory.map
+type map
+type obj = { named : string ; flags : Attr.flags ; addr : Condition.addr }
 
-(** Memoized *)
-val get : kernel_function -> Memory.map
-
-(** Memoized *)
-val compute : kernel_function -> unit
-
-(** Hook on update *)
-val add_hook : (unit -> unit) -> unit
+val create : unit -> map
+val add : map -> node:node -> from:node -> obj -> unit
+val iter : (node -> obj -> unit) -> map -> unit
+val iter2 : (node -> obj -> obj -> unit) -> map -> unit

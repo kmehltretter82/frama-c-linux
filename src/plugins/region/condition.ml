@@ -13,45 +13,15 @@
 open Cil_types
 open Cil_datatype
 
-let taddrof ?loc tlv =
-  Logic_utils.mk_logic_AddrOf ?loc tlv @@ Cil.typeOfTermLval tlv
-
-let addrof ?loc lv = taddrof ?loc @@ Logic_utils.lval_to_term_lval lv
-
-let pnull ?loc ?names ~eq addr =
-  let null = Logic_const.term ?loc Tnull addr.term_type in
-  let rel = if eq then Req else Rneq in
-  Logic_const.prel ?loc ?names (rel,addr,null)
-
-let pvalid ?loc ?names ?(label=Logic_const.here_label) addr =
-  Logic_const.pvalid ?loc ?names (label,addr)
-
-let pvalid_read ?loc ?names ?(label=Logic_const.here_label) addr =
-  Logic_const.pvalid_read ?loc ?names (label,addr)
-
-let pvalid_pointer ?loc ?names ?(label=Logic_const.here_label) addr =
-  Logic_const.por ?loc ?names
-    ( pnull ?loc ?names ~eq:true addr ,
-      if Ast_types.is_logic_fun_ptr addr.term_type
-      then Logic_const.pvalid_function ?loc ?names addr
-      else Logic_const.pobject_pointer ?loc ?names (label, addr) )
-
-let pinitialized ?loc ?names ?(label=Logic_const.here_label) addr =
-  Logic_const.pinitialized ?loc ?names (label,addr)
-
-let paligned ?loc ?names addr te =
-  let size = Logic_const.term ?loc (TAlignOf te) Linteger in
-  Logic_const.paligned ?loc ?names (addr,size)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Valid Region Built-in                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let l_valid_region = "\\valid_region"
-let is_valid_region lf = lf.l_var_info.lv_name = l_valid_region
+let lvalid_region = "\\valid_region"
+let is_valid_region lf = lf.l_var_info.lv_name = lvalid_region
 
 let () = Logic_builtin.register {
-    bl_name = l_valid_region;
+    bl_name = lvalid_region;
     bl_labels = [FormalLabel "A"] ;
     bl_params = [] ;
     bl_type = None ;
@@ -62,151 +32,168 @@ let () = Logic_builtin.register {
   }
 
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
-  let f = List.hd @@ Logic_env.find_all_logic_functions l_valid_region in
+  let f = List.hd @@ Logic_env.find_all_logic_functions lvalid_region in
   let te = Logic_typing.ctype_of_pointed addr.term_type in
   let size = Logic_const.term ?loc (TSizeOf te) Linteger in
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
 
 (* -------------------------------------------------------------------------- *)
-(* --- L-Val Kinds                                                        --- *)
+(* ---  Side Conditions                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-type lkind = {
-  host : varinfo option ;
-  indexed : bool ;
-  aligned : bool ;
-}
+type addr =
+  | L of Lval.t
+  | E of Exp.t
+  | T of Term.t * Typ.t
+  | R of Term.t * Typ.t * Term.t * Term.t
+[@@ deriving eq]
 
-let pp_kind fmt kd =
-  begin
-    match kd.host with
-    | None -> Format.pp_print_string fmt "(*"
-    | Some v -> Format.fprintf fmt "(%s" v.vname
-  end ;
-  if not kd.indexed then Format.pp_print_string fmt ",misindexed" ;
-  if not kd.aligned then Format.pp_print_string fmt ",misaligned" ;
-  Format.pp_print_string fmt ")"
+let pp_addr fmt = function
+  | L lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
+  | E p -> Printer.pp_exp fmt p
+  | T(p,_) -> Printer.pp_term fmt p
+  | R(a,_,p,q) ->
+    Format.fprintf fmt "&(%a[%a..%a])"
+      Printer.pp_term a Printer.pp_term p Printer.pp_term q
 
-let safe = { host = None ; indexed = true ; aligned = true }
-let unsafe = { host = None ; indexed = false ; aligned = false }
+type access = Read | Write | Region | Initialized [@@ deriving eq]
 
-let rec kind e =
-  match e.enode with
-  | Lval _ -> safe
-  | AddrOf lv | StartOf lv -> lkind lv
-  | BinOp((PlusPI|MinusPI),p,_,_) -> { (kind p) with indexed = false }
-  | CastE(ty,p) when Ast_types.is_ptr ty -> { (kind p) with aligned = false }
-  | _ -> unsafe
+type guard =
+  | True | Invalid of guard
+  | Named of string * guard
+  | Or of guard * guard
+  | And of guard * guard
+  | Imply of guard * guard
+  | Bounds of Exp.t * Z.t
+  | Null of bool * addr
+  | Valid of access * addr
+  | Separated of addr * addr
+[@@ deriving eq]
 
-and lkind (h,o) =
-  let kd = hkind h in
-  if kd.indexed && safe_array_offset (Cil.typeOfLhost h) o then kd
-  else { kd with indexed = false }
+let rec pp_guard fmt = function
+  | True -> Format.pp_print_string fmt "\\true"
+  | Invalid p -> Format.fprintf fmt "\\false/* %a */" pp_guard p
+  | Named(a,p) -> Format.fprintf fmt "%s: %a" a pp_guard p
+  | Or(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ || %a)@]" pp_guard p pp_guard q
+  | And(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ && %a)@]" pp_guard p pp_guard q
+  | Imply(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ ==> %a)@]" pp_guard p pp_guard q
+  | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Printer.pp_exp k Z.pretty n
+  | Null(eq,a) -> Format.fprintf fmt "(%a %c= \\null)" pp_addr a (if eq then '=' else '!')
+  | Valid(Write,a) -> Format.fprintf fmt "\\valid(%a)" pp_addr a
+  | Valid(Read,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
+  | Valid(Region,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
+  | Valid(Initialized,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
+  | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
-and hkind = function
-  | Var v -> { safe with host = Some v }
-  | Mem e -> kind e
+let rec trivial = function True -> true | Named(_,g) -> trivial g | _ -> false
+let rec invalid = function Invalid _ -> true | Named(_,g) -> invalid g | _ -> false
+let rec falsy = function Invalid p -> p | Named(_,g) -> falsy g | g -> g
 
-and safe_array_offset t = function
-  | NoOffset -> true
-  | Field(fd,o) -> safe_array_offset fd.ftype o
-  | Index(_,o) ->
-    Kernel.SafeArrays.get () &&
-    let n = Ast_info.direct_array_size t in
-    not (Z.is_zero n) &&
-    safe_array_offset (Ast_types.direct_element_type t) o
+let pointed = function
+  | L lv -> Cil.typeOfLval lv
+  | E p -> Ast_types.pointed_type @@ Cil.typeOf p
+  | T(_,te) | R(_,te,_,_) -> te
 
-let rec term_kind t =
+let is_zero t =
   match t.term_node with
-  | TLval _ -> safe
-  | TAddrOf lv | TStartOf lv -> term_lkind lv
-  | TBinOp((PlusPI|MinusPI),p,_) ->
-    { (term_kind p) with indexed = false }
-  | TCast(_,Ctype ty,p) when Ast_types.is_ptr ty ->
-    { (term_kind p) with aligned = true }
-  | _ -> unsafe
-
-and term_lkind (h,o) =
-  let kd = term_hkind h in
-  if kd.indexed && safe_array_toffset (Cil.typeOfTermLval (h,TNoOffset)) o
-  then kd
-  else { kd with indexed = false }
-
-and term_hkind = function
-  | TVar { lv_origin = (Some _ as host) } -> { safe with host }
-  | TMem e -> term_kind e
-  | _ -> safe
-
-and safe_array_toffset t = function
-  | TNoOffset -> true
-  | TField(fd,o) -> safe_array_toffset (Ctype fd.ftype) o
-  | TModel(fm,o) -> safe_array_toffset fm.mi_field_type o
-  | TIndex(_,o) ->
-    Kernel.SafeArrays.get () &&
-    let n = Ast_info.direct_array_size @@ Logic_utils.logicCType t in
-    not (Z.is_zero n) &&
-    safe_array_toffset (Logic_utils.type_of_array_elem t) o
+  | TConst(Integer(z,_)) -> Z.is_zero z
+  | _ -> false
 
 (* -------------------------------------------------------------------------- *)
-(* --- Side Condition Generators                                          --- *)
+(* ---  Smart Constructors                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-type residual = [ `Default | `True | `False ]
+let g_true = True
+let g_invalid p = Invalid p
+let g_name a g = if a <> "" then Named(a,g) else g
 
-let pp_residual fmt = function
-  | `Default -> Format.pp_print_string fmt "default"
-  | `True -> Format.pp_print_string fmt "true"
-  | `False -> Format.pp_print_string fmt "false"
+let g_null ?(eq=true) = function
+  | R(p,t,_,_) -> Null(eq,T(p,t))
+  | L(Var _,_) as addr -> if eq then Invalid (Null(eq,addr)) else True
+  | addr -> Null(eq,addr)
 
-let rpath kd =
-  if kd.indexed && kd.aligned then `True else `Default
+let g_and p q =
+  match p,q with
+  | True,w | w,True -> w
+  | Invalid _,_ -> p
+  | _,Invalid _ -> q
+  | _ -> And(p,q)
 
-(* -------------------------------------------------------------------------- *)
-(* ---  Validity                                                          --- *)
-(* -------------------------------------------------------------------------- *)
+let g_or p q =
+  match p,q with
+  | True,_ | _,True -> True
+  | Invalid _,w | w,Invalid _ -> w
+  | _ -> Or(p,q)
 
-let in_scope v stmt =
-  List.exists
-    (fun b ->
-       List.exists (Varinfo.equal v) b.blocals
-    ) @@ Kernel_function.find_all_enclosing_blocks stmt
+let rec filter hyp = function
+  | Or(p,q) -> g_or (filter hyp p) (filter hyp q)
+  | And(p,q) -> g_and (filter hyp p) (filter hyp q)
+  | Imply(p,q) ->
+    if equal_guard hyp p
+    then filter hyp q
+    else Imply(filter hyp p, filter hyp q)
+  | p ->
+    if equal_guard hyp p then True else p
 
-let rallocated kinstr v =
-  if v.vglob || v.vformal then `True else
-    match kinstr with
-    | Kglobal -> `Default
-    | Kstmt stmt -> if in_scope v stmt then `True else `False
+let g_imply p q =
+  match p,q with
+  | True,_ -> q
+  | Invalid _,_ | _,True -> True
+  | Null(eq,a) , Invalid _ -> Null(not eq,a)
+  | _ -> if equal_guard p q then True else Imply(p,filter p q)
 
-let rvalid ?(writing=false) kinstr node kd =
-  if not kd.aligned then `Default
-  else
-    match kd.host with
-    | Some v ->
-      if writing && Attr.is_const v then `False else
-      if kd.indexed then rallocated kinstr v else `Default
-    | None ->
-      let flags = Memory.flags node in
-      if writing && Attr.mem `Readonly flags then `False else `Default
-
-(* -------------------------------------------------------------------------- *)
-(* ---  Initialized                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-let rinitialized node kd =
-  match kd.host with
-  | Some _ ->
-    let flags = Memory.flags node in
-    let garbage = Attr.mem `Garbage flags in
-    if not garbage then `True else `Default
-  | None -> `Default
+let g_bounds e n = Bounds(e,n)
+let g_valid acs p = Valid(acs,p)
+let g_separated p q = Separated(p,q)
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Aligned                                                           --- *)
+(* ---  Extraction                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let raligned node ~bits ?(default=true) kd =
-  if (default && kd.aligned) || (Memory.size node mod bits = 0)
-  then `True
-  else `Default
+let of_addr ?loc = function
+  | L lv ->
+    let lv = Logic_utils.lval_to_term_lval lv in
+    Logic_utils.mk_logic_AddrOf ?loc lv @@ Cil.typeOfTermLval lv
+  | E ptr ->
+    Logic_utils.expr_to_term ~coerce:true ptr
+  | T(ptr,_) -> ptr
+  | R(a,t,p,q) ->
+    if is_zero p && is_zero q then a else
+      let index =
+        if Term.equal p q then p
+        else Logic_const.trange ?loc (Some p,Some q)
+      in Logic_const.term ?loc
+        (TBinOp(PlusPI,a,index))
+        (Ctype (Cil_const.mk_tptr t))
+
+(* Names are only set at top-level predicate *)
+let rec of_guard ?loc ?(names=[]) = function
+  | True -> Logic_const.prepend_names ~names @@ Logic_const.ptrue
+  | Invalid p -> of_guard ?loc ~names p
+  | Named(a,p) -> of_guard ?loc ~names:(names @ [a]) p
+  | Or(p,q) -> Logic_const.por ?loc ~names (of_guard ?loc p , of_guard ?loc q)
+  | And(p,q) -> Logic_const.pand ?loc ~names (of_guard ?loc p , of_guard ?loc q)
+  | Imply(p,q) -> Logic_const.pimplies ?loc ~names (of_guard ?loc p , of_guard ?loc q)
+  | Bounds(k,n) ->
+    let z = Logic_const.tinteger ?loc 0 in
+    let n = Logic_const.tint ?loc n in
+    let k = Logic_utils.expr_to_term ~coerce:true k in
+    let inf = Logic_const.pred ?loc (Prel(Rle,z,k)) in
+    let sup = Logic_const.pred ?loc (Prel(Rlt,k,n)) in
+    Logic_const.pand ?loc ~names (inf,sup)
+  | Null(eq,a) ->
+    let addr = of_addr ?loc a in
+    let null = Logic_const.term ?loc Tnull addr.term_type in
+    let rel = if eq then Req else Rneq in
+    Logic_const.prel ?loc ~names (rel,addr,null)
+  | Valid(Write,p) ->
+    Logic_const.(pvalid ?loc ~names (here_label, of_addr ?loc p))
+  | Valid(Read,p) ->
+    Logic_const.(pvalid_read ?loc ~names (here_label, of_addr ?loc p))
+  | Valid(Initialized,p) ->
+    Logic_const.(pinitialized ?loc ~names (here_label, of_addr ?loc p))
+  | Valid(Region,p) -> pvalid_region ?loc ~names @@ of_addr ?loc p
+  | Separated(a,b) ->
+    Logic_const.pseparated ?loc ~names [ of_addr ?loc a ; of_addr ?loc b ]
 
 (* -------------------------------------------------------------------------- *)

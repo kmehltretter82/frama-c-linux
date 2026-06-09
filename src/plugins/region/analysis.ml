@@ -10,17 +10,17 @@
 (* ---  Projectification                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-module DOMAIN : Datatype.S with type t = Code.domain =
+module MAP : Datatype.S with type t = Memory.map =
   Datatype.Make
     (struct
-      type t = Code.domain
+      type t = Memory.map
       include Datatype.Undefined
-      let name = "Region.Analysis.MEMORY"
+      let name = "Region.Analysis.MAP"
       let mem_project = Datatype.never_any_project
       let reprs = [ Memory.create () ]
     end)
 
-module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
+module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(MAP)
     (struct
       let size = 0
       let name = "Region.Analysis.STATE"
@@ -40,8 +40,8 @@ let get kf =
   try STATE.find kf with Not_found ->
     Options.feedback ~ontty:`Transient
       "Function %a%t" Kernel_function.pretty kf Unicode.pp_ellipsis ;
-    let domain = Code.domain kf in
-    STATE.add kf domain ;
+    let map = Code.compute kf in
+    STATE.add kf map ;
     if Options.is_debug_key_enabled dump then
       Options.result "@[<v 2>Function %a:%t@]@."
         Kernel_function.pretty kf
@@ -51,9 +51,9 @@ let get kf =
               Format.pp_print_newline fmt () ;
               Memory.pp_region fmt r ;
             end @@
-          Memory.regions domain ;
+          Memory.regions map ;
         end ;
-    domain
+    map
 
 let compute kf = ignore @@ get kf
 

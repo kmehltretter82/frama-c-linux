@@ -18,8 +18,6 @@ Options taking a string as argument should preferably be written
 -region-assert      Generate ACSL 'assert' annotations instead of checks
                     (opposite option is -region-check)
 -region-check       Generate ACSL 'check' annotations (set by default)
--region-logic       Also generate guards for logic (opposite option is
-                    -region-no-logic)
 
 *** DEBUG
 

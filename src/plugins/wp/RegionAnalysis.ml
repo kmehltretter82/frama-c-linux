@@ -14,7 +14,7 @@ type region = Region.node
 
 let get_map () =
   match WpContext.get_scope () with
-  | Kf kf -> Region.map kf
+  | Kf kf -> Region.get_map kf
   | Global -> Wp_parameters.not_yet_implemented "[region] logic context"
 
 let id = Region.id

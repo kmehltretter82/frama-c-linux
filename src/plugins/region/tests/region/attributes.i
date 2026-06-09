@@ -1,6 +1,6 @@
 /*@
   region A: p[0..n-1] , \nullable, \garbage ;
-  region B: q[0..n-1] , \nullable, \readonly ;
+  region B: q[0..n-1] , \nullable, \validread ;
   */
 int job_disjoint( int n, int * p , int * q )
 {
@@ -12,7 +12,7 @@ int job_disjoint( int n, int * p , int * q )
 
 /*@
   region A: p[0..n-1] , \nullable, \garbage ;
-  region B: q[0..n-1] , \nullable, \readonly ;
+  region B: q[0..n-1] , \nullable, \validread ;
   region p[..], q[..];
   */
 int job_merged( int n, int * p , int * q )

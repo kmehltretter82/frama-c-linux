@@ -13,8 +13,7 @@ struct S {
 int ptr(int *p)
 {
   int __retres;
-  /*@ check region: mem_access: \valid_read(p); */
-  /*@ check region: initialized: \initialized(p); */
+  /*@ check region: \valid_region(p, sizeof(int)); */
   __retres = *p;
   return __retres;
 }
@@ -23,9 +22,7 @@ int ptr(int *p)
 int arr(int *p, int k, int n)
 {
   int __retres;
-  /*@ check region: mem_access: \valid_read(p + k); */
-  /*@ check region: path: \valid_region(p + k, sizeof(int)); */
-  /*@ check region: initialized: \initialized(p + k); */
+  /*@ check region: \valid_region(p + k, sizeof(int)); */
   __retres = *(p + k);
   return __retres;
 }
@@ -34,7 +31,7 @@ int arr(int *p, int k, int n)
 int comp(struct S p, int k)
 {
   int __retres;
-  /*@ check region: bounds: 0 ≤ k < 5; */
+  /*@ check region: 0 ≤ k < 5; */
   __retres = p.f[k];
   return __retres;
 }
@@ -43,9 +40,8 @@ int comp(struct S p, int k)
 int pcomp(struct S *p, int k)
 {
   int __retres;
-  /*@ check region: bounds: 0 ≤ k < 5; */
-  /*@ check region: mem_access: \valid_read(&p->f[k]); */
-  /*@ check region: initialized: \initialized(&p->f[k]); */
+  /*@ check region: \valid_region(p, sizeof(struct S)); */
+  /*@ check region: 0 ≤ k < 5; */
   __retres = p->f[k];
   return __retres;
 }
@@ -54,10 +50,7 @@ int pcomp(struct S *p, int k)
 int cast(char *p, int k, int n)
 {
   int __retres;
-  /*@ check region: mem_access: \valid_read((int *)(p + k)); */
-  /*@ check region: path: \valid_region((int *)(p + k), sizeof(int)); */
-  /*@ check region: initialized: \initialized((int *)(p + k)); */
-  /*@ check region: aligned: \aligned((int *)(p + k),alignof(int)); */
+  /*@ check region: \valid_region((int *)(p + k), sizeof(int)); */
   __retres = *((int *)(p + k));
   return __retres;
 }
@@ -66,9 +59,7 @@ int cast(char *p, int k, int n)
 int nocast(char *p, int k, int n)
 {
   int __retres;
-  /*@ check region: mem_access: \valid_read((int *)p + k); */
-  /*@ check region: path: \valid_region((int *)p + k, sizeof(int)); */
-  /*@ check region: initialized: \initialized((int *)p + k); */
+  /*@ check region: \valid_region((int *)p + k, sizeof(int)); */
   __retres = *((int *)p + k);
   return __retres;
 }

@@ -19,6 +19,8 @@ type 'a t = private
   | Logic  of logic_type_info * 'a t list
   | Arrow  of 'a t list * 'a t
 
+val map : ('a -> 'b) -> 'a t -> 'b t
+
 val is_pure : 'a t -> bool
 val pretty : (formatter -> 'a -> unit) -> formatter -> 'a t -> unit
 

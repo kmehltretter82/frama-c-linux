@@ -213,10 +213,17 @@ let pp_region fmt (r : node) =
 let id n = (UF.get n).cid
 let of_id m = UF.of_id m.store
 
-module SNode = Set.Make(struct
-    type t = node
-    let compare r1 r2 = Int.compare (id r1) (id r2)
-  end)
+module Node =
+struct
+  type t = node
+  let hash = id
+  let equal a b = (id a = id b)
+  let compare a b = Int.compare (id a) (id b)
+end
+
+module Nset = Set.Make(Node)
+module Nmap = Map.Make(Node)
+module Nhash = Hashtbl.Make(Node)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk Constructors                                                 --- *)
@@ -278,10 +285,10 @@ let add_result (m: map) =
     let r = new_chunk m.store ~result:true () in
     m.result <- Some r ; r
 
-let domain_of_typ (m:map) (typ:typ) =
+let dtyp (m:map) (typ:typ) =
   Domain.of_typ (new_chunk m.store) typ
 
-let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
+let ltyp (m:map) ?(ctxt) (lt:logic_type) =
   let d : domain = Domain.of_ltype (new_chunk m.store) lt in
   Option.fold ~none:d ~some:(fun (c:context) -> Domain.subst c d) ctxt
 
@@ -304,10 +311,11 @@ let witer (m:map) (f: node -> bool) =
     Option.iter (walk f) m.result ;
   end
 
-let iter m f = witer m (UF.once f)
+let iter f m = witer m (UF.once f)
 let size (r: node) = sizeof (UF.get r).clayout
 let parents (r: node) = UF.find_all (UF.get r).cparents
 let cvars (r: node) = Vset.elements (UF.get r).ccvars
+let roots (r: node) = Bag.elements (UF.get r).croots
 let labels (r: node) = Lset.elements (UF.get r).clabels
 
 (* -------------------------------------------------------------------------- *)
@@ -440,16 +448,25 @@ let merge_all = function
       do_merge q a b ;
     done
 
+let any a b = if UF.id a <= UF.id b then a else b
 let merge (a: node) (b: node) : unit = merge_all [a;b]
 
+
 (* -------------------------------------------------------------------------- *)
-(* --- Merging Domains                                                    --- *)
+(* --- Domains                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let pure : domain = Domain.pure
-let dmerge a b = merge a b ; min a b
-let merge_domain = Domain.merge dmerge
-let merge_points_to = Domain.pointed dmerge
+let dmerge  = Domain.merge any
+let dindex = Domain.get_index any
+let dfield = Domain.get_field any
+let dpointed = Domain.pointed any
+
+let merge_node a b = merge a b ; any a b
+let merge_domain = Domain.merge merge_node
+let merge_field = Domain.get_field merge_node
+let merge_index = Domain.get_index merge_node
+let merge_pointed = Domain.pointed merge_node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -570,49 +587,21 @@ let field (r: node) (fd: fieldinfo) : node =
 
 let footprint (r: node) : node list =
   try
-    let visited = ref SNode.empty (* set of visited & normalized nodes *) in
+    let visited = Nhash.create 0 (* set of visited & normalized nodes *) in
     let leaves = ref [] (* returned leaves *) in
     let rec visit (r: node) : unit =
       let n = find r in (* normalized node *)
-      if SNode.mem n !visited then () else
-        visited := SNode.add n !visited ;
-      match (UF.get n).clayout with
-      | Compound (_, _, range) -> Ranges.iter visit range
-      | Blob _ | Cell (_,_) -> leaves := n :: !leaves
+      if not (Nhash.mem visited n) then
+        begin
+          Nhash.add visited n () ;
+          match (UF.get n).clayout with
+          | Compound (_, _, range) -> Ranges.iter visit range
+          | Blob _ | Cell (_,_) -> leaves := n :: !leaves
+        end
     in visit r ; !leaves
   with Not_found -> []
 
 let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
-
-let rec lval (m: map) (h,ofs) : node =
-  offset (lhost m h) (Cil.typeOfLhost h) ofs
-
-and lhost (m: map) (h: lhost) : node =
-  match h with
-  | Var x -> cvar m x
-  | Mem e ->
-    match exp m e with
-    | Some r -> r
-    | None -> raise Not_found
-
-and offset (r: node) (ty: typ) (ofs: offset) : node =
-  match ofs with
-  | NoOffset -> UF.find r
-  | Field (fd, ofs) ->
-    offset (field r fd) fd.ftype ofs
-  | Index (_, ofs) ->
-    let te = Ast_types.direct_element_type ty in
-    offset (index r te) te ofs
-
-and exp (m: map) (e: exp) : node option =
-  match e.enode with
-  | Const _
-  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> None
-  | Lval lv -> points_to @@ lval m lv
-  | AddrOf lv | StartOf lv -> Some (lval m lv)
-  | CastE(_, e) -> exp m e
-  | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
-  | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
 
 let result (m: map) = m.result
 
@@ -707,6 +696,9 @@ let reads (r:node) =
 let writes (r:node) =
   let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cwrites
+
+let readonly (r:node) =
+  let node = UF.get r in Access.Set.is_empty node.cwrites
 
 let shifts (r:node) =
   let node = UF.get r in
@@ -907,14 +899,14 @@ let region n = make_region n (UF.get n)
 
 let regions map =
   let pool = ref [] in
-  iter map (fun r -> pool := region r :: !pool) ;
+  iter (fun r -> pool := region r :: !pool) map ;
   List.rev !pool
 
 let lock m =
   begin
     witer m UF.lock ;
     let marks = UF.marks () in
-    iter m (consolidate m.gvars marks) ;
+    iter (consolidate m.gvars marks) m ;
   end
 
 (* -------------------------------------------------------------------------- *)

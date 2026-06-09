@@ -9,8 +9,5 @@
 open Cil_types
 open Memory
 
-(** All the provided maps are locked. *)
-type domain = map
-
 (** Domain for a function (not memoized). *)
-val domain : kernel_function -> domain
+val compute : kernel_function -> map

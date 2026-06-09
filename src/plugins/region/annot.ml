@@ -9,6 +9,7 @@
 open Cil_types
 
 open Memory
+open Lookup
 open Logic
 
 (* -------------------------------------------------------------------------- *)
@@ -34,7 +35,7 @@ let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.context,lv)
 
 let dpoints_to env deps =
-  merge_points_to @@
+  merge_pointed @@
   List.fold_left
     (fun d t -> merge_domain d (add_iterm env t))
     pure deps
@@ -161,7 +162,7 @@ let rec add_assigns_from env ~iscalled ~from tgt =
 let context ~called ~kf ip =
   match called with
   | None -> Access.Prop ip
-  | Some stmt -> Access.Call(stmt,kf,ip)
+  | Some stmt -> Access.CallProp(stmt,kf,ip)
 
 let add_requires ~map ~called ~kf ~ki ~bhv ~formals ~result ip =
   let context = context ~called ~kf @@ Property.ip_of_requires kf ki bhv ip in
@@ -182,7 +183,9 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
     let ip = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
     let context = context ~called ~kf ip in
     let env = { map ; context ; formals ; result } in
-    let iscalled = Option.map (fun _ -> ref false) called in
+    let iscalled =
+      if called = None && Kernel_function.has_definition kf
+      then None else Some (ref false) in
     List.iter
       (fun (t,from) -> add_assigns_from env ~iscalled ~from t.it_content) ws ;
     match iscalled with
@@ -230,28 +233,22 @@ let rec add_extension ~map ~called ~kf ~ki ~formals ~result acsl =
     | Kglobal -> Property.ELContract kf
     | Kstmt stmt -> Property.ELStmt (kf, stmt) in
   let context = context ~called ~kf @@ Property.ip_of_extended eloc acsl in
+  let env = { map ; context ; formals ; result } in
   match acsl.ext_kind with
   | Ext_id id ->
     if acsl.ext_plugin = "region" then
       match called with
       | None ->
-        let env = { map ; context ; formals ; result } in
         List.iter (Logic.add_region env) (Spec.of_extid id)
-      | Some stmt ->
-        let loc = Cil_datatype.Stmt.loc stmt in
-        Options.not_yet_implemented ~source:(fst loc)
-          "Unsupported region specification for calls"
+      | Some _stmt ->
+        List.iter (Logic.add_object env) (Spec.of_extid id)
     else
       let loc = Access.location context in
       Options.not_yet_implemented ~source:(fst loc)
         "Unsupported \\%s:%s extensions" acsl.ext_plugin acsl.ext_name
 
-  | Ext_terms ts ->
-    let env = { map ; context ; formals ; result } in
-    List.iter (iadd_term env) ts
-  | Ext_preds ps ->
-    let env = { map ; context ; formals ; result } in
-    List.iter (add_predicate env) ps
+  | Ext_terms ts -> List.iter (iadd_term env) ts
+  | Ext_preds ps -> List.iter (add_predicate env) ps
   | Ext_annot (_,acsls) ->
     List.iter (add_extension ~map ~called ~kf ~ki ~formals ~result) acsls
 

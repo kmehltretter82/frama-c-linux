@@ -19,6 +19,15 @@ type 'a t =
   | Logic  of logic_type_info * 'a t list (* not all pure *)
   | Arrow  of 'a t list * 'a t (* not all pure *)
 
+let rec map f = function
+  | Pure -> Pure
+  | Dvar a -> Dvar a
+  | Ptr n -> Ptr (f n)
+  | Array d -> Array (map f d)
+  | Record w -> Record (Fmap.map (map f) w)
+  | Logic(t,ds) -> Logic(t,List.map (map f) ds)
+  | Arrow(ds,d) -> Arrow(List.map (map f) ds, map f d)
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Printer                                                           --- *)
 (* -------------------------------------------------------------------------- *)

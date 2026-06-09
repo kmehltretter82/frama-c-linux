@@ -80,10 +80,11 @@ val find_all : node list -> node list
 val size : node -> int
 val parents : node -> node list
 val cvars : node -> varinfo list
+val roots : node -> root list
 val labels : node -> string list
 val region : node -> region
 val regions : map -> region list
-val iter : map -> (node -> unit) -> unit
+val iter : (node -> unit) -> map -> unit
 
 val fresh : map -> node
 val add_cvar : map -> ?garbage:bool -> Cil_types.varinfo -> node
@@ -103,25 +104,34 @@ val add_write : node -> Access.acs -> unit
 val add_shift : node -> Access.acs -> typ -> unit
 val add_init : node -> Access.acs -> typ -> unit
 
-val domain_of_typ : map -> typ -> domain
-val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
+(** Not merge, the two nodes are assumed to be equivalent *)
+val any : node -> node -> node
 
 val merge : node -> node -> unit
 val merge_all : node list -> unit
-
-val pure : domain
-val merge_domain : domain -> domain -> domain
-val merge_points_to : domain -> node option
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
 val logic : map -> logic_info -> domain
 val field : node -> fieldinfo -> node
 val index : node -> typ -> node
-val lval : map -> lval -> node
-val exp : map -> exp -> node option
 val result : map -> node option
 val garbage : map -> varinfo -> bool
+
+val pure : domain
+val dmerge : domain -> domain -> domain
+val dindex : domain -> domain
+val dfield : domain -> fieldinfo -> domain
+val dpointed : domain -> node option
+
+val merge_node : node -> node -> node
+val merge_domain : domain -> domain -> domain
+val merge_pointed : domain -> node option
+val merge_index : domain -> domain
+val merge_field : domain -> fieldinfo -> domain
+
+val dtyp : map -> typ -> domain
+val ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val ranges : node -> range list
 val points_to : node -> node option
@@ -140,6 +150,19 @@ val inits : node -> typ list
 val types : node -> typ list
 val typed : node -> typ option
 val flags : node -> Attr.flags
+val readonly : node -> bool
+
+module Node :
+sig
+  type t = node
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+module Nset : Set.S with type elt = node
+module Nmap : Map.S with type key = node
+module Nhash : Hashtbl.S with type key = node
 
 (**/**)
 val body : (map -> logic_info -> domain -> unit) ref

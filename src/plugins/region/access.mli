@@ -11,7 +11,8 @@ open Cil_types
 type clause =
   | Body of logic_info
   | Prop of Property.t
-  | Call of stmt * kernel_function * Property.t
+  | CallSite of stmt * kernel_function
+  | CallProp of stmt * kernel_function * Property.t
 
 type acs =
   | Exp of stmt * exp
@@ -21,9 +22,6 @@ type acs =
   | Term of clause * term_lval
 
 val typeof : acs -> typ
-
-val compare : acs -> acs -> int
-val compare_clause : clause -> clause -> int
 
 val pretty : Format.formatter -> acs -> unit
 val pp_label : Format.formatter -> stmt -> unit

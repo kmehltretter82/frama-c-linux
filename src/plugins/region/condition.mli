@@ -8,81 +8,56 @@
 
 open Cil_types
 
-(* -------------------------------------------------------------------------- *)
-(** {2 Logic Helpers} *)
-(* -------------------------------------------------------------------------- *)
+(** Name of "\valid_region" predicate *)
+val lvalid_region : string
 
-val addrof : ?loc:location -> lval -> term
-val taddrof : ?loc:location -> term_lval -> term
-
-val pnull :
-  ?loc:location -> ?names:string list -> eq:bool ->
-  term -> predicate
-
-val pvalid :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val pvalid_read :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
+val is_valid_region : logic_info -> bool
 
 val pvalid_region :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
-(** [p] is [\null] or [\object_pointer(p)], or [\valid_function(p)]
-    for function pointers *)
-val pvalid_pointer :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val pinitialized :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val paligned :
-  ?loc:location -> ?names:string list ->
-  term -> typ -> predicate
-
-val is_valid_region : logic_info -> bool
-
 (* -------------------------------------------------------------------------- *)
-(** {2 Kind of L-Values and Pointers} *)
+(** {2 Logic Helpers} *)
 (* -------------------------------------------------------------------------- *)
 
-type lkind
+type addr = L of lval | E of exp | T of term * typ | R of term * typ * term * term
+type access = Read | Write | Region | Initialized
 
-val safe : lkind
-val unsafe : lkind
+(** Tip: named terms are opaque to smart constructors *)
 
-val kind : exp -> lkind
-val lkind : lval -> lkind
-val hkind : lhost -> lkind
-val term_kind : term -> lkind
-val term_hkind : term_lhost -> lkind
-val term_lkind : term_lval -> lkind
-val safe_array_offset : typ -> offset -> bool
-val safe_array_toffset : logic_type -> term_offset -> bool
+type guard = private
+  | True
+  | Invalid of guard (* original guard *)
+  | Named of string * guard
+  | Or of guard * guard
+  | And of guard * guard
+  | Imply of guard * guard
+  | Bounds of exp * Z.t
+  | Null of bool * addr
+  | Valid of access * addr
+  | Separated of addr * addr
 
-(* -------------------------------------------------------------------------- *)
-(** {2 Residual Conditions} *)
-(* -------------------------------------------------------------------------- *)
+val pointed : addr -> typ
+val trivial : guard -> bool
+val invalid : guard -> bool
+val falsy : guard -> guard
 
-(** The residual conditions are computed by assuming that all inner
-    sub-expresisions or l-values are correct. *)
+val g_true : guard
+val g_invalid : guard -> guard
+val g_or : guard -> guard -> guard
+val g_and : guard -> guard -> guard
+val g_imply : guard -> guard -> guard
+val g_name : string -> guard -> guard
+val g_null : ?eq:bool -> addr -> guard
+val g_bounds : exp -> Z.t -> guard
+val g_valid : access -> addr -> guard
+val g_separated : addr -> addr -> guard
 
-type residual = [ `Default | `True | `False ]
+val pp_addr  : Format.formatter -> addr  -> unit
+val pp_guard : Format.formatter -> guard -> unit
 
-val rpath : lkind -> residual
-val rvalid : ?writing:bool -> kinstr -> Memory.node -> lkind -> residual
-val rinitialized : Memory.node -> lkind -> residual
-val raligned : Memory.node -> bits:int -> ?default:bool -> lkind -> residual
-val rallocated : kinstr -> varinfo -> residual
-
-(* -------------------------------------------------------------------------- *)
-
-val pp_kind : Format.formatter -> lkind -> unit
-val pp_residual : Format.formatter -> residual -> unit
+val of_addr  : ?loc:location -> addr -> term
+val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
 
 (* -------------------------------------------------------------------------- *)
