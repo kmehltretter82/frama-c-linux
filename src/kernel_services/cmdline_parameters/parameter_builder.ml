@@ -134,7 +134,7 @@ struct
     let negate_name name =
       (* do we match '-shortname-'? (one dash before, one after) *)
       let len = String.length P.shortname + 2  in
-      if String.length name <= len || P.shortname = empty_string then
+      if String.length name <= len || P.shortname = "kernel" then
         "-no" ^ name
       else
         let bef = Str.string_before name len in
@@ -214,9 +214,7 @@ struct
       add_parameter !Parameter_customize.group_ref stage p;
       Parameter_customize.reset ();
       if is_dynamic then
-        let plugin = empty_string in
-        Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else p
 
     let add_aliases ?visible ?deprecated list =
@@ -324,9 +322,7 @@ struct
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-        let plugin = empty_string in
-        Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else p
 
   end
@@ -390,9 +386,7 @@ struct
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-        let plugin = empty_string in
-        Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else p
 
   end
@@ -493,9 +487,7 @@ struct
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-        let plugin = empty_string in
-        Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else
         p
 
@@ -585,9 +577,7 @@ struct
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-        let plugin = empty_string in
-        Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else
         p
 
@@ -780,7 +770,7 @@ struct
         (Cmdline.String String_parameter.set);
       Parameter_customize.reset ();
       if is_dynamic then
-        Dynamic.register ~plugin:empty_string X.option_name Typed_parameter.ty p
+        Dynamic.register ~plugin:"kernel" X.option_name Typed_parameter.ty p
       else
         p
   end

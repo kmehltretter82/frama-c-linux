@@ -177,14 +177,14 @@ module Parameter = struct
       functor_name fct_name option_name
 
   let get_parameter option_name =
-    get ~plugin:"" option_name Typed_parameter.ty
+    get ~plugin:"kernel" option_name Typed_parameter.ty
 
   let get_state option_name =
-    let prm = get ~plugin:"" option_name Typed_parameter.ty in
+    let prm = get ~plugin:"kernel" option_name Typed_parameter.ty in
     State.get prm.Typed_parameter.name
 
   let apply modname name s ty1 ty2 =
-    get ~plugin:""  (get_name modname s name) (Datatype.func ty1 ty2)
+    get ~plugin:"kernel"  (get_name modname s name) (Datatype.func ty1 ty2)
 
   module Common(X: sig type t val modname:string val ty: t Type.t end ) = struct
     type t = X.t
