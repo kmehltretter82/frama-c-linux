@@ -159,8 +159,6 @@ and compile_conditional ~ity ~origin ?(name = "if") op1 op2 op3 =
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
   match enode with
-  | True -> M.return (Cil.one ~loc, None, Some (Analyses_types.C_number, ""))
-  | False -> M.return (Cil.zero ~loc, None, Some (Analyses_types.C_number, ""))
   | Integer {n; ity} ->
     (* cf Translate_terms.constant_to_exp *)
     let e, strnum =

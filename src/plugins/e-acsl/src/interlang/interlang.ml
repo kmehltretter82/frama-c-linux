@@ -26,8 +26,6 @@ type exp =
   }
 
 and exp_node =
-  | True
-  | False
   | Integer of {ity : Number_ty.t; n : Z.t}
   | UnOp of unop_node
   | BinOp of binop_node
@@ -97,8 +95,6 @@ module Pretty = struct
   and pp_exp fmt {enode} = pp_exp_node fmt enode
 
   and pp_exp_node fmt = function
-    | True -> fprintf fmt "true"
-    | False -> fprintf fmt "false"
     | Integer {ity; n} ->
       fprintf fmt "@[%a@]@ :@ @[%a@]" Z.pretty n Analyses_types.pp_number_ty ity;
     | UnOp {unop; op} ->
@@ -122,8 +118,8 @@ module Optimization = struct
 
   module Aux = struct
     let of_bool = function
-      | true -> True
-      | false -> False
+      | true -> Integer {n = Z.one; ity = C_integer IInt}
+      | false -> Integer {n = Z.zero; ity = C_integer IInt}
 
     let under_coerce e = match e.enode with
       | Coerce {coerced = exp} -> exp
@@ -208,26 +204,26 @@ module Optimization = struct
 
   let conjunction e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | False, _ -> Some False
-    | True, _ -> Some e2.enode
+    | Integer {n = z}, _ when z = Z.zero -> Some (Aux.of_bool false)
+    | Integer {n = z}, _ when z != Z.zero -> Some e2.enode
     | _ -> None
 
   let disjunction e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | True, _ -> Some True
-    | False, _ -> Some e2.enode
+    | Integer {n = z}, _ when z != Z.zero -> Some (Aux.of_bool true)
+    | Integer {n = z}, _ when z = Z.zero-> Some e2.enode
     | _ -> None
 
   let negation e =
     match (Aux.under_coerce e).enode with
-    | True -> Some False
-    | False -> Some True
+    | Integer {n = z} when z != Z.zero -> Some (Aux.of_bool false)
+    | Integer {n = z} when z = Z.zero -> Some (Aux.of_bool true)
     | _ -> None
 
   let conditional e1 e2 e3 =
     match (Aux.under_coerce e1).enode with
-    | True -> Some e2.enode
-    | False -> Some e3.enode
+    | Integer {n = z} when z != Z.zero -> Some e2.enode
+    | Integer {n = z} when z = Z.zero -> Some e3.enode
     | _ -> None
 end
 module Exp_node = struct
@@ -269,8 +265,8 @@ module Exp = struct
   let rte rte =
     Aux.of_exp_node ~origin:(Analyses_types.PoT_pred rte.rorigin) rte.rnode
 
-  let mk_true ~origin () = Aux.of_exp_node ~origin True
-  let mk_false ~origin () = Aux.of_exp_node ~origin False
+  let mk_true ~origin () = integer ~origin ~ity:(C_integer IInt) Z.one
+  let mk_false ~origin () = integer ~origin ~ity:(C_integer IInt) Z.zero
 
   let conditional ~origin ity e1 e2 e3 =
     let org = If {ity; op1 = e1; op2 = e2; op3 = e3} in

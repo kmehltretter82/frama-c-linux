@@ -47,8 +47,6 @@ type exp = private
     it stems from a predicate as predicates never require casts. *)
 
 and exp_node = private
-  | True
-  | False
   | Integer of {ity : number_ty; n : Z.t}
   | UnOp of unop_node
   | BinOp of binop_node
