@@ -257,6 +257,8 @@ let example_msg =
      @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.diff   # Prints differences with the oracles related to the specified execnow command.@  \
      @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show      # Prints the related sub-test command.@  \
      @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show   # Prints the related execnow command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec           # Run the command and display its output.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.bench     # Run the command using hyperfine and output a short performance report.@  \
      Note: the <alias-name> defaults to 'ptests'. It can be specified in different ways:@  \
      - from the command line option '-dune-alias <alias-name>'@  \
      - from directives in 'ptests_config' files such as 'DUNE_ALIAS = <alias-name>'@  \
