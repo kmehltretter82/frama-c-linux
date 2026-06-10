@@ -11,6 +11,7 @@ THIS_SCRIPT="$0"
 CONFIG="<default>"
 VERBOSE=
 FORCE=
+BENCH=
 PREPARE=
 USEWPCACHE=
 UPDATE=
@@ -72,6 +73,8 @@ function Usage
     echo "  -g|--generate       Generate new oracles and update oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
+    echo "  -b|--benchmark      run hyperfine to measure time of the given tests"
+    echo "                      Uses --force, will perform 5 warmup runs"
     echo "  --coverage          compute test coverage in html format"
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
@@ -131,16 +134,37 @@ function Run
     "$@"
 }
 
+function RunDevNull
+{
+    Echo "> $* >/dev/null 2>&1"
+    "$@" >/dev/null 2>&1
+}
+
+function RunBench
+{
+    if [ "$BENCH" = "yes" ]; then
+        echo "Running hyperfine benchmarks"
+        Run hyperfine -w 5 "$*"
+    else
+        Run "$@"
+    fi
+}
+
 function Cmd
 {
     Run "$@" || Error "(command exits $?): $*"
+}
+
+function CmdDevNull
+{
+    RunDevNull "$@" || Error "(command exits $?): $*"
 }
 
 function RequiredTools
 {
     local tool
     for tool in "$@" ; do
-        which "$tool" >/dev/null 2>&1 || Error "Executable not found: $tool"
+        RunDevNull which "$tool" || Error "Executable not found: $tool"
     done
 }
 
@@ -188,6 +212,11 @@ do
             ;;
         "-v"|"--verbose")
             VERBOSE=yes
+            ;;
+        "-b"|"--benchmark")
+            RequiredTools hyperfine
+            FORCE=yes
+            BENCH=yes
             ;;
         "-l"|"--logs")
             LOGS=yes
@@ -311,7 +340,7 @@ function GetCache
     else
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
     fi
 }
 
@@ -428,10 +457,9 @@ function RunAlias
     # shellcheck disable=SC2206
     local commands=(${DUNE_OPT[@]} $@ ${DUNE_OPT_POST[@]})
 
-    if [ "$DUNE_LOG" = "" ]; then
-        Run dune build "${commands[@]}"
-    elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
-        Run dune build "${commands[@]}"
+    # For practical reasons, benchmarks can only be launched without save option
+    if [ "$DUNE_LOG" = "" ] || [ "$SAVE" != "yes" ]; then
+        RunBench dune build "${commands[@]}"
     else
         # note: the Run function cannot performs redirection
         echo "> dune build ${commands[*]} 2> >(tee -a $DUNE_LOG >&2)"
@@ -589,10 +617,10 @@ function Register
 
 function MissingOracles
 {
-    if Run which frama-c-ptests >/dev/null 2>&1 ; then
-        Cmd frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
+    if RunDevNull which frama-c-ptests ; then
+        CmdDevNull frama-c-ptests "$1" "${PTESTS_DIR[@]}"
     else
-        Cmd dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
+        CmdDevNull dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}"
     fi
 }
 
@@ -645,8 +673,8 @@ function Status
     if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
-        Run git -C "$FRAMAC_WP_CACHEDIR" add -A
-        Run git -C "$FRAMAC_WP_CACHEDIR" status -s
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" add -A
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" status -s
     fi
 }
 
