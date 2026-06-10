@@ -14,6 +14,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
+import { PinnedMessages } from 'dome/frame/toolbars';
 import { GlobalDeclarations, GlobalByFiles } from 'frama-c/kernel/Globals';
 import { Projects } from  'frama-c/kernel/Projects';
 import ASTview from 'frama-c/kernel/ASTview';
@@ -61,6 +62,11 @@ Ivette.registerSidebar({
 Ivette.registerToolbar({
   id: 'ivette.history',
   children: <History />
+});
+
+Ivette.registerToolbar({
+  id: 'ivette.pinned-messages',
+  children: <PinnedMessages />
 });
 
 Ivette.registerStatusbar({

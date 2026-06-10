@@ -59,7 +59,6 @@ export default function Application(): JSX.Element {
               <Laboratory.Tabs />
               <div className="toolbar-tools">
                 <>{ToolBar}</>
-                <Toolbar.PinnedMessages />
                 <IvettePrefs.FontTools />
                 <Search.SearchField />
                 <IvettePrefs.ThemeSwitchTool />
