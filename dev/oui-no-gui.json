@@ -1,0 +1,23 @@
+{
+  "name": "frama-c",
+  "fullname": "Frama-C",
+  "version": "33.0~beta",
+  "exec_files": [
+    "bin/frama-c",
+    "bin/frama-c-script",
+    "bin/e-acsl-gcc"
+  ],
+  "manpages": {
+    "man1": [
+      "man/man1/frama-c.1",
+      "man/man1/e-acsl-gcc.1"
+    ]
+  },
+  "unique_id": "com.frama_c.frama_c",
+  "wix_manufacturer": "CEA List",
+  "wix_description": "To complete",
+  "wix_icon_file": "./share/frama-c.ico",
+  "wix_banner_bmp_file": "./share/frama-c.png",
+  "wix_license_file": "LICENSE",
+  "macos_symlink_dirs": [ "lib" ]
+}

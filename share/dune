@@ -26,7 +26,11 @@
   (frama-c.png as frama-c.png)
   (unmark.png as unmark.png)
   (switch-on.png as switch-on.png)
-  (switch-off.png as switch-off.png)))
+  (switch-off.png as switch-off.png)
+  ; Linux configuration files
+  (apparmor-profile as apparmor-profile)
+  (frama-c-gui.desktop as frama-c-gui.desktop)
+  ))
 
 ; Analysis scripts (executable files)
 (install

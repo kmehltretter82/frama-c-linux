@@ -1,0 +1,33 @@
+{
+  "name": "frama-c",
+  "fullname": "Frama-C",
+  "version": "33.0~beta",
+  "exec_files": [
+    "bin/frama-c",
+    "bin/frama-c-script",
+    "bin/e-acsl-gcc",
+    {
+      "path": "lib/frama-c/gui/frama-c-gui",
+      "deps": false,
+      "desktop_tpl": "share/frama-c/share/frama-c-gui.desktop",
+      "apparmor_profile": "share/frama-c/share/apparmor-profile"
+    }
+  ],
+  "plugin_dirs": {
+    "plugins_dir": "lib/frama-c/plugins",
+    "lib_dir": "lib"
+  },
+  "manpages": {
+    "man1": [
+      "man/man1/frama-c.1",
+      "man/man1/e-acsl-gcc.1"
+    ]
+  },
+  "unique_id": "com.frama_c.frama_c",
+  "wix_manufacturer": "CEA List",
+  "wix_description": "To complete",
+  "wix_icon_file": "./share/frama-c.ico",
+  "wix_banner_bmp_file": "./share/frama-c.png",
+  "wix_license_file": "LICENSE",
+  "macos_symlink_dirs": [ "lib", "share" ]
+}

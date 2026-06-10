@@ -155,6 +155,11 @@ hello-*.tar.gz
 # When a nix-build is executed it generates
 /result*
 
+# bundle related artifacts
+/bundle
+/why3*
+/*.run
+
 #######################
 # should remain empty #
 #######################
