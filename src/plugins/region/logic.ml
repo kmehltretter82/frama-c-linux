@@ -82,9 +82,9 @@ let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
     end
   | TVar v ->
     let left x =
-        let garbage =
-          garbage && x.vformal && Ast_types.C.is_struct_or_union x.vtype in
-        let r = Memory.add_cvar ~garbage env.map x in
+      let garbage =
+        garbage && x.vformal && Ast_types.C.is_struct_or_union x.vtype in
+      let r = Memory.add_cvar ~garbage env.map x in
       add_addr_offset ~loc  env x.vtype r loffset in
     let right d = add_term_offset ~loc env d loffset in
     Either.map ~left ~right @@ lvar env v

@@ -543,11 +543,11 @@ let forward_cast ~src_type ~dst_type v =
    -------------------------------------------------------------------------- *)
 
 let make_volatile v =
-    match v with
-    | V.Top _ -> v
-    | V.Map m ->
-      let aux b _ acc = V.join acc (V.inject b Ival.top) in
-      V.M.fold aux m V.bottom
+  match v with
+  | V.Top _ -> v
+  | V.Map m ->
+    let aux b _ acc = V.join acc (V.inject b Ival.top) in
+    V.M.fold aux m V.bottom
 
 let eval_float_constant f fkind fstring =
   if Fc_float.is_nan f
