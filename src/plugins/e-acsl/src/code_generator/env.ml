@@ -197,6 +197,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       false (* is a global? *)
       false (* is a formal? *)
       ~referenced:true
+      ~orig_name:name
       (Varname.get ~scope (Functions.RTL.mk_gen_name name))
       (Misc.unghost_type ty)
   in
