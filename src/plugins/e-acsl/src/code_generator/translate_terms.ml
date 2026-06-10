@@ -208,11 +208,11 @@ and thost_to_host_il host =
     M.return @@ IL.Lhost.var v
   | TVar ({lv_origin = None} as logic_v) ->
     let v' = Env.Logic_binding.get env logic_v in
-    M.return @@ IL.Lhost.var ~name:logic_v.lv_name v'
+    M.return @@ IL.Lhost.var v'
   | TResult _typ ->
     let lhost = Misc.result_lhost kf in
     (match lhost with
-     | Var v -> M.return @@ IL.Lhost.var ~name:"result" v
+     | Var v -> M.return @@ IL.Lhost.var v
      | _ -> assert false)
   | TMem t -> M.map IL.Lhost.mem @@ to_exp_il t
 

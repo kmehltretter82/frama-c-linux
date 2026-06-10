@@ -1330,7 +1330,7 @@ double __gen_e_acsl_avg(double a, double b)
     __e_acsl_mpq_t __gen_e_acsl_div;
     __e_acsl_mpq_t __gen_e_acsl_delta_2;
     __e_acsl_mpq_t __gen_e_acsl_sub;
-    __e_acsl_mpq_t __gen_e_acsl_result;
+    __e_acsl_mpq_t __gen_e_acsl___retres;
     int __gen_e_acsl_lt;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -1354,10 +1354,10 @@ double __gen_e_acsl_avg(double a, double b)
     __gmpq_sub(__gen_e_acsl_sub,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real),
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_delta_2));
-    __gmpq_init(__gen_e_acsl_result);
-    __gmpq_set_d(__gen_e_acsl_result,__retres);
+    __gmpq_init(__gen_e_acsl___retres);
+    __gmpq_set_d(__gen_e_acsl___retres,__retres);
     __gen_e_acsl_lt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_sub),
-                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_result));
+                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl___retres));
     __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"avg_real",
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
@@ -1365,19 +1365,19 @@ double __gen_e_acsl_avg(double a, double b)
     __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
                                     __retres);
     if (__gen_e_acsl_lt < 0) {
-      __e_acsl_mpq_t __gen_e_acsl_result_2;
+      __e_acsl_mpq_t __gen_e_acsl___retres_2;
       __e_acsl_mpq_t __gen_e_acsl_delta_3;
       __e_acsl_mpq_t __gen_e_acsl_add_2;
       int __gen_e_acsl_lt_2;
-      __gmpq_init(__gen_e_acsl_result_2);
-      __gmpq_set_d(__gen_e_acsl_result_2,__retres);
+      __gmpq_init(__gen_e_acsl___retres_2);
+      __gmpq_set_d(__gen_e_acsl___retres_2,__retres);
       __gmpq_init(__gen_e_acsl_delta_3);
       __gmpq_set_si(__gen_e_acsl_delta_3,(long)__gen_e_acsl_delta,1UL);
       __gmpq_init(__gen_e_acsl_add_2);
       __gmpq_add(__gen_e_acsl_add_2,
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real),
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_delta_3));
-      __gen_e_acsl_lt_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_result_2),
+      __gen_e_acsl_lt_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl___retres_2),
                                      (__e_acsl_mpq_struct const *)(__gen_e_acsl_add_2));
       __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
                                       __retres);
@@ -1386,7 +1386,7 @@ double __gen_e_acsl_avg(double a, double b)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
                                    __gen_e_acsl_delta);
       __gen_e_acsl_and = __gen_e_acsl_lt_2 < 0;
-      __gmpq_clear(__gen_e_acsl_result_2);
+      __gmpq_clear(__gen_e_acsl___retres_2);
       __gmpq_clear(__gen_e_acsl_delta_3);
       __gmpq_clear(__gen_e_acsl_add_2);
     }
@@ -1409,7 +1409,7 @@ double __gen_e_acsl_avg(double a, double b)
     __gmpq_clear(__gen_e_acsl_div);
     __gmpq_clear(__gen_e_acsl_delta_2);
     __gmpq_clear(__gen_e_acsl_sub);
-    __gmpq_clear(__gen_e_acsl_result);
+    __gmpq_clear(__gen_e_acsl___retres);
     __gmpq_clear(__gen_e_acsl_at);
     __gmpq_clear(__gen_e_acsl_at_2);
     return __retres;
