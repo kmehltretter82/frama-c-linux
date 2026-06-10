@@ -101,8 +101,8 @@ let concat vs =
   v_concat vs tl
 
 let list es = concat (List.map v_elt es)
-
 let repeat s n = v_repeat s n (typeof s)
+let vrepeat = function [s;n] -> repeat s n | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Rewriters                                                          --- *)
@@ -473,15 +473,34 @@ and apply (engine : #engine) fmt f x es =
     Format.fprintf fmt "@[<hov 2>(%s@ %a@ %a)@]"
       f engine#pp_atom x (export engine) es
 
-(* TODO[LC] specialized export of concat and elements *)
-let _cc_concat tau = function
-  | [] -> v_nil (Option.get tau)
-  | e::es ->
-    begin match repr e with
-      | L.Fun( elt , [x] ) when f_elt @= elt ->
-        e_fun ?result:tau !@f_cons [x;e_fun ?result:tau !@f_concat es]
-      | _ -> raise Not_found
+let () =
+  let open ExportWhy3.CC in
+  Context.register
+    begin fun () ->
+      hack !@f_concat @@
+      fun env tr ts ->
+      let ty = cc_tau env tr in
+      let rec elements = function
+        | [] ->
+          let nil = find_ls env "list.List.Nil" in
+          Why3.Term.t_app nil [] ty
+        | e::es ->
+          let ls = elements es in
+          match Lang.F.repr e with
+          | Fun(f,[x]) when f_elt @= f ->
+            let e = cc_term env x in
+            let cons = find_ls env "list.List.Cons" in
+            Why3.Term.t_app cons [e;ls] ty
+          | _ ->
+            let l = cc_term env e in
+            let append = find_ls env "list.Append.(++)" in
+            Why3.Term.t_app append [l;ls] ty
+      in elements ts
     end
+
+let () = Tactical.add_computer "wp:list" list
+let () = Tactical.add_computer "wp:concat" concat
+let () = Tactical.add_computer "wp:repeat" vrepeat
 
 (* -------------------------------------------------------------------------- *)
 
