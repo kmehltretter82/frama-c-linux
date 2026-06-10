@@ -141,12 +141,12 @@ let update_var_type v t =
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
     ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?alignas
-    ?(loc=Fileloc.unknown)
+    ?(loc=Fileloc.unknown) ?orig_name
     global formal name typ
   =
 
   let vi =
-    { vorig_name = name;
+    { vorig_name = Option.value ~default:name orig_name;
       vname = name;
       vid   = -1;
       vglob = global;
@@ -4155,16 +4155,16 @@ let rec findUniqueName ?(suffix="") fdec name =
 let refresh_local_name fdec vi =
   let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
-let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?loc fdec name typ =
+let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?loc ?orig_name fdec name typ =
   (* a helper function *)
   let name = findUniqueName fdec name in
   fdec.smaxid <- 1 + fdec.smaxid;
-  let vi = makeVarinfo ~temp ?referenced ?ghost ?loc false formal name typ in
+  let vi = makeVarinfo ~temp ?referenced ?ghost ?loc ?orig_name false formal name typ in
   vi
 
 (* Make a local variable and add it to a function *)
-let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?ghost ?loc name typ =
-  let vi = makeLocal ~temp ?referenced ?ghost ?loc fdec name typ in
+let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?ghost ?loc ?orig_name name typ =
+  let vi = makeLocal ~temp ?referenced ?ghost ?loc ?orig_name fdec name typ in
   refresh_local_name fdec vi;
   if insert then
     begin
@@ -4264,8 +4264,8 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced ?ghost ?alignas ?loc name typ =
-  makeVarinfo ?source ?temp ?referenced ?ghost ?alignas ?loc true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?ghost ?alignas ?loc ?orig_name name typ =
+  makeVarinfo ?source ?temp ?referenced ?ghost ?alignas ?loc ?orig_name true false name typ
 
 let create_string_literal =
   let module StrLitCounter =

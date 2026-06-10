@@ -541,7 +541,7 @@ val compatibleTypes :
 *)
 val makeVarinfo:
   ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool ->
-  ?alignas:exp -> ?loc:Fileloc.t -> bool -> bool
+  ?alignas:exp -> ?loc:Fileloc.t -> ?orig_name:string -> bool -> bool
   -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
@@ -570,7 +570,7 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Fileloc.t -> s
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
-  ?ghost:bool -> ?loc:Fileloc.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?loc:Fileloc.t -> ?orig_name:string -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
     clash with the one of a local or formal variable of the given function.
@@ -597,7 +597,8 @@ val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
     is unique. [source] defaults to [true]. [temp] defaults to [false].
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
-  ?ghost:bool -> ?alignas:exp -> ?loc:Fileloc.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?alignas:exp -> ?loc:Fileloc.t -> ?orig_name:string ->
+  string -> typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
