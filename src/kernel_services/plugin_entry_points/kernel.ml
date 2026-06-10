@@ -1961,9 +1961,9 @@ module PowLimit =
     let help =
       Format.sprintf
         "for performance reasons, limit the maximum exponent accepted by pow \
-         functions in Z. Must be positive. Default value is %d" default
+         functions in Z. Must be at least 1024. Default value is %d" default
   end)
-let () = PowLimit.set_range ~min:0 ~max:max_int
+let () = PowLimit.set_range ~min:1024 ~max:max_int
 let () = PowLimit.add_update_hook (fun _ i -> Z.set_pow_exponent_limit i)
 
 (* ************************************************************************* *)
