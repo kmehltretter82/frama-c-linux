@@ -105,6 +105,33 @@ let rec predicate_content_to_exp_il p =
          (Analyses_types.C_integer IInt)
          op1)
       op2
+  | Piff(p1, p2) -> (* (p1 <==> p2) <==> (!p1 || p2 && !p2 || p1) *)
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop
+      ~origin
+      And
+      (Analyses_types.C_integer IInt)
+      (Interlang.Exp.binop
+         ~origin
+         Or
+         (Analyses_types.C_integer IInt)
+         (Interlang.Exp.unop
+            ~origin:(Analyses_types.PoT_pred p1)
+            Not
+            (Analyses_types.C_integer IInt)
+            op1)
+         op2)
+      (Interlang.Exp.binop
+         ~origin
+         Or
+         (Analyses_types.C_integer IInt)
+         (Interlang.Exp.unop
+            ~origin:(Analyses_types.PoT_pred p2)
+            Not
+            (Analyses_types.C_integer IInt)
+            op2)
+         op1)
   | Pnot p ->
     let+ op = predicate_content_to_exp_il p in
     Interlang.Exp.unop ~origin Not (Analyses_types.C_integer IInt) op

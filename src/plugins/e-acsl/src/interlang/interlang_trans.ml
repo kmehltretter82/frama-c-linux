@@ -250,10 +250,14 @@ and compile_context_insensitive {Interlang.enode; origin} =
     in
     M.return (e, None, Some (Analyses_types.C_number, Misc.name_of_binop binop))
   | BinOp {ity; binop = And; op1; op2} ->
+    let name = match origin with
+      | Analyses_types.PoT_pred { pred_content = Piff _ } -> "equiv"
+      | _ -> "and"
+    in
     let* e = compile_conditional
         ~ity
         ~origin
-        ~name:"and"
+        ~name
         op1
         op2
         (Interlang.Exp.mk_false ~origin ())
