@@ -105,7 +105,7 @@ val of_type_offset : Base.t -> typ -> offset -> t
 
 type location = t
 [@@deprecated "Use Locations.t instead"]
-[@@migrate { repl = Locations.t }]
+[@@migrate { repl = Rel.t }]
 
 module Location_Bytes = Addresses.Bytes
 [@@deprecated "Use Addresses.Bytes instead"]
