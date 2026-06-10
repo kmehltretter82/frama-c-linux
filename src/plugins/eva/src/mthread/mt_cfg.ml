@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Mt_cil
 open Mt_types
 open Mt_shared_vars_types
@@ -170,7 +169,6 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
       Mt_self.fatal "No events at subtrace %a" Callstack.pretty callstack
     | Some { Trace.trace_states = states;
              Trace.trace_states_after = states_after } ->
-      assert (Stmt.Map.cardinal states > 0);
       Mt_memory.Types.map_functions_states_to_get_state states,
       Mt_memory.Types.map_functions_states_to_get_state states_after
   in
