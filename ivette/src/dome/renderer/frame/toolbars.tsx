@@ -17,12 +17,12 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import { Icon, SVG } from 'dome/controls/icons';
+import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import './style.css';
 import { GlobalState, useGlobalState } from 'dome/data/states';
-import { Tooltip } from 'dome/dialogs';
+import { Dropdown } from 'dome/dialogs';
 import { LED, LEDstatus } from 'dome/controls/displays';
 
 // --------------------------------------------------------------------------
@@ -139,14 +139,26 @@ export function delPinnedMessage(id: string): void {
   pinnedMessage.setValue(filteredList);
 }
 
-export function IconPinnedMessage(): React.ReactNode {
-  const icon = <Icon id='PIN' kind='warning'
-    className='dome-xIcon-pinned' size={16} />;
+export function PinnedMessages(): React.ReactNode {
   const [ messages, ] = useGlobalState(pinnedMessage);
+  const hasMessages = messages.length > 0;
+  const button = (
+    <Button
+      enabled={hasMessages}
+      className='dome-xIcon-pinned'
+      title={hasMessages ? undefined : 'No pinned messages'}
+    >
+      <SVG
+        id='PIN'
+        offset={-1}
+        className='dome-xIcon-pinned-icon'
+      />
+    </Button>
+  );
 
-  if(messages.length <= 0) return null;
+  if(!hasMessages) return button;
   return (
-    <Tooltip control={icon}>
+    <Dropdown control={button}>
       <div className='dome-xIcon-pinned-content'>
         { messages.map(e =>
             <div key={e.id}>
@@ -161,7 +173,7 @@ export function IconPinnedMessage(): React.ReactNode {
             </div>)
         }
       </div>
-    </Tooltip>
+    </Dropdown>
   );
 }
 
