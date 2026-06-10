@@ -124,7 +124,7 @@ class engine =
           if Z.is_one den then
             Format.fprintf fmt "%s.0" (Z.to_string num)
           else
-            Format.fprintf fmt "(%s.0/%s)"
+            Format.fprintf fmt "(%s/%s)"
               (Z.to_string num)
               (Z.to_string den)
         | `Float ->

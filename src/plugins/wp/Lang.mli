@@ -109,6 +109,7 @@ val tau_of_ctype : typ -> tau
 val tau_of_ltype : logic_type -> tau
 val tau_of_return : logic_type option -> tau
 val tau_of_lfun : lfun -> tau option list -> tau
+val adt_of_field : field -> adt
 val tau_of_field : field -> tau
 val tau_of_record : field -> tau
 

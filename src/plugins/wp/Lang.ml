@@ -290,6 +290,8 @@ let tau_of_field = function
   | Cfield(f, KValue) -> tau_of_ctype f.ftype
   | Cfield(f, KInit) -> init_of_ctype f.ftype
 
+let adt_of_field = function Cfield(f,kd) -> Comp(f.fcomp,kd)
+
 let tau_of_record = function
   | Cfield(f, KValue) -> t_comp f.fcomp
   | Cfield(f, KInit) -> t_init f.fcomp

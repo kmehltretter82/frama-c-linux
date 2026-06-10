@@ -13,16 +13,8 @@ let dkey_compile =
 
 let failwith msg = Format.kasprintf failwith msg
 
-type global = {
-  env: Why3.Env.env;
-  hts: (string, Why3.Ty.tysymbol) Hashtbl.t; (* types *)
-  hls: (string, Why3.Term.lsymbol) Hashtbl.t; (* logics *)
-  hfs: (string, Why3.Term.lsymbol) Hashtbl.t; (* fields *)
-  hcs: (string, Why3.Term.lsymbol) Hashtbl.t; (* records *)
-}
-
 type context = {
-  global : global ;
+  env: Why3.Env.env;
   cluster : Qed.Symbol.cluster ;
 }
 
@@ -34,22 +26,37 @@ type env = {
 
 (** get symbols *)
 
+module SMAP(S : sig type data val name : string end) =
+  WpContext.Index
+    (struct
+      type key = string
+      type data = S.data
+      let name = "ExportWhy3." ^ S.name
+      let compare = String.compare
+      let pretty = Format.pp_print_string
+    end)
+
+module TS = SMAP(struct type data = Why3.Ty.tysymbol let name = "TS" end)
+module LS = SMAP(struct type data = Why3.Term.lsymbol let name = "LS" end)
+module FS = SMAP(struct type data = Why3.Term.lsymbol let name = "FS" end)
+module CS = SMAP(struct type data = Why3.Term.lsymbol let name = "CS" end)
+
 let get_ts ctxt name =
-  let data = Qed.Symbol.find_data ctxt.global.env name in
+  let data = Qed.Symbol.find_data ctxt.env name in
   Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Data.theory data ;
   Qed.Symbol.Data.symbol data
 
 let get_ls ctxt name =
-  let lfun  = Qed.Symbol.find_lfun ctxt.global.env name in
+  let lfun  = Qed.Symbol.find_lfun ctxt.env name in
   Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
   Qed.Symbol.Fun.symbol lfun
 
-let t_app ctxt name tl = Why3.Term.t_app_infer (get_ls ctxt name) tl
+let t_app env name tl = Why3.Term.t_app_infer (get_ls env.context name) tl
 
 let is_prop x =
   match x.Why3.Term.t_ty with
-  | None -> false
-  | Some _ -> true
+  | None -> true
+  | Some _ -> false
 
 let is_ty ty x =
   match x.Why3.Term.t_ty with
@@ -58,19 +65,11 @@ let is_ty ty x =
 
 let is_int = is_ty Why3.Ty.ty_int
 let is_real = is_ty Why3.Ty.ty_real
-let is_bool = is_ty Why3.Ty.ty_bool
 
-let global env = {
-  env ;
-  hls = Hashtbl.create 0 ;
-  hts = Hashtbl.create 0 ;
-  hfs = Hashtbl.create 0 ;
-  hcs = Hashtbl.create 0 ;
-}
-
-let context global name = {
-  global ; cluster = Qed.Symbol.cluster ~path:["wp";"generated"] name ;
-}
+let context env name =
+  let cluster = Qed.Symbol.cluster ~path:["wp";"generated"] name in
+  Qed.Symbol.use cluster Why3.Theory.builtin_theory ;
+  { env ; cluster }
 
 let gamma context = {
   context ;
@@ -114,21 +113,31 @@ let subterms f e =
 
 (* conversion *)
 
-let cc_adt global (adt : Lang.adt) =
+let cc_adt (adt : Lang.adt) =
   try match adt with
     | Qdata a -> Qed.Symbol.Data.symbol a
-    | Atype lt -> Hashtbl.find global.hts (Lang.type_id lt)
-    | Comp(c,KValue) -> Hashtbl.find global.hts (Lang.comp_id c)
-    | Comp(c,KInit) -> Hashtbl.find global.hts (Lang.comp_init_id c)
-  with Not_found -> failwith "Unknown logic type %S" @@ Lang.ADT.fullname adt
+    | Atype lt -> TS.find (Lang.type_id lt)
+    | Comp(c,KValue) -> TS.find (Lang.comp_id c)
+    | Comp(c,KInit) -> TS.find (Lang.comp_init_id c)
+  with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
 
-let cc_lfun global (lf : Lang.lfun) =
+let cc_lfun (lf : Lang.lfun) =
   try match lf with
     | Lang.QFUN f -> Qed.Symbol.Fun.symbol f.e_symbol
-    | LFUN f -> Hashtbl.find global.hls f.m_name
-    | ACSL f -> Hashtbl.find global.hls (Lang.logic_id f)
-    | CTOR c -> Hashtbl.find global.hls (Lang.ctor_id c)
-  with Not_found -> failwith "Unknown logic symbol %S" @@ Lang.Fun.fullname lf
+    | LFUN f -> LS.find f.m_name
+    | ACSL f -> LS.find (Lang.logic_id f)
+    | CTOR c -> LS.find (Lang.ctor_id c)
+  with Not_found -> failwith "Undefined logic symbol %S" @@ Lang.Fun.fullname lf
+
+let cc_field (fd : Lang.field) =
+  try FS.find (Lang.Field.name fd)
+  with Not_found -> failwith "Undefined field symbol %S" @@ Lang.Field.fullname fd
+
+let cc_comp = function
+  | [] -> assert false
+  | (fd,_) :: _ ->
+    try CS.find (Lang.ADT.name @@ Lang.adt_of_field fd)
+    with Not_found -> failwith "Undefined record symbol for field %S" @@ Lang.Field.fullname fd
 
 let is_cassoc = function Qed.Logic.Operator op -> op.associative | _ -> false
 
@@ -140,14 +149,15 @@ let is_assoc = function
 let rec cc_tau ctxt (t:Lang.F.tau) =
   match t with
   | Prop -> None
-  | Bool -> Some Why3.Ty.ty_bool
   | Int -> Some Why3.Ty.ty_int
   | Real -> Some Why3.Ty.ty_real
+  | Bool ->
+    Qed.Symbol.use ctxt.cluster Why3.Theory.bool_theory ; Some Why3.Ty.ty_bool
   | Array(k,v) ->
     let ts = get_ts ctxt "map.Map.map" in
     Some (Why3.Ty.ty_app ts [Option.get (cc_tau ctxt k); Option.get (cc_tau ctxt v)])
   | Data(adt,l) ->
-    let ts = cc_adt ctxt.global adt in
+    let ts = cc_adt adt in
     Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
   | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
   | Record _ -> failwith "Type %a not (yet) convertible" Lang.F.pp_tau t
@@ -219,28 +229,43 @@ let rec cc_trigger env t =
       with Not_found -> failwith "Unbound variable %a" Lang.F.pp_var v
     end
   | Qed.Engine.TgGet(m,k) ->
-    t_app env.context "map.Map.get" [cc_trigger env m;cc_trigger env k]
+    t_app env "map.Map.get" [cc_trigger env m;cc_trigger env k]
   | TgSet(m,k,v) ->
-    t_app env.context "mapMap.set" [cc_trigger env m;cc_trigger env k;cc_trigger env v]
+    t_app env "mapMap.set" [cc_trigger env m;cc_trigger env k;cc_trigger env v]
   | TgFun (f,ts) | TgProp(f,ts) ->
-    Why3.Term.t_app_infer (cc_lfun env.context.global f) (List.map (cc_trigger env) ts)
+    Why3.Term.t_app_infer (cc_lfun f) (List.map (cc_trigger env) ts)
 
 let t_real env u =
   if is_int u then t_app env "real.FromInt.from_int" [u] else u
 
-let t_bool u =
-  if is_prop u then u else Why3.Term.(t_equ u t_bool_true)
+let t_prop env u =
+  if is_prop u then u else
+    begin
+      Qed.Symbol.use env.context.cluster Why3.Theory.bool_theory ;
+      Why3.Term.(t_equ u t_bool_true)
+    end
 
-let t_prop u =
-  if is_bool u then u else Why3.Term.(t_if u t_bool_true t_bool_false)
+let t_bool env u =
+  if is_prop u then
+    begin
+      Qed.Symbol.use env.context.cluster Why3.Theory.bool_theory ;
+      Why3.Term.(t_if u t_bool_true t_bool_false)
+    end
+  else u
 
 let hacked = Why3.Term.Hls.create 0
+
+let pp_oty fmt = function
+  | None -> Format.pp_print_string fmt "PROP"
+  | Some ty -> Why3.Pretty.print_ty fmt ty
+[@@warning "-32"]
 
 let rec cc env t : Why3.Term.term =
   try Lang.F.Tmap.find t env.locals with Not_found ->
   match Lang.F.repr t with
   | Fvar _ -> invalid_arg "missing free variable"
   | Bvar _ -> invalid_arg "missing bound variable"
+  | Apply _ -> assert false
   | Bind(q,_,_) ->
     let xs, t = cc_binders env q t in
     let quant = match q with
@@ -252,19 +277,19 @@ let rec cc env t : Why3.Term.term =
   | True -> Why3.Term.t_true
   | False -> Why3.Term.t_false
   | Kint z -> const_int z
-  | Kreal q -> const_qint env.context q
+  | Kreal q -> const_qint env q
   | Times(z,t) ->
     let u = cc env t in
     if is_int u then
-      t_app env.context "int.Int.(*)" [const_int z; u]
+      t_app env "int.Int.(*)" [const_int z; u]
     else
-      t_app env.context "real.Real.(*)" [const_rint z ; u]
+      t_app env "real.Real.(*)" [const_rint z ; u]
   | Add ts ->
     cc_arith env ~i:"int.Int.(+)" ~r:"real.Real.(+)" ts
   | Mul ts ->
     cc_arith env ~i:"int.Int.(*)" ~r:"real.Real.(*)" ts
   | Mod(a,b) ->
-    t_app env.context "int.ComputerDivision.mod" [ cc_term env a; cc_term env b ]
+    t_app env "int.ComputerDivision.mod" [ cc_term env a; cc_term env b ]
   | Div(a,b) ->
     cc_binop env ~i:"int.ComputerDivision.div" ~r:"real.Real.(/)" a b
   | Lt (a,b) ->
@@ -273,7 +298,7 @@ let rec cc env t : Why3.Term.term =
     cc_binop env ~i:"int.Int.(<=)" ~r:"real.Real.(<=)" a b
   | And ts -> cc_logic env Why3.Term.Tand ts
   | Or ts -> cc_logic env Why3.Term.Tor ts
-  | Imply (hs,p) -> Why3.Term.t_implies (cc_logic env Tand hs) (cc_prop env p)
+  | Imply (hs,p) -> cc_implies env hs (cc_prop env p)
   | Not e -> Why3.Term.t_not @@ cc_prop env e
   | Eq(a,b) -> cc_equal env a b
   | Neq (a,b) -> Why3.Term.t_not @@ cc_equal env a b
@@ -282,16 +307,16 @@ let rec cc env t : Why3.Term.term =
     let a = cc env a in
     let b = cc env b in
     if is_real a || is_real b then
-      Why3.Term.t_if p (t_real env.context a) (t_real env.context b)
+      Why3.Term.t_if p (t_real env a) (t_real env b)
     else if is_prop a || is_prop b then
-      Why3.Term.t_if p (t_prop a) (t_prop b)
+      Why3.Term.t_if p (t_prop env a) (t_prop env b)
     else Why3.Term.t_if p a b
   | Aget(m,k) ->
-    t_app env.context "map.Map.get" [cc_term env m; cc_term env k]
+    t_app env "map.Map.get" [cc_term env m; cc_term env k]
   | Aset(m,k,v) ->
-    t_app env.context "map.Map.set" [cc_term env m; cc_term env k; cc_term env v]
+    t_app env "map.Map.set" [cc_term env m; cc_term env k; cc_term env v]
   | Acst(_,v) ->
-    t_app env.context "map.Const.const" [cc_term env v]
+    t_app env "map.Const.const" [cc_term env v]
   | Fun(f, [x]) when Lang.E.(Cfloat.fq32 @= f) ->
     begin match Lang.F.repr x with
       | Kreal q -> const_float env.context Float32 q
@@ -299,7 +324,7 @@ let rec cc env t : Why3.Term.term =
     end
   | Fun(f, [x]) when Lang.E.(Cfloat.fq64 @= f) ->
     begin match Lang.F.repr x with
-      | Kreal q -> const_float env.context Float32 q
+      | Kreal q -> const_float env.context Float64 q
       | _ -> raise Not_found
     end
   | Fun (fn,ts) ->
@@ -314,7 +339,7 @@ let rec cc env t : Why3.Term.term =
       with Not_found ->
         let ts = List.map (cc_term env) ts in
         let tr = cc_tau env.context @@ Lang.F.typeof t in
-        let ls = cc_lfun env.context.global fn in
+        let ls = cc_lfun fn in
         if is_assoc fn then
           let rec foldop = function
             | [] -> failwith "Empty associative operator"
@@ -324,22 +349,24 @@ let rec cc env t : Why3.Term.term =
         else
           Why3.Term.t_app ls ts tr
     end
-  | Apply _ -> assert false
-  | Rget _ -> assert false
-  | Rdef _ -> assert false
+  | Rget(e,fd) ->
+    Why3.Term.t_app_infer (cc_field fd) [cc_term env e]
+  | Rdef fvs ->
+    let ts = List.map (fun (_,v) -> cc_term env v) fvs in
+    Why3.Term.t_app_infer (cc_comp fvs) ts
 
 and cc_equal env a b =
   let a = cc env a in
   let b = cc env b in
   if is_real a || is_real b then
-    Why3.Term.t_equ (t_real env.context a) (t_real env.context b)
+    Why3.Term.t_equ (t_real env a) (t_real env b)
   else if is_prop a || is_prop b then
-    Why3.Term.t_iff (t_prop a) (t_prop b)
+    Why3.Term.t_iff (t_prop env a) (t_prop env b)
   else Why3.Term.t_equ a b
 
-and cc_prop env a = t_prop @@ cc env a
-and cc_term env a = t_bool @@ cc env a
-and cc_real env a = t_real env.context @@ cc env a
+and cc_prop env a = t_prop env @@ cc env a
+and cc_term env a = t_bool env @@ cc env a
+and cc_real env a = t_real env @@ cc env a
 
 and cc_arith env ~i ~r = function
   | [] -> assert false
@@ -362,14 +389,19 @@ and cc_binop env ~i ~r a b =
   let a = cc env a in
   let b = cc env b in
   if is_int a && is_int b then
-    t_app env.context i [a;b]
+    t_app env i [a;b]
   else
-    t_app env.context r [ t_real env.context a; t_real env.context b ]
+    t_app env r [ t_real env a; t_real env b ]
 
 and cc_logic env op = function
   | [] -> assert false
   | [x] -> cc_prop env x
   | x::xs -> Why3.Term.t_binary op (cc_prop env x) @@ cc_logic env op xs
+
+and cc_implies env hs p =
+  match hs with
+  | [] -> p
+  | h::hs -> Why3.Term.t_implies (cc_prop env h) @@ cc_implies env hs p
 
 and cc_lets env ts =
   List.fold_left
@@ -432,7 +464,7 @@ module CLUSTERS = WpContext.Index
     (struct
       type key = Definitions.cluster
       type data = int * Why3.Theory.theory
-      let name = "ProverWhy3.CLUSTERS"
+      let name = "ExportWhy3.CLUSTERS"
       let compare = Definitions.cluster_compare
       let pretty = Definitions.pp_cluster
     end)
@@ -441,7 +473,6 @@ class visitor ctxt c =
   object(self)
 
     inherit Definitions.visitor c
-
 
     (* --- Files, Theories and Clusters --- *)
 
@@ -453,7 +484,7 @@ class visitor ctxt c =
         let thy =
           let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
           if age < Definitions.cluster_age c then
-            let ctxt = context ctxt.global th_name in
+            let ctxt = context ctxt.env th_name in
             let v = new visitor ctxt c in v#vself;
             let th = Qed.Symbol.close ctxt.cluster in
             if Wp_parameters.(has_dkey print_generated) then
@@ -501,7 +532,7 @@ class visitor ctxt c =
         let map i _ = tvar i in
         let tvs = List.mapi map lt.lt_params in
         let tys = Why3.Ty.create_tysymbol id tvs NoDef in
-        Hashtbl.add ctxt.global.hts name tys ;
+        TS.update name tys ;
         let tvs = List.map Why3.Ty.ty_var tvs in
         let rty = Why3.Ty.ty_app tys tvs in
         let constr = List.length cases in
@@ -512,7 +543,7 @@ class visitor ctxt c =
                let id = Why3.Ident.id_fresh name in
                let ts = List.map (fun t -> Option.get (cc_tau ctxt t)) targs in
                let ls = Why3.Term.create_fsymbol ~constr id ts rty in
-               Hashtbl.add ctxt.global.hls name ls ;
+               LS.update name ls ;
                ls, List.map (fun _ -> None) ts
             ) cases in
         let decl = Why3.Decl.create_data_decl [tys,cases] in
@@ -523,7 +554,7 @@ class visitor ctxt c =
         let map i _ = tvar i in
         let tvs = List.mapi map lt.lt_params in
         let tys = Why3.Ty.create_tysymbol id tvs NoDef in
-        Hashtbl.add ctxt.global.hts name tys ;
+        TS.update name tys ;
         let tvs = List.map Why3.Ty.ty_var tvs in
         let rty = Why3.Ty.ty_app tys tvs in
         let fields,args =
@@ -532,13 +563,13 @@ class visitor ctxt c =
               let id = Why3.Ident.id_fresh name in
               let ty = Option.get (cc_tau ctxt ty) in
               let ls = Why3.Term.create_fsymbol ~proj:true id [rty] ty in
-              Hashtbl.add ctxt.global.hfs name ls ;
+              FS.update name ls ;
               Some ls,ty
             ) fields in
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let ctor = Why3.Term.create_fsymbol ~constr:1 id args rty in
         let decl = Why3.Decl.create_data_decl [tys,[ctor,fields]] in
-        Hashtbl.add ctxt.global.hcs name ctor ;
+        CS.update name ctor ;
         Qed.Symbol.add ctxt.cluster decl
 
     method private on_comp_gen kind c fts =
@@ -559,7 +590,7 @@ class visitor ctxt c =
           let name = Lang.Field.name fd in
           let id = Why3.Ident.id_fresh name in
           let ls = Why3.Term.create_lsymbol ~proj:true id [ty] tf in
-          Hashtbl.add ctxt.global.hfs name ls ;
+          FS.update name ls ;
           (Some ls,Option.get tf) in
         let decl =
           match fts with
@@ -568,9 +599,11 @@ class visitor ctxt c =
             let projs,fields = List.split @@ List.map field fts in
             let id = Why3.Ident.id_fresh name in
             let ctor = Why3.Term.create_fsymbol ~constr:1 id fields ty in
-            Hashtbl.add ctxt.global.hcs name ctor ;
+            CS.update name ctor ;
             Why3.Decl.create_data_decl [ts,[ctor,projs]]
-        in Qed.Symbol.add ctxt.cluster decl
+        in
+        TS.update name ts ;
+        Qed.Symbol.add ctxt.cluster decl
       end
 
     method on_comp = self#on_comp_gen KValue
@@ -611,14 +644,14 @@ class visitor ctxt c =
         match d.d_definition with
         | Logic t ->
           let ls = Why3.Term.create_lsymbol id tvs (cc_tau ctxt t) in
-          Hashtbl.add ctxt.global.hls name ls ;
+          LS.update name ls ;
           let decl = Why3.Decl.create_param_decl ls in
           Qed.Symbol.add ctxt.cluster decl
         | Function(tr,mu,def) ->
           begin
             let tyr = cc_tau ctxt tr in
             let ls = Why3.Term.create_lsymbol id tvs tyr in
-            Hashtbl.add ctxt.global.hls name ls ;
+            LS.update name ls ;
             let env, vars = cc_params env d.d_params in
             let value = compile env tr def in
             match mu with
@@ -632,14 +665,14 @@ class visitor ctxt c =
               let call = Why3.Term.t_app ls (List.map Why3.Term.t_var vars) tyr in
               let decl =
                 Why3.Decl.create_prop_decl Why3.Decl.Paxiom
-                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name ^ "'def")))
+                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name ^ "_def")))
                   (Why3.Term.t_forall_close vars [] (Why3.Term.t_equ call value)) in
               Qed.Symbol.add ctxt.cluster decl
           end
         | Predicate(mu,def) ->
           begin
             let ls = Why3.Term.create_lsymbol id tvs None in
-            Hashtbl.add ctxt.global.hls name ls ;
+            LS.update name ls ;
             let env, vars = cc_params env d.d_params in
             let value = compile env Qed.Logic.Prop @@ Lang.F.e_prop def in
             match mu with
@@ -653,14 +686,14 @@ class visitor ctxt c =
               let call = Why3.Term.t_app_infer ls (List.map Why3.Term.t_var vars) in
               let decl =
                 Why3.Decl.create_prop_decl Why3.Decl.Paxiom
-                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"'def")))
+                  (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"_def")))
                   (Why3.Term.t_forall_close vars [] (Why3.Term.t_iff call value))
               in Qed.Symbol.add ctxt.cluster decl
           end
         | Inductive dcs ->
           (* create predicate symbol *)
           let ls = Why3.Term.create_lsymbol id tvs None in
-          Hashtbl.add ctxt.global.hls name ls ;
+          LS.update name ls ;
           let cases =
             List.map
               (fun (lemma:Definitions.dlemma) ->
@@ -753,8 +786,8 @@ let convert_freevariables ~probes env t =
 let cc_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) goal =
   (* Format.printf "why3_of_qed start@."; *)
   let cg = Definitions.cluster ~id ~title () in
-  let global = global @@ Why3Env.env () in
-  let context = context global name in
+  let env = Why3Env.env () in
+  let context = context env name in
   Wp_parameters.debug ~dkey:dkey_compile "%t"
     begin fun fmt ->
       Format.fprintf fmt "---------------------------------------------@\n" ;

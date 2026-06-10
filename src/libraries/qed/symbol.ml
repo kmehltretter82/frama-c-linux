@@ -137,7 +137,7 @@ let use cluster (thy : Why3.Theory.theory) =
     cluster.uc <- uc
 
 let add cluster decl =
-  cluster.uc <- Why3.Theory.add_decl cluster.uc decl
+  cluster.uc <- Why3.Theory.add_decl cluster.uc ~warn:false decl
 
 (* -------------------------------------------------------------------------- *)
 (* --- Abstract Data Types                                                --- *)
