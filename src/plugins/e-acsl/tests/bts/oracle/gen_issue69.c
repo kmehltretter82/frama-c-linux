@@ -56,29 +56,8 @@ int main(void)
     if (n > 0) __gen_e_acsl_if = 4; else __gen_e_acsl_if = 341;
     __gen_e_acsl_m = __gen_e_acsl_if;
     __gen_e_acsl_forall_2 = 1;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
     __gen_e_acsl_u = 2;
     while (1) {
-      {
-        int __gen_e_acsl_and_2;
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"u",0,
-                                     __gen_e_acsl_u);
-        if (-128 <= __gen_e_acsl_u) {
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"u",0,
-                                       __gen_e_acsl_u);
-          __gen_e_acsl_and_2 = __gen_e_acsl_u < 128;
-        }
-        else __gen_e_acsl_and_2 = 0;
-        __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "-128 <= u < 128";
-        __gen_e_acsl_assert_data_3.file = "issue69.c";
-        __gen_e_acsl_assert_data_3.fct = "main";
-        __gen_e_acsl_assert_data_3.line = 11;
-        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-      }
       if (__gen_e_acsl_u < __gen_e_acsl_m) ; else break;
       if (__gen_e_acsl_u > 0) ;
       else {
