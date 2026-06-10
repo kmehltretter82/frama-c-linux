@@ -63,9 +63,12 @@
     border-color: var(--selected-button-img);
 }
 
-.sidebar-selector-toggle {
+.sidebar-selector-settings {
+    border-left: none;
+}
+
+.sidebar-selector-footer {
     margin-top: auto;
-    border-top: solid 1px var(--border-discrete);
 }
 
 .component-info {

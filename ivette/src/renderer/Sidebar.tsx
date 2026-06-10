@@ -18,6 +18,7 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { SidebarProps, SIDEBAR } from 'ivette';
 import * as State from 'ivette/state';
+import { showOptionsModal } from 'frama-c/options';
 
 export const DEFAULT_SIDEBAR_PANEL_WIDTH = 320;
 const SIDEBAR_TOGGLE_MENU_ID = 'ivette.sidebar.toggle';
@@ -166,6 +167,27 @@ function Selector(props: SelectorProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Sidebar Settings Selector                                          --- */
+/* -------------------------------------------------------------------------- */
+
+function SettingsSelector(): JSX.Element {
+  const className = classes(
+    'sidebar-selector',
+    'sidebar-selector-settings',
+    'dome-color-frame',
+  );
+  return (
+    <div
+      className={className}
+      title="Open Frama-C parameters"
+      onClick={showOptionsModal}
+    >
+      <Icon size={20} className="sidebar-selector-icon" id="SETTINGS" />
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Sidebar Toggle Selector                                            --- */
 /* -------------------------------------------------------------------------- */
 
@@ -177,7 +199,6 @@ function ToggleSelector(props: SidebarPanel): JSX.Element {
   const { visible, setVisible } = props;
   const className = classes(
     'sidebar-selector',
-    'sidebar-selector-toggle',
     'dome-color-frame',
     visible && 'sidebar-selector-selected',
   );
@@ -219,7 +240,10 @@ export function Selectors(props: SidebarState): JSX.Element {
   return (
     <div className={itemsClassName}>
       <div className={selectorsClasses}>{selectors}</div>
-      <ToggleSelector {...panel} />
+      <div className="sidebar-selector-footer">
+        <SettingsSelector />
+        <ToggleSelector {...panel} />
+      </div>
     </div>
   );
 }
