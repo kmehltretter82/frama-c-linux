@@ -474,8 +474,7 @@ and apply (engine : #engine) fmt f x es =
       f engine#pp_atom x (export engine) es
 
 (* TODO[LC] specialized export of concat and elements *)
-let _rewriter_concat es tau =
-  match es with
+let _cc_concat tau = function
   | [] -> v_nil (Option.get tau)
   | e::es ->
     begin match repr e with

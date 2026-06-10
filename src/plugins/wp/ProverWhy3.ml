@@ -50,7 +50,7 @@ let get_ls ctxt name =
   Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
   Qed.Symbol.Fun.symbol lfun
 
-let t_app env name tl = Why3.Term.t_app_infer (get_ls env name) tl
+let t_app ctxt name tl = Why3.Term.t_app_infer (get_ls ctxt name) tl
 
 let is_prop x =
   match x.Why3.Term.t_ty with
@@ -240,6 +240,8 @@ let t_bool u =
 let t_prop u =
   if is_bool u then u else Why3.Term.(t_if u t_bool_true t_bool_false)
 
+let hacked = Why3.Term.Hls.create 0
+
 let rec cc env t : Why3.Term.term =
   try Lang.F.Tmap.find t env.locals with Not_found ->
   match Lang.F.repr t with
@@ -307,17 +309,27 @@ let rec cc env t : Why3.Term.term =
       | _ -> raise Not_found
     end
   | Fun (fn,ts) ->
-    let tr = cc_tau env.context @@ Lang.F.typeof t in
-    let ts = List.map (cc_term env) ts in
-    let ls = cc_lfun env.context.global fn in
-    if is_assoc fn then
-      let rec foldop = function
-        | [] -> failwith "Empty associative operator"
-        | [a] -> a
-        | a::ops -> Why3.Term.t_app ls [a;foldop ops] tr
-      in foldop ts
-    else
-      Why3.Term.t_app ls ts tr
+    begin
+      try
+        let ls = match fn with
+          | Lang.QFUN f -> Qed.Symbol.Fun.symbol f.e_symbol
+          | _ -> raise Not_found in
+        let cc = Why3.Term.Hls.find hacked ls in
+        let tr = Lang.F.typeof t in
+        cc env tr ts
+      with Not_found ->
+        let ts = List.map (cc_term env) ts in
+        let tr = cc_tau env.context @@ Lang.F.typeof t in
+        let ls = cc_lfun env.context.global fn in
+        if is_assoc fn then
+          let rec foldop = function
+            | [] -> failwith "Empty associative operator"
+            | [a] -> a
+            | a::ops -> Why3.Term.t_app ls [a;foldop ops] tr
+          in foldop ts
+        else
+          Why3.Term.t_app ls ts tr
+    end
   | Apply _ -> assert false
   | Rget _ -> assert false
   | Rdef _ -> assert false
@@ -675,6 +687,26 @@ class visitor ctxt c =
       end
 
   end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Public API                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module CC =
+struct
+  type nonrec env = env
+  let tvar = tvar
+  let find_ts env = get_ts env.context
+  let find_ls env = get_ls env.context
+  let cc_tau env = cc_tau env.context
+  let cc_term = cc_term
+  let cc_pred env p = cc_prop env @@ Lang.F.e_prop p
+  let hack lf cc =
+    match lf with
+    | Lang.QFUN f ->
+      Why3.Term.Hls.replace hacked (Qed.Symbol.Fun.symbol f.e_symbol) cc
+    | _ -> invalid_arg "Wp.ProverWhy3.CC.hack"
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Goal Compilation                                                   --- *)
