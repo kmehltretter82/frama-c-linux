@@ -325,21 +325,21 @@ ptests_config header_spec=.ignore
 /src/kernel_services/visitors/visitor_behavior.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/visitors/visitor_behavior.mli header_spec=CEA_INRIA_LGPL
 
-/src/libraries/datatype/unmarshal.ml header_spec=INRIA_BSD
-/src/libraries/datatype/unmarshal.mli header_spec=INRIA_BSD
-/src/libraries/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
-/src/libraries/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
-/src/libraries/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
-/src/libraries/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
-/src/libraries/utils/escape.ml header_spec=CIL
-/src/libraries/utils/escape.mli header_spec=CIL
-/src/libraries/utils/hptmap.ml header_spec=MODIFIED_MENHIR
-/src/libraries/utils/hptmap.mli header_spec=MODIFIED_MENHIR
-/src/libraries/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
-/src/libraries/utils/rangemap.ml header_spec=OCAML_STDLIB
-/src/libraries/utils/rangemap.mli header_spec=OCAML_STDLIB
-/src/libraries/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
-/src/libraries/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
+/lib/datatype/unmarshal.ml header_spec=INRIA_BSD
+/lib/datatype/unmarshal.mli header_spec=INRIA_BSD
+/lib/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
+/lib/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
+/lib/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
+/lib/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
+/lib/utils/escape.ml header_spec=CIL
+/lib/utils/escape.mli header_spec=CIL
+/lib/utils/hptmap.ml header_spec=MODIFIED_MENHIR
+/lib/utils/hptmap.mli header_spec=MODIFIED_MENHIR
+/lib/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
+/lib/utils/rangemap.ml header_spec=OCAML_STDLIB
+/lib/utils/rangemap.mli header_spec=OCAML_STDLIB
+/lib/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
+/lib/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
 
 /tools/lint/UTF8.ml header_spec=MODIFIED_CAMOMILE
 
