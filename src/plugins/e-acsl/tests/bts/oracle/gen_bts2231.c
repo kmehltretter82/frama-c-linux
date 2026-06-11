@@ -36,7 +36,7 @@ int main(void)
     __gmpz_add(__gen_e_acsl_add,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_A),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    __gmpz_init_set_si(__gen_e_acsl__3,(long)(-1));
+    __gmpz_init_set_si(__gen_e_acsl__3,-1L);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"A",0,A);

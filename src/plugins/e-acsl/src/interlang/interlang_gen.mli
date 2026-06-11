@@ -73,5 +73,6 @@ end
 
 type 'a m = 'a M.t (** an abbreviation for the monad type *)
 
+val of_unop: Cil_types.unop -> Interlang.unop
 val of_binop: Cil_types.binop -> Interlang.binop
 val of_relation: Cil_types.relation -> Interlang.binop

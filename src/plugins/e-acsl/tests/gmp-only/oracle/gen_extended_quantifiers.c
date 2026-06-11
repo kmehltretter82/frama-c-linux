@@ -299,29 +299,27 @@ int main(void)
   /*@ assert \product(1, 10, \lambda integer k; k) == 3628800; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__19;
-    __e_acsl_mpz_t __gen_e_acsl_neg;
+    __e_acsl_mpz_t __gen_e_acsl__20;
     __e_acsl_mpz_t __gen_e_acsl_k_5;
     __e_acsl_mpz_t __gen_e_acsl_one_5;
     int __gen_e_acsl_cond_5;
     __e_acsl_mpz_t __gen_e_acsl_lambda_5;
     __e_acsl_mpz_t __gen_e_acsl_accumulator_5;
-    __e_acsl_mpz_t __gen_e_acsl__20;
+    __e_acsl_mpz_t __gen_e_acsl__21;
     int __gen_e_acsl_eq_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__19,10L);
-    __gmpz_init(__gen_e_acsl_neg);
-    __gmpz_neg(__gen_e_acsl_neg,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
+    __gmpz_init_set_str(__gen_e_acsl__19,"-10",10);
+    __gmpz_init_set_si(__gen_e_acsl__20,10L);
     __gmpz_init_set_si(__gen_e_acsl_one_5,1L);
     __gen_e_acsl_cond_5 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_5,0L);
     __gmpz_init_set_si(__gen_e_acsl_accumulator_5,1L);
     __gmpz_init_set(__gen_e_acsl_k_5,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg));
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
     while (1) {
       __gen_e_acsl_cond_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_k_5),
-                                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
+                                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__20));
       if (__gen_e_acsl_cond_5 > 0) break;
       else {
         __gmpz_set(__gen_e_acsl_lambda_5,
@@ -334,9 +332,9 @@ int main(void)
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_one_5));
       }
     }
-    __gmpz_init_set_si(__gen_e_acsl__20,0L);
+    __gmpz_init_set_si(__gen_e_acsl__21,0L);
     __gen_e_acsl_eq_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_5),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__20));
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__21));
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_5,
                                  "\\product(-10, 10, \\lambda integer k; k)",
                                  0,
@@ -350,12 +348,12 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_eq_6 == 0,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gmpz_clear(__gen_e_acsl__19);
-    __gmpz_clear(__gen_e_acsl_neg);
+    __gmpz_clear(__gen_e_acsl__20);
     __gmpz_clear(__gen_e_acsl_k_5);
     __gmpz_clear(__gen_e_acsl_one_5);
     __gmpz_clear(__gen_e_acsl_lambda_5);
     __gmpz_clear(__gen_e_acsl_accumulator_5);
-    __gmpz_clear(__gen_e_acsl__20);
+    __gmpz_clear(__gen_e_acsl__21);
   }
   /*@ assert \product(-10, 10, \lambda integer k; k) == 0; */ ;
   __retres = 0;

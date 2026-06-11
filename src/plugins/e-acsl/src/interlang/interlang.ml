@@ -9,26 +9,32 @@
 open Cil_types
 open Analyses_datatype
 
-
 type binop =
-  | Plus | Minus | Mult | Div | Mod
+  | Plus | Minus | Mult | Div | Mod (* arithmetic operators *)
   | Lt | Gt | Le | Ge | Eq | Ne (* arithmetic comparison *)
+  | And | Or (* logical operators *)
+
+type unop =
+  | Neg   (* arithmetic operator *)
+  | Not  (* Logical operator *)
 
 type exp =
   {
     enode : exp_node;
     rtes : rte list;
-    origin : term option
+    origin : Pred_or_term.t
   }
 
 and exp_node =
-  | True
-  | False
-  | Integer of {ity : Analyses_types.number_ty; n : Z.t}
+  | Integer of {ity : Number_ty.t; n : Z.t}
+  | UnOp of unop_node
   | BinOp of binop_node
+  | If of {ity : Number_ty.t; op1 : exp; op2 : exp; op3 : exp}
   | Lval of lval
   | SizeOf of typ
   | Coerce of {coerce_to : typ; coerced : exp}
+
+and unop_node = {ity : Number_ty.t; unop : unop; op : exp}
 
 and binop_node = {ity : Number_ty.t; binop : binop; op1 : exp; op2 : exp}
 
@@ -44,10 +50,6 @@ and offset =
   | Index of exp * offset
 
 and rte = {rnode : exp_node; rorigin : predicate}
-
-let of_bool = function
-  | true -> True
-  | false -> False
 
 module Pretty = struct
   open Format
@@ -65,7 +67,15 @@ module Pretty = struct
        | Le -> "<="
        | Ge -> ">="
        | Eq -> "=="
-       | Ne -> "!=")
+       | Ne -> "!="
+       | And -> "&&"
+       | Or -> "||")
+
+  let pp_unop fmt u =
+    fprintf fmt "%s"
+      (match u with
+       | Neg -> "-"
+       | Not -> "!")
 
   let rec pp_lhost fmt = function
     | Var vi -> Printer.pp_varinfo fmt vi
@@ -85,12 +95,15 @@ module Pretty = struct
   and pp_exp fmt {enode} = pp_exp_node fmt enode
 
   and pp_exp_node fmt = function
-    | True -> fprintf fmt "true"
-    | False -> fprintf fmt "false"
     | Integer {ity; n} ->
       fprintf fmt "@[%a@]@ :@ @[%a@]" Z.pretty n Analyses_types.pp_number_ty ity;
+    | UnOp {unop; op} ->
+      fprintf fmt "@[%a@]@%a@" pp_unop unop pp_exp op
     | BinOp {binop; op1; op2} ->
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
+    | If {op1; op2; op3} ->
+      fprintf fmt "if %a@ then @[%a@]@ else @[%a@]"
+        pp_exp op1 pp_exp op2 pp_exp op3
     | Lval lval -> pp_lval fmt lval
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
     | Coerce {coerce_to = ty; coerced = exp} ->
@@ -99,20 +112,26 @@ module Pretty = struct
   let pp_rtes fmt rtes =
     let pp_rte fmt rte = fprintf fmt "%a" pp_exp_node rte.rnode in
     Pretty_utils.pp_list ~pre:"[" ~suf:"]" ~sep:";@ " pp_rte fmt rtes
-
 end
-
 
 module Optimization = struct
 
   module Aux = struct
-    let modulo_coerce e1 e2 =
-      let under_coerce e = match e.enode with
-        | Coerce {coerced = exp} -> exp
-        | _ -> e
-      in
-      (under_coerce e1).enode, (under_coerce e2).enode
+    let of_bool = function
+      | true -> Integer {n = Z.one; ity = C_integer IInt}
+      | false -> Integer {n = Z.zero; ity = C_integer IInt}
+
+    let under_coerce e = match e.enode with
+      | Coerce {coerced = exp} -> exp
+      | _ -> e
+
+    let modulo_coerce e1 e2 = (under_coerce e1).enode, (under_coerce e2).enode
   end
+
+  let neg ~ity e =
+    match (Aux.under_coerce e).enode with
+    | Integer {n = z} -> Some (Integer {n = Z.neg z; ity})
+    | _ -> None
 
   let plus ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
@@ -154,66 +173,114 @@ module Optimization = struct
 
   let lt e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.lt z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (Aux.of_bool @@ Z.lt z1 z2)
     | _ -> None
 
   let gt e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.gt z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (Aux.of_bool @@ Z.gt z1 z2)
     | _ -> None
 
   let le e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.leq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (Aux.of_bool @@ Z.leq z1 z2)
     | _ -> None
 
   let ge e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.geq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (Aux.of_bool @@ Z.geq z1 z2)
     | _ -> None
 
   let eq e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.equal z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (Aux.of_bool @@ Z.equal z1 z2)
     | _ -> None
 
   let ne e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ not @@ Z.equal z1 z2)
+    | Integer {n = z1}, Integer {n = z2} ->
+      Some (Aux.of_bool @@ not @@ Z.equal z1 z2)
+    | _ -> None
+
+  let conjunction e1 e2 =
+    match Aux.modulo_coerce e1 e2 with
+    | Integer {n = z}, _ when z = Z.zero -> Some (Aux.of_bool false)
+    | Integer {n = z}, _ when z != Z.zero -> Some e2.enode
+    | _ -> None
+
+  let disjunction e1 e2 =
+    match Aux.modulo_coerce e1 e2 with
+    | Integer {n = z}, _ when z != Z.zero -> Some (Aux.of_bool true)
+    | Integer {n = z}, _ when z = Z.zero-> Some e2.enode
+    | _ -> None
+
+  let negation e =
+    match (Aux.under_coerce e).enode with
+    | Integer {n = z} when z != Z.zero -> Some (Aux.of_bool false)
+    | Integer {n = z} when z = Z.zero -> Some (Aux.of_bool true)
+    | _ -> None
+
+  let conditional e1 e2 e3 =
+    match (Aux.under_coerce e1).enode with
+    | Integer {n = z} when z != Z.zero -> Some e2.enode
+    | Integer {n = z} when z = Z.zero -> Some e3.enode
     | _ -> None
 end
-
 module Exp_node = struct
-  let of_binop ~bop ~ity =
+
+  let of_unop ~uop ~ity e =
+    let open Optimization in
+    match uop with
+    | Neg -> neg ~ity e
+    | Not -> negation e
+
+  let of_binop ~bop ~ity e1 e2 =
     let open Optimization in
     match bop with
-    | Plus -> plus ~ity
-    | Minus -> minus ~ity
-    | Mult -> mult ~ity
-    | Div -> div ~ity
-    | Mod -> modulo ~ity
-    | Lt -> lt
-    | Gt -> gt
-    | Le -> le
-    | Ge -> ge
-    | Eq -> eq
-    | Ne -> ne
+    | Plus -> plus ~ity e1 e2
+    | Minus -> minus ~ity e1 e2
+    | Mult -> mult ~ity e1 e2
+    | Div -> div ~ity e1 e2
+    | Mod -> modulo ~ity e1 e2
+    | Lt -> lt e1 e2
+    | Gt -> gt e1 e2
+    | Le -> le e1 e2
+    | Ge -> ge e1 e2
+    | Eq -> eq e1 e2
+    | Ne -> ne e1 e2
+    | And -> conjunction e1 e2
+    | Or -> disjunction e1 e2
+
+  let of_conditional = Optimization.conditional
 end
 
 module Exp = struct
   module Aux = struct
-    let of_exp_node ?origin enode = {enode; rtes = []; origin}
+    let of_exp_node ~origin enode = {enode; rtes = []; origin}
   end
 
-  let lval ?origin lval = Aux.of_exp_node ?origin @@ Lval lval
+  let lval ~origin lval = Aux.of_exp_node ~origin @@ Lval lval
   let integer ~origin ~ity n = Aux.of_exp_node ~origin @@ Integer {ity; n}
   let sizeof ~origin ty = Aux.of_exp_node ~origin @@ SizeOf ty
-  let rte rte = Aux.of_exp_node ?origin:None rte.rnode
+  let rte rte =
+    Aux.of_exp_node ~origin:(Analyses_types.PoT_pred rte.rorigin) rte.rnode
 
-  let mk_true ?origin () = Aux.of_exp_node ?origin True
-  let mk_false ?origin () = Aux.of_exp_node ?origin False
+  let mk_true ~origin () = integer ~origin ~ity:(C_integer IInt) Z.one
+  let mk_false ~origin () = integer ~origin ~ity:(C_integer IInt) Z.zero
 
-  let binop ?origin bop ity e1 e2 =
+  let conditional ~origin ity e1 e2 e3 =
+    let org = If {ity; op1 = e1; op2 = e2; op3 = e3} in
+    let res = if Options.O.get () = 0 then org
+      else match Exp_node.of_conditional e1 e2 e3 with
+        | Some e ->
+          Options.debug ~dkey:Options.Dkey.interlang_print_opt ~level:3
+            "@[%a@] => @[%a@]"
+            Pretty.pp_exp_node org Pretty.pp_exp_node e;
+          e
+        | None -> org
+    in Aux.of_exp_node ~origin res
+
+  let binop ~origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
     let res = if Options.O.get () < 1 then org
       else match Exp_node.of_binop ~bop ~ity e1 e2 with
@@ -223,17 +290,25 @@ module Exp = struct
             Pretty.pp_exp_node org Pretty.pp_exp_node e;
           e
         | None -> org
-    in Aux.of_exp_node ?origin res
+    in Aux.of_exp_node ~origin res
 
-  let coerce ?origin ~coerce_to exp =
-    let origin =
-      try List.find Option.is_some [origin; exp.origin]
-      with Not_found -> None
-    in
+  let unop ~origin uop ity e =
+    let org = UnOp {unop = uop; ity; op = e} in
+    let res = if Options.O.get () = 0 then org
+      else match Exp_node.of_unop ~uop ~ity e with
+        | Some e ->
+          Options.debug ~dkey:Options.Dkey.interlang_print_opt ~level:3
+            "@[%a@] => @[%a@]"
+            Pretty.pp_exp_node org Pretty.pp_exp_node e;
+          e
+        | None -> org
+    in Aux.of_exp_node ~origin res
+
+  let coerce ~origin ~coerce_to exp =
     match exp with
     | {enode = Coerce c; origin} as exp -> (* collapse stacked coercions *)
       {exp with origin; enode = Coerce {c with coerce_to}}
-    | exp -> Aux.of_exp_node ?origin @@ Coerce {coerce_to; coerced = exp}
+    | exp -> Aux.of_exp_node ~origin @@ Coerce {coerce_to; coerced = exp}
 end
 
 module Rte = struct

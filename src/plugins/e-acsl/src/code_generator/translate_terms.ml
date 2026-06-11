@@ -48,6 +48,13 @@ module Translate_predicates = struct
   let to_exp ~adata ?inplace ?name kf ?rte env p =
     !to_exp_ref ~adata ?inplace ?name kf ?rte env p
 
+  let to_exp_il_ref :
+    (rte:bool -> predicate Interlang_trans.il_compiler) ref
+    = ref @@ fun ~rte:_ _p ->
+    Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_il_ref"
+
+  let to_exp_il p = !to_exp_il_ref p
+
   let rte_guards_to_exp_old_ref
     : (loc:location ->
        kf:kernel_function ->
@@ -78,7 +85,7 @@ let constant_to_exp_il t c =
   | Integer (n, _) ->
     let* logic_env = M.read_logic_env in
     let ity = Typing.get_number_ty ~logic_env t in
-    M.return @@ IL.Exp.integer ~origin:t ~ity n
+    M.return @@ IL.Exp.integer ~origin:(PoT_term t) ~ity n
   | _ -> M.not_covered Printer.pp_term t
 
 let constant_to_exp_old ~loc env t c =
@@ -344,6 +351,31 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   | _ ->
     assert false
 
+and context_insensitive_binop_to_exp_il ~origin bop t1 t2 =
+  let* logic_env = M.read_logic_env in
+  let oity =
+    match bop with
+    | PlusA | MinusA | Mult | Div | Mod ->
+      let ty = Typing.get_typ ~logic_env origin in
+      if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
+        assert (Logic_utils.is_integral_type origin.term_type);
+      Some (Typing.get_number_ty ~logic_env origin)
+    | LAnd | LOr ->
+      Some (Typing.get_number_ty ~logic_env origin)
+    | Lt | Gt | Le | Ge | Eq | Ne ->
+      Some (Typing.join
+              (Typing.get_effective_ty ~logic_env t1)
+              (Typing.get_effective_ty ~logic_env t2))
+    | _ -> None
+  in
+  match oity with
+  | None -> M.not_covered Printer.pp_term origin
+  | Some ity ->
+    let* e1 = to_exp_il t1 in
+    let+ e2 = to_exp_il t2 in
+    Interlang.Exp.binop
+      ~origin:(PoT_term origin) (Interlang_gen.of_binop bop) ity e1 e2
+
 and context_insensitive_term_to_exp_il ?inplace t =
   ignore inplace; (* will be required for implementing Tat *)
   let t = Logic_normalizer.get_term t in
@@ -351,37 +383,43 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TConst c -> constant_to_exp_il t c
   | TLval lv ->
     let* l = tlval_to_lval_il lv in
-    M.return @@ IL.Exp.lval ~origin:t l
-  | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:t ty
-  | TCast (true, _, t) -> to_exp_il t
-  | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
+    M.return @@ IL.Exp.lval ~origin:(PoT_term t) l
+  | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:(PoT_term t) ty
+  | Tif (p, t1, t2) ->
     let* logic_env = M.read_logic_env in
-    let* e1 = to_exp_il t1 in
-    let+ e2 = to_exp_il t2 in
-    let ity = Typing.get_number_ty ~logic_env t in
+    let* e1 = Translate_predicates.to_exp_il ~rte:true p in
+    let* e2 = to_exp_il t1 in
+    let+ e3 = to_exp_il t2 in
+    Interlang.Exp.conditional
+      ~origin:(PoT_term t) (Typing.get_number_ty ~logic_env t) e1 e2 e3
+  | TCast (true, _, t) -> context_insensitive_term_to_exp_il t
+  | TBinOp(bop, t1, t2) ->
+    context_insensitive_binop_to_exp_il ~origin:t bop t1 t2
+  | TUnOp (Neg, t') ->
+    let* logic_env = M.read_logic_env in
     let ty = Typing.get_typ ~logic_env t in
     if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
       assert (Logic_utils.is_integral_type t.term_type);
-    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2
-  | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
-    let* logic_env = M.read_logic_env in
-    let ity =
-      Typing.join
-        (Typing.get_effective_ty ~logic_env t1)
-        (Typing.get_effective_ty ~logic_env t2)
-    in
-    let* e1 = to_exp_il t1 in
-    let+ e2 = to_exp_il t2 in
-    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2
-  | TBinOp (Div | Mod as binop, t1, t2) ->
-    let* logic_env = M.read_logic_env in
-    let ty = Typing.get_typ ~logic_env t in
-    let* e1 = to_exp_il t1 in
-    let+ e2 = to_exp_il t2 in
     let ity = Typing.get_number_ty ~logic_env t in
-    if not (Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty) then
-      assert (Logic_utils.is_integral_type t.term_type);
-    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop binop) ity e1 e2
+    let+ e = to_exp_il t' in
+    Interlang.Exp.unop ~origin:(PoT_term t) (Interlang_gen.of_unop Neg) ity e
+  | TUnOp (LNot, t') ->
+    let origin = PoT_term t in
+    let* logic_env = M.read_logic_env in
+    let ity = Typing.get_effective_ty ~logic_env t in
+    begin match ity with
+      | Gmpz ->
+        (* [!t] is converted into [t == 0] *)
+        let zero = Logic_const.tinteger 0 in
+        Typing.preprocess_term ~use_gmp_opt:true ~ctx:ity ~logic_env zero;
+        let* e = to_exp_il t' in
+        let+ zero = to_exp_il zero in
+        Interlang.Exp.binop ~origin Eq ity e zero
+      | C_integer _ ->
+        let+ e = to_exp_il t' in
+        Interlang.Exp.unop ~origin (Interlang_gen.of_unop LNot) ity e
+      | _ -> M.not_covered Printer.pp_term t
+    end
   | _ -> M.not_covered Printer.pp_term t
 
 and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
@@ -977,7 +1015,7 @@ and to_exp_il ?inplace t =
   let e = IL.Helpers.attach_rtes rte_guards e in
   let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
     | None -> e
-    | Some typ -> IL.Exp.coerce ?origin:e.origin ~coerce_to:typ e
+    | Some typ -> IL.Exp.coerce ~origin:e.origin ~coerce_to:typ e
   in
   Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a (%a)"
     Profile.pretty (Env.Logic_env.get_profile env)

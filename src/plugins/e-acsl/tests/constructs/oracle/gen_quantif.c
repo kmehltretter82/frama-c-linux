@@ -1309,50 +1309,35 @@ int __gen_e_acsl_implicitly_labelled_here(void)
                                     "__gen_e_acsl_i_15",0,__gen_e_acsl_i_15);
       __gen_e_acsl_assert_data_37.blocking = 1;
       __gen_e_acsl_assert_data_37.kind = "RTE";
-      __gen_e_acsl_assert_data_37.pred_txt = "(int)__gen_e_acsl_i_15 < 2";
+      __gen_e_acsl_assert_data_37.pred_txt = "__gen_e_acsl_i_15 < 2";
       __gen_e_acsl_assert_data_37.file = "quantif.i";
       __gen_e_acsl_assert_data_37.fct = "implicitly_labelled_here";
       __gen_e_acsl_assert_data_37.line = 18;
       __gen_e_acsl_assert_data_37.name = "index_bound";
-      __e_acsl_assert((int)__gen_e_acsl_i_15 < 2,
-                      & __gen_e_acsl_assert_data_37);
+      __e_acsl_assert(__gen_e_acsl_i_15 < 2U,& __gen_e_acsl_assert_data_37);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_37);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_38 =
         {.values = (void *)0};
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_38,
-                                    "__gen_e_acsl_i_15",0,__gen_e_acsl_i_15);
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[__gen_e_acsl_i_15],
+                                              _Alignof(int));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_38,
+                                     "alignof(int)",0,_Alignof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_38,
+                                   "a[__gen_e_acsl_i_15]",
+                                   (void *)a[__gen_e_acsl_i_15]);
       __gen_e_acsl_assert_data_38.blocking = 1;
       __gen_e_acsl_assert_data_38.kind = "RTE";
-      __gen_e_acsl_assert_data_38.pred_txt = "0 <= (int)__gen_e_acsl_i_15";
+      __gen_e_acsl_assert_data_38.pred_txt = "\\aligned(a[__gen_e_acsl_i_15],alignof(int))";
       __gen_e_acsl_assert_data_38.file = "quantif.i";
       __gen_e_acsl_assert_data_38.fct = "implicitly_labelled_here";
       __gen_e_acsl_assert_data_38.line = 18;
-      __gen_e_acsl_assert_data_38.name = "index_bound";
-      __e_acsl_assert(0 <= (int)__gen_e_acsl_i_15,
-                      & __gen_e_acsl_assert_data_38);
+      __gen_e_acsl_assert_data_38.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_38);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_38);
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_39 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[(int)__gen_e_acsl_i_15],
-                                              _Alignof(int));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_39,
-                                     "alignof(int)",0,_Alignof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_39,
-                                   "a[(int)__gen_e_acsl_i_15]",
-                                   (void *)a[(int)__gen_e_acsl_i_15]);
-      __gen_e_acsl_assert_data_39.blocking = 1;
-      __gen_e_acsl_assert_data_39.kind = "RTE";
-      __gen_e_acsl_assert_data_39.pred_txt = "\\aligned(a[(int)__gen_e_acsl_i_15],alignof(int))";
-      __gen_e_acsl_assert_data_39.file = "quantif.i";
-      __gen_e_acsl_assert_data_39.fct = "implicitly_labelled_here";
-      __gen_e_acsl_assert_data_39.line = 18;
-      __gen_e_acsl_assert_data_39.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_39);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_39);
-      __gen_e_acsl_valid_5 = __e_acsl_valid((void *)a[(int)__gen_e_acsl_i_15],
+      __gen_e_acsl_valid_5 = __e_acsl_valid((void *)a[__gen_e_acsl_i_15],
                                             sizeof(int),
-                                            (void *)a[(int)__gen_e_acsl_i_15],
-                                            (void *)(& a[(int)__gen_e_acsl_i_15]));
+                                            (void *)a[__gen_e_acsl_i_15],
+                                            (void *)(& a[__gen_e_acsl_i_15]));
       if (__gen_e_acsl_valid_5) ;
       else {
         __gen_e_acsl_forall_19 = 0;

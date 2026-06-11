@@ -38,7 +38,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl__2;
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl_mod;
-    long __gen_e_acsl__3;
+    long __gen_e_acsl_mod_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_,2L);
     __gmpz_init(__gen_e_acsl_x);
@@ -55,7 +55,7 @@ int main(void)
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __gen_e_acsl__3 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
+    __gen_e_acsl_mod_2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
     __e_acsl_assert_register_ulonglong(& __gen_e_acsl_assert_data,"x",0,x);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
@@ -63,7 +63,7 @@ int main(void)
     __gen_e_acsl_assert_data.file = "longlong.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 19;
-    __e_acsl_assert(__gen_e_acsl__3 == 1L,& __gen_e_acsl_assert_data);
+    __e_acsl_assert(__gen_e_acsl_mod_2 == 1L,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_x);

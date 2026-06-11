@@ -49,8 +49,6 @@ module M = struct
     with_env (fun env -> {env with adata_register = false}) m
 
   let with_loc loc m = with_env (fun env -> {env with loc}) m
-  let maybe_with_term_loc t_opt m =
-    match t_opt with | None -> m | Some t -> with_loc t.Cil_types.term_loc m
 
   let do_if_registering_adata m =
     let* env = read in
@@ -61,9 +59,21 @@ module M = struct
     let e, env = f env in
     let* () = set {state with env} in
     return e
+
+  let push_env a = modifying_env @@ fun env -> a, Env.push env
+
+  let with_generating_adata m =
+    Assert.push_pending_register_data ();
+    let* res = m in
+    modifying_env @@ fun env ->
+    res, Assert.do_pending_register_data env
 end
 
 open M.Operators
+
+let compile_unop = function
+  | Interlang.Neg -> Cil_types.Neg
+  | Interlang.Not -> LNot
 
 let compile_binop = function
   | Interlang.Plus -> Cil_types.PlusA
@@ -77,6 +87,8 @@ let compile_binop = function
   | Ge -> Ge
   | Eq -> Eq
   | Ne -> Ne
+  | And -> LAnd
+  | Or -> LOr
 
 let assert_register_term ~loc ?force e t =
   M.do_if_registering_adata @@
@@ -88,11 +100,8 @@ let rec compile ?(flush_rtes=false) exp =
   match cast_info with (* [cast_info] specifies type type we cast from. *)
   | Some (strnum, name) ->
     let name = if name = "" then None else Some name in
-    let* {kf; loc} = M.read in
-    let loc = match exp.origin with
-      | Some t -> t.term_loc
-      | None -> loc
-    in
+    let* {kf} = M.read in
+    let loc = Misc.get_loc_from_pot exp.origin in
     M.modifying_env (fun env ->
         Typed_number.add_cast ~loc
           ?name
@@ -100,7 +109,7 @@ let rec compile ?(flush_rtes=false) exp =
           kf
           coerce
           strnum
-          exp.origin
+          (Misc.get_term_from_pot exp.origin)
           e)
   | None -> M.return e (* no cast required *)
 
@@ -108,11 +117,48 @@ and compile_with_rtes ?(flush_rtes=false) exp =
   let res = M.update exp.rtes @@ compile_context_insensitive exp in
   if flush_rtes then compile_rte_guards res else res
 
+and compile_conditional ~ity ~origin ?(name = "if") op1 op2 op3 =
+  let* {kf; loc} = M.read in
+  let ty = Typing.typ_of_number_ty ity in
+  let* e1 = M.with_generating_adata @@ compile ~flush_rtes:true op1 in
+  let* () = M.push_env () in
+  let* e2 = M.with_generating_adata @@ compile ~flush_rtes:true op2 in
+  let* {env = env2} = M.get in
+  let* () = M.push_env () in
+  let* e3 = M.with_generating_adata @@ compile ~flush_rtes:true op3 in
+  let* {env = env3} = M.get in
+  M.modifying_env @@ fun env ->
+  let env = Env.pop (Env.pop env) in
+  let _, e, env =
+    Env.new_var
+      ~loc
+      ~name
+      env
+      kf
+      (Misc.get_term_from_pot origin) (* /!\ Use the term for optimization *)
+      ty
+      (fun v ev ->
+         let lv = Cil.var v in
+         let ty = Cil.typeOf ev in
+         let init_set =
+           assert (not (Gmp_types.Q.is_t ty));
+           Gmp.init_set
+         in
+         let affect e = init_set ~loc lv ev e in
+         let then_blk, _ =
+           let s = affect e2 in
+           Env.pop_and_get ~kf env2 s ~global_clear:false Env.Middle
+         in
+         let else_blk, _ =
+           let s = affect e3 in
+           Env.pop_and_get ~kf env3 s ~global_clear:false Env.Middle
+         in
+         [ Smart_stmt.if_stmt ~loc ~cond:e1 then_blk ~else_blk ])
+  in e, env
+
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
   match enode with
-  | True -> M.return (Cil.one ~loc, None, Some (Analyses_types.C_number, ""))
-  | False -> M.return (Cil.zero ~loc, None, Some (Analyses_types.C_number, ""))
   | Integer {n; ity} ->
     (* cf Translate_terms.constant_to_exp *)
     let e, strnum =
@@ -144,12 +190,48 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e1 = compile ~flush_rtes:true op1 in
     let* e2 = compile ~flush_rtes:true op2 in
     let name = Misc.name_of_binop binop in
-    let* e = M.modifying_env @@ fun env ->
-      Translate_utils.comparison_to_exp ~loc kf env ity binop e1 e2 ~name origin
+    let* e = M.modifying_env @@ fun env -> Translate_utils.comparison_to_exp
+        ~loc
+        kf
+        env
+        ity
+        binop
+        e1
+        e2
+        ~name
+        (Misc.get_term_from_pot origin)
     in
     M.return (e, None, Some (Analyses_types.C_number, name))
-  | BinOp {ity; binop = Plus | Minus | Mult as binop; op1; op2} ->
+  | UnOp {ity; unop = Neg as uop; op} ->
+    let* e = compile op in
+    let unop = compile_unop uop in
+    begin match ity with
+      | Gmpz ->
+        let+ e = M.modifying_env @@ fun env ->
+          Gmp.Z.new_var
+            ~loc
+            env
+            kf
+            ~name:"neg"
+            (Misc.get_term_from_pot origin)
+            (fun _ ev ->
+               [ Smart_stmt.rtl_call ~loc ~prefix:"" "__gmpz_neg" [ ev; e ] ])
+        in
+        e, None, Some (Analyses_types.C_number, Misc.name_of_unop unop)
+      | Rational ->
+        let* {env} = M.get in
+        Env.not_yet env "reals: Neg"
+      | _ ->
+        let ty = Typing.typ_of_number_ty ity in
+        let e = Cil.new_exp ~loc (UnOp(unop, e, ty)) in
+        M.return (e, None, Some (Analyses_types.C_number, ""))
+    end
+  | UnOp {unop = Not; op} ->
+    let* e = compile op in
+    M.return (Smart_exp.lnot ~loc e, None, Some (Analyses_types.C_number, ""))
+  | BinOp {ity; binop = Plus | Minus | Mult | Div | Mod as binop; op1; op2} ->
     let binop = compile_binop binop in
+    let origin = Misc.get_term_from_pot origin in
     let* e1 = compile op1 in
     let* e2 = compile op2 in
     let* e = match ity with
@@ -167,53 +249,61 @@ and compile_context_insensitive {Interlang.enode; origin} =
         M.return @@ Cil.new_exp ~loc @@ BinOp (binop, e1, e2, ty)
     in
     M.return (e, None, Some (Analyses_types.C_number, Misc.name_of_binop binop))
-  | BinOp ({binop = Div | Mod} as binop_node) ->
-    compile_div_mod ~origin binop_node
+  | BinOp {ity; binop = And; op1; op2} ->
+    let name = match origin with
+      | Analyses_types.PoT_pred { pred_content = Piff _ } -> "equiv"
+      | _ -> "and"
+    in
+    let* e = compile_conditional
+        ~ity
+        ~origin
+        ~name
+        op1
+        op2
+        (Interlang.Exp.mk_false ~origin ())
+    in
+    M.return (e, None, Some (Analyses_types.C_number, ""))
+  | BinOp {ity; binop = Or; op1; op2} ->
+    let name = match origin with
+      | Analyses_types.PoT_pred { pred_content = Pimplies _ } -> "implies"
+      | _ -> "or"
+    in
+    let* e = compile_conditional
+        ~ity
+        ~origin
+        ~name
+        op1
+        (Interlang.Exp.mk_true ~origin ())
+        op2
+    in
+    M.return (e, None, Some (Analyses_types.C_number, ""))
+
+  | If {ity; op1; op2; op3} ->
+    let* e = compile_conditional ~ity ~origin op1 op2 op3 in
+    M.return (e, None, Some (Analyses_types.C_number, ""))
   | Lval lval ->
-    M.maybe_with_term_loc origin @@
+    M.with_loc (Misc.get_loc_from_pot origin) @@
     let* lval, name = M.without_registering_adata @@ compile_lval lval in
     let* {loc} = M.read in
     let e = Smart_exp.lval ~loc lval in
-    let* () = M.Option.iter (assert_register_term ~loc e) origin in
+    let* () =
+      M.Option.iter
+        (assert_register_term ~loc e)
+        (Misc.get_term_from_pot origin)
+    in
     M.return (e, None, Some (Analyses_types.C_number, name))
   | SizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
-    let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
+    let* () =
+      M.Option.iter
+        (assert_register_term ~loc ~force:true e)
+        (Misc.get_term_from_pot origin)
+    in
     M.return (e, None, Some (Analyses_types.C_number, "sizeof"))
   | Coerce {coerce_to = typ; coerced = exp} ->
     let* e, coerce, cast_info = compile_with_rtes exp in
     ignore coerce; (* coerce to A and then B ⇒ just coerce directly to B *)
     M.return (e, Some typ, cast_info)
-
-and compile_div_mod ~origin {ity; binop; op1; op2} =
-  assert (Interlang.Helpers.is_div_or_mod binop);
-  let* {kf; loc} = M.read in
-  let ty = Typing.typ_of_number_ty ity in
-  let binop = compile_binop binop in
-  let* e1 = compile op1 in
-  let* e =
-    match ity with
-    | Gmpz ->
-      let* e2 = compile op2 in
-      let mk_stmts _v e =
-        assert (Gmp_types.Z.is_t ty);
-        let name = Gmp.Z.name_arith_bop binop in
-        let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
-        [ instr ]
-      in
-      let name = Misc.name_of_binop binop in
-      M.modifying_env (fun env -> Gmp.Z.new_var ~loc ~name env kf None mk_stmts)
-    | Rational ->
-      let* e2 = compile op2 in
-      M.modifying_env (fun env -> Gmp.Q.binop ~loc origin binop env kf e1 e2)
-    | Analyses_types.C_integer _
-    | Analyses_types.C_float _
-    | Analyses_types.Real
-    | Analyses_types.Nan ->
-      let* e2 = compile op2 in
-      M.return @@ Cil.new_exp ~loc @@ BinOp (binop, e1, e2, ty)
-  in
-  M.return (e, None, Some (Analyses_types.C_number, ""))
 
 and compile_lhost = function
   | Var vi -> M.return (Cil_types.Var vi, vi.vorig_name)

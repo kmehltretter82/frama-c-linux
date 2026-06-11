@@ -61,6 +61,9 @@ val term_has_lv_from_vi: term -> bool
 (** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
 
+val name_of_unop: unop -> string
+(** @return the name of the given unop as a string. *)
+
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)
 
@@ -101,3 +104,7 @@ val labels_are_all_here : logic_label list -> bool
 
 val unghost_type : typ -> typ
 (** remove all occurrences (also deep ones) of the "ghost" attribute. *)
+
+val get_loc_from_pot : Analyses_types.pred_or_term -> location
+
+val get_term_from_pot : Analyses_types.pred_or_term -> term option

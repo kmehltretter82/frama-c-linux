@@ -240,25 +240,25 @@ int main(void)
   }
   /*@ assert x == 1 ? x == 18 : x == 0; */ ;
   {
-    int __gen_e_acsl_implies_3;
+    int __gen_e_acsl_or_3;
     int __gen_e_acsl_equiv;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"x",0,x);
-    if (! (x == 2)) __gen_e_acsl_implies_3 = 1;
+    if (! (x == 2)) __gen_e_acsl_or_3 = 1;
     else {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"y",0,y);
-      __gen_e_acsl_implies_3 = y == 3;
+      __gen_e_acsl_or_3 = y == 3;
     }
-    if (__gen_e_acsl_implies_3) {
-      int __gen_e_acsl_implies_4;
+    if (__gen_e_acsl_or_3) {
+      int __gen_e_acsl_or_4;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"y",0,y);
-      if (! (y == 3)) __gen_e_acsl_implies_4 = 1;
+      if (! (y == 3)) __gen_e_acsl_or_4 = 1;
       else {
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"x",0,x);
-        __gen_e_acsl_implies_4 = x == 2;
+        __gen_e_acsl_or_4 = x == 2;
       }
-      __gen_e_acsl_equiv = __gen_e_acsl_implies_4;
+      __gen_e_acsl_equiv = __gen_e_acsl_or_4;
     }
     else __gen_e_acsl_equiv = 0;
     __gen_e_acsl_assert_data_13.blocking = 1;
@@ -272,25 +272,25 @@ int main(void)
   }
   /*@ assert x == 2 <==> y == 3; */ ;
   {
-    int __gen_e_acsl_implies_5;
+    int __gen_e_acsl_or_5;
     int __gen_e_acsl_equiv_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"x",0,x);
-    if (! (x == 0)) __gen_e_acsl_implies_5 = 1;
+    if (! (x == 0)) __gen_e_acsl_or_5 = 1;
     else {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"y",0,y);
-      __gen_e_acsl_implies_5 = y == 1;
+      __gen_e_acsl_or_5 = y == 1;
     }
-    if (__gen_e_acsl_implies_5) {
-      int __gen_e_acsl_implies_6;
+    if (__gen_e_acsl_or_5) {
+      int __gen_e_acsl_or_6;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"y",0,y);
-      if (! (y == 1)) __gen_e_acsl_implies_6 = 1;
+      if (! (y == 1)) __gen_e_acsl_or_6 = 1;
       else {
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"x",0,x);
-        __gen_e_acsl_implies_6 = x == 0;
+        __gen_e_acsl_or_6 = x == 0;
       }
-      __gen_e_acsl_equiv_2 = __gen_e_acsl_implies_6;
+      __gen_e_acsl_equiv_2 = __gen_e_acsl_or_6;
     }
     else __gen_e_acsl_equiv_2 = 0;
     __gen_e_acsl_assert_data_14.blocking = 1;
@@ -325,7 +325,7 @@ int main(void)
   /*@ assert ((x != 0 ? x : y) != 0) == (x == 0); */ ;
   {
     int __gen_e_acsl_and_3;
-    int __gen_e_acsl_or_3;
+    int __gen_e_acsl_or_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"x",0,x);
@@ -334,10 +334,10 @@ int main(void)
       __gen_e_acsl_and_3 = y != 0;
     }
     else __gen_e_acsl_and_3 = 0;
-    if (__gen_e_acsl_and_3) __gen_e_acsl_or_3 = 1;
+    if (__gen_e_acsl_and_3) __gen_e_acsl_or_7 = 1;
     else {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"y",0,y);
-      __gen_e_acsl_or_3 = y != 0;
+      __gen_e_acsl_or_7 = y != 0;
     }
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
@@ -345,22 +345,22 @@ int main(void)
     __gen_e_acsl_assert_data_16.file = "lazy.i";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 25;
-    __e_acsl_assert(__gen_e_acsl_or_3,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert(__gen_e_acsl_or_7,& __gen_e_acsl_assert_data_16);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
   }
   /*@ assert (x != 0 && y != 0) || y != 0; */ ;
   {
-    int __gen_e_acsl_or_4;
+    int __gen_e_acsl_or_8;
     int __gen_e_acsl_and_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"x",0,x);
-    if (x != 0) __gen_e_acsl_or_4 = 1;
+    if (x != 0) __gen_e_acsl_or_8 = 1;
     else {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"y",0,y);
-      __gen_e_acsl_or_4 = y != 0;
+      __gen_e_acsl_or_8 = y != 0;
     }
-    if (__gen_e_acsl_or_4) {
+    if (__gen_e_acsl_or_8) {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"y",0,y);
       __gen_e_acsl_and_4 = y == 1;
     }
@@ -376,12 +376,15 @@ int main(void)
   }
   /*@ assert (x != 0 || y != 0) && y == 1; */ ;
   {
-    int __gen_e_acsl_or_5;
+    int __gen_e_acsl_or_9;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
-    if (x != 0) __gen_e_acsl_or_5 = 1; else __gen_e_acsl_or_5 = y != 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"x",0,x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"y",0,y);
+    if (x != 0) __gen_e_acsl_or_9 = 1;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"y",0,y);
+      __gen_e_acsl_or_9 = y != 0;
+    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"y",0,y);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";
@@ -389,7 +392,7 @@ int main(void)
     __gen_e_acsl_assert_data_18.file = "lazy.i";
     __gen_e_acsl_assert_data_18.fct = "main";
     __gen_e_acsl_assert_data_18.line = 27;
-    __e_acsl_assert(__gen_e_acsl_or_5 == (y != 0),
+    __e_acsl_assert(__gen_e_acsl_or_9 == (y != 0),
                     & __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
   }
@@ -398,9 +401,12 @@ int main(void)
     int __gen_e_acsl_and_5;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
-    if (x != 0) __gen_e_acsl_and_5 = y != 0; else __gen_e_acsl_and_5 = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"x",0,x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"y",0,y);
+    if (x != 0) {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"y",0,y);
+      __gen_e_acsl_and_5 = y != 0;
+    }
+    else __gen_e_acsl_and_5 = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"x",0,x);
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";

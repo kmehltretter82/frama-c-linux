@@ -175,6 +175,11 @@ let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
 
+let name_of_unop = function
+  | Neg -> "neg"
+  | LNot -> "not"
+  | BNot -> "bnot"
+
 let name_of_binop = function
   | Lt -> "lt"
   | Gt -> "gt"
@@ -195,6 +200,14 @@ let name_of_binop = function
   | PlusA -> "add"
   | MinusA -> "sub"
   | MinusPP | MinusPI | PlusPI -> assert false
+
+let get_loc_from_pot = function
+  | Analyses_types.PoT_pred p -> p.pred_loc
+  | Analyses_types.PoT_term t -> t.term_loc
+
+let get_term_from_pot = function
+  | Analyses_types.PoT_pred _ -> None
+  | Analyses_types.PoT_term t -> Some t
 
 let make_binop = Cil.mkBinOp_exn ~constfold:true
 

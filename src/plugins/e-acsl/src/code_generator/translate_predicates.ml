@@ -10,7 +10,6 @@
 
 open Cil_types
 open Cil_datatype
-open Analyses_types
 let dkey = Options.Dkey.translation
 
 module IL = struct
@@ -60,11 +59,14 @@ let relation_to_binop = function
   | Req -> Eq
   | Rneq -> Ne
 
-let predicate_content_to_exp_il p =
+let c_int = Analyses_types.C_integer IInt
+
+let rec predicate_content_to_exp_il p =
   let p = Logic_normalizer.get_pred p in
+  let origin = Analyses_types.PoT_pred p in
   match p.pred_content with
-  | Ptrue -> M.return @@ IL.Exp.mk_true ()
-  | Pfalse -> M.return @@ IL.Exp.mk_false ()
+  | Ptrue -> M.return @@ IL.Exp.mk_true ~origin ()
+  | Pfalse -> M.return @@ IL.Exp.mk_false ~origin ()
   | Prel(rel, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let t1 = Logic_normalizer.get_term t1 in
@@ -76,8 +78,40 @@ let predicate_content_to_exp_il p =
     in
     let rel = Interlang_gen.of_relation rel in
     let* op1 = Translate_terms.to_exp_il t1 in
-    let* op2 = Translate_terms.to_exp_il t2 in
-    M.return @@ Interlang.Exp.binop rel ity op1 op2
+    let+ op2 = Translate_terms.to_exp_il t2 in
+    Interlang.Exp.binop ~origin rel ity op1 op2
+  | Pif (p1,p2,p3) ->
+    let* e1 = predicate_content_to_exp_il p1 in
+    let* e2 = predicate_content_to_exp_il p2 in
+    let+ e3 = predicate_content_to_exp_il p3 in
+    Interlang.Exp.conditional ~origin c_int e1 e2 e3
+  | Pand(p1, p2) ->
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop ~origin And c_int op1 op2
+  | Por(p1, p2) ->
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop ~origin Or c_int op1 op2
+  | Pimplies(p1, p2) -> (* (p1 ==> p2) <==> !p1 || p2 *)
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop ~origin Or c_int
+      (Interlang.Exp.unop ~origin:(PoT_pred p1) Not c_int op1)
+      op2
+  | Piff(p1, p2) -> (* (p1 <==> p2) <==> (!p1 || p2 && !p2 || p1) *)
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop ~origin And c_int
+      (Interlang.Exp.binop ~origin Or c_int
+         (Interlang.Exp.unop ~origin:(PoT_pred p1) Not c_int op1)
+         op2)
+      (Interlang.Exp.binop ~origin Or c_int
+         (Interlang.Exp.unop ~origin:(PoT_pred p2) Not c_int op2)
+         op1)
+  | Pnot p ->
+    let+ op = predicate_content_to_exp_il p in
+    Interlang.Exp.unop ~origin Not c_int op
   | _ -> M.not_covered Printer.pp_predicate p
 
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the
@@ -206,7 +240,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
     (* Register the logic var to the logic scope *)
-    let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let lvs = Analyses_types.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env p in
@@ -476,7 +510,8 @@ let () =
     rte_guards_to_exp_old;
   Translate_terms.Translate_predicates.rte_guards_to_exp_il_ref :=
     rte_guards_to_exp_il;
-  Translate_terms.Translate_predicates.to_exp_ref := to_exp
+  Translate_terms.Translate_predicates.to_exp_ref := to_exp;
+  Translate_terms.Translate_predicates.to_exp_il_ref := to_exp_il
 
 exception No_simple_translation of predicate
 
