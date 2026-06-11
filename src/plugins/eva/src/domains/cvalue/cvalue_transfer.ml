@@ -75,7 +75,7 @@ let update valuation t =
   let process exp record t =
     match exp.node with
     | Lval lv ->
-      if record.reductness = Reduced && Ast_types.is_scalar lv.typ
+      if record.reductness = Reduced && Ast_types.C.is_scalar lv.typ
       then
         let {v; initialized; escaping} = record.value in
         let v = unbottomize v in

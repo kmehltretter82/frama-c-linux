@@ -124,7 +124,7 @@ let test (types, kind) =
   in
   let is_const = is_const kind in
   let kind = if is_const then "const" else "mutable" in
-  let has_const = Ast_types.has_attribute "const" inner_type in
+  let has_const = Ast_types.C.has_attribute "const" inner_type in
   if is_const && not has_const then begin
     let filename = generate_failure_file kind is_const types in
     Crowbar.fail

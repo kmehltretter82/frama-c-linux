@@ -130,7 +130,7 @@ let mk_init_function () =
              | _ -> [Smart_stmt.mark_readonly ~loc @@ Cil.evar ~loc vi]
            in
            let stmts =
-             if Ast_types.is_const vi.vtype then
+             if Ast_types.C.is_const vi.vtype then
                (* a const global can't be modified after initialization. *)
                mark_readonly vi.vtype @ stmts
              else stmts

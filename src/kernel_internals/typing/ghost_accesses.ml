@@ -67,20 +67,20 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Ast_types.unroll_logic t) with
-  | Ctype t -> Ast_types.is_ghost t
-  | t when Logic_const.is_set_type t ->
-    ghost_term_type (Logic_const.type_of_element t)
+  match (Ast_types.Acsl.unroll t) with
+  | Ctype t -> Ast_types.C.is_ghost t
+  | t when Ast_types.Acsl.is_plain_set t ->
+    ghost_term_type (Ast_types.Acsl.set_element t)
   | _ -> false
 
 class visitor = object(self)
   inherit Visitor.frama_c_inplace
 
   method private ghost_incompatible nt ot =
-    match Ast_types.unroll_node nt, Ast_types.unroll_node ot with
+    match Ast_types.C.unroll_node nt, Ast_types.C.unroll_node ot with
     | TPtr nt', TPtr ot'
     | TPtr nt', TArray (ot', _) ->
-      Ast_types.is_ghost nt' <> Ast_types.is_ghost ot' ||
+      Ast_types.C.is_ghost nt' <> Ast_types.C.is_ghost ot' ||
       self#ghost_incompatible nt' ot'
     | _ ->
       false
@@ -134,12 +134,12 @@ class visitor = object(self)
       | None -> true, (Log.get_current_source ())
     in
     if not(is_generated_ret_var v)
-    && not (Ast_types.is_wellformed_ghost v.vtype) then
+    && not (Ast_types.C.is_wellformed_ghost v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
-    if Ast_types.(is_fun (unroll v.vtype)) then begin
-      let ftype = Cil.getReturnType (Ast_types.unroll v.vtype) in
+    if Ast_types.C.(is_fun (unroll v.vtype)) then begin
+      let ftype = Cil.getReturnType (Ast_types.C.unroll v.vtype) in
       match ftype.tnode with
-      | TPtr t when not (Ast_types.is_wellformed_ghost t) ->
+      | TPtr t when not (Ast_types.C.is_wellformed_ghost t) ->
         Error.invalid_ghost_type_for_return ~once:true ~current ~source ()
       | _ -> ()
     end ;
@@ -155,7 +155,7 @@ class visitor = object(self)
           Error.bad_cast_on_return ~current:true f ret_type lv
       in
       let error_if_not_writable lv =
-        if not (Ast_types.is_ghost (Cil.typeOfLval lv)) then
+        if not (Ast_types.C.is_ghost (Cil.typeOfLval lv)) then
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
       let failed = match i with

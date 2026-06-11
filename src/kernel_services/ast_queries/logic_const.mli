@@ -233,78 +233,12 @@ val pseparated: ?loc:location -> ?names:string list -> term list -> predicate
 (** {2 Logic types} *)
 (* ************************************************************************** *)
 
-(** instantiate type variables in a logic type.
-    @since 18.0-Argon moved from Logic_utils *)
-val instantiate :
-  (string * logic_type) list ->
-  logic_type -> logic_type
-
 (** @return [true] if the logic type definition can be expanded.
-    @since 18.0-Argon *)
+    @since 18.0-Argon
+*)
 val is_unrollable_ltdef : logic_type_info -> bool
-
-(** expands logic type definitions only.
-    To expands both logic part and C part, uses {!Ast_types.unroll_logic}.
-    @since 18.0-Argon *)
-val unroll_ltdef : logic_type -> logic_type
-
-(** [isLogicType test typ] is [false] for pure logic types and the result
-    of test for C types. *)
-val isLogicCType : (typ -> bool) -> logic_type -> bool
-
-(** returns [true] if the type is a list<t>.
-    @since Aluminium-20160501 *)
-val is_list_type: logic_type -> bool
-
-(** [make_type_list_of t] returns the type list<[t]>.
-    @since Aluminium-20160501 *)
-val make_type_list_of: logic_type -> logic_type
-
-(** returns the type of elements of a list type.
-    @raise Failure if the input type is not a list type.
-    @since Aluminium-20160501 *)
-val type_of_list_elem: logic_type -> logic_type
-
-(** returns [true] if the type is a set<t>.
-    @since Neon-20140301 *)
-val is_set_type: logic_type -> bool
-
-(** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
-    is a set. Elements have type [ty1], or the type of the elements of [ty1] if
-    it is itself a set-type (i.e. we do not build set of sets that way).
-*)
-val set_conversion: logic_type -> logic_type -> logic_type
-
-(** converts a type into the corresponding set type if needed. Does nothing
-    if the argument is already a set type. *)
-val make_set_type: logic_type -> logic_type
-
-(** returns the type of elements of a set type.
-    @raise Failure if the input type is not a set type. *)
-val type_of_element: logic_type -> logic_type
-
-(** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
-    if it is a set type. *)
-val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
-
-(** [transform_element f t] is the same as
-    [set_conversion (plain_or_set f t) t]
-    @since Nitrogen-20111001
-*)
-val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
-
-(** [true] if the argument is not a set type. *)
-val is_plain_type: logic_type -> bool
-
-(** [make_arrow_type args rt] returns a [rt] if [args] is empty or the
-    corresponding [Larrow] type.
-
-    @since 25.0-Manganese
-*)
-val make_arrow_type: logic_var list -> logic_type -> logic_type
-
-(** @return true if the argument is the boolean type. *)
-val is_boolean_type: logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_unrollable_ltdef instead"]
+[@@migrate { repl = Ast_types.Acsl.is_unrollable_ltdef }]
 
 (* ************************************************************************** *)
 (** {1 Logic Terms} *)
@@ -386,3 +320,108 @@ val addTermOffset:     term_offset -> term_offset -> term_offset
 (** Equivalent to [addOffsetLval] for terms.
         @since Oxygen-20120901 *)
 val addTermOffsetLval: term_offset -> term_lval -> term_lval
+
+
+
+
+
+
+
+(** instantiate type variables in a logic type.
+    @since 18.0-Argon moved from Logic_utils *)
+val instantiate :
+  (string * logic_type) list ->
+  logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.instantiate instead"]
+[@@migrate { repl = Ast_types.Acsl.instantiate }]
+
+(** expands logic type definitions only.
+    To expands both logic part and C part, uses {!Ast_types.unroll_logic}.
+    @since 18.0-Argon *)
+val unroll_ltdef : logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.unroll_ltdef instead"]
+[@@migrate { repl = Ast_types.Acsl.unroll_ltdef }]
+
+(** [isLogicType test typ] is [false] for pure logic types and the result
+    of test for C types. *)
+val isLogicCType : (typ -> bool) -> logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_ctype }]
+
+(** returns [true] if the type is a list<t>.
+    @since Aluminium-20160501 *)
+val is_list_type: logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_list instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_list }]
+
+(** [make_type_list_of t] returns the type list<[t]>.
+    @since Aluminium-20160501 *)
+val make_type_list_of: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.make_list instead"]
+[@@migrate { repl = Ast_types.Acsl.make_list }]
+
+(** returns the type of elements of a list type.
+    @raise Failure if the input type is not a list type.
+    @since Aluminium-20160501 *)
+val type_of_list_elem: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.list_element instead"]
+[@@migrate { repl = Ast_types.Acsl.list_element }]
+
+(** returns [true] if the type is a set<t>.
+    @since Neon-20140301 *)
+val is_set_type: logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_set instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_set }]
+
+(** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
+    is a set. Elements have type [ty1], or the type of the elements of [ty1] if
+    it is itself a set-type (i.e. we do not build set of sets that way).
+*)
+val set_conversion: logic_type -> logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.set_conversion instead"]
+[@@migrate { repl = Ast_types.Acsl.set_conversion }]
+
+(** converts a type into the corresponding set type if needed. Does nothing
+    if the argument is already a set type. *)
+val make_set_type: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.make_set instead"]
+[@@migrate { repl = Ast_types.Acsl.make_set }]
+
+(** returns the type of elements of a set type.
+    @raise Failure if the input type is not a set type. *)
+val type_of_element: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.set_element instead"]
+[@@migrate { repl = Ast_types.Acsl.set_element }]
+
+(** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
+    if it is a set type. *)
+val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
+[@@deprecated "Use Ast_types.Acsl.plain_or_set instead"]
+[@@migrate { repl = Ast_types.Acsl.plain_or_set }]
+
+(** [transform_element f t] is the same as
+    [set_conversion (plain_or_set f t) t]
+    @since Nitrogen-20111001
+*)
+val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.transform_element instead"]
+[@@migrate { repl = Ast_types.Acsl.transform_element }]
+
+(** [true] if the argument is not a set type. *)
+val is_plain_type: logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain }]
+
+(** [make_arrow_type args rt] returns a [rt] if [args] is empty or the
+    corresponding [Larrow] type.
+
+    @since 25.0-Manganese
+*)
+val make_arrow_type: logic_var list -> logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.make_arrow instead"]
+[@@migrate { repl = Ast_types.Acsl.make_arrow }]
+
+(** @return true if the argument is the boolean type. *)
+val is_boolean_type: logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_logic_bool instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_bool }]

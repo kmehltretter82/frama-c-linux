@@ -66,7 +66,7 @@ let access_ptr_elts ~loc tlv =
   let basetype = Cil.typeOfTermLval tlv in
   let base = Logic_const.term ~loc (TLval tlv) basetype in
   let base, basetype =
-    if Logic_utils.isLogicVoidPointerType basetype then begin
+    if Ast_types.Acsl.is_void_ptr basetype then begin
       let typ = Ctype Cil_const.charPtrType in
       Logic_const.term ~loc (TCast(false, Ctype Cil_const.charPtrType,base)) typ, typ
     end else base, basetype
@@ -87,7 +87,7 @@ let access_elts ~loc ?size tlv =
   Logic_const.addTermOffsetLval (TIndex(range,TNoOffset)) tlv
 
 let extract_mem_term ~loc acc tlv =
-  match Ast_types.unroll_logic (Cil.typeOfTermLval tlv) with
+  match Ast_types.Acsl.unroll (Cil.typeOfTermLval tlv) with
   | Ctype { tnode = TPtr _ } -> access_ptr_elts ~loc tlv :: acc
   | Ctype { tnode = TArray (_,e) } ->
     let size = Option.bind (Cil.constFoldToInt ~machdep:true) e in
@@ -114,7 +114,7 @@ class visit_assembly =
         let lv_from =
           List.filter
             (fun lv ->
-               not (Logic_utils.isLogicArrayType (Cil.typeOfTermLval lv)))
+               not (Ast_types.Acsl.is_array (Cil.typeOfTermLval lv)))
             lv_from
         in
         (* the only interesting information for clobbers is the
@@ -141,8 +141,8 @@ class visit_assembly =
           let typ = Cil.typeOfTermLval lv in
           let base_term = Logic_const.term ~loc (TLval lv) typ in
           let term =
-            if Logic_utils.isLogicPointerType typ ||
-               Logic_utils.isLogicArrayType typ
+            if Ast_types.Acsl.is_ptr typ ||
+               Ast_types.Acsl.is_array typ
             then { base_term with term_name = ["indirect"] }
             else base_term
           in
@@ -156,7 +156,7 @@ class visit_assembly =
         in
         let mk_initialized x =
           let typ = Cil.typeOfTermLval x in
-          if Logic_utils.isLogicVoidType typ then None
+          if Ast_types.Acsl.is_void typ then None
           else begin
             let t = Logic_utils.mk_logic_AddrOf ~loc x typ in
             let pred =

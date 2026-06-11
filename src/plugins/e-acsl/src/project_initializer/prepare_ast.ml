@@ -120,7 +120,7 @@ let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
   let new_formals = List.map mk_formal formals in
   let res =
     let ty = Kernel_function.get_return_type kf in
-    if Ast_types.is_void ty
+    if Ast_types.C.is_void ty
     then None
     else Some (Cil.makeVarinfo false false ~referenced:true "__retres" ty)
   in
@@ -612,7 +612,7 @@ let must_duplicate kf vi =
   && (* it is duplicable *)
   not (Datatype.String.Set.mem vi.vname unduplicable_functions)
   && (* it is not a variadic function *)
-  not (Ast_types.is_variadic vi.vtype)
+  not (Ast_types.C.is_variadic vi.vtype)
   && (* it is not a built-in *)
   not (Misc.is_fc_or_compiler_builtin vi)
   && (* it is not a generated function *)

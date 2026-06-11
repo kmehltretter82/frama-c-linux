@@ -180,7 +180,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       Kernel.fatal "Function %s does not have a function type" f.svar.vname
   in
   (* Does it return anything ? *)
-  let hasRet = match Ast_types.unroll_node retTyp with TVoid -> false | _ -> true in
+  let hasRet = match Ast_types.C.unroll_node retTyp with TVoid -> false | _ -> true in
 
   (* Memoize the return result variable. Use only if hasRet *)
   let lastloc = ref Fileloc.unknown in

@@ -59,76 +59,28 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
 (** {3 tests and extraction of element type}
     @before 31.0-Gallium these function were in {!Logic_typing}
 *)
-(** {4 tests for an individual (non set) type}
-    [plain_xxx t] returns [true] iff [t] is a [xxx]
-    @before 31.0-Gallium these functions were not exported
-*)
 
-val plain_arithmetic_type: Cil_types.logic_type -> bool
-val plain_integral_type: Cil_types.logic_type -> bool
-val plain_fun_ptr: Cil_types.logic_type -> bool
-val plain_array_type: Cil_types.logic_type -> bool
-val plain_pointer_type: Cil_types.logic_type -> bool
-
-(** {4 tests for potential sets}
-    [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
-*)
-
-val is_arithmetic_type: Cil_types.logic_type -> bool
-val is_integral_type: Cil_types.logic_type -> bool
-val is_fun_ptr: Cil_types.logic_type -> bool
-val is_array_type: Cil_types.logic_type -> bool
-val is_pointer_type: Cil_types.logic_type -> bool
-
-(** {4 sets and lists} *)
-
-val is_list_type: Cil_types.logic_type -> bool
-val is_set_type: Cil_types.logic_type -> bool
 
 (** {4 extract elements} *)
-
-val type_of_set_elem: logic_type -> logic_type
-val type_of_list_elem : logic_type -> logic_type
 
 (** returns the type of the element pointed to by the type. If the
     source type is a set of pointers, returns a set of elements.
 *)
 val type_of_pointed: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.direct_pointed instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_pointed }]
 
 (** same as {!type_of_pointed} but for arrays (or set of arrays). *)
 val type_of_array_elem: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.direct_array_element instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_array_element }]
 
-(** {3 Predefined tests over types} *)
 
-(** [isLogicType test typ] is [false] for pure logic types and the result
-    of test for C types.
-    In case of a set type, the function tests the element type.
-*)
-val isLogicType : (typ -> bool) -> logic_type -> bool
-
-val isLogicArrayType : logic_type -> bool
-
-val isLogicCharType : logic_type -> bool
-
-(** @since Chlorine-20180501 *)
-val isLogicAnyCharType : logic_type -> bool
-val isLogicVoidType : logic_type -> bool
-val isLogicPointerType : logic_type -> bool
-val isLogicVoidPointerType : logic_type -> bool
 
 (** {3 Type conversions} *)
 
-(** @return the equivalent C type.
-    @raise Failure if the type is purely logical *)
-val logicCType : logic_type -> typ
-
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
-
-(** removes qualifiers if logic_type is a C type, identity otherwise.
-    @since 27.0-Cobalt
-*)
-val logic_type_remove_qualifiers: logic_type -> logic_type
 
 (** C type to logic type, with implicit conversion for arithmetic types.
     @since 21.0-Scandium
@@ -362,8 +314,6 @@ val is_same_logic_label :
    @since Nitrogen-20111001
 *)
 val is_same_pconstant: Logic_ptree.constant -> Logic_ptree.constant -> bool
-
-val is_same_type : logic_type -> logic_type -> bool
 val is_same_var : logic_var -> logic_var -> bool
 val is_same_logic_signature :
   logic_info -> logic_info -> bool
@@ -515,3 +465,129 @@ class simplify_const_lval: (varinfo -> init_or_str option) -> Cil.cilVisitor
     has been completed after its use in an annotation. Internal use only.
     @since Neon-20140301 *)
 val complete_types: file -> unit
+
+
+
+
+(** {4 tests for an individual (non set) type}
+    [plain_xxx t] returns [true] iff [t] is a [xxx]
+    @before 31.0-Gallium these functions were not exported
+*)
+
+val plain_arithmetic_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_arithmetic instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_arithmetic }]
+
+val plain_integral_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_integral instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_integral }]
+
+val plain_fun_ptr: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_fun_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_fun_ptr }]
+
+val plain_array_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_array }]
+
+val plain_pointer_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_plain_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_ptr }]
+
+(** {4 tests for potential sets}
+    [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
+*)
+
+val is_arithmetic_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_arithmetic instead"]
+[@@migrate { repl = Ast_types.Acsl.is_arithmetic }]
+
+val is_integral_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_integral instead"]
+[@@migrate { repl = Ast_types.Acsl.is_integral }]
+
+val is_fun_ptr: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_fun_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_fun_ptr }]
+
+val is_array_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_array }]
+
+val is_pointer_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_ptr }]
+
+(** {4 sets and lists} *)
+
+val is_list_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_list instead"]
+[@@migrate { repl = Ast_types.Acsl.is_list }]
+
+val is_set_type: Cil_types.logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_set instead"]
+[@@migrate { repl = Ast_types.Acsl.is_set }]
+
+(** {3 Predefined tests over types} *)
+
+(** [isLogicType test typ] is [false] for pure logic types and the result
+    of test for C types.
+    In case of a set type, the function tests the element type.
+*)
+val isLogicType : (typ -> bool) -> logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.plain_or_set_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.plain_or_set_ctype }]
+
+val isLogicArrayType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_array }]
+
+val isLogicCharType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_char instead"]
+[@@migrate { repl = Ast_types.Acsl.is_char }]
+
+(** @since Chlorine-20180501 *)
+val isLogicAnyCharType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_any_char instead"]
+[@@migrate { repl = Ast_types.Acsl.is_any_char }]
+
+val isLogicVoidType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_void instead"]
+[@@migrate { repl = Ast_types.Acsl.is_void }]
+
+val isLogicPointerType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_ptr }]
+
+val isLogicVoidPointerType : logic_type -> bool
+[@@deprecated "Use Ast_types.Acsl.is_void_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_void_ptr }]
+
+(** {3 Type conversions} *)
+
+(** @return the equivalent C type.
+    @raise Failure if the type is purely logical *)
+val logicCType : logic_type -> typ
+[@@deprecated "Use Ast_types.Acsl.get_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.get_ctype }]
+
+(** removes qualifiers if logic_type is a C type, identity otherwise.
+    @since 27.0-Cobalt
+*)
+val logic_type_remove_qualifiers: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.remove_qualifiers instead"]
+[@@migrate { repl = Ast_types.Acsl.remove_qualifiers }]
+
+(** {4 extract elements} *)
+
+val type_of_set_elem: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.set_element instead"]
+[@@migrate { repl = Ast_types.Acsl.set_element }]
+
+val type_of_list_elem : logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.list_element instead"]
+[@@migrate { repl = Ast_types.Acsl.list_element }]
+
+val is_same_type : logic_type -> logic_type -> bool
+[@@deprecated "Cil_datatype.Logic_type_ByName.equal instead"]
+[@@migrate { repl = Cil_datatype.Logic_type_ByName.equal }]

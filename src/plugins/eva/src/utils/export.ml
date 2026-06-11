@@ -131,7 +131,7 @@ let fval kind (exp : Exp.exp) (fval : Fval.t) : pred =
 let domain lv value =
   let exp = Exp.of_lval lv in
   let typ = Cil.typeOfLval lv in
-  match Ast_types.unroll_node typ with
+  match Ast_types.C.unroll_node typ with
   | TInt _ | TEnum _ ->
     Results.as_ival value |> Result.fold ~error ~ok:(ival exp)
   | TFloat kind ->

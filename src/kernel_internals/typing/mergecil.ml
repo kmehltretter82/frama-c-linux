@@ -954,7 +954,7 @@ let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
      not (equal_attributes_for_merge f1.fattr f2.fattr) ||
      not
        (equal_attributes_for_merge
-          (Ast_types.get_attributes f1.ftype) (Ast_types.get_attributes f2.ftype))
+          (Ast_types.C.get_attributes f1.ftype) (Ast_types.C.get_attributes f2.ftype))
   then
     (* different attributes: check if the difference is only due
        to aligned/packed attributes, and if the offsets are the same,
@@ -1513,7 +1513,7 @@ let matchModelField
     let oldfidx = oldlnode.nfidx in
     let mf = lnode.ndata in
     let fidx = oldlnode.nfidx in
-    if Logic_utils.is_same_type oldmf.mi_field_type mf.mi_field_type then
+    if Cil_datatype.Logic_type_ByName.equal oldmf.mi_field_type mf.mi_field_type then
       begin
         if oldfidx < fidx then
           lnode.nrep <- oldlnode.nrep
@@ -1657,10 +1657,10 @@ let oneFilePass1 (f:file) : unit =
       (* We do not want to turn non-"const" globals into "const" one. That
        * can happen if one file declares the variable a non-const while
        * others declare it as "const". *)
-      if Ast_types.has_attribute "const" vi.vtype !=
-         Ast_types.has_attribute "const" oldvi.vtype then begin
+      if Ast_types.C.has_attribute "const" vi.vtype !=
+         Ast_types.C.has_attribute "const" oldvi.vtype then begin
         Cil.update_var_type
-          newrep.ndata (Ast_types.remove_attributes ["const"] newtype);
+          newrep.ndata (Ast_types.C.remove_attributes ["const"] newtype);
       end else Cil.update_var_type newrep.ndata newtype;
       (* clean up the storage. also update the location of the variable
          declaration, but only if the new one should be preferred. *)

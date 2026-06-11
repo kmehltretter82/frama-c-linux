@@ -159,7 +159,7 @@ let inconsistent_builtin_typ kf = function
       (* If a builtin expects a void pointer, then accept all pointer types. *)
       let need_cast typ expected =
         Cil.need_cast typ expected
-        && not Ast_types.(is_void_ptr expected && is_ptr typ)
+        && not Ast_types.C.(is_void_ptr expected && is_ptr typ)
       in
       let args = Cil.argsToList args in
       need_cast result expected_result

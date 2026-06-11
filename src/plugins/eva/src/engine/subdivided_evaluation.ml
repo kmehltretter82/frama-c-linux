@@ -81,7 +81,7 @@ let gather_non_linear expr =
       let map1 = compute_from_offset d expr offset in
       let map2 = compute_from_host d host in
       let map = union expr depth map1 map2 in
-      if LvalMap.is_empty map && Ast_types.is_arithmetic lv.typ
+      if LvalMap.is_empty map && Ast_types.C.is_arithmetic lv.typ
       then LvalMap.singleton lv (expr, d, LvalSet.empty)
       else map
     | UnOp (_, e, _) | CastE (_, e) -> compute depth e

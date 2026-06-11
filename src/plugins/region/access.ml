@@ -98,7 +98,7 @@ let typeof = function
   | Init(_,lv,_) | Lval(_,lv) -> Cil.typeOfLval lv
   | Exp(_,e) | Ret(_,e) -> Cil.typeOf e
   | Term(_,lv) ->
-    Logic_const.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
+    Ast_types.Acsl.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
 
 open Printer_tag
 

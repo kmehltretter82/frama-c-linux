@@ -201,7 +201,7 @@ let field = function
 let load = function
   | Loc_var x -> Val_var x (* E.access x ByValue E.bot *)
   | Loc_shift(x,e) ->
-    if Ast_types.is_scalar x.vtype then
+    if Ast_types.C.is_scalar x.vtype then
       E (E.access x ByAddr e)
     else
       E (E.access x ByValue e)
@@ -247,7 +247,7 @@ let cast_obj tgt src =
 let cast_ctyp tgt src =
   cast_obj (Ctypes.object_of tgt) (Ctypes.object_of src)
 let cast_ltyp tgt src =
-  match Ast_types.unroll_logic ~unroll_typedef:false src with
+  match Ast_types.Acsl.unroll ~unroll_typedef:false src with
   | Ctype src -> cast_ctyp tgt src
   | _ -> Cast
 
@@ -372,7 +372,7 @@ and offset (m:model) = function
   | Index(e,ofs) -> offset (shift m (vexpr e)) ofs
 
 and startof (m:model) typ =
-  if Ast_types.is_array typ then shift m E.bot else m
+  if Ast_types.C.is_array typ then shift m E.bot else m
 
 (* ---------------------------------------------------------------------- *)
 (* --- Compilation of ACSL-Terms                                      --- *)
@@ -837,7 +837,7 @@ struct
     let type_term ctxt loc e =
       match ctxt.Logic_typing.type_term ctxt ctxt.pre_state e with
       | { term_node = TLval (TVar { lv_origin = Some vi }, TNoOffset) } as term
-        when Ast_types.is_ptr vi.vtype && vi.vformal ->
+        when Ast_types.C.is_ptr vi.vtype && vi.vformal ->
         make_nullable vi ; term
       | t -> ctxt.error loc "Not a formal pointer: %a" Cil_printer.pp_term t
 

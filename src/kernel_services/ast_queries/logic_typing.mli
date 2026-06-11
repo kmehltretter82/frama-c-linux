@@ -27,10 +27,17 @@ val unescape: string -> string
 val wcharlist_of_string: string -> int64 list
 
 val ctype_of_pointed: logic_type -> typ
+[@@deprecated "Use Ast_types.Acsl.direct_pointed_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_pointed_ctype }]
+
 val ctype_of_array_elem: logic_type -> typ
+[@@deprecated "Use Ast_types.Acsl.direct_array_element_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_array_element_ctype }]
 
 val arithmetic_conversion:
   Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
+[@@deprecated "Use Ast_types.Acsl.arithmetic_conversion instead"]
+[@@migrate { repl = Ast_types.Acsl.arithmetic_conversion }]
 
 exception Typing_error of location * string
 

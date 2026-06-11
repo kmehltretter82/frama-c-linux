@@ -119,14 +119,14 @@ let parse_lval env p =
 
 let parse_integer env p =
   let v = parse_term env p in
-  if not @@ Ast_types.is_logic_integral v.term_type then
+  if not @@ Ast_types.Acsl.is_plain_integral v.term_type then
     error env ~loc:p.lexpr_loc "Expected integer term for object bounds" ; v
 
 let parse_pointer env p =
   let loc = p.lexpr_loc in
   let a = parse_term env p in
   let te =
-    match Ast_types.unroll_logic a.term_type with
+    match Ast_types.Acsl.unroll a.term_type with
     | Ctype { tnode = TPtr te } -> te
     | _ -> error env ~loc "Expected pointer l-value for region object"
   in te,a
@@ -152,7 +152,7 @@ let garbage = Attr.(add `Garbage empty)
 let applies flags = function
   | Range _ -> true
   | Alias(_,(TVar { lv_origin = Some v },_)) ->
-    flags = garbage && v.vformal && Ast_types.is_struct_or_union v.vtype
+    flags = garbage && v.vformal && Ast_types.C.is_struct_or_union v.vtype
   | Alias _ | Field _ -> false
 
 let flush source env =

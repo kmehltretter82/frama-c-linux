@@ -409,7 +409,7 @@ let rec infer ~force ~logic_env t =
     | TBinOp (MinusPP, t1, t2) ->
       ignore (recurse t1);
       ignore (recurse t2);
-      (match Ast_types.unroll (get_cty t1) with
+      (match Ast_types.C.unroll (get_cty t1) with
        | { tnode = TArray(_, _) } as ta ->
          begin
            try
@@ -427,7 +427,7 @@ let rec infer ~force ~logic_env t =
     | Tblock_length (_, t)
     | Toffset (_, t) ->
       ignore (recurse t);
-      (match Ast_types.unroll (get_cty t) with
+      (match Ast_types.C.unroll (get_cty t) with
        | { tnode = TArray (_, _) } as ta ->
          begin
            try
@@ -616,7 +616,7 @@ and infer_term_lval ~force ~logic_env (host, offset as tlv) =
   | _ ->
     ignore (infer_term_host ~force ~logic_env host);
     infer_term_offset ~force ~logic_env offset;
-    let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
+    let ty = Ast_types.Acsl.get_ctype (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
 and infer_term_host ~force ~logic_env thost =
@@ -628,15 +628,15 @@ and infer_term_host ~force ~logic_env thost =
      | Linteger -> top_ival
      | Ctype { tnode = TFloat fk } -> Float(fk, None)
      | Lreal -> Real
-     | Ctype _ -> interv_of_typ (Logic_utils.logicCType v.lv_type)
+     | Ctype _ -> interv_of_typ (Ast_types.Acsl.get_ctype v.lv_type)
      | Ltype _ | Lvar _ | Larrow _ ->
        Options.fatal "unexpected logic type")
   | TResult ty ->
     interv_of_typ ty
   | TMem t ->
     ignore (infer ~force ~logic_env t);
-    let ty = Logic_utils.logicCType t.term_type in
-    match Ast_types.unroll_node ty with
+    let ty = Ast_types.Acsl.get_ctype t.term_type in
+    match Ast_types.C.unroll_node ty with
     | TPtr ty | TArray (ty, _) ->
       interv_of_typ ty
     | _ ->

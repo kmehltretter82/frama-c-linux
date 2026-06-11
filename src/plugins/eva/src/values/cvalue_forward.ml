@@ -436,7 +436,7 @@ let forward_binop_int ~typ ev1 (op : Eva_ast.binop) ev2 =
       ~contains_non_zero:(V.contains_non_zero ev1 && V.contains_non_zero ev2)
   | Eq | Ne | Ge | Le | Gt | Lt ->
     let op = Eva_ast.conv_relation op in
-    let signed = Bit_utils.is_signed_int_enum_pointer (Ast_types.unroll typ) in
+    let signed = Bit_utils.is_signed_int_enum_pointer (Ast_types.C.unroll typ) in
     V.inject_comp_result (V.forward_comp_int ~signed op ev1 ev2)
 
 let forward_binop_float fkind ev1 op ev2 =
@@ -466,7 +466,7 @@ let forward_binop_float fkind ev1 op ev2 =
    This is left to the caller *)
 let forward_uneg v t =
   try
-    match Ast_types.unroll_node t with
+    match Ast_types.C.unroll_node t with
     | TFloat _ ->
       let v = V.project_float v in
       V.inject_ival (Ival.inject_float (Fval.neg v))
@@ -482,7 +482,7 @@ let forward_unop typ op value =
   match op with
   | Eva_ast.Neg -> forward_uneg value typ
   | BNot -> begin
-      match Ast_types.unroll_node typ with
+      match Ast_types.C.unroll_node typ with
       | TInt ik | TEnum {ekind=ik} ->
         let size = Cil.bitsSizeOfInt ik in
         let signed = Cil.isSigned ik in
@@ -492,7 +492,7 @@ let forward_unop typ op value =
   | LNot ->
     let eq = Abstract_interp.Comp.Eq in
     (* [!c] holds iff [c] is equal to [O] *)
-    if Ast_types.is_float typ then
+    if Ast_types.C.is_float typ then
       try
         let i = V.project_ival value in
         let f = Ival.project_float i in

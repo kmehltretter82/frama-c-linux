@@ -358,7 +358,7 @@ and context_insensitive_binop_to_exp_il ~origin bop t1 t2 =
     | PlusA | MinusA | Mult | Div | Mod ->
       let ty = Typing.get_typ ~logic_env origin in
       if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
-        assert (Logic_utils.is_integral_type origin.term_type);
+        assert (Ast_types.Acsl.is_integral origin.term_type);
       Some (Typing.get_number_ty ~logic_env origin)
     | LAnd | LOr ->
       Some (Typing.get_number_ty ~logic_env origin)
@@ -399,7 +399,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
     let* logic_env = M.read_logic_env in
     let ty = Typing.get_typ ~logic_env t in
     if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
-      assert (Logic_utils.is_integral_type t.term_type);
+      assert (Ast_types.Acsl.is_integral t.term_type);
     let ity = Typing.get_number_ty ~logic_env t in
     let+ e = to_exp_il t' in
     Interlang.Exp.unop ~origin:(PoT_term t) (Interlang_gen.of_unop Neg) ity e
@@ -503,7 +503,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Ast_types.is_integral ty);
+      assert (Ast_types.C.is_integral ty);
       let e, adata, env = to_exp ~adata kf env t in
       let e = Smart_exp.lnot ~loc e in
       e, adata, env, Analyses_types.C_number, ""
@@ -521,7 +521,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_utils.is_integral_type t.term_type);
+      assert (Ast_types.Acsl.is_integral t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Analyses_types.C_number, ""
     end
@@ -545,7 +545,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_utils.is_integral_type t.term_type);
+      assert (Ast_types.Acsl.is_integral t.term_type);
       (* no guard required since RTEs are generated separately *)
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
@@ -747,7 +747,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_utils.is_integral_type t.term_type);
+      assert (Ast_types.Acsl.is_integral t.term_type);
       let e1, adata, env = t1_to_exp adata env in
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
@@ -803,7 +803,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_utils.is_integral_type t.term_type);
+      assert (Ast_types.Acsl.is_integral t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Analyses_types.C_number, ""
     end

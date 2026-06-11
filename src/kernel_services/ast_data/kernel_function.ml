@@ -560,10 +560,10 @@ let is_in_libc kf =
   in Cil.is_in_libc attrs
 
 let has_noreturn_attr kf =
-  Ast_types.has_attribute "noreturn" (get_type kf)
+  Ast_types.C.has_attribute "noreturn" (get_type kf)
 
 let is_variadic kf =
-  Ast_types.is_variadic (get_type kf)
+  Ast_types.C.is_variadic (get_type kf)
 
 let is_first_stmt kf stmt =
   try
@@ -591,7 +591,7 @@ let is_main kf =
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
-  match Ast_types.unroll_node result_type with
+  match Ast_types.C.unroll_node result_type with
   | TVoid -> true
   | _ -> false
 

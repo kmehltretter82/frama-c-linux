@@ -252,7 +252,7 @@ let number_ty_of_typ ~post ty =
   if post && Gmp_types.Z.is_t ty then Gmpz
   else if post && Gmp_types.Q.is_t ty then Rational
   else
-    match Ast_types.unroll_node ty with
+    match Ast_types.C.unroll_node ty with
     | TInt ik | TEnum { ekind = ik } -> C_integer ik
     | TFloat fk -> C_float fk
     | TVoid | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list -> Nan
@@ -297,7 +297,7 @@ let c_type_or_int_in_ival_of t i =
   let t = Logic_utils.remove_logic_coerce t in
   match t.term_type with
   | Ctype typ ->
-    (match Ast_types.unroll_node typ with
+    (match Ast_types.C.unroll_node typ with
      | TInt ik | TEnum { ekind = ik } when
          Interval.is_included_in_typ i typ
        ->
@@ -743,7 +743,7 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
       | None -> ty_of_interv ~ctx:Gmpz i
     in mk_ctx ~use_gmp_opt:true ty
   | Ctype ty ->
-    let ty = Ast_types.unroll ty in
+    let ty = Ast_types.C.unroll ty in
     (match ty.tnode with
      | TInt ik | TEnum { ekind = ik} ->
        join
@@ -906,7 +906,7 @@ let extract_typ t ty =
   try typ_of_number_ty ty
   with Not_a_number ->
   match t.term_type with
-  | Ctype _ as lty -> Logic_utils.logicCType lty
+  | Ctype _ as lty -> Ast_types.Acsl.get_ctype lty
   | Lboolean | Linteger | Lreal ->
     Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
   | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"

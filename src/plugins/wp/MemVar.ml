@@ -45,7 +45,7 @@ struct
   let datatype = "Static"
   let param x =
     let open Cil_types in
-    if x.vaddrof || Ast_types.is_array x.vtype || Ast_types.is_ptr x.vtype
+    if x.vaddrof || Ast_types.C.is_array x.vtype || Ast_types.C.is_ptr x.vtype
     then MemoryContext.ByAddr else MemoryContext.ByValue
   let iter = Raw.iter
 end
@@ -89,7 +89,7 @@ struct
     let pretty = Varinfo.pretty
     let typ_of_chunk x =
       match V.param x with
-      | ByRef -> Ast_types.direct_pointed_type x.vtype
+      | ByRef -> Ast_types.C.direct_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
@@ -128,7 +128,7 @@ struct
     let pretty = Varinfo.pretty
     let typ_of_chunk x =
       match V.param x with
-      | ByRef -> Ast_types.direct_pointed_type x.vtype
+      | ByRef -> Ast_types.C.direct_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
     let is_init _ = true
@@ -312,8 +312,8 @@ struct
   let vtype m x =
     match m with
     | CVAL | HEAP -> x.vtype
-    | CTXT _ | CREF -> Ast_types.direct_pointed_type x.vtype
-    | CARR _ -> Cil_const.mk_tarray (Ast_types.direct_pointed_type x.vtype) None
+    | CTXT _ | CREF -> Ast_types.C.direct_pointed x.vtype
+    | CARR _ -> Cil_const.mk_tarray (Ast_types.C.direct_pointed x.vtype) None
 
   let vobject m x = Ctypes.object_of (vtype m x)
 
@@ -739,7 +739,7 @@ struct
   let valid_base sigma acs mem x =
     if x.vglob then
       match acs with
-      | RW -> if Ast_types.has_qualifier "const" x.vtype then p_false else p_true
+      | RW -> if Ast_types.C.has_qualifier "const" x.vtype then p_false else p_true
       | RD | OBJ -> p_true
     else
       match mem with
@@ -934,7 +934,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec forall_pointers phi v t =
-    match Ast_types.unroll_node t with
+    match Ast_types.C.unroll_node t with
     | TInt _ | TFloat _ | TVoid | TEnum _ | TNamed _ | TBuiltin_va_list
       -> F.p_true
     | TPtr _ | TFun _ -> phi v
@@ -1128,7 +1128,7 @@ struct
       | C_comp _ -> p_true
       (* Neither is initialization of arrays of structures *)
       | C_array { arr_element=t }
-        when Ast_types.is_struct_or_union t -> p_true
+        when Ast_types.C.is_struct_or_union t -> p_true
 
       | C_int _ | C_float _ | C_pointer _ ->
         p_imply
@@ -1156,7 +1156,7 @@ struct
     | Val((CVAL|CREF),x,ofs) ->
       let value = Lang.freshvar ~basename:"v" (tau_of_object obj) in
       memvar_stored KValue seq x ofs (e_var value) ::
-      if Ast_types.is_struct_or_union x.vtype then []
+      if Ast_types.C.is_struct_or_union x.vtype then []
       else begin
         let init = Lang.freshvar ~basename:"v" (init_of_object obj) in
         Assert(monotonic_initialized seq obj x ofs) ::

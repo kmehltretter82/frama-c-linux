@@ -109,7 +109,7 @@ let compute_using_prototype_for_state state kf assigns =
       in
       let return_assigns =
         match return_assigns with
-        | [] when Ast_types.is_void rt_typ ->
+        | [] when Ast_types.C.is_void rt_typ ->
           From_memory.default_return
         | [] -> (* \from unspecified. *)
           let size = Bit_utils.sizeof rt_typ in
@@ -423,8 +423,8 @@ struct
                for small struct arrays, as this may be more precise in case of
                padding bits. The 100 limit is arbitrary. *)
             let implicit =
-              not (Ast_types.is_array ct &&
-                   (Ast_types.(is_scalar (direct_element_type ct))
+              not (Ast_types.C.is_array ct &&
+                   (Ast_types.C.(is_scalar (direct_array_element ct))
                     || Ast_info.array_size ct > 100z))
             in
             let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
@@ -446,9 +446,9 @@ struct
     let transfer_guard s e d =
       let request = To_Use.stmt_request s in
       let interpreted_e = Eva.Results.(eval_exp e request |> as_cvalue) in
-      let t1 = Ast_types.unroll (Cil.typeOf e) in
+      let t1 = Ast_types.C.unroll (Cil.typeOf e) in
       let do_then, do_else =
-        if Ast_types.is_integral t1 || Ast_types.is_ptr t1
+        if Ast_types.C.is_integral t1 || Ast_types.C.is_ptr t1
         then Cvalue.V.contains_non_zero interpreted_e,
              Cvalue.V.contains_zero interpreted_e
         else true, true (* TODO: a float condition is true iff != 0.0 *)

@@ -249,7 +249,7 @@ let rec is_volatile_cil_offset = function
   | NoOffset -> false
   | Index (_exp, offset) -> is_volatile_cil_offset offset
   | Field (field, offset) ->
-    Ast_types.has_qualifier "volatile" field.ftype
+    Ast_types.C.has_qualifier "volatile" field.ftype
     || is_volatile_cil_offset offset
 
 let is_volatile_offset vi offset size =
@@ -261,7 +261,7 @@ let is_volatile_offset vi offset size =
       let size = Bit_utils.MatchSize size in
       let aux offset =
         let offset, typ = Bit_utils.find_offset vi.vtype ~offset size in
-        is_volatile_cil_offset offset || Ast_types.is_volatile typ
+        is_volatile_cil_offset offset || Ast_types.C.is_volatile typ
       in
       List.exists aux list
     with Bit_utils.NoMatchingOffset -> true
@@ -270,8 +270,8 @@ let is_volatile loc =
   let is_base_volatile base offset =
     match base with
     | Base.Var (vi, _) ->
-      Ast_types.has_qualifier "volatile" vi.vtype
-      || (Ast_types.has_attribute_memory_block "volatile" vi.vtype
+      Ast_types.C.has_qualifier "volatile" vi.vtype
+      || (Ast_types.C.has_attribute_memory_block "volatile" vi.vtype
           && is_volatile_offset vi offset loc.size)
     | _ -> false
   in

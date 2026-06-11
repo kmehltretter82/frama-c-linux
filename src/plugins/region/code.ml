@@ -36,7 +36,7 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field r fd) fd.ftype ofs
   | Index(e,ofs) ->
-    let elt = Ast_types.direct_element_type ty in
+    let elt = Ast_types.C.direct_array_element ty in
     ignore @@ add_exp m s e ;
     add_loffset m s (add_index r elt) elt ofs
 
@@ -54,7 +54,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
   | BinOp((PlusPI|MinusPI),p,k,tr) ->
     add_value m s k ;
     let vp = add_exp m s p in
-    let te = Ast_types.pointed_type tr in
+    let te = Ast_types.C.pointed tr in
     Memory.add_shift (pointer vp) (Exp(s,e)) te ; vp
 
   | UnOp(_,e,_) ->
@@ -76,7 +76,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
 (* -------------------------------------------------------------------------- *)
 
 let is_comp lv =
-  Ast_types.is_struct_or_union @@ Cil.typeOfLval lv
+  Ast_types.C.is_struct_or_union @@ Cil.typeOfLval lv
 
 (* -------------------------------------------------------------------------- *)
 (* --- Initializers                                                       --- *)
@@ -93,7 +93,7 @@ let rec add_init (m:map) (s:stmt) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = add_lval m s lv in
     let tv = Cil.typeOfLval lv in
-    let tr = if Ast_types.is_array tv then Ast_types.element_type tv else tv in
+    let tr = if Ast_types.C.is_array tv then Ast_types.C.array_element tv else tv in
     let acs = Access.Init(s,lv,e) in
     Memory.add_init r acs tr ;
     Option.iter (Memory.add_points_to r) (add_exp m s e)

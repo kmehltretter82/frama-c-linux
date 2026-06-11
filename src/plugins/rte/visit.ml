@@ -225,7 +225,7 @@ class annot_visitor kf flags on_alarm = object (self)
       let generate () =
         match exp.enode with
         | BinOp((Div | Mod), lexp, rexp, ty) ->
-          (match Ast_types.unroll_node ty with
+          (match Ast_types.C.unroll_node ty with
            | TInt kind ->
              (* add assertion "divisor not zero" *)
              if self#do_div_mod () then
@@ -239,11 +239,11 @@ class annot_visitor kf flags on_alarm = object (self)
            | _ -> ())
 
         | BinOp((Shiftlt | Shiftrt) as op, lexp, rexp,ttype ) ->
-          (match Ast_types.unroll_node ttype with
+          (match Ast_types.C.unroll_node ttype with
            | TInt kind ->
              (* 0 <= rexp <= width *)
              if self#do_shift () then begin
-               let typ = Ast_types.unroll (Cil.typeOf exp) in
+               let typ = Ast_types.C.unroll (Cil.typeOf exp) in
                (* Not really a problem of overflow, but almost a similar to self#do_div_mod *)
                self#generate_assertion Rte.shift_width_assertion (rexp, typ);
              end;
@@ -264,7 +264,7 @@ class annot_visitor kf flags on_alarm = object (self)
         | BinOp((PlusA |MinusA | Mult) as op, lexp, rexp, ttype) ->
           (* may be skipped if the enclosing expression is a downcast to a signed
              type *)
-          (match Ast_types.unroll_node ttype with
+          (match Ast_types.C.unroll_node ttype with
            | TInt kind when Cil.isSigned kind ->
              if self#do_signed_overflow () && not (self#must_skip exp) then
                self#generate_assertion
@@ -287,7 +287,7 @@ class annot_visitor kf flags on_alarm = object (self)
              "subtracting the promoted value from the largest value
              of the promoted type and adding one",
              the result is always representable: so no overflow *)
-          (match Ast_types.unroll_node ty with
+          (match Ast_types.C.unroll_node ty with
            | TInt kind when Cil.isSigned kind ->
              if self#do_signed_overflow () then
                self#generate_assertion Rte.uminus_assertion exp;
@@ -296,7 +296,7 @@ class annot_visitor kf flags on_alarm = object (self)
            | _ -> ())
 
         | Lval lval ->
-          (match Ast_types.unroll_node (Cil.typeOfLval lval) with
+          (match Ast_types.C.unroll_node (Cil.typeOfLval lval) with
            | TPtr _ ->
              (* Note: here we are forced to make these checks because we do not
                 control strict aliasing violation, thus a pointer might be
@@ -316,7 +316,7 @@ class annot_visitor kf flags on_alarm = object (self)
           self#check_initialized lval
 
         | CastE (ty, e) ->
-          (match Ast_types.unroll_node ty,  Ast_types.unroll_node (Cil.typeOf e) with
+          (match Ast_types.C.unroll_node ty,  Ast_types.C.unroll_node (Cil.typeOf e) with
            (* to , from *)
            | TInt _, TPtr _ when self#do_pointer_downcast () ->
              self#generate_assertion Rte.downcast_assertion (ty, e)

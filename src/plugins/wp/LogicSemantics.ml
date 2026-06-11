@@ -94,8 +94,8 @@ struct
   let collection_of_term env t =
     let v = C.logic env t in
     match v with
-    | Vexp s when Logic_utils.is_set_type t.term_type ->
-      let te = Logic_utils.type_of_set_elem t.term_type in
+    | Vexp s when Ast_types.Acsl.is_plain_set t.term_type ->
+      let te = Ast_types.Acsl.set_element t.term_type in
       Vset [Vset.Set(tau_of_ltype te,s)]
     | w -> w
 
@@ -148,7 +148,7 @@ struct
     | TField(f,offset) ->
       logic_offset env f.ftype (L.field v f) offset
     | TIndex(k,offset) ->
-      let te = Ast_types.direct_element_type typ in
+      let te = Ast_types.C.direct_array_element typ in
       let size = Ctypes.get_array_size (Ctypes.object_of typ) in
       let obj = Ctypes.object_of te in
       let vloc = L.shift v obj ?size (C.logic env k) in
@@ -189,7 +189,7 @@ struct
           load_loc env ty l loffset
       end
     | TMem e ->
-      let te = Logic_typing.ctype_of_pointed e.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype e.term_type in
       let te , lp = logic_offset env te (C.logic env e) loffset in
       L.load (C.current env) (Ctypes.object_of te) lp
     | TVar{lv_name="\\exit_status"} ->
@@ -216,7 +216,7 @@ struct
           Wp_parameters.abort ~current:true "Address of \\result"
       end
     | TMem e ->
-      let te = Logic_typing.ctype_of_pointed e.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype e.term_type in
       logic_offset env te (C.logic env e) loffset
     | TVar lv ->
       begin
@@ -265,7 +265,7 @@ struct
   and matrixinfo = c_object * int option list
 
   let eqsort_of_type t =
-    match Ast_types.unroll_logic ~unroll_typedef:false t with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false t with
     | Ltype({lt_name="set"},[_]) -> EQ_set
     | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
     | Ctype t ->
@@ -342,15 +342,15 @@ struct
 
 
   let float_of_logic_type lt =
-    match Ast_types.unroll_logic lt with
+    match Ast_types.Acsl.unroll lt with
     | Ctype ty ->
-      (match Ast_types.unroll_node ty with
+      (match Ast_types.C.unroll_node ty with
        | TFloat f -> Some (Ctypes.c_float f)
        | _ -> None)
     | _ -> None
 
   let compare_term env vrel lrel frel a b =
-    if Logic_utils.is_pointer_type a.term_type then
+    if Ast_types.Acsl.is_ptr a.term_type then
       lrel (loc_of_term env a) (loc_of_term env b)
     else match float_of_logic_type a.term_type with
       | Some f -> frel f (val_of_term env a) (val_of_term env b)
@@ -379,8 +379,8 @@ struct
   let arith env fint freal a b =
     let va = C.logic env a in
     let vb = C.logic env b in
-    let ta = Logic_utils.is_integral_type a.term_type in
-    let tb = Logic_utils.is_integral_type b.term_type in
+    let ta = Ast_types.Acsl.is_integral a.term_type in
+    let tb = Ast_types.Acsl.is_integral b.term_type in
     if ta && tb
     then fint va vb
     else freal (toreal ta va) (toreal tb vb)
@@ -404,15 +404,15 @@ struct
     | PlusPI ->
       let va = C.logic env a in
       let vb = C.logic env b in
-      let te = Logic_typing.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       L.shift va (Ctypes.object_of te) vb
     | MinusPI ->
       let va = C.logic env a in
       let vb = C.logic env b in
-      let te = Logic_typing.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       L.shift va (Ctypes.object_of te) (L.map_opp vb)
     | MinusPP ->
-      let te = Logic_typing.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       let la = loc_of_term env a in
       let lb = loc_of_term env b in
       Vexp(M.loc_diff (Ctypes.object_of te) la lb)
@@ -444,7 +444,7 @@ struct
     | L_array of arrayinfo
 
   let rec cvsort_of_ltype src_ltype =
-    match Ast_types.unroll_logic ~unroll_typedef:false src_ltype with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false src_ltype with
     | Lboolean -> L_bool
     | Linteger -> L_integer
     | Lreal -> L_real
@@ -462,7 +462,7 @@ struct
           Warning.error "@[Logic cast from union (%a) not implemented yet@]"
             Printer.pp_typ src_ctype
       end
-    | Ltype _ as b when Logic_const.is_boolean_type b -> L_bool
+    | Ltype _ as b when Ast_types.Acsl.is_logic_boolean b -> L_bool
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting or set of elements ? *)
       cvsort_of_ltype elt_ltype
     | (Ltype _ | Lvar _ | Larrow _) as typ ->
@@ -543,7 +543,7 @@ struct
         Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
 
   let term_cast_to_real env t =
-    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_cint _ ->
       L.map (fun x -> Cmath.real_of_int (Cint.to_integer x)) (C.logic env t)
@@ -557,7 +557,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lreal
 
   let term_cast_to_integer env t =
-    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_real ->
       L.map Cmath.int_of_real (C.logic env t)
@@ -575,7 +575,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
 
   let term_cast_to_boolean env t =
-    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_bool -> C.logic env t
     | L_integer | L_cint _ ->
@@ -585,7 +585,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lboolean
 
   let rec term_cast_to_ltype env dst_ltype t =
-    match Ast_types.unroll_logic ~unroll_typedef:false dst_ltype with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false dst_ltype with
     | Ctype typ-> term_cast_to_ctype env typ t
     | Lboolean -> term_cast_to_boolean env t
     | Linteger -> term_cast_to_integer env t
@@ -593,7 +593,7 @@ struct
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting, set of elements ? *)
       term_cast_to_ltype env elt_ltype t
     | (Ltype _ | Lvar _ | Larrow _) as dst_ltype ->
-      let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
+      let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
       Warning.error "@[Logic cast to (%a) from (%a) not implemented yet@]"
         Printer.pp_logic_type dst_ltype Printer.pp_logic_type src_ltype
 
@@ -645,13 +645,13 @@ struct
       begin
         let lt = Cil.typeOfTermLval lval in
         let base = addr_lval env lval in
-        match Ast_types.unroll_logic lt with
+        match Ast_types.Acsl.unroll lt with
         | Ctype ct ->
           L.map_loc (fun l -> Cvalues.startof ~shift:M.shift l ct) base
         | _ -> base
       end
 
-    | TUnOp(Neg,t) when not (Logic_utils.is_integral_type t.term_type) ->
+    | TUnOp(Neg,t) when not (Ast_types.Acsl.is_integral t.term_type) ->
       L.map F.e_opp (C.logic env t)
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b
@@ -702,7 +702,7 @@ struct
       L.map_l2t M.base_offset (C.logic env t)
 
     | Tblock_length (label,t) ->
-      let obj = object_of (Logic_typing.ctype_of_pointed t.term_type) in
+      let obj = object_of (Ast_types.Acsl.direct_pointed_ctype t.term_type) in
       let sigma = C.mem_at env (of_logic label) in
       L.map_l2t (M.block_length sigma obj) (C.logic env t)
 
@@ -758,7 +758,7 @@ struct
       begin
         List.map
           (fun t ->
-             let te = Logic_typing.ctype_of_pointed t.term_type in
+             let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
              let obj = Ctypes.object_of te in
              L.region obj (C.logic env t)
           ) ts
@@ -782,13 +782,13 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let valid env acs label t =
-    let te = Logic_typing.ctype_of_pointed t.term_type in
+    let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
     let sigma = C.mem_at env (Clabels.of_logic label) in
     let addrs = C.logic env t in
     p_all (L.valid sigma acs) (L.region (Ctypes.object_of te) addrs)
 
   let initialized env label t =
-    let te = Logic_typing.ctype_of_pointed t.term_type in
+    let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
     let sigma = C.mem_at env (Clabels.of_logic label) in
     let addrs = C.logic env t in
     p_all (L.initialized sigma) (L.region (Ctypes.object_of te) addrs)

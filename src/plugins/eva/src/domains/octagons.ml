@@ -42,7 +42,7 @@ end
 type kind = Integer | Float
 
 let typ_kind typ =
-  match Ast_types.unroll_node typ with
+  match Ast_types.C.unroll_node typ with
   | TInt _ | TEnum  _ | TPtr _ -> Integer
   | TFloat _ -> Float
   | _ -> assert false
@@ -324,7 +324,7 @@ module Rewriting = struct
     let kind = typ_kind e1.typ in
     let v1 = eval e1 in
     let v2 = eval e2 in
-    if Ast_types.is_ptr typ
+    if Ast_types.C.is_ptr typ
     then f kind v1 v2
     else
       let* v1' = project_ival v1 in
@@ -361,9 +361,9 @@ module Rewriting = struct
             let inverse_op = if op = Add then Arith.sub else Arith.add in
             try
               let v2 =
-                if Ast_types.is_ptr typ
+                if Ast_types.C.is_ptr typ
                 then
-                  let scale = Cil.(bytesSizeOf (Ast_types.direct_pointed_type typ)) in
+                  let scale = Cil.(bytesSizeOf (Ast_types.C.direct_pointed typ)) in
                   Arith.mul_integer (Z.of_int scale) v2
                 else v2
               in
@@ -385,10 +385,10 @@ module Rewriting = struct
         apply_binop rewrite_binop eval typ e1 op e2
 
       | CastE (typ, e) ->
-        if Ast_types.(is_integral typ && is_integral e.typ) then
+        if Ast_types.C.(is_integral typ && is_integral e.typ) then
           let* v = project_ival (eval e) in
           if may_overflow ~cast:true typ v then [] else rewrite eval env e
-        else if Ast_types.(is_ptr typ && is_ptr e.typ) then
+        else if Ast_types.C.(is_ptr typ && is_ptr e.typ) then
           rewrite eval env e
         else
           []
@@ -448,7 +448,7 @@ module Rewriting = struct
       let make_octagons typ _ _ = make_octagons_from_binop typ e1 op e2 ival in
       apply_binop make_octagons evaluate typ e1 op e2
     | BinOp ((Lt | Gt | Le | Ge | Eq | Ne as binop), e1, e2, _typ) ->
-      if not (Ast_types.is_integral_or_pointer e1.typ)
+      if not (Ast_types.C.is_integral_or_pointer e1.typ)
       || (Ival.contains_zero ival && Ival.contains_non_zero ival)
       then []
       else
@@ -518,7 +518,7 @@ module Rewriting = struct
         then default
         else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
-      when Ast_types.is_integral_or_pointer e1.typ ->
+      when Ast_types.C.is_integral_or_pointer e1.typ ->
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
       let range = comparison_range binop in
@@ -1247,7 +1247,7 @@ module State = struct
         with Cil.SizeOfError _ -> `Top
       end
     | Index (exp, sub) ->
-      let elem_type = Ast_types.direct_element_type base_type in
+      let elem_type = Ast_types.C.direct_array_element base_type in
       let* cvalue = eval exp in
       let* index =
         try
@@ -1271,13 +1271,13 @@ module State = struct
     fun exp ->
       match exp.node with
       | Lval lval
-        when Ast_types.is_integral_or_pointer lval.typ
+        when Ast_types.C.is_integral_or_pointer lval.typ
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_lval lval, Ival.zero)
 
       | CastE (typ, { node = Lval { node = Var vi, NoOffset } })
-        when Ast_types.is_integral typ
-          && Ast_types.is_float vi.vtype
+        when Ast_types.C.is_integral typ
+          && Ast_types.C.is_float vi.vtype
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_int vi, Ival.zero)
 
@@ -1624,7 +1624,7 @@ module Domain = struct
 
   let reduce_further state expr value =
     match expr.node with
-    | Lval lval when Ast_types.is_integral_or_pointer lval.typ ->
+    | Lval lval when Ast_types.C.is_integral_or_pointer lval.typ ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
@@ -1684,7 +1684,7 @@ module Domain = struct
     then state
     else
       match expr.node with
-      | Lval lval when Ast_types.is_integral lval.typ ->
+      | Lval lval when Ast_types.C.is_integral lval.typ ->
         let var = Variable.make_lval lval in
         let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
@@ -1765,7 +1765,7 @@ module Domain = struct
 
   let assign ~pos left_value expr assigned valuation state =
     if Position.is_local pos
-    && Ast_types.is_integral_or_pointer left_value.lval.typ
+    && Ast_types.C.is_integral_or_pointer left_value.lval.typ
     && not (valuation.Abstract_domain.is_volatile (`Lval left_value.lval))
     && not (valuation.Abstract_domain.is_volatile (`Expr expr))
     then assign_variable left_value.lval expr assigned valuation state
@@ -1800,7 +1800,7 @@ module Domain = struct
       | None ->
         let assign_formal state { formal; concrete; avalue } =
           let lval = Eva_ast.Build.var formal in
-          if Ast_types.is_integral_or_pointer formal.vtype
+          if Ast_types.C.is_integral_or_pointer formal.vtype
           && not (valuation.Abstract_domain.is_volatile (`Expr concrete))
           then state >>- assign_variable lval concrete avalue valuation
           else state

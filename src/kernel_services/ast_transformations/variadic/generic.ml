@@ -88,7 +88,7 @@ let translate_va_builtin caller inst =
       | _ -> Kernel.abort "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
-    if Ast_types.is_integral ty then begin
+    if Ast_types.C.is_integral ty then begin
       let promoted_type = Cil.integralPromotion ty in
       if promoted_type <> ty then
         Kernel.warning ~current:true ~wkey:Kernel.wkey_typing

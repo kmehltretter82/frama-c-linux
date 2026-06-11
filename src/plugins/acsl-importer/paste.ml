@@ -1095,7 +1095,7 @@ let integral_cast ty t =
     begin
       let loc = t.term_loc in
       let source = fst loc in
-      let ty = Ast_types.remove_attributes_for_logic_type ty in
+      let ty = Ast_types.C.remove_attributes_for_logic_type ty in
       Options.warning ~wkey:Options.wkey_integer_cast ~source "Casting term %a of type %a into type %a."
         Printer.pp_term t Printer.pp_logic_type Linteger Printer.pp_typ ty;
       Logic_const.tcast ~loc t ty

@@ -91,7 +91,7 @@ let cpointed = function Blob _ | Compound _ -> None | Cell(_,p) -> p
 let ctypes (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
   let add acs =
-    pool := Typ.Set.add (Ast_types.unroll @@ Access.typeof acs) !pool in
+    pool := Typ.Set.add (Ast_types.C.unroll @@ Access.typeof acs) !pool in
   Access.Set.iter add m.creads ;
   Access.Set.iter add m.cwrites ;
   Access.Set.iter add m.cinits ;
@@ -517,7 +517,7 @@ let add_points_to (a: node) (b : node) =
   end
 
 let add_value (rv:node) (ty:typ) : node option =
-  if Ast_types.is_ptr ty then
+  if Ast_types.C.is_ptr ty then
     begin
       let m = UF.store rv in
       let rp = new_chunk m ~pointed:rv () in
@@ -532,7 +532,7 @@ let add_value (rv:node) (ty:typ) : node option =
 (* -------------------------------------------------------------------------- *)
 
 let sized (a:node) ~value (ty: typ) =
-  if Ast_types.is_scalar ty then
+  if Ast_types.C.is_scalar ty then
     let layout = (UF.get a).clayout in
     let sr = sizeof layout in
     let size = Ranges.gcd sr (Fields.bitsSizeOf ty) in
@@ -717,7 +717,7 @@ let typed (r:node) =
   try
     let check acs =
       let t = Access.typeof acs in
-      match Ast_types.unroll_skel t with
+      match Ast_types.C.unroll_skel t with
       | TVoid | TFun _ -> ()
       | _ ->
         if Fields.bitsSizeOf t > size then raise Exit ;

@@ -11,7 +11,7 @@ let check ty =
       end else Cil.SkipChildren
   end
   in
-  let ty' = Ast_types.remove_qualifiers_deep ty in
+  let ty' = Ast_types.C.remove_qualifiers_deep ty in
   ignore (Cil.visitCilType vis ty');
   Format.printf "@[<v>%a@;%a@;@;@]" Cil_printer.pp_typ ty Cil_printer.pp_typ ty'
 

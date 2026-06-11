@@ -70,7 +70,7 @@ let record m =
   else Record m
 
 let logic s l =
-  if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
+  if Ast_types.Acsl.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
   else if List.for_all is_pure l then Pure
   else Logic (s,l)
 
@@ -156,7 +156,7 @@ let rec of_typ create ty : 'a t = match ty.tnode with
   | TNamed { ttype } -> of_typ create ttype
 
 let rec of_ltype create lt =
-  match Ast_types.unroll_logic ~unroll_typedef:false lt with
+  match Ast_types.Acsl.unroll ~unroll_typedef:false lt with
   | Ctype ty -> of_typ create ty
   | Lvar v -> Dvar v
   | Ltype (ti,ts) -> logic ti @@ List.map (of_ltype create) ts

@@ -1,8 +1,8 @@
 open Cil_types
 
 let rec ghost_status fmt lval =
-  let t = Ast_types.unroll (Cil.typeOfLval lval) in
-  let ghost = Ast_types.is_ghost t in
+  let t = Ast_types.C.unroll (Cil.typeOfLval lval) in
+  let ghost = Ast_types.C.is_ghost t in
 
   Format.fprintf fmt "%s" (if ghost then "ghost" else "normal") ;
   match t.tnode with

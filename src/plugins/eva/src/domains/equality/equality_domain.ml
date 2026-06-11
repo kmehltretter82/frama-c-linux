@@ -384,7 +384,7 @@ struct
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq (left_lval: Eva_ast.lval) right_expr value valuation state =
-    if not (Ast_types.is_scalar left_lval.typ) || indeterminate_copy value
+    if not (Ast_types.C.is_scalar left_lval.typ) || indeterminate_copy value
     then state
     else
       let right_expr = Eva_ast.const_fold right_expr in
@@ -459,7 +459,7 @@ struct
         if not (is_safe_equality valuation e1 e2)
         || valuation.Abstract_domain.is_volatile (`Expr e1)
         || valuation.Abstract_domain.is_volatile (`Expr e2)
-        || not (Ast_types.is_scalar e1.typ)
+        || not (Ast_types.C.is_scalar e1.typ)
         || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
             expr_cardinal_zero_or_one valuation e2)
         || (expr_is_cardinal_zero_or_one_loc valuation e2 &&

@@ -634,7 +634,7 @@ module Make (Engine : Engine_Subset) = struct
         "Recording results for %a" Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
-      if Ast_types.has_attribute "noreturn" f.svar.vtype && results <> [] then
+      if Ast_types.C.has_attribute "noreturn" f.svar.vtype && results <> [] then
         Self.warning ~current:true ~once:true
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;

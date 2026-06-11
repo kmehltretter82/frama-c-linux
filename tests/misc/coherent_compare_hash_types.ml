@@ -60,7 +60,7 @@ let attrs_combinations =
   @ [ attrs ]
 
 let mk_types_attrs t =
-  List.map (fun attrs -> Ast_types.add_attributes attrs t) attrs_combinations
+  List.map (fun attrs -> Ast_types.C.add_attributes attrs t) attrs_combinations
 
 let attrs_typ = mk_types_attrs intType
 

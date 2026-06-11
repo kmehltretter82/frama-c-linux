@@ -126,108 +126,6 @@ let loop_entry_label = BuiltinLabel LoopEntry
 
 (** {2 Types} *)
 
-let rec instantiate subst = function
-  | Ltype(ty,prms) -> Ltype(ty, List.map (instantiate subst) prms)
-  | Larrow(args,rt) ->
-    Larrow(List.map (instantiate subst) args, instantiate subst rt)
-  | Lvar v as ty ->
-    (* This is an application of type parameters:
-       no need to recursively substitute in the resulting type. *)
-    (try List.assoc v subst with Not_found -> ty)
-  | Ctype _ | Linteger | Lreal | Lboolean as ty -> ty
-
-let is_unrollable_ltdef = function
-  | {lt_def=Some (LTsyn _)} -> true
-  | {lt_def=Some (LTsum _)} | {lt_def=None} -> false
-
-let rec unroll_ltdef = function
-  | Ltype ({lt_def=Some (LTsyn ty);lt_params},prms) ->
-    let subst =
-      try
-        List.combine lt_params prms
-      with Invalid_argument _ ->
-        Kernel.fatal "Logic type used with wrong number of parameters"
-    in
-    unroll_ltdef (instantiate subst ty)
-  | Ltype ({lt_def= None},_)
-  | Ltype ({lt_def= Some (LTsum _)},_)
-  | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ as ty  -> ty
-
-let rec isLogicCType f = function
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isLogicCType f (unroll_ltdef ty)
-  | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> false
-  | Ctype cty  -> f cty
-
-let rec is_list_type = function
-  | Ltype ({lt_name = "\\list"},[_]) -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    is_list_type (unroll_ltdef ty)
-  | _ -> false
-
-(** returns the type of elements of a list type.
-    @raise Failure if the input type is not a list type. *)
-let rec type_of_list_elem ty = match ty with
-  | Ltype ({lt_name = "\\list"},[t]) -> t
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    type_of_list_elem (unroll_ltdef ty)
-  | _ -> failwith "not a list type"
-
-(** build the type list of [ty]. *)
-let make_type_list_of ty =
-  Ltype(Logic_env.find_logic_type "\\list",[ty])
-
-let rec is_set_type = function
-  | Ltype ({lt_name = "set"},[_]) -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    is_set_type (unroll_ltdef ty)
-  | _ -> false
-
-(** converts a type into the corresponding set type if needed. *)
-let make_set_type ty =
-  if is_set_type ty then ty
-  else Ltype(Logic_env.find_logic_type "set",[ty])
-
-(** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
-    is a set. Elements have type [ty1], or the type of the elements of [ty1] if
-    it is itself a set-type ({i.e.} we do not build set of sets that way).*)
-let set_conversion ty1 ty2 =
-  if is_set_type ty2 then make_set_type ty1 else ty1
-
-(** returns the type of elements of a set type.
-    @raise Failure if the input type is not a set type. *)
-let rec type_of_element ty = match ty with
-  | Ltype ({lt_name = "set"},[t]) -> t
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    type_of_element (unroll_ltdef ty)
-  | _ -> failwith "not a set type"
-
-(** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
-    if it is a set type *)
-let plain_or_set f = function
-  | Ltype ({lt_name = "set"},[t]) -> f t
-  | Ltype (tdef,_) as t when is_unrollable_ltdef tdef -> begin
-      match unroll_ltdef t with
-      | Ltype ({lt_name = "set"},[t]) -> f t
-      | _ -> f t
-    end
-  | t -> f t
-
-let transform_element f t = set_conversion (plain_or_set f t) t
-
-let is_plain_type ty = not (is_set_type ty)
-
-let make_arrow_type args rt =
-  match args with
-  | [] -> rt
-  | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
-
-let rec is_boolean_type = function
-  | Lboolean -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    is_boolean_type (unroll_ltdef ty)
-  | _ -> false
-
 (** {2 Offsets} *)
 
 let rec lastTermOffset (off: term_offset) : term_offset =
@@ -471,7 +369,7 @@ let pvalid_index ?loc ?names (l,t1,t2) =
       | TStartOf lv ->
         TAddrOf (addTermOffsetLval (TIndex(t2,TNoOffset)) lv)
       | _ -> TBinOp (PlusPI, t1, t2)),
-             set_conversion ty1 ty2 in
+             Ast_types.Acsl.set_conversion ty1 ty2 in
   let t = term ?loc t ty in
   pvalid ?loc ?names (l,t)
 (* the range should be a range of integers *)
@@ -490,3 +388,40 @@ let pseparated ?loc ?names seps =
 let paligned ?loc ?names (p, n) =
   pred ?loc ?names (Paligned(p, n))
 
+
+
+
+let instantiate = Ast_types.Acsl.instantiate
+
+let is_unrollable_ltdef = Ast_types.Acsl.is_unrollable_ltdef
+
+let unroll_ltdef = Ast_types.Acsl.unroll_ltdef
+
+let isLogicCType = Ast_types.Acsl.fold_plain_ctype ~default:false
+
+let is_list_type = Ast_types.Acsl.is_plain_list
+
+(** build the type list of [ty]. *)
+let make_type_list_of = Ast_types.Acsl.make_list
+
+(** returns the type of elements of a list type.
+    @raise Failure if the input type is not a list type. *)
+let type_of_list_elem = Ast_types.Acsl.list_element
+
+let is_set_type = Ast_types.Acsl.is_plain_set
+
+let set_conversion = Ast_types.Acsl.set_conversion
+
+let make_set_type = Ast_types.Acsl.make_set
+
+let type_of_element = Ast_types.Acsl.set_element
+
+let plain_or_set = Ast_types.Acsl.plain_or_set
+
+let transform_element = Ast_types.Acsl.transform_element
+
+let is_plain_type = Ast_types.Acsl.is_plain
+
+let make_arrow_type = Ast_types.Acsl.make_arrow
+
+let is_boolean_type = Ast_types.Acsl.is_logic_boolean

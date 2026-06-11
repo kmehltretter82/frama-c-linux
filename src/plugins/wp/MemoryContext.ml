@@ -64,28 +64,28 @@ let set x p w =
   | NotUsed -> w
   | ByAddr -> { w with by_addr = Var x :: w.by_addr }
   | ByRef ->
-    if Ast_types.is_fun x.vtype then w else
+    if Ast_types.C.is_fun x.vtype then w else
       { w with context = Ptr x :: w.context }
   | InContext v ->
-    if Ast_types.is_fun x.vtype then w else
+    if Ast_types.C.is_fun x.vtype then w else
       begin match v with
         | Nullable -> { w with nullable = Ptr x :: w.nullable }
         | Valid -> { w with context = Ptr x :: w.context }
       end
   | InArray v ->
-    if Ast_types.is_fun x.vtype then w else
+    if Ast_types.C.is_fun x.vtype then w else
       begin match v with
         | Nullable -> { w with nullable = Arr x :: w.nullable }
         | Valid -> { w with context = Arr x :: w.context }
       end
   | ByValue | ByShift ->
     if x.vghost then w else
-    if Ast_types.is_fun x.vtype then w else
+    if Ast_types.C.is_fun x.vtype then w else
     if x.vglob && (x.vstorage <> Static || x.vaddrof) then
-      let z = if Ast_types.is_array x.vtype then Arr x else Var x in
+      let z = if Ast_types.C.is_array x.vtype then Arr x else Var x in
       { w with globals = z :: w.globals }
     else
-    if x.vformal && Ast_types.is_ptr x.vtype then
+    if x.vformal && Ast_types.C.is_ptr x.vtype then
       let z = if p = ByShift then Arr x else Ptr x in
       { w with to_heap = z :: w.to_heap }
     else w
@@ -98,9 +98,9 @@ open Logic_const
 
 let rec ptr_of = function
   | Ctype t -> Ctype (Cil_const.mk_tptr t)
-  | t when Logic_utils.is_set_type t ->
-    let t = Logic_utils.type_of_set_elem t in
-    Logic_const.make_set_type (ptr_of t)
+  | t when Ast_types.Acsl.is_plain_set t ->
+    let t = Ast_types.Acsl.set_element t in
+    Ast_types.Acsl.make_set (ptr_of t)
   | _ -> assert false
 
 let rec addr_of_lval ?loc term =
@@ -130,8 +130,8 @@ let rec addr_of_lval ?loc term =
 let type_of_zone = function
   | Ptr vi -> vi.vtype
   | Var vi -> Cil_const.mk_tptr vi.vtype
-  | Arr vi when Ast_types.is_ptr vi.vtype -> vi.vtype
-  | Arr vi -> Cil_const.mk_tptr (Ast_types.direct_element_type vi.vtype)
+  | Arr vi when Ast_types.C.is_ptr vi.vtype -> vi.vtype
+  | Arr vi -> Cil_const.mk_tptr (Ast_types.C.direct_array_element vi.vtype)
 
 let zone_to_term ?(to_char=false) loc zone =
   let typ = Ctype (type_of_zone zone) in
@@ -155,7 +155,7 @@ let zone_to_term ?(to_char=false) loc zone =
   | Ptr vi -> loc_range (term ~loc (TLval(lval vi)) typ)
   | Arr vi ->
     let ptr =
-      if Ast_types.is_array vi.vtype
+      if Ast_types.C.is_array vi.vtype
       then term ~loc (TStartOf (lval vi)) typ
       else term ~loc (TLval(lval vi)) typ
     in
@@ -174,7 +174,7 @@ let region_to_term loc = function
     let tl = List.map type_of_zone tl in
     let to_char = not (List.for_all (Cil_datatype.Typ.equal fst) tl) in
     let set_typ =
-      make_set_type (Ctype (if to_char then Cil_const.charPtrType else fst))
+      Ast_types.Acsl.make_set (Ctype (if to_char then Cil_const.charPtrType else fst))
     in
     term ~loc (Tunion (List.map (zone_to_term ~to_char loc) l)) set_typ
 
@@ -212,8 +212,8 @@ let normalize ps =
   List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps
 
 let ptrset { term_type = t } =
-  let open Logic_utils in
-  is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
+  let open Ast_types.Acsl in
+  is_ptr t || (is_plain_set t && is_ptr (set_element t))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Partition Helpers                                                  --- *)
@@ -369,7 +369,7 @@ let out_pointers_separation kf loc p =
   in
   let asgnd_ptrs = List.filter_map assigned_ptr (assigned_via_pointers kf) in
   let asgnd_ptrs =
-    if Ast_types.is_ptr ret_t then tresult ~loc ret_t :: asgnd_ptrs
+    if Ast_types.C.is_ptr ret_t then tresult ~loc ret_t :: asgnd_ptrs
     else asgnd_ptrs
   in
   let formals_separation =

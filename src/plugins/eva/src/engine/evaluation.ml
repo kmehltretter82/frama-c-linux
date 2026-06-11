@@ -128,10 +128,10 @@ let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | `None -> false
   | `All -> true
-  | `Pointer -> Ast_types.(is_ptr typ)
+  | `Pointer -> Ast_types.(C.is_ptr typ)
 
 let propagate_all_pointer_comparison typ =
-  not (Ast_types.is_ptr typ)
+  not (Ast_types.C.is_ptr typ)
   || Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let comparison_kind = function
@@ -150,7 +150,7 @@ let signed_ikind = function
   | IInt128 | IUInt128      -> IInt128
 
 let rec signed_counterpart typ =
-  let typ = Ast_types.unroll typ in
+  let typ = Ast_types.C.unroll typ in
   match typ.tnode with
   | TInt ik -> Cil_const.mk_tint ~tattr:typ.tattr (signed_ikind ik)
   | TEnum ei ->
@@ -471,11 +471,11 @@ module Make
   (* Casts to void* are always safe, and no alignment for functions. *)
   let check_alignment target =
     Kernel.UnalignedPointer.get ()
-    && not (Ast_types.is_void target)
-    && not (Ast_types.is_fun target)
+    && not (Ast_types.C.is_void target)
+    && not (Ast_types.C.is_fun target)
 
   let assume_aligned expr typ value =
-    let target = Ast_types.direct_pointed_type typ in
+    let target = Ast_types.C.direct_pointed typ in
     if check_alignment target then
       let target_align = Cil.bytesAlignOf target in
       if target_align > 1 then
@@ -522,7 +522,7 @@ module Make
   let assume_valid_value context lval res =
     let open Evaluated.Operators in
     let* value, origin = res in
-    match Ast_types.unroll_node lval.typ with
+    match Ast_types.C.unroll_node lval.typ with
     | TFloat fkind ->
       let expr = Eva_ast.Build.lval lval in
       let+ new_value = remove_special_float expr fkind value in
@@ -611,7 +611,7 @@ module Make
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    if Ast_types.is_integral typ || Ast_types.is_ptr typ then
+    if Ast_types.C.is_integral typ || Ast_types.C.is_ptr typ then
       match op with
       | Div | Mod ->
         (* The behavior of a%b is undefined if the behavior of a/b is undefined,
@@ -663,7 +663,7 @@ module Make
         let zero = Value.inject_int typ_res Z.zero in
         let one = Value.inject_int typ_res Z.one in
         let zero_or_one = Value.join zero one in
-        if Ast_types.is_ptr typ_arg then
+        if Ast_types.C.is_ptr typ_arg then
           Self.result
             ~current:true ~once:true
             ~dkey:Self.dkey_pointer_comparison
@@ -676,7 +676,7 @@ module Make
 
   let forward_binop context ~typ_res (e1, v1 as arg1) op arg2 =
     let open Evaluated.Operators in
-    let typ_arg = Ast_types.unroll e1.typ in
+    let typ_arg = Ast_types.C.unroll e1.typ in
     match comparison_kind op with
     | Some kind ->
       let compute v1 v2 = Value.forward_binop context typ_arg op v1 v2 in
@@ -688,7 +688,7 @@ module Make
       Value.forward_binop context typ_arg op v1 v2
 
   let forward_unop context ~typ_res unop (e, v as arg) =
-    let typ_arg = Ast_types.unroll e.typ in
+    let typ_arg = Ast_types.C.unroll e.typ in
     if unop = LNot then
       let kind = Abstract_value.Equality in
       let compute _ v = Value.forward_unop context typ_arg unop v in
@@ -804,7 +804,7 @@ module Make
         match src_type, dst_type with
         | TSPtr src, TSInt dst ->
           let alarm =
-            if Ast_types.is_intptr_t dst_typ || Ast_types.is_uintptr_t dst_typ
+            if Ast_types.C.is_intptr_t dst_typ || Ast_types.C.is_uintptr_t dst_typ
             then NoAlarm
             else PtrDowncast
           in
@@ -991,7 +991,7 @@ module Make
     | CastE (dst_typ, e) ->
       let* value, volatile = root_forward_eval env e in
       let v = forward_cast env.context ~dst_typ e value in
-      let v = match Ast_types.unroll_node dst_typ with
+      let v = match Ast_types.C.unroll_node dst_typ with
         | TFloat fkind -> let* v in remove_special_float expr fkind v
         | TPtr _ ->
           let* v in
@@ -1034,7 +1034,7 @@ module Make
         let volatile_loc = Loc.is_volatile loc in
         (* This warning should be a proper alarm. Do not emit the warning
            on evaluations from the oracle or from calls to the Eva API. *)
-        if volatile_loc && not (Ast_types.is_volatile lval.typ) && reduction
+        if volatile_loc && not (Ast_types.C.is_volatile lval.typ) && reduction
            && not env.oracle_evaluation
            && Self.ComputationState.get () = Computing
         then
@@ -1113,7 +1113,7 @@ module Make
     | Index (index_expr, remaining) ->
       let open Evaluated.Operators in
       let typ_pointed, array_size =
-        match Ast_types.unroll typ with
+        match Ast_types.C.unroll typ with
         | { tnode = TArray (t, size) } -> t, size
         | t -> Self.fatal ~current:true "Got type '%a'" Printer.pp_typ t
       in
@@ -1141,9 +1141,9 @@ module Make
       remaining_volatile || volatile
     | Field (fi, remaining) ->
       let open Evaluated.Operators in
-      let attrs = Ast_types.get_attributes typ in
+      let attrs = Ast_types.C.get_attributes typ in
       let attrs = Ast_attributes.filter_qualifiers attrs in
-      let typ_fi = Ast_types.add_attributes attrs fi.ftype in
+      let typ_fi = Ast_types.C.add_attributes attrs fi.ftype in
       let evaluated = eval_offset env ~reduce_valid_index typ_fi remaining in
       let+ r, volatile = evaluated in
       let off = Loc.forward_field typ fi r in
@@ -1393,12 +1393,12 @@ module Make
          Value.backward_unop? *)
       backward_eval fuel context state cond (Some value)
     | UnOp (op, e, _typ) ->
-      let typ_arg = Ast_types.unroll e.typ in
+      let typ_arg = Ast_types.C.unroll e.typ in
       let* arg = find_val e in
       let* v = Value.backward_unop context ~typ_arg op ~arg ~res:value in
       backward_eval fuel context state e v
     | BinOp (binop, e1, e2, typ) ->
-      let resulting_type = Ast_types.unroll typ in
+      let resulting_type = Ast_types.C.unroll typ in
       let input_type = e1.typ in
       let* left = find_val e1
       and* right = find_val e2 in
@@ -1408,8 +1408,8 @@ module Make
       backward_eval fuel context state e2 v2
     | CastE (typ, e) ->
       begin
-        let dst_typ = Ast_types.unroll typ in
-        let src_typ = Ast_types.unroll e.typ in
+        let dst_typ = Ast_types.C.unroll typ in
+        let src_typ = Ast_types.C.unroll e.typ in
         let* src_val = find_val e in
         let backward = Value.backward_cast context ~src_typ ~dst_typ in
         let* v = backward ~src_val ~dst_val:value in
@@ -1488,7 +1488,7 @@ module Make
         backward_eval fuel context state expr (Some loc_value)
       | _ ->
         let reduce_valid_index = true in
-        let typ_lval = Ast_types.direct_pointed_type expr.typ in
+        let typ_lval = Ast_types.C.direct_pointed expr.typ in
         let* env = fast_eval_environment state in
         let eval = eval_offset env ~reduce_valid_index typ_lval offset in
         let* loc_offset, _ = fst eval in
@@ -1506,7 +1506,7 @@ module Make
       backward_offset fuel context state field.ftype remaining rem
     | Index (exp, remaining) ->
       let* v = find_val exp in
-      let typ_pointed = Ast_types.direct_element_type typ in
+      let typ_pointed = Ast_types.C.direct_array_element typ in
       let* env = fast_eval_environment state in
       let* rem, _ =
         eval_offset env ~reduce_valid_index:true typ_pointed remaining |> fst
