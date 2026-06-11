@@ -10,7 +10,7 @@
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "Frama-C:" %{lib-available:frama-c.kernel} "\n")
+          (echo "Frama-C Kernel:" %{lib-available:frama-c.kernel_base} "\n")
           (echo "  - str:" %{lib-available:str} "\n")
           (echo "  - unix:" %{lib-available:unix} "\n")
           (echo "  - zarith:" %{lib-available:zarith} "\n")
@@ -40,13 +40,14 @@
  (enabled_if
   (and
    (= %{env:FRAMAC_DEVELOPER=no} "yes")
-   (not %{lib-available:frama-c.kernel})))
- (action (echo "WARNING: Frama-C disabled. Run 'dune build @frama-c-configure' for more details\n"))
+   (not %{lib-available:frama-c.kernel_base})))
+ (action (echo "WARNING: Frama-C Kernel disabled. Run 'dune build @frama-c-configure' for more details\n"))
 )
 
 (library
-  (name frama_c_kernel)
-  (public_name frama-c.kernel)
+  (name frama_c_kernel_base)
+  (public_name frama-c.kernel_base)
+  (modules (:standard \ frama_c_kernel))
   (flags -open Fclib :standard -w -9)
   (libraries frama-c.fclib frama-c.init fpath str unix zarith ocamlgraph dynlink bytes yaml.unix yojson menhirLib dune-site dune-site.plugins zip frama-c.fc_internal_z)
   (instrumentation (backend landmarks))
@@ -55,11 +56,23 @@
   (preprocess (pps ppx_deriving.eq ppx_deriving.show ppx_deriving.make ppx_deriving.ord ppx_deriving_yaml ppx_inline_test frama-c.ppx_z_literals))
 )
 
-(generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins)))
-
-(include_subdirs unqualified)
+(library
+  (name frama_c_kernel)
+  (public_name frama-c.kernel)
+  (modules frama_c_kernel)
+  (wrapped false)
+  (flags :standard -w -9)
+  (libraries frama-c.fclib frama-c.kernel_base)
+)
 
 (alias
   (name all)
-  (deps (file frama_c_kernel.cma)(file frama_c_kernel.cmxa))
+  (deps (file frama_c_kernel.cma) (file frama_c_kernel.cmxa))
 )
+
+(alias (name runtest-frama_c_kernel)
+  (deps (alias runtest-frama_c_kernel_base)))
+
+(generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins)))
+
+(include_subdirs unqualified)
