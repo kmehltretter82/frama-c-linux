@@ -281,7 +281,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pobject_pointer _ -> Env.not_yet env "labeled \\object_pointer"
   | Pseparated tlist ->
-    let env =
+    let rtes () =
       List.fold_left
         (fun env t ->
            let name = "separated_guard" in
@@ -301,6 +301,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
         env
         tlist
     in
+    let env = if Options.Optimisations.Omit_rte.get () then env else rtes () in
     let e, adata, env =
       Memory_translate.call_with_size
         ~adata

@@ -12,32 +12,33 @@ open Cil_types
 let dkey = Options.Dkey.translation
 
 let rte_annots pp elt kf env l =
-  let old_kind = Env.annotation_kind env in
-  let env = Env.set_annotation_kind env RTE in
-  let env =
-    List.fold_left
-      (fun env a -> match a.annot_content with
-         | AAssert(_, p) ->
-           Env.handle_error
-             (fun env ->
-                Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
-                (* The logic scope MUST NOT be reset here since we still might
-                   be in the middle of the translation of the original
-                   predicate. *)
-                let lscope_reset_old = Env.Logic_scope.get_reset env in
-                let env = Env.Logic_scope.set_reset env false in
-                let env =
-                  Env.with_params ~rte:false ~env
-                    (fun env -> Translate_predicates.do_it kf env p)
-                in
-                let env = Env.Logic_scope.set_reset env lscope_reset_old in
-                env)
-             env
-         | _ -> assert false)
-      env
-      l
-  in
-  Env.set_annotation_kind env old_kind
+  if Options.Optimisations.Omit_rte.get () then env else
+    let old_kind = Env.annotation_kind env in
+    let env = Env.set_annotation_kind env RTE in
+    let env =
+      List.fold_left
+        (fun env a -> match a.annot_content with
+           | AAssert(_, p) ->
+             Env.handle_error
+               (fun env ->
+                  Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
+                  (* The logic scope MUST NOT be reset here since we still might
+                     be in the middle of the translation of the original
+                     predicate. *)
+                  let lscope_reset_old = Env.Logic_scope.get_reset env in
+                  let env = Env.Logic_scope.set_reset env false in
+                  let env =
+                    Env.with_params ~rte:false ~env
+                      (fun env -> Translate_predicates.do_it kf env p)
+                  in
+                  let env = Env.Logic_scope.set_reset env lscope_reset_old in
+                  env)
+               env
+           | _ -> assert false)
+        env
+        l
+    in
+    Env.set_annotation_kind env old_kind
 
 let exp ?filter kf env e =
   if Options.Optimisations.Omit_rte.get () then env else begin
