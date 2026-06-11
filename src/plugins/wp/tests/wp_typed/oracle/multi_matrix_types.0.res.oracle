@@ -12,19 +12,9 @@ theory Matrix
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
+  (* use frama_c_wp.cint.Cint *)
   
   (* use map.Map *)
-  
-  (* use frama_c_wp.cint.Cint *)
   
   predicate IsArray_uint32 (t:int -> int) = forall i:int. is_uint32 (get t i)
   
@@ -41,29 +31,20 @@ theory S1_S
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
   (* use map.Map *)
   
   type S1_S =
     | S1_S1 (F1_S_f:int) (F1_S_a:int -> int) (F1_S_b:int -> int)
   
-  (* use Matrix *)
+  (* use wp.generated.Matrix *)
   
   predicate IsS1_S (s:S1_S) =
-    (IsArray_sint64 (F1_S_b s) /\ IsArray_uint32 (F1_S_a s)) /\
-    is_sint32 (F1_S_f s)
+    IsArray_sint64 (F1_S_b s) /\
+    IsArray_uint32 (F1_S_a s) /\ is_sint32 (F1_S_f s)
   
   predicate EqS1_S (s:S1_S) (s1:S1_S) =
-    (F1_S_f s1 = F1_S_f s /\ EqArray_int 5 (F1_S_a s) (F1_S_a s1)) /\
+    F1_S_f s1 = F1_S_f s /\
+    EqArray_int 5 (F1_S_a s) (F1_S_a s1) /\
     EqArray_int 5 (F1_S_b s) (F1_S_b s1)
   
 end
@@ -73,18 +54,6 @@ end
 theory Compound
   
   (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
   
   (* use frama_c_wp.memaddr.MemAddr *)
   
@@ -102,7 +71,7 @@ theory Compound
   
   function Array_sint64 addr int (addr -> int) : int -> int
   
-  (* use S1_S *)
+  (* use wp.generated.S1_S *)
   
   function Load_S1_S (p:addr) (mint:addr -> int) (mint1:addr -> int) (mint2:
     addr -> int) : S1_S =
@@ -146,31 +115,19 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
-    (* use S1_S *)
+    (* use wp.generated.S1_S *)
     
-    (* use Compound *)
-    
-    goal wp_goal :
-      forall t:addr -> int, t1:addr -> int, t2:addr -> int, a:addr, i:int.
-       let a1 = Load_S1_S a t t2 t1 in
-       let a2 = Load_S1_S a t (set t2 (shiftfield_F1_S_f a) i) t1 in
-       region (a.base) <= 0 -> IsS1_S a1 -> IsS1_S a2 -> EqS1_S a2 a1
+    (* use wp.generated.Compound *)
     
   end
+  
+  goal wp :
+    forall t:addr -> int, t1:addr -> int, t2:addr -> int, a:addr, i:int.
+     let a1 = Load_S1_S a t t2 t1 in
+     let a2 = Load_S1_S a t (set t2 (shiftfield_F1_S_f a) i) t1 in
+     region (a.base) <= 0 -> IsS1_S a1 -> IsS1_S a2 -> EqS1_S a2 a1
 [wp] 1 goal generated
 ------------------------------------------------------------
   Function job

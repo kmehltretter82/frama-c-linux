@@ -20,17 +20,16 @@ Prover CFG returns Valid
 Goal Post-condition ("float_real.i", line 14, characters 11-42) in 'dequal':
 Assume {
   Type: is_sint32(dequal_0).
-  If lt_f64(sub_f64(x, y),
-       to_fq64((5902958103587057.0/590295810358705651712)))
+  If lt_f64(sub_f64(x, y), to_fq64((5902958103587057/590295810358705651712)))
   Then {
-    If lt_f64(to_fq64((-5902958103587057.0/590295810358705651712)),
+    If lt_f64(to_fq64((-5902958103587057/590295810358705651712)),
          sub_f64(x, y))
     Then { Have: dequal_0 = 1. }
     Else { Have: dequal_0 = 0. }
   }
   Else { Have: dequal_0 = 0. }
 }
-Prove: (abs(of_f64(x) - of_f64(y)) < (1.0/100000)) <-> (dequal_0 != 0).
+Prove: (abs(of_f64(x) - of_f64(y)) < (1/100000)) <-> (dequal_0 != 0).
 
 ------------------------------------------------------------
 

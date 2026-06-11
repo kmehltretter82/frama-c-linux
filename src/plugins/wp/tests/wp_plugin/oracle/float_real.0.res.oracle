@@ -20,15 +20,15 @@ Prover CFG returns Valid
 Goal Post-condition ("float_real.i", line 14, characters 11-42) in 'dequal':
 Assume {
   Type: is_sint32(dequal_0).
-  If x < ((1.0/100000) + y)
+  If x < ((1/100000) + y)
   Then {
-    If y < ((1.0/100000) + x)
+    If y < ((1/100000) + x)
     Then { Have: dequal_0 = 1. }
     Else { Have: dequal_0 = 0. }
   }
   Else { Have: dequal_0 = 0. }
 }
-Prove: (abs(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
+Prove: (abs(x - y) < (1/100000)) <-> (dequal_0 != 0).
 
 ------------------------------------------------------------
 

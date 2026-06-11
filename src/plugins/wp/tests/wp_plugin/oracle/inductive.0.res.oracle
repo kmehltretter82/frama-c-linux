@@ -9,18 +9,6 @@ theory Compound
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
@@ -33,21 +21,9 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
-    (* use Compound *)
+    (* use wp.generated.Compound *)
     
     inductive P_reachable (int -> int) (addr -> addr) addr addr =
       | Q_P_reachable_root_reachable :
@@ -74,11 +50,11 @@ end
     
     predicate P_swap (mint:addr -> int) (mint1:addr -> int) (a:addr) (b:addr)
       (begin1:int) (i:int) (j:int) (end1:int) =
-      ((((get mint1 (shift_sint32 a i) = get mint (shift_sint32 b j) /\
-          get mint1 (shift_sint32 a j) = get mint (shift_sint32 b i)) /\
-         begin1 <= i) /\
-        i < j) /\
-       j < end1) /\
+      get mint1 (shift_sint32 a i) = get mint (shift_sint32 b j) /\
+      get mint1 (shift_sint32 a j) = get mint (shift_sint32 b i) /\
+      begin1 <= i /\
+      i < j /\
+      j < end1 /\
       (forall i1:int.
         not i1 = i ->
         not j = i1 ->
@@ -104,33 +80,21 @@ end
            P_same_elements mint1 mint2 a b begin1 end1 ->
            P_same_elements mint mint2 a c begin1 end1
     
-    goal wp_goal :
-      forall t:addr -> int, t1:addr -> int, a:addr, a1:addr, i:int, i1:int, i2:
-       int.
-       P_same_elements t t1 (shift_sint32 a i2) (shift_sint32 a1 i2) i i1 ->
-       P_same_elements t t1 a a1 (i + i2) (i1 + i2)
-    
   end
+  
+  goal wp :
+    forall t:addr -> int, t1:addr -> int, a:addr, a1:addr, i:int, i1:int, i2:
+     int.
+     P_same_elements t t1 (shift_sint32 a i2) (shift_sint32 a1 i2) i i1 ->
+     P_same_elements t t1 a a1 (i + i2) (i1 + i2)
 [wp:print-generated] 
   theory WP1
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
-    (* use Compound *)
+    (* use wp.generated.Compound *)
     
     inductive P_reachable1 (int -> int) (addr -> addr) addr addr =
       | Q_P_reachable_root_reachable1 :
@@ -142,14 +106,14 @@ end
            P_reachable1 malloc mptr (get mptr (shiftfield_F1__list_next root))
            node -> P_reachable1 malloc mptr root node
     
-    goal wp_goal :
-      forall t:int -> int, t1:addr -> addr, a:addr, a1:addr.
-       P_reachable1 t t1 a1 a ->
-       a1 = a \/
-       valid_rw t a1 2 /\
-       P_reachable1 t t1 (get t1 (shiftfield_F1__list_next a1)) a
-    
   end
+  
+  goal wp :
+    forall t:int -> int, t1:addr -> addr, a:addr, a1:addr.
+     P_reachable1 t t1 a1 a ->
+     a1 = a \/
+     valid_rw t a1 2 /\
+     P_reachable1 t t1 (get t1 (shiftfield_F1__list_next a1)) a
 [wp] 2 goals generated
 ------------------------------------------------------------
   Global

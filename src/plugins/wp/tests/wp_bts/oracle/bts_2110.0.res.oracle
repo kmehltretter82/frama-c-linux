@@ -14,18 +14,6 @@ theory S2_A
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   type S2_A =
     | S2_A1 (F2_A_dummy:int)
   
@@ -43,23 +31,11 @@ theory Compound
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shiftfield_F2_A_dummy (p:addr) : addr = shift p 0
   
-  (* use S2_A *)
+  (* use wp.generated.S2_A *)
   
   function Load_S2_A (p:addr) (mint:addr -> int) : S2_A =
     S2_A1 (get mint (shiftfield_F2_A_dummy p))
@@ -76,35 +52,23 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
-    (* use Compound *)
+    (* use wp.generated.Compound *)
     
     (* use frama_c_wp.memory.Memory *)
     
-    goal wp_goal :
-      forall t:addr -> int, t1:addr -> int, a:addr, a1:addr, i:int.
-       let a2 = shiftfield_F1_FD_pos a1 in
-       let x = get t a2 in
-       let a3 = Load_S2_A a t in
-       let a4 = Load_S2_A a (set (memcpy t a t1 a 1) a2 i) in
-       not x = i ->
-       region (a1.base) <= 0 ->
-       region (a.base) <= 0 ->
-       is_sint32 i -> IsS2_A a3 -> is_sint32 x -> IsS2_A a4 -> EqS2_A a4 a3
-    
   end
+  
+  goal wp :
+    forall t:addr -> int, t1:addr -> int, a:addr, a1:addr, i:int.
+     let a2 = shiftfield_F1_FD_pos a1 in
+     let x = get t a2 in
+     let a3 = Load_S2_A a t in
+     let a4 = Load_S2_A a (set (memcpy t a t1 a 1) a2 i) in
+     not x = i ->
+     region (a.base) <= 0 ->
+     region (a1.base) <= 0 ->
+     is_sint32 i -> IsS2_A a3 -> is_sint32 x -> IsS2_A a4 -> EqS2_A a4 a3
 [wp] [Generated] Goal typed_myMain_terminates (Qed)
 [wp] 3 goals generated

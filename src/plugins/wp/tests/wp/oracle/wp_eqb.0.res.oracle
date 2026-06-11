@@ -10,27 +10,15 @@
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.cint.Cint *)
     
-    goal wp_goal :
-      forall i:int, i1:int, i2:int, i3:int.
-       (if i3 = i2 then 1 else 0) = (if i1 = i then 1 else 0) ->
-       is_sint32 i3 ->
-       is_sint32 i2 -> is_sint32 i1 -> is_sint32 i -> i3 = i2 <-> i1 = i
-    
   end
+  
+  goal wp :
+    forall i:int, i1:int, i2:int, i3:int.
+     (if i3 = i2 then 1 else 0) = (if i1 = i then 1 else 0) ->
+     is_sint32 i ->
+     is_sint32 i1 -> is_sint32 i2 -> is_sint32 i3 -> i3 = i2 <-> i1 = i
 [wp] 1 goal generated
 ------------------------------------------------------------
   Function f
