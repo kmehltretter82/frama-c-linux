@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-machdep gcc_x86_32 -kernel-debug 1 -kernel-msg-key file -kernel-msg-key=-file:transformation,-file:source"
+STDOPT: +"-machdep gcc_x86_32 -kernel-debug 1 -kernel-msg-key file,printer:builtins -kernel-msg-key=-file:transformation,-file:source"
 */
 
 /*@ ensures \result >= i;
