@@ -18,6 +18,12 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2026-06-11] Refactoring for (logic) type-related functions.
+              Many logic functions were moved into a new `Ast_types.Acsl`
+              module, many of which were renamed for better consistency. Code
+              related functions are now inside the new `Ast_types.C` module.
+              All the old functions are now deprecated.
+
 ###############################################################################
 Open Source Release 33.0 (Arsenic)
 ###############################################################################
@@ -50,7 +56,7 @@ o!  Kernel    [2026-04-29] Split module `Locations` into `Addresses`, `Locations
 -   Ivette    [2026-04-16] Improve sidebar behavior: show/hide sidebar with
               Ctrl+B shortcut or by clicking on the selected sidebar button.
 o!  Kernel    [2026-04-13] Use ppx_deriving.show to generate debug printers
-              for `Cabs` and `Cil_types` ASTs. `Cabs_debug` et `Cil_types_debug`
+              for `Cabs` and `Cil_types` ASTs. `Cabs_debug` and `Cil_types_debug`
               are now deprecated.
 -*  Kernel    [2026-04-10] Fix enumeration typing by making sure all items are
               of type ekind (#@1682)
