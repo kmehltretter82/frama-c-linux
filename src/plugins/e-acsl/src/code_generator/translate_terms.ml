@@ -392,7 +392,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
     let+ e3 = to_exp_il t2 in
     Interlang.Exp.conditional
       ~origin:(PoT_term t) (Typing.get_number_ty ~logic_env t) e1 e2 e3
-  | TCast (true, _, t) -> context_insensitive_term_to_exp_il t
+  | TCast (true, _, t) -> to_exp_il_with_rtes t
   | TBinOp(bop, t1, t2) ->
     context_insensitive_binop_to_exp_il ~origin:t bop t1 t2
   | TUnOp (Neg, t') ->
@@ -1002,6 +1002,12 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let env = Env.Logic_scope.remove env lvs in
     e, adata, env, Analyses_types.C_number, ""
 
+and to_exp_il_with_rtes ?inplace t =
+  (* translates RTE guards of the current term *)
+  let* rte_guards = Translate_predicates.rte_guards_to_exp_il t in
+  let+ e = context_insensitive_term_to_exp_il ?inplace t in
+  IL.Helpers.attach_rtes rte_guards e
+
 and to_exp_il ?inplace t =
   let* {env} = M.read in
   let* () =
@@ -1009,10 +1015,7 @@ and to_exp_il ?inplace t =
     then M.not_covered ~pre:"with RTE" Printer.pp_term t
     else M.return ()
   in
-  (* translates RTE guards of the current term *)
-  let* rte_guards = Translate_predicates.rte_guards_to_exp_il t in
-  let* e = context_insensitive_term_to_exp_il ?inplace t in
-  let e = IL.Helpers.attach_rtes rte_guards e in
+  let* e = to_exp_il_with_rtes ?inplace t in
   let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
     | None -> e
     | Some typ -> IL.Exp.coerce ~origin:e.origin ~coerce_to:typ e
