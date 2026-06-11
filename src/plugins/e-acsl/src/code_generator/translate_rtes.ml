@@ -40,17 +40,19 @@ let rte_annots pp elt kf env l =
   Env.set_annotation_kind env old_kind
 
 let exp ?filter kf env e =
-  Assert.push_pending_register_data();
-  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
-  let l = Rte.exp kf stmt e in
-  let l =
-    match filter with
-    | Some f -> List.filter f l
-    | None -> l
-  in
-  List.iter (Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env)) l;
-  let env = rte_annots Printer.pp_exp e kf env l in
-  Assert.do_pending_register_data env
+  if Options.Optimisations.Omit_rte.get () then env else begin
+    Assert.push_pending_register_data();
+    let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
+    let l = Rte.exp kf stmt e in
+    let l =
+      match filter with
+      | Some f -> List.filter f l
+      | None -> l
+    in
+    List.iter (Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env)) l;
+    let env = rte_annots Printer.pp_exp e kf env l in
+    Assert.do_pending_register_data env
+  end
 
 let () =
   Translate_terms.Translate_rtes.exp_ref := exp;
