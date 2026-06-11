@@ -61,7 +61,7 @@ export function usePluginsContextById(id: string): PContextById {
 // --- Options
 // --------------------------------------------------------------------------
 
-const defaultSelected: SelectedPlugins = ['kernel', ''];
+const defaultSelected: SelectedPlugins = ['Frama-C kernel', ''];
 
 /** Number of forms modified */
 export const countFormsModified = new GlobalState<number>(0);
