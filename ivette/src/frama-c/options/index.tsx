@@ -61,8 +61,6 @@ export function usePluginsContextById(id: string): PContextById {
 // --- Options
 // --------------------------------------------------------------------------
 
-const defaultSelected: SelectedPlugins = ['Frama-C kernel', ''];
-
 /** Number of forms modified */
 export const countFormsModified = new GlobalState<number>(0);
 
@@ -74,18 +72,28 @@ export default function Options(): React.JSX.Element | null {
   const [remotes,] = remotesState;
 
   /** Selected plugins */
-  const selectedState = React.useState<SelectedPlugins>(defaultSelected);
+  const selectedState = React.useState<SelectedPlugins>(['', '']);
 
-  /** List of plugins */
+  /** Kernel and list of plugins */
+  const [kernel, setKernel] = React.useState<Params.plugin>();
   const [plugins, setPlugins] = React.useState<Params.plugin[]>([]);
   React.useEffect(() => {
     const fetchPlugins = async (): Promise<void> => {
+      const kernel = await Server.send(Params.getKernel, {});
+      setKernel(kernel);
       const plugins = await Server.send(Params.getPlugins, {});
       setPlugins(plugins.sort((a, b) => alpha(a.name, b.name)));
     };
     if (Server.isRunning()) fetchPlugins();
     else Server.onReady(fetchPlugins);
   }, []);
+
+  /* By default, select the kernel. */
+  React.useEffect(() => {
+    const [selected, setSelected] = selectedState;
+    if (kernel && selected[0] === '')
+      setSelected([kernel.name, selected[1]]);
+  }, [kernel, selectedState]);
 
   /** List of plugins set, true if plugin contains a field set by the user */
   const [isSetElement, setIsSetElement] = React.useState<IsSetElement>({});
@@ -109,11 +117,13 @@ export default function Options(): React.JSX.Element | null {
         D.warn("Error on getPluginParameters: ", id, err);
       }
     };
+    if (kernel !== undefined) fetchParams(kernel.name);
     plugins.map(p => fetchParams(p.name));
-  }, [plugins, addPluginsSet]);
+  }, [kernel, plugins, addPluginsSet]);
 
+  if (kernel === undefined) return null;
   const paramsNb = Object.keys(params).length;
-  if (paramsNb !== plugins.length || paramsNb <= 0) return null;
+  if (paramsNb !== plugins.length + 1 || paramsNb <= 0) return null;
 
   return (
     <PLUGINSCONTEXT.Provider value={{ params, isSetElement, addPluginsSet }}>
@@ -121,6 +131,7 @@ export default function Options(): React.JSX.Element | null {
         <LSplit settings="frama-c.options" unfold={true}>
           <OptionsSidebar
             selectedState={selectedState}
+            kernel={kernel}
             plugins={plugins}
             remotes={remotes}
             isSetElement={isSetElement}
