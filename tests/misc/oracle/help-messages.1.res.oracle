@@ -410,8 +410,8 @@ Options taking a string as argument should preferably be written
                     values, analyses consume much less memory but are also
                     slightly slower. Must be between 1 and 10; default is 6.
 -pow-limit <max>    for performance reasons, limit the maximum exponent
-                    accepted by pow functions in Z. Must be positive. Default
-                    value is 99999
+                    accepted by pow functions in Z. Must be at least 1024.
+                    Default value is 99999
 
 *** PROJECT-RELATED OPTIONS
 
