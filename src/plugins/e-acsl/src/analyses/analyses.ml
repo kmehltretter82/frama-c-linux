@@ -10,10 +10,12 @@ let analyses_feedback msg =
   Options.feedback ~level:2 "%s in %a" msg Project.pretty (Project.current ())
 
 module Terms = Misc.Id_term.Hashtbl
+module Logic_infos = Cil_datatype.Logic_info.Hashtbl
 
 let check_integrity () =
   if Kernel.Check.get () then begin
     let visited_terms = Terms.create 7 in
+    let visited_logic_infos = Logic_infos.create 7 in
     let integrity_checker = object
       inherit Visitor.frama_c_inplace
 
@@ -25,14 +27,20 @@ let check_integrity () =
         | GFunDecl _ -> Cil.SkipChildren
         | _ -> Cil.DoChildren
 
+      (* The same logic_info may occur multiple times. Only visit once.
+         Recursive predicates extracted from inductive ones coexist in the same
+         file and may share terms between them. However their respective
+         logic_infos also share the same l_var_info. So as the extracted
+         recursive predicate comes first only it will be visited (and only it
+         will be translated). *)
+      method! vlogic_info_decl li =
+        if Logic_infos.mem visited_logic_infos li
+        then Cil.SkipChildren
+        else (Logic_infos.add visited_logic_infos li (); Cil.DoChildren)
+
       method! vannotation = function
         | Dfun_or_pred (li, _) ->
           begin match li.l_body with
-            | LBinductive _ ->
-              (* inductives are translated into predicate/function definitions,
-                 but we also keep the old definition in the file, without unsharing.
-                 But these are not translated, so it's no problem. *)
-              Cil.SkipChildren
             | _ ->
               if li.l_labels <> [] then
                 (* because of Here-inlining:

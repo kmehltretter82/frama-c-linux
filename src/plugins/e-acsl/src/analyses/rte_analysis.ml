@@ -142,4 +142,6 @@ let fold_guards_old ~default t f =
   in
   List.fold_left (fun x y -> f y x) default (collect t)
 
+let remove t = Guards.remove t
+
 let clear () = Guards.clear ()
