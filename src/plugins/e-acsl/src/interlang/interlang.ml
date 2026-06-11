@@ -316,9 +316,7 @@ module Rte = struct
 end
 
 module Lhost = struct
-  let var ?name vi =
-    let name = Option.value ~default:vi.vname name in
-    Var {vi with vorig_name = name}
+  let var vi = Var vi
 
   let mem e = Mem e
 end

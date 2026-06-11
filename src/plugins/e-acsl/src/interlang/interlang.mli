@@ -112,7 +112,7 @@ end
 
 (** smart constructors for generating [lhost] nodes *)
 module Lhost : sig
-  val var : ?name:string -> varinfo -> lhost
+  val var : Cil_types.varinfo -> lhost
   val mem : exp -> lhost
 end
 
