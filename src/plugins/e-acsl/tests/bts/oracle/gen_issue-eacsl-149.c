@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     unsigned int __gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_exists = 0;
-    __gen_e_acsl_x = 0U;
+    __gen_e_acsl_x = (unsigned int)(-1 + 1);
     while (1) {
       if (__gen_e_acsl_x < 5U) ; else break;
       if (! (__gen_e_acsl_x == 0U)) ;
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_x_2 = 0U;
+    __gen_e_acsl_x_2 = (unsigned int)(-1 + 1);
     while (1) {
       if (__gen_e_acsl_x_2 < 5U) ; else break;
       if (__gen_e_acsl_x_2 != 0U) ;

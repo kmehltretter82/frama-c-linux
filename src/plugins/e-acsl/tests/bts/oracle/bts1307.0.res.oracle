@@ -4,6 +4,18 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] bts1307.i:11: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] bts1307.i:11: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] bts1307.i:11: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] bts1307.i:11: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] bts1307.i:26: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] bts1307.i:26: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] bts1307.i:26: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] bts1307.i:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

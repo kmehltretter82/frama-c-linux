@@ -8,5 +8,9 @@
   unaligned pointer creation. assert \aligned(state,alignof(spongeState));
 [eva:alarm] bts1399.c:19: Warning: 
   unaligned pointer creation. assert \aligned(state,alignof(spongeState));
+[eva:alarm] bts1399.c:19: Warning: 
+  unaligned pointer creation. assert \aligned(state,alignof(spongeState));
+[eva:alarm] bts1399.c:19: Warning: 
+  unaligned pointer creation. assert \aligned(state,alignof(spongeState));
 [eva:alarm] bts1399.c:22: Warning: 
   unaligned pointer creation. assert \aligned(state,alignof(spongeState));

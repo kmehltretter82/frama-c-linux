@@ -206,156 +206,156 @@ int main(void)
   /*@ assert use_multimode(0, 0); */ ;
   {
     int __gen_e_acsl_simple_complex_argument_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __gen_e_acsl_simple_complex_argument_2 = __gen_e_acsl_simple_complex_argument
     (0,1);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "simple_complex_argument(0, 1)",0,
                                  __gen_e_acsl_simple_complex_argument_2);
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "simple_complex_argument(0, 1)";
-    __gen_e_acsl_assert_data_2.file = "contrived.c";
-    __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 78;
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "simple_complex_argument(0, 1)";
+    __gen_e_acsl_assert_data_4.file = "contrived.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 78;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_2,
-                    & __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+                    & __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert simple_complex_argument(0, 1); */ ;
   {
     int __gen_e_acsl_simple_complex_argument_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
     __gen_e_acsl_simple_complex_argument_4 = __gen_e_acsl_simple_complex_argument
     (0,2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "simple_complex_argument(0, 2)",0,
                                  __gen_e_acsl_simple_complex_argument_4);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "simple_complex_argument(0, 2)";
-    __gen_e_acsl_assert_data_3.file = "contrived.c";
-    __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 79;
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "simple_complex_argument(0, 2)";
+    __gen_e_acsl_assert_data_5.file = "contrived.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 79;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_4,
-                    & __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+                    & __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert simple_complex_argument(0, 2); */ ;
   {
     int __gen_e_acsl_conds_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
     __gen_e_acsl_conds_2 = __gen_e_acsl_conds(0,2,1);
     if (! __gen_e_acsl_conds_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                  "conds(0, 2, 1)",0,__gen_e_acsl_conds_2);
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "conds(0, 2, 1)";
-    __gen_e_acsl_assert_data_4.file = "contrived.c";
-    __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 80;
-    __e_acsl_assert(__gen_e_acsl_conds_2,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "conds(0, 2, 1)";
+    __gen_e_acsl_assert_data_6.file = "contrived.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 80;
+    __e_acsl_assert(__gen_e_acsl_conds_2,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
   /*@ assert conds(0, 2, 1); */ ;
   {
     int __gen_e_acsl_use_var_bind_and_subst_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
     __gen_e_acsl_use_var_bind_and_subst_2 = __gen_e_acsl_use_var_bind_and_subst
     (0,0);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                  "use_var_bind_and_subst(0, 0)",0,
                                  __gen_e_acsl_use_var_bind_and_subst_2);
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "Assertion";
-    __gen_e_acsl_assert_data_5.pred_txt = "use_var_bind_and_subst(0, 0)";
-    __gen_e_acsl_assert_data_5.file = "contrived.c";
-    __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 81;
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "use_var_bind_and_subst(0, 0)";
+    __gen_e_acsl_assert_data_9.file = "contrived.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 81;
     __e_acsl_assert(__gen_e_acsl_use_var_bind_and_subst_2,
-                    & __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+                    & __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
   /*@ assert use_var_bind_and_subst(0, 0); */ ;
   {
     int __gen_e_acsl_use_var_use_bind_and_subst_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
     __gen_e_acsl_use_var_use_bind_and_subst_2 = __gen_e_acsl_use_var_use_bind_and_subst
     (0,0);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                  "use_var_use_bind_and_subst(0, 0)",0,
                                  __gen_e_acsl_use_var_use_bind_and_subst_2);
-    __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "Assertion";
-    __gen_e_acsl_assert_data_6.pred_txt = "use_var_use_bind_and_subst(0, 0)";
-    __gen_e_acsl_assert_data_6.file = "contrived.c";
-    __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 82;
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "use_var_use_bind_and_subst(0, 0)";
+    __gen_e_acsl_assert_data_11.file = "contrived.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 82;
     __e_acsl_assert(__gen_e_acsl_use_var_use_bind_and_subst_2,
-                    & __gen_e_acsl_assert_data_6);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+                    & __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
   /*@ assert use_var_use_bind_and_subst(0, 0); */ ;
   {
     int __gen_e_acsl_bind_twice_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
       {.values = (void *)0};
     __gen_e_acsl_bind_twice_2 = __gen_e_acsl_bind_twice(2,3,1);
     if (! __gen_e_acsl_bind_twice_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                  "bind_twice(2, 3, 1)",0,
                                  __gen_e_acsl_bind_twice_2);
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "Assertion";
-    __gen_e_acsl_assert_data_7.pred_txt = "bind_twice(2, 3, 1)";
-    __gen_e_acsl_assert_data_7.file = "contrived.c";
-    __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 83;
-    __e_acsl_assert(__gen_e_acsl_bind_twice_2,& __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "bind_twice(2, 3, 1)";
+    __gen_e_acsl_assert_data_12.file = "contrived.c";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 83;
+    __e_acsl_assert(__gen_e_acsl_bind_twice_2,& __gen_e_acsl_assert_data_12);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }
   /*@ assert bind_twice(2, 3, 1); */ ;
   {
     int __gen_e_acsl_subst_let_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
       {.values = (void *)0};
     __gen_e_acsl_subst_let_2 = __gen_e_acsl_subst_let(1,2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                  "subst_let(1, 2)",0,
                                  __gen_e_acsl_subst_let_2);
-    __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "subst_let(1, 2)";
-    __gen_e_acsl_assert_data_8.file = "contrived.c";
-    __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 84;
-    __e_acsl_assert(__gen_e_acsl_subst_let_2,& __gen_e_acsl_assert_data_8);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "Assertion";
+    __gen_e_acsl_assert_data_15.pred_txt = "subst_let(1, 2)";
+    __gen_e_acsl_assert_data_15.file = "contrived.c";
+    __gen_e_acsl_assert_data_15.fct = "main";
+    __gen_e_acsl_assert_data_15.line = 84;
+    __e_acsl_assert(__gen_e_acsl_subst_let_2,& __gen_e_acsl_assert_data_15);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
   /*@ assert subst_let(1, 2); */ ;
   {
     int __gen_e_acsl_dupl_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
     __gen_e_acsl_dupl_2 = __gen_e_acsl_dupl(-1,0);
     if (! __gen_e_acsl_dupl_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                  "dupl(-1, 1 / 2 + 1 / 2)",0,
                                  __gen_e_acsl_dupl_2);
-    __gen_e_acsl_assert_data_9.blocking = 1;
-    __gen_e_acsl_assert_data_9.kind = "Assertion";
-    __gen_e_acsl_assert_data_9.pred_txt = "dupl(-1, 1 / 2 + 1 / 2)";
-    __gen_e_acsl_assert_data_9.file = "contrived.c";
-    __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 85;
-    __e_acsl_assert(__gen_e_acsl_dupl_2,& __gen_e_acsl_assert_data_9);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "dupl(-1, 1 / 2 + 1 / 2)";
+    __gen_e_acsl_assert_data_16.file = "contrived.c";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 85;
+    __e_acsl_assert(__gen_e_acsl_dupl_2,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
   }
   /*@ assert dupl(-1, 1 / 2 + 1 / 2); */ ;
   __retres = 0;
@@ -368,7 +368,21 @@ int main(void)
 int __gen_e_acsl_multimode_fun2(int x, int z)
 {
   int __gen_e_acsl_if;
-  if (z == 0) __gen_e_acsl_if = 0; else __gen_e_acsl_if = 0;
+  if (z == 0) __gen_e_acsl_if = 0;
+  else {
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+      __gen_e_acsl_assert_data_2.file = "contrived.c";
+      __gen_e_acsl_assert_data_2.fct = "multimode_fun2";
+      __gen_e_acsl_assert_data_2.line = 9;
+      __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
+    }
+    __gen_e_acsl_if = 0;
+  }
   return __gen_e_acsl_if;
 }
 
@@ -377,7 +391,21 @@ int __gen_e_acsl_multimode_fun2(int x, int z)
 int __gen_e_acsl_multimode_fun3(int x, int y)
 {
   int __gen_e_acsl_if_2;
-  if (y == 0) __gen_e_acsl_if_2 = 0; else __gen_e_acsl_if_2 = 0;
+  if (y == 0) __gen_e_acsl_if_2 = 0;
+  else {
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "Assertion";
+      __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
+      __gen_e_acsl_assert_data_3.file = "contrived.c";
+      __gen_e_acsl_assert_data_3.fct = "multimode_fun3";
+      __gen_e_acsl_assert_data_3.line = 9;
+      __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
+    }
+    __gen_e_acsl_if_2 = 0;
+  }
   return __gen_e_acsl_if_2;
 }
 
@@ -477,6 +505,17 @@ int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
     }
     else {
       __e_acsl_mpz_t __gen_e_acsl__13;
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_8.blocking = 1;
+        __gen_e_acsl_assert_data_8.kind = "Assertion";
+        __gen_e_acsl_assert_data_8.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_8.file = "contrived.c";
+        __gen_e_acsl_assert_data_8.fct = "conds_fun3";
+        __gen_e_acsl_assert_data_8.line = 30;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
+      }
       __gmpz_init_set_si(__gen_e_acsl__13,0L);
       __gmpz_init_set(__gen_e_acsl_if_5,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
@@ -564,6 +603,17 @@ void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
     }
     else {
       __e_acsl_mpz_t __gen_e_acsl__10;
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_7.blocking = 1;
+        __gen_e_acsl_assert_data_7.kind = "Assertion";
+        __gen_e_acsl_assert_data_7.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_7.file = "contrived.c";
+        __gen_e_acsl_assert_data_7.fct = "conds_fun3_2";
+        __gen_e_acsl_assert_data_7.line = 30;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_7);
+      }
       __gmpz_init_set_si(__gen_e_acsl__10,0L);
       __gmpz_init_set(__gen_e_acsl_if_3,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__10));
@@ -651,6 +701,17 @@ void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i)
       }
       else {
         __e_acsl_mpz_t __gen_e_acsl__17;
+        {
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+            {.values = (void *)0};
+          __gen_e_acsl_assert_data_10.blocking = 1;
+          __gen_e_acsl_assert_data_10.kind = "Assertion";
+          __gen_e_acsl_assert_data_10.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_10.file = "contrived.c";
+          __gen_e_acsl_assert_data_10.fct = "fibo_fun2";
+          __gen_e_acsl_assert_data_10.line = 38;
+          __e_acsl_assert(0,& __gen_e_acsl_assert_data_10);
+        }
         __gmpz_init_set_si(__gen_e_acsl__17,0L);
         __gmpz_init_set(__gen_e_acsl_if_7,
                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__17));
@@ -736,7 +797,20 @@ int __gen_e_acsl_bind_twice_fun3(int a, int b)
     __gen_e_acsl_bind_twice_fun3_9 = __gen_e_acsl_bind_twice_fun3(a,0);
     if ((long)__gen_e_acsl_bind_twice_fun3_9 == __gen_e_acsl_z_3) __gen_e_acsl_if_12 = 
                                                                   a - 1L;
-    else __gen_e_acsl_if_12 = 0L;
+    else {
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_14.blocking = 1;
+        __gen_e_acsl_assert_data_14.kind = "Assertion";
+        __gen_e_acsl_assert_data_14.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_14.file = "contrived.c";
+        __gen_e_acsl_assert_data_14.fct = "bind_twice_fun3";
+        __gen_e_acsl_assert_data_14.line = 54;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_14);
+      }
+      __gen_e_acsl_if_12 = 0;
+    }
     __gen_e_acsl_if_13 = __gen_e_acsl_if_12;
   }
   int __retres = (int)__gen_e_acsl_if_13;
@@ -761,7 +835,20 @@ long __gen_e_acsl_bind_twice_fun3_2(int a, int b)
     __gen_e_acsl_bind_twice_fun3_6 = __gen_e_acsl_bind_twice_fun3(a,0);
     if ((long)__gen_e_acsl_bind_twice_fun3_6 == __gen_e_acsl_z_4) __gen_e_acsl_if_10 = 
                                                                   a - 1L;
-    else __gen_e_acsl_if_10 = 0L;
+    else {
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_13.blocking = 1;
+        __gen_e_acsl_assert_data_13.kind = "Assertion";
+        __gen_e_acsl_assert_data_13.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_13.file = "contrived.c";
+        __gen_e_acsl_assert_data_13.fct = "bind_twice_fun3_2";
+        __gen_e_acsl_assert_data_13.line = 54;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_13);
+      }
+      __gen_e_acsl_if_10 = 0;
+    }
     __gen_e_acsl_if_11 = __gen_e_acsl_if_10;
   }
   long __retres = (int)__gen_e_acsl_if_11;
@@ -820,7 +907,21 @@ int __gen_e_acsl_dupl_fun2(int a)
     if (__gen_e_acsl_y < 9U) __gen_e_acsl_if_20 = __gen_e_acsl_y + (int)__gen_e_acsl_y;
     else {
       int __gen_e_acsl_if_19;
-      if (a >= 0) __gen_e_acsl_if_19 = 1 / a; else __gen_e_acsl_if_19 = 0;
+      if (a >= 0) __gen_e_acsl_if_19 = 1 / a;
+      else {
+        {
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
+            {.values = (void *)0};
+          __gen_e_acsl_assert_data_19.blocking = 1;
+          __gen_e_acsl_assert_data_19.kind = "Assertion";
+          __gen_e_acsl_assert_data_19.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_19.file = "contrived.c";
+          __gen_e_acsl_assert_data_19.fct = "dupl_fun2";
+          __gen_e_acsl_assert_data_19.line = 71;
+          __e_acsl_assert(0,& __gen_e_acsl_assert_data_19);
+        }
+        __gen_e_acsl_if_19 = 0;
+      }
       __gen_e_acsl_if_20 = __gen_e_acsl_if_19;
     }
     __gen_e_acsl_if_22 = __gen_e_acsl_if_20;
@@ -828,7 +929,20 @@ int __gen_e_acsl_dupl_fun2(int a)
   else {
     int __gen_e_acsl_if_21;
     if ((unsigned int)a >= 0U) __gen_e_acsl_if_21 = (int)(1U / a);
-    else __gen_e_acsl_if_21 = 0;
+    else {
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_20.blocking = 1;
+        __gen_e_acsl_assert_data_20.kind = "Assertion";
+        __gen_e_acsl_assert_data_20.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_20.file = "contrived.c";
+        __gen_e_acsl_assert_data_20.fct = "dupl_fun2";
+        __gen_e_acsl_assert_data_20.line = 71;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_20);
+      }
+      __gen_e_acsl_if_21 = 0;
+    }
     __gen_e_acsl_if_22 = __gen_e_acsl_if_21;
   }
   return __gen_e_acsl_if_22;
@@ -848,7 +962,21 @@ unsigned int __gen_e_acsl_dupl_fun2_2(int a)
     if (__gen_e_acsl_y_2 < 9U) __gen_e_acsl_if_16 = __gen_e_acsl_y_2 + (int)__gen_e_acsl_y_2;
     else {
       int __gen_e_acsl_if_15;
-      if (a >= 0) __gen_e_acsl_if_15 = 1 / a; else __gen_e_acsl_if_15 = 0;
+      if (a >= 0) __gen_e_acsl_if_15 = 1 / a;
+      else {
+        {
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+            {.values = (void *)0};
+          __gen_e_acsl_assert_data_17.blocking = 1;
+          __gen_e_acsl_assert_data_17.kind = "Assertion";
+          __gen_e_acsl_assert_data_17.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_17.file = "contrived.c";
+          __gen_e_acsl_assert_data_17.fct = "dupl_fun2_2";
+          __gen_e_acsl_assert_data_17.line = 71;
+          __e_acsl_assert(0,& __gen_e_acsl_assert_data_17);
+        }
+        __gen_e_acsl_if_15 = 0;
+      }
       __gen_e_acsl_if_16 = __gen_e_acsl_if_15;
     }
     __gen_e_acsl_if_18 = __gen_e_acsl_if_16;
@@ -856,7 +984,20 @@ unsigned int __gen_e_acsl_dupl_fun2_2(int a)
   else {
     int __gen_e_acsl_if_17;
     if ((unsigned int)a >= 0U) __gen_e_acsl_if_17 = (int)(1U / a);
-    else __gen_e_acsl_if_17 = 0;
+    else {
+      {
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
+          {.values = (void *)0};
+        __gen_e_acsl_assert_data_18.blocking = 1;
+        __gen_e_acsl_assert_data_18.kind = "Assertion";
+        __gen_e_acsl_assert_data_18.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_18.file = "contrived.c";
+        __gen_e_acsl_assert_data_18.fct = "dupl_fun2_2";
+        __gen_e_acsl_assert_data_18.line = 71;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_18);
+      }
+      __gen_e_acsl_if_17 = 0;
+    }
     __gen_e_acsl_if_18 = __gen_e_acsl_if_17;
   }
   return __gen_e_acsl_if_18;

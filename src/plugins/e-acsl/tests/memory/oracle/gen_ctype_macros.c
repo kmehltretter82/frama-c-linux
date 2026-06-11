@@ -36,8 +36,32 @@ int main(int argc, char const **argv)
   __e_acsl_store_block((void *)(& d),8UL);
   __e_acsl_full_init((void *)(& d));
   {
+    int __gen_e_acsl_initialized;
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& d),
+                                                    sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&d",
+                                 (void *)(& d));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(char *)",0,sizeof(char *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&d)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&d); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&d)";
+      __gen_e_acsl_assert_data_2.file = "ctype_macros.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 39;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char),(void *)d,
                                         (void *)(& d));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"d",(void *)d);

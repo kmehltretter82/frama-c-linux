@@ -20,8 +20,33 @@ struct list *add(struct list *l, int i)
   __e_acsl_full_init((void *)(& new));
   new = (struct list *)malloc(16UL);
   {
+    int __gen_e_acsl_initialized;
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& new),
+                                                    sizeof(struct list *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&new",
+                                 (void *)(& new));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(struct list *)",0,
+                                   sizeof(struct list *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&new)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&new); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&new)";
+      __gen_e_acsl_assert_data_2.file = "local_var.c";
+      __gen_e_acsl_assert_data_2.fct = "add";
+      __gen_e_acsl_assert_data_2.line = 15;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gen_e_acsl_valid = __e_acsl_valid((void *)new,sizeof(struct list),
                                         (void *)new,(void *)(& new));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"new",

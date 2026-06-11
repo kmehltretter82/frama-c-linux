@@ -16,6 +16,14 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:434: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
@@ -91,12 +99,18 @@
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] printf.c:61: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:434: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:440: Warning: 
   function __gen_e_acsl_strcpy: postcondition 'equal_contents' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:214: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:221: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:218: Warning: 
   function __gen_e_acsl_strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:214: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:214: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:214: Warning: 

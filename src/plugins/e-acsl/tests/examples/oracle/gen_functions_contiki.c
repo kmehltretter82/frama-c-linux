@@ -55,8 +55,33 @@ int main(void)
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   {
+    int __gen_e_acsl_initialized;
     long __gen_e_acsl_length_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& l),
+                                                    sizeof(struct list *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&l",
+                                 (void *)(& l));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(struct list *)",0,
+                                   sizeof(struct list *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&l)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&l); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&l)";
+      __gen_e_acsl_assert_data_2.file = "functions_contiki.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 29;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gen_e_acsl_length_here_2 = __gen_e_acsl_length_here(l);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"l",(void *)l);
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"length(l)",0,
@@ -93,7 +118,7 @@ long __gen_e_acsl_length_here(struct list *l)
 long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
 {
   long __gen_e_acsl_if_3;
-  if (n < 0U) __gen_e_acsl_if_3 = -1L;
+  if (n < 0U) __gen_e_acsl_if_3 = -1;
   else {
     long __gen_e_acsl_if_2;
     if (l == (struct list *)0) __gen_e_acsl_if_2 = n;
@@ -105,7 +130,7 @@ long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
         (l->next,n + 1U);
         __gen_e_acsl_if = __gen_e_acsl_length_aux_here_3;
       }
-      else __gen_e_acsl_if = -1L;
+      else __gen_e_acsl_if = -1;
       __gen_e_acsl_if_2 = __gen_e_acsl_if;
     }
     __gen_e_acsl_if_3 = __gen_e_acsl_if_2;

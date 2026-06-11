@@ -17,8 +17,17 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:521: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:516: Warning: 
   no assigns clause generated for function strnlen because pointers as arguments is not yet supported
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:515: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
@@ -56,6 +65,14 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -114,6 +131,14 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:434: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
@@ -121,6 +146,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/string.h:434: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:440: Warning: 
   function __gen_e_acsl_strcpy: postcondition 'equal_contents' got status unknown.
 [eva:alarm] str.c:16: Warning: 
@@ -147,6 +174,8 @@
   function strcat: precondition 'valid_string_dest' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:490: Warning: 
   function strcat: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:490: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:498: Warning: 
   function __gen_e_acsl_strcat: postcondition 'sum_of_lengths' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:501: Warning: 
@@ -170,6 +199,8 @@
   function strncat: precondition 'valid_string_dest' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:511: Warning: 
   function strncat, behavior partial: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:511: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:533: Warning: 
   function __gen_e_acsl_strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status unknown.
 [eva:alarm] str.c:60: Warning: 

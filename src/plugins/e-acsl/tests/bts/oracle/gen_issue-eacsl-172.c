@@ -13,6 +13,30 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_2,"d2",d2);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "-2147483649 < d2";
+    __gen_e_acsl_assert_data_2.file = "issue-eacsl-172.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 7;
+    __gen_e_acsl_assert_data_2.name = "float_to_int";
+    __e_acsl_assert(-2147483649. < d2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_3,"d2",d2);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "d2 < 2147483648";
+    __gen_e_acsl_assert_data_3.file = "issue-eacsl-172.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 7;
+    __gen_e_acsl_assert_data_3.name = "float_to_int";
+    __e_acsl_assert(d2 < 2147483648.,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"d2",d2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
