@@ -812,8 +812,6 @@ void __gen_e_acsl_g(long *ptr, size_t size)
     __e_acsl_mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_le;
     __e_acsl_mpz_t __gen_e_acsl_if;
-    __e_acsl_mpz_t __gen_e_acsl__4;
-    int __gen_e_acsl_le_2;
     unsigned long __gen_e_acsl_size_3;
     int __gen_e_acsl_valid;
     __e_acsl_store_block((void *)(& ptr),8UL);
@@ -856,23 +854,6 @@ void __gen_e_acsl_g(long *ptr, size_t size)
       __gmpz_init_set(__gen_e_acsl_if,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2));
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl__4,18446744073709551615UL);
-    __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_if),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,
-                                 "__gen_e_acsl_if",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(long) * (((size - 1) - 0) + 1); size <= 0 ? 0 : size) <=\n18446744073709551615";
-    __gen_e_acsl_assert_data_2.file = "ranges_in_builtins.c";
-    __gen_e_acsl_assert_data_2.fct = "g";
-    __gen_e_acsl_assert_data_2.line = 8;
-    __gen_e_acsl_assert_data_2.name = "offset_lesser_or_eq_than_SIZE_MAX";
-    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_size_3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)ptr + 0),
                                         __gen_e_acsl_size_3,(void *)ptr,
@@ -905,118 +886,97 @@ void __gen_e_acsl_g(long *ptr, size_t size)
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl__2);
     __gmpz_clear(__gen_e_acsl_if);
-    __gmpz_clear(__gen_e_acsl__4);
   }
   g(ptr,size);
   {
     __e_acsl_mpz_t __gen_e_acsl_size_4;
     __e_acsl_mpz_t __gen_e_acsl_sizeof_2;
-    __e_acsl_mpz_t __gen_e_acsl__5;
+    __e_acsl_mpz_t __gen_e_acsl__4;
     __e_acsl_mpz_t __gen_e_acsl_add_2;
-    __e_acsl_mpz_t __gen_e_acsl__6;
+    __e_acsl_mpz_t __gen_e_acsl__5;
     __e_acsl_mpz_t __gen_e_acsl_sub_2;
     __e_acsl_mpz_t __gen_e_acsl_add_3;
     __e_acsl_mpz_t __gen_e_acsl_mul_2;
-    int __gen_e_acsl_le_3;
+    int __gen_e_acsl_le_2;
     __e_acsl_mpz_t __gen_e_acsl_if_2;
-    __e_acsl_mpz_t __gen_e_acsl__8;
-    int __gen_e_acsl_le_4;
     unsigned long __gen_e_acsl_size_5;
     int __gen_e_acsl_valid_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_sizeof_2,8L);
-    __gmpz_init_set_si(__gen_e_acsl__5,1L);
+    __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gmpz_init(__gen_e_acsl_add_2);
     __gmpz_add(__gen_e_acsl_add_2,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_at),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
-    __gmpz_init_set_si(__gen_e_acsl__6,0L);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
+    __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gmpz_init(__gen_e_acsl_sub_2);
     __gmpz_sub(__gen_e_acsl_sub_2,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_add_3);
     __gmpz_add(__gen_e_acsl_add_3,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_2),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init(__gen_e_acsl_mul_2);
     __gmpz_mul(__gen_e_acsl_mul_2,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_sizeof_2),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3));
     __gmpz_init_set(__gen_e_acsl_size_4,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2));
-    __gen_e_acsl_le_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_3,"size",0,
+    __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
+    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,"size",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4));
-    if (__gen_e_acsl_le_3 <= 0) {
-      __e_acsl_mpz_t __gen_e_acsl__7;
-      __gmpz_init_set_si(__gen_e_acsl__7,0L);
+    if (__gen_e_acsl_le_2 <= 0) {
+      __e_acsl_mpz_t __gen_e_acsl__6;
+      __gmpz_init_set_si(__gen_e_acsl__6,0L);
       __gmpz_init_set(__gen_e_acsl_if_2,
-                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
-      __gmpz_clear(__gen_e_acsl__7);
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
+      __gmpz_clear(__gen_e_acsl__6);
     }
     else {
-      __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_3,"size",0,
+      __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,"size",0,
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4));
       __gmpz_init_set(__gen_e_acsl_if_2,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4));
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl__8,18446744073709551615UL);
-    __gen_e_acsl_le_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_4,
-                                 "__gen_e_acsl_if_2",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "(\\let size = sizeof(long) * (((\\old(size) + 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
-    __gen_e_acsl_assert_data_4.file = "ranges_in_builtins.c";
-    __gen_e_acsl_assert_data_4.fct = "g";
-    __gen_e_acsl_assert_data_4.line = 9;
-    __gen_e_acsl_assert_data_4.name = "offset_lesser_or_eq_than_SIZE_MAX";
-    __e_acsl_assert(__gen_e_acsl_le_4 <= 0,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gen_e_acsl_size_5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)((char *)__gen_e_acsl_at_2 + 0),
                                           __gen_e_acsl_size_5,
                                           (void *)__gen_e_acsl_at_2,
                                           (void *)(& __gen_e_acsl_at_2));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\old(ptr)",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"\\old(ptr)",
                                  (void *)__gen_e_acsl_at_2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sizeof(long)",
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(long)",
                                  0,8);
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_3,"\\old(size)",
+    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,"\\old(size)",
                                  0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_at));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,
                                  "__gen_e_acsl_if_2",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(\\old(ptr) + (0 .. \\old(size) + 1))",
                                  0,__gen_e_acsl_valid_2);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Postcondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "!\\valid(\\old(ptr) + (0 .. \\old(size) + 1))";
-    __gen_e_acsl_assert_data_3.file = "ranges_in_builtins.c";
-    __gen_e_acsl_assert_data_3.fct = "g";
-    __gen_e_acsl_assert_data_3.line = 9;
-    __e_acsl_assert(! __gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(\\old(ptr) + (0 .. \\old(size) + 1))";
+    __gen_e_acsl_assert_data_2.file = "ranges_in_builtins.c";
+    __gen_e_acsl_assert_data_2.fct = "g";
+    __gen_e_acsl_assert_data_2.line = 9;
+    __e_acsl_assert(! __gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_delete_block((void *)(& ptr));
     __gmpz_clear(__gen_e_acsl_size_4);
     __gmpz_clear(__gen_e_acsl_sizeof_2);
-    __gmpz_clear(__gen_e_acsl__5);
+    __gmpz_clear(__gen_e_acsl__4);
     __gmpz_clear(__gen_e_acsl_add_2);
-    __gmpz_clear(__gen_e_acsl__6);
+    __gmpz_clear(__gen_e_acsl__5);
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_add_3);
     __gmpz_clear(__gen_e_acsl_mul_2);
     __gmpz_clear(__gen_e_acsl_if_2);
-    __gmpz_clear(__gen_e_acsl__8);
     __gmpz_clear(__gen_e_acsl_at);
     return;
   }
@@ -1039,8 +999,6 @@ void __gen_e_acsl_f(char *s, long n)
     __e_acsl_mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_le;
     __e_acsl_mpz_t __gen_e_acsl_if;
-    __e_acsl_mpz_t __gen_e_acsl__6;
-    int __gen_e_acsl_le_2;
     unsigned long __gen_e_acsl_size_2;
     int __gen_e_acsl_valid;
     __e_acsl_store_block((void *)(& s),8UL);
@@ -1086,23 +1044,6 @@ void __gen_e_acsl_f(char *s, long n)
       __gmpz_init_set(__gen_e_acsl_if,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_size));
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl__6,18446744073709551615UL);
-    __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_if),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,
-                                 "__gen_e_acsl_if",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((n + 1000) - 3) + 1); size <= 0 ? 0 : size) <=\n18446744073709551615";
-    __gen_e_acsl_assert_data_2.file = "ranges_in_builtins.c";
-    __gen_e_acsl_assert_data_2.fct = "f";
-    __gen_e_acsl_assert_data_2.line = 6;
-    __gen_e_acsl_assert_data_2.name = "offset_lesser_or_eq_than_SIZE_MAX";
-    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_size_2 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_valid = __e_acsl_valid((void *)(s + 1 * 3),
                                         __gen_e_acsl_size_2,(void *)s,
@@ -1139,7 +1080,6 @@ void __gen_e_acsl_f(char *s, long n)
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl__4);
     __gmpz_clear(__gen_e_acsl_if);
-    __gmpz_clear(__gen_e_acsl__6);
   }
   f(s,n);
   __e_acsl_delete_block((void *)(& s));
