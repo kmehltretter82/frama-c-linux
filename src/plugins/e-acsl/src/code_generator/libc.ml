@@ -203,6 +203,12 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
       in
       lower && check_lower_bound, upper
     in
+    let check_lower_bound =
+      check_lower_bound && not @@ Options.Optimisations.Omit_rte.get ()
+    in
+    let check_upper_bound =
+      check_upper_bound && not @@ Options.Optimisations.Omit_rte.get ()
+    in
     let stmts, env =
       if check_lower_bound then begin
         let lower_guard = Misc.make_binop ~loc Ge e (Cil.zero ~loc) in
