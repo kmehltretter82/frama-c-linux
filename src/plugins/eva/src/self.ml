@@ -13,12 +13,13 @@ let parse_categories s =
   let parse_name s =
     match String.split_on_char '=' s with
     | [] -> assert false (* split_on_char never returns an empty list *)
+    | "" :: _ -> None
     | name :: _ ->
       match String.get name 0 with
-      | '-' | '+' -> String.sub name 1 (String.length name - 1)
-      | _ -> name
+      | '-' | '+' -> Some (String.sub name 1 (String.length name - 1))
+      | _ -> Some name
   in
-  List.map parse_name categories
+  List.filter_map parse_name categories
 
 (* Split a category "x:y:z" into a list of subcategories "x", "x:y", "x:y:z". *)
 let split_category name =
