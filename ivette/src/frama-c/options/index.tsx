@@ -61,7 +61,7 @@ export function usePluginsContextById(id: string): PContextById {
 // --- Options
 // --------------------------------------------------------------------------
 
-const defaultSelected: SelectedPlugins = ['kernel', ''];
+const defaultSelected: SelectedPlugins = ['Frama-C kernel', ''];
 
 /** Number of forms modified */
 export const countFormsModified = new GlobalState<number>(0);
@@ -83,14 +83,15 @@ export default function Options(): React.JSX.Element | null {
       const plugins = await Server.send(Params.getPlugins, {});
       setPlugins(plugins.sort((a, b) => alpha(a.name, b.name)));
     };
-    if(Server.isRunning()) fetchPlugins();
+    if (Server.isRunning()) fetchPlugins();
     else Server.onReady(fetchPlugins);
   }, []);
 
   /** List of plugins set, true if plugin contains a field set by the user */
   const [isSetElement, setIsSetElement] = React.useState<IsSetElement>({});
   const addPluginsSet = React.useCallback((value: IsSetElement) => {
-    setIsSetElement(prev => ({ ...prev, ...value })); }, [setIsSetElement]);
+    setIsSetElement(prev => ({ ...prev, ...value }));
+  }, [setIsSetElement]);
 
   /** Set of parameters (grouped by section) for each plugin name */
   const [params, setParams] =
@@ -100,7 +101,7 @@ export default function Options(): React.JSX.Element | null {
       try {
         const params = await Server.send(Params.getPluginParameters, id);
         /** Initial check if field 'isSet' for sidebar items */
-        if(params.find(plugin => plugin[1].find(param => param.isSet)))
+        if (params.find(plugin => plugin[1].find(param => param.isSet)))
           addPluginsSet({ [id]: true });
         const sortedParams = params.sort((a, b) => alpha(a[0], b[0]));
         setParams(v => ({ ...v, [id]: sortedParams }));
@@ -127,7 +128,7 @@ export default function Options(): React.JSX.Element | null {
           <OptionsForms
             selectedState={selectedState}
             remotesState={remotesState}
-            />
+          />
         </LSplit>
       </div>
     </PLUGINSCONTEXT.Provider>
@@ -139,10 +140,10 @@ export default function Options(): React.JSX.Element | null {
 /* -------------------------------------------------------------------------- */
 
 async function onClose(): Promise<boolean> {
-  if(countFormsModified.getValue() <= 0) return true;
+  if (countFormsModified.getValue() <= 0) return true;
   const confirm = await showMessageBox({
-      block: true,
-      buttons: [
+    block: true,
+    buttons: [
       { label: 'Cancel' },
       { label: 'Ok', value: true }
     ],
@@ -155,7 +156,7 @@ async function onClose(): Promise<boolean> {
 export function showOptionsModal(): void {
   showModal(
     <Modal className='modal-framac-options' label='Frama-C Parameters'>
-      <Options/>
+      <Options />
     </Modal>,
     onClose
   );

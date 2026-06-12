@@ -25,13 +25,6 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
--* E-ACSL     [2026-05-22] Fix crash due to interval analysis failure.
-
-###############################################################################
-Plugin E-ACSL 34.0 (Selenium)
-###############################################################################
-
--o E-ACSL     [2026-05-26] Fix bugs and crashes due to new RTE management
 -  E-ACSL     [2026-05-20] New option -e-acsl-O <n> that configures the level
                            of optimization. Default is 2. Replaces
                            -e-acsl-interlang-opt.
@@ -41,6 +34,8 @@ Plugin E-ACSL 34.0 (Selenium)
 Plugin E-ACSL 33.0 (Arsenic)
 ###############################################################################
 
+-* E-ACSL     [2026-05-26] Fix bugs and crashes due to new RTE management
+-* E-ACSL     [2026-05-22] Fix crash due to interval analysis failure.
 -  E-ACSL     [2026-04-28] Extend translation of range on array for arrays in
                            structures and dereferenced arrays.
 -  E-ACSL     [2026-04-06] Support built-in predicates in inductive predicates.
