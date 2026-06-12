@@ -26,7 +26,7 @@ let code_annotation_text ca =
    statement instead. *)
 let code_annotation_loc ca stmt =
   match Cil_datatype.Code_annotation.loc ca with
-  | Some loc when not (Fileloc.(equal loc unknown)) -> loc
+  | Some loc when not (Fileloc.is_empty loc) -> loc
   | _ -> Cil_datatype.Stmt.loc stmt
 
 

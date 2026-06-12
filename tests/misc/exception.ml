@@ -4,7 +4,7 @@ open Cil_types
 let rec init_exn exn init acc =
   match init with
   | SingleInit init ->
-    Cil.mkStmtOneInstr (Set(exn,init,Fileloc.unknown))
+    Cil.mkStmtOneInstr (Set(exn,init,Kernel.gen_loc))
     :: acc
   | CompoundInit (ct,initl) ->
     Cil.foldLeftCompound
@@ -18,7 +18,7 @@ let add_throw_test f exn_type test init =
   let exn = Cil.makeLocalVar f ~scope:throw_block "exn" exn_type in
   let valid_sid = true in
   let set_exn_stmts = init_exn (Var exn, NoOffset) init [] in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let throw_stmt =
     Cil.mkStmt
       ~valid_sid
@@ -31,7 +31,7 @@ let add_throw_test f exn_type test init =
 let add_my_exn my_exn f =
   let c = Cil.evar (List.hd f.sformals) in
   let exn_type = Cil_const.mk_tcomp my_exn in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let my_field = List.hd (Option.get my_exn.cfields) in
   let kind =
     match my_field.ftype.tnode with
@@ -47,7 +47,7 @@ let add_my_exn my_exn f =
 
 let add_int_exn f =
   let c = Cil.evar (List.hd f.sformals) in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let test =
     Cil.new_exp ~loc (BinOp (Lt,c,Cil.kinteger ~loc IInt 50,Cil_const.intType))
   in
@@ -55,7 +55,7 @@ let add_int_exn f =
 
 let add_int_ptr_exn glob f =
   let c = Cil.evar (List.hd f.sformals) in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let test =
     Cil.new_exp ~loc (BinOp (Gt,c,Cil.kinteger ~loc IInt 150, Cil_const.intType))
   in
@@ -70,7 +70,7 @@ let add_catch my_exn my_exn2 f =
   let exn_field = List.hd (Option.get my_exn.cfields) in
   let exn_field_offset = Field(exn_field,NoOffset) in
   let exn2_field = List.hd (Option.get my_exn2.cfields) in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let real_locals = f.sbody.blocals in
   let v1 = Cil.makeLocalVar f "exn" exn_type in
   let v2 = Cil.makeLocalVar f "y" Cil_const.intType in
@@ -136,7 +136,7 @@ let add_exn ast =
   in
   List.iter treat_glob ast.globals
 
-let loc = Fileloc.unknown
+let loc = Kernel.gen_loc
 let stmt stmt_node = { stmt_ghost = false; stmt_node }
 let var v = { expr_loc = loc; expr_node = VARIABLE v }
 

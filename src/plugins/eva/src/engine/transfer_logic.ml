@@ -155,7 +155,7 @@ let pp_code_annot fmt ca =
    statement instead. *)
 let code_annotation_loc stmt code_annot =
   match Cil_datatype.Code_annotation.loc code_annot with
-  | Some loc when not (Fileloc.(equal loc unknown)) -> loc
+  | Some loc when not (Fileloc.is_empty loc) -> loc
   | _ -> Cil_datatype.Stmt.loc stmt
 
 let emit_code_annot_status ~reduce ~empty kf stmt code_annot status =

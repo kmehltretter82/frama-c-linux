@@ -87,7 +87,7 @@ let dummy_edge = {
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
-  edge_loc = Fileloc.unknown;
+  edge_loc = Kernel.gen_loc;
 }
 
 (* --- Signatures --- *)
@@ -593,9 +593,6 @@ let is_goto_destination stmt = List.exists is_goto stmt.preds
 let stmt_loc stmt =
   Cil_datatype.Stmt.loc stmt
 
-let unknown_loc =
-  Fileloc.unknown
-
 let first_loc block =
   let rec f = function
     | [] ->
@@ -606,7 +603,7 @@ let first_loc block =
       stmt_loc stmt
   in
   try f block.bstmts
-  with Not_found -> unknown_loc
+  with Not_found -> Kernel.gen_loc
 
 let last_loc block =
   let rec f = function
@@ -618,7 +615,7 @@ let last_loc block =
       stmt_loc stmt
   in
   try f (List.rev block.bstmts)
-  with Not_found -> unknown_loc
+  with Not_found -> Kernel.gen_loc
 
 module LabelMap = struct
   include Cil_datatype.Logic_label.Map
@@ -739,7 +736,7 @@ let build_automaton ~annotations kf =
   (* AST traversal *)
   let rec do_block control kinstr block =
     if block.bstmts = [] then
-      add_edge control.src control.dest kinstr Skip unknown_loc
+      add_edge control.src control.dest kinstr Skip Kernel.gen_loc
     else begin
       let englobing_blocks = block :: control.blocks in
       let block_start = add_vertex englobing_blocks

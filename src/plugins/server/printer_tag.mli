@@ -100,7 +100,7 @@ val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
 val loc_of_localizable : localizable -> Fileloc.t
-(** Might return [Fileloc.unknown] *)
+(** Might return [Kernel.gen_loc] *)
 
 val pos_to_localizable: ?precise_col:bool -> Filepos.t -> localizable option
 (** return the (hopefully) most precise localizable that contains the given

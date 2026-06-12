@@ -2,7 +2,7 @@ open Cabs
 
 [@@@warning "-32-27"]
 
-let loc = Fileloc.unknown
+let loc = Kernel.gen_loc
 
 let gen_int_type =
   Crowbar.(choose [

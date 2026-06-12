@@ -48,7 +48,7 @@ module Make() = struct
         tname = !t_struct_torig_ref.tname ^ " *";
         ttype =
           Cil_const.(mk_tarray (mk_tnamed !t_struct_torig_ref)
-                       (Some (Cil.one ~loc:Fileloc.unknown)));
+                       (Some (Cil.one ~loc:Options.gen_loc)));
         treferenced = true;
       }
 

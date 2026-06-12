@@ -137,19 +137,19 @@ let code_annot kf stmt s =
 let default_term_env () =
   Logic_typing.append_here_label (Logic_typing.Lenv.empty())
 
-let term kf ?(loc=Fileloc.unknown) ?(env=default_term_env ()) s =
+let term kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
   sync_typedefs ();
   let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
   let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
   let parse pa_expr = LT.term env pa_expr in
   wrap parse pa_expr loc
 
-let term_lval kf ?(loc=Fileloc.unknown) ?(env=default_term_env ()) s =
+let term_lval kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
   match (term kf ~loc ~env s).term_node with
   | TLval lv -> lv
   | _ -> raise (Error (loc, "Syntax error (expecting an lvalue)"))
 
-let predicate kf ?(loc=Fileloc.unknown) ?(env=default_term_env ()) s =
+let predicate kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
   sync_typedefs ();
   let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
   let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in

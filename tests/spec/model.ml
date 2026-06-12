@@ -26,9 +26,9 @@ let add_model ty =
       mi_attr = [];
       mi_field_type = Linteger;
       mi_base_type = ty;
-      mi_decl = Fileloc.unknown }
+      mi_decl = Kernel.gen_loc }
   in
-  let annot = Dmodel_annot (m,Fileloc.unknown) in
+  let annot = Dmodel_annot (m,Kernel.gen_loc) in
   Annotations.add_global e annot;
   annot
 

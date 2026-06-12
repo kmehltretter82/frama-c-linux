@@ -717,12 +717,12 @@ let inject_global_handler file main =
   if Memory_tracking.use_monitoring () then
     (* Create [__e_acsl_globals_init] function *)
     let vi_init, fundec_init = Global_observer.mk_init_function () in
-    let cil_fct_init = GFun(fundec_init, Fileloc.unknown) in
+    let cil_fct_init = GFun(fundec_init, Options.gen_loc) in
     (* Create [__e_acsl_globals_delete] function *)
     let vi_and_fundec_clean_opt = Global_observer.mk_clean_function () in
     let cil_fct_clean_opt =
       Option.map
-        (fun (_, fundec_clean) -> GFun(fundec_clean, Fileloc.unknown))
+        (fun (_, fundec_clean) -> GFun(fundec_clean, Options.gen_loc))
         vi_and_fundec_clean_opt
     in
     match main with
@@ -730,7 +730,7 @@ let inject_global_handler file main =
       let mk_fct_call vi =
         let stmt =
           Cil.mkStmtOneInstr ~valid_sid:true
-            (Call(None, Var vi, [], Fileloc.unknown))
+            (Call(None, Var vi, [], Options.gen_loc))
         in
         vi.vreferenced <- true;
         stmt
@@ -767,7 +767,7 @@ let inject_global_handler file main =
           | f :: l -> rev_and_extend (f :: acc) l
         in
         (* [main] at the end *)
-        let globals_to_add = [ GFun(main_fundec, Fileloc.unknown) ] in
+        let globals_to_add = [ GFun(main_fundec, Options.gen_loc) ] in
         (* Prepend [__e_acsl_globals_clean] if not empty *)
         let globals_to_add =
           Option.fold
@@ -783,7 +783,7 @@ let inject_global_handler file main =
       (* add the literal string varinfos as the very first globals *)
       let new_globals =
         Literal_strings.fold
-          (fun _ vi l -> GVar(vi, { init = None }, Fileloc.unknown) :: l)
+          (fun _ vi l -> GVar(vi, { init = None }, Options.gen_loc) :: l)
           new_globals
       in
       file.globals <- new_globals
@@ -813,7 +813,7 @@ let inject_global_handler file main =
 let inject_mtracking_handler main =
   if Memory_tracking.use_monitoring () ||
      Options.Assert_print_data.get () then begin
-    let loc = Fileloc.unknown in
+    let loc = Options.gen_loc in
     let nulls = [ Smart_exp.null ~loc ; Smart_exp.null ~loc ] in
     let handle_main main =
       let fundec =

@@ -1,7 +1,7 @@
 open Cil_types
 open Fun.Operators
 
-let loc = Fileloc.unknown
+let loc = Kernel.gen_loc
 
 let main () =
   let prj = Project.create "empty" in

@@ -86,7 +86,7 @@ val pbounds_incl_excl: ?loc:Fileloc.t -> term -> term -> term -> predicate
        \forall int x ; 0 <= x < __fc_len ==> p[x] == 0].
 
     Parameters:
-    - [loc] defaults to [Fileloc.unknown]
+    - [loc] defaults to [Options.gen_loc]
     - [name_ext] defaults to [""]
     - [ltyp] must be a logic C type
     - [bytes_len] is a value in bytes that should be divided by the [sizeof(ltyp)]

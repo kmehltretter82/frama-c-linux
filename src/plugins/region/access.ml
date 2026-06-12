@@ -90,7 +90,7 @@ let ctype_of = function
   | _ -> Cil_const.voidType
 
 let location = function
-  | Body _ -> Fileloc.unknown (* TODO *)
+  | Body _ -> Options.gen_loc (* TODO *)
   | CallSite(s,_) -> Stmt.loc s
   | Prop ip | CallProp(_,_,ip) -> Property.location ip
 
@@ -111,7 +111,7 @@ let marker = function
   | Term (CallProp (stmt, _, _), _) ->
     PStmtStart(Kernel_function.find_englobing_kf stmt, stmt)
   | Term (Body fn, _) ->
-    PGlobal(GAnnot(Dfun_or_pred(fn,Fileloc.unknown),Fileloc.unknown))
+    PGlobal(GAnnot(Dfun_or_pred(fn,Options.gen_loc),Options.gen_loc))
   | Term (Prop ip, _) -> PIP ip
 
 let rank = function

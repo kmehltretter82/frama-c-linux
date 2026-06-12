@@ -389,7 +389,7 @@ let track_argument ?(typ) param index env =
   match Ast_types.C.unroll_node typ with
   | TPtr _
   | TComp _ ->
-    let stmt = Mk.pull_param ~loc:Fileloc.unknown param index in
+    let stmt = Mk.pull_param ~loc:Options.gen_loc param index in
     Env.add_stmt ~post:false env stmt
   | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list -> env
   | TNamed _ -> assert false

@@ -74,8 +74,8 @@ val generated : ?pos:t -> string -> t
 
 (** Special representation of an unknown position. *)
 val unknown : t
-[@@deprecated "Use your plug-in generated location via Self.generated or \
-               Self.generated_from instead."]
+[@@deprecated "Use your plug-in generated location via Self.gen_loc or \
+               Self.gen_loc_from instead."]
 
 (** {2 Conversion from/to Lexing.position } *)
 

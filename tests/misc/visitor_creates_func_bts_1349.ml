@@ -12,15 +12,15 @@ class test prj = object(self)
     f.sbody <-
       Cil.mkBlock
         [Cil.mkStmt ~valid_sid:true
-           (Return (Some (Cil.evar x),Fileloc.unknown))];
+           (Return (Some (Cil.evar x),Kernel.gen_loc))];
     Queue.add
       (fun () ->
          Globals.Functions.replace_by_definition
-           (Cil.empty_funspec()) f Fileloc.unknown)
+           (Cil.empty_funspec()) f Kernel.gen_loc)
       self#get_filling_actions
     ;
-    [GFunDecl(Cil.empty_funspec(),f.svar,Fileloc.unknown);
-     GFun(f,Fileloc.unknown)]
+    [GFunDecl(Cil.empty_funspec(),f.svar,Kernel.gen_loc);
+     GFun(f,Kernel.gen_loc)]
 
   method! vglob_aux = function
     | GVar (v,i,loc) ->

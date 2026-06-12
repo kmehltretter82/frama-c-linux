@@ -782,7 +782,7 @@ end = struct
       (* [VP 2013-11-06] an enumerated constant has the corresponding
          integral type, not an enumerated type. *)
       let typ = Cil_const.mk_tint item.eihost.ekind in
-      let exp = Cil.new_exp ~loc:Fileloc.unknown (Const (CEnum (item)))
+      let exp = Cil.new_exp ~loc:Options.gen_loc (Const (CEnum (item)))
       in
       Options.debug ~level:2 ~dkey "Found enum item of name %s: symbol=%a type=%a@."
         name Printer.pp_exp exp Printer.pp_logic_type (Ctype typ);
@@ -1109,7 +1109,7 @@ let lt_error (source, _ ) fmt = Options.annot_warning ~raising:(fun () -> raise 
 
 let lt_on_error action finally arg =
   try action arg
-  with Exit -> finally (Fileloc.unknown,"Error"); raise Exit
+  with Exit -> finally (Options.gen_loc,"Error"); raise Exit
 
 (** Add global annotations. *)
 let dkey = Options.register_category "trace-pasting"

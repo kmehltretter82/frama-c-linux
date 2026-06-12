@@ -421,7 +421,7 @@ let get_description = function
 (* Given a "topmost" location and another one supposed to be more precise,
    returns the best (hopefully not unknown) one. *)
 let best_loc ~loc loc' =
-  if Fileloc.equal loc' Fileloc.unknown then loc else loc'
+  if Fileloc.is_empty loc' then loc else loc'
 
 let overflowed_expr_to_term ~loc e =
   let loc = best_loc ~loc e.eloc in
@@ -463,7 +463,7 @@ let create_special_float_predicate ~loc e fkind predicate =
   in
   Logic_const.unnamed ~loc (Papp (pi, [], [ t ]))
 
-let create_predicate ?(loc=Fileloc.unknown) alarm =
+let create_predicate ?(loc=Kernel.gen_loc) alarm =
   let aux = function
     | Division_by_zero e ->
       (* e != 0 *)
@@ -688,7 +688,7 @@ let to_annot_aux kinstr ?loc alarm =
   let loc = match loc, kinstr with
     | Some l, _ -> l
     | None, Kstmt stmt -> Stmt.loc stmt
-    | None, Kglobal -> Fileloc.unknown
+    | None, Kglobal -> Kernel.gen_loc
   in
   let add alarm =
     let pred = create_predicate ~loc alarm in

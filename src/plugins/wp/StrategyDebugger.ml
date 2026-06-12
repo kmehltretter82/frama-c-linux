@@ -494,9 +494,9 @@ struct
 
   let equal_alternatives l1 l2 = List.equal equal_alternative l1 l2
 
-  let error = error ~loc:Fileloc.unknown
-  let ignored = ignored ~loc:Fileloc.unknown
-  let valid = valid ~loc:Fileloc.unknown
+  let error = error ~loc:Wp_parameters.gen_loc
+  let ignored = ignored ~loc:Wp_parameters.gen_loc
+  let valid = valid ~loc:Wp_parameters.gen_loc
 
   let debug ?node content () =
     let res = debug ?node content () in

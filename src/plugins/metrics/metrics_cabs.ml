@@ -542,7 +542,7 @@ module Halstead = struct
     let operand_tbl = cabs_visitor#get_operand_tbl () in
 
     let dummy_cst cst =
-      { expr_loc = Fileloc.unknown;
+      { expr_loc = Metrics_parameters.gen_loc;
         expr_node = CONSTANT cst;
       }
     and simple_pp_htbl ppf htbl =

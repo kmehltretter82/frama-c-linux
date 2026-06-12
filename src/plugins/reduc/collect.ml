@@ -83,7 +83,7 @@ and collect_array typ acc = function
   | x when Z.is_zero x -> acc
   | x ->
     let offs = collect_off typ in
-    let exp = Cil.kinteger64 ~loc:Fileloc.unknown x in
+    let exp = Cil.kinteger64 ~loc:Reduc_options.gen_loc x in
     let acc' = acc @ List.map (fun off -> Index(exp ,off)) offs in
     collect_array typ acc' (Z.add x Z.minus_one)
 

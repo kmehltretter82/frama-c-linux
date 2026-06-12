@@ -140,7 +140,7 @@ let transform_cabs cabs =
 
     (* Adds eventual unroll loop pragmas to the current loop statement [s] *)
     method unroll_pragma_insertion_process s =
-      let mk_spec cst = Logic_ptree.({ lexpr_loc = Fileloc.unknown;
+      let mk_spec cst = Logic_ptree.({ lexpr_loc = Options.gen_loc;
                                        lexpr_node = PLconstant cst }) in
       if not unroll_loop_pragma then s
       else try begin

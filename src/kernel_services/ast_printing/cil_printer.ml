@@ -368,12 +368,12 @@ module Precedence = struct
     | AUnOp (uo, _) ->
       getParenthLevel
         (Cil.dummy_exp
-           (UnOp(uo, Cil.zero ~loc:Fileloc.unknown, Cil_const.intType)))
+           (UnOp(uo, Cil.zero ~loc:Kernel.gen_loc, Cil_const.intType)))
     | ABinOp (bo, _, _) ->
       getParenthLevel
         (Cil.dummy_exp(BinOp(bo,
-                             Cil.zero ~loc:Fileloc.unknown,
-                             Cil.zero ~loc:Fileloc.unknown,
+                             Cil.zero ~loc:Kernel.gen_loc,
+                             Cil.zero ~loc:Kernel.gen_loc,
                              Cil_const.intType)))
     | AAddrOf _ -> addrOfLevel
     | ADot _ | AIndex _ | AStar _ -> memOffset_level

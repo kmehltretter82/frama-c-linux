@@ -124,8 +124,7 @@ let convert_location (wloc : Why3.Loc.position option) : Fileloc.t =
     let pstart = Filepos.make ~path ~line:lstart ~column:cstart ~offset:0 () in
     let pend = Filepos.make ~path ~line:lend ~column:cend ~offset:0 () in
     (pstart, pend)
-  | None ->
-    (Filepos.unknown, Filepos.unknown)
+  | None -> Wp_parameters.gen_loc
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)

@@ -696,7 +696,7 @@ end
 module LTyping = Logic_typing.Make(C_logic_env)
 
 let type_expr metaenv env ?tr ?current e =
-  let loc = Fileloc.unknown in
+  let loc = Aorai_option.gen_loc in
   let rec aux env cond e =
     match e with
     | PVar s ->
@@ -887,7 +887,7 @@ let type_expr metaenv env ?tr ?current e =
 
 let type_cond needs_pebble metaenv env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
-  let loc = Fileloc.unknown in
+  let loc = Aorai_option.gen_loc in
   let rec aux pos env =
     function
     | PRel(rel,e1,e2) ->
@@ -977,7 +977,7 @@ let add_if_needed states st =
 
 let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end seq =
   let dkey = typing_dkey in
-  let loc = Fileloc.unknown in
+  let loc = Aorai_option.gen_loc in
   match seq with
   | [] -> (* We identify start and end. *)
     (env, [], [], curr_end, curr_end)

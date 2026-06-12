@@ -169,7 +169,7 @@ let rec mk_logic_StartOf t =
 
 (* Make an AddrOf. Given an lval of type T will give back an expression of
  * type ptr(T)  *)
-let mk_logic_AddrOf ?(loc=Fileloc.unknown) lval typ =
+let mk_logic_AddrOf ?(loc=Kernel.gen_loc) lval typ =
   let lift_set typ =
     Ast_types.Acsl.transform_element
       (fun typ -> Ctype (Cil_const.mk_tptr (Ast_types.Acsl.get_ctype typ))) typ
@@ -2042,13 +2042,13 @@ let merge_post_cond l1 l2 =
     l1 l2
 
 let pp_old_loc fmt oldloc =
-  if Fileloc.(equal oldloc unknown) then
+  if Fileloc.is_empty oldloc then
     Format.ifprintf fmt ""
   else
     Format.fprintf fmt " (old location: %a)"
       Fileloc.pretty oldloc
 
-let merge_behaviors ?(oldloc=Fileloc.unknown) ~silent old_behaviors fresh_behaviors =
+let merge_behaviors ?(oldloc=Kernel.gen_loc) ~silent old_behaviors fresh_behaviors =
   old_behaviors @
   (List.filter
      (fun b ->
@@ -2076,7 +2076,7 @@ let merge_behaviors ?(oldloc=Fileloc.unknown) ~silent old_behaviors fresh_behavi
         with Not_found -> true)
      fresh_behaviors)
 
-let merge_funspec ?(oldloc=Fileloc.unknown) ?(silent_about_merging_behav=false) old_spec fresh_spec =
+let merge_funspec ?(oldloc=Kernel.gen_loc) ?(silent_about_merging_behav=false) old_spec fresh_spec =
   if not (is_same_spec old_spec fresh_spec || Cil.is_empty_funspec fresh_spec)
   then
     if Cil.is_empty_funspec old_spec then begin
