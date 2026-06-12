@@ -51,7 +51,10 @@ let get_ls ctxt name =
   Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
   Qed.Symbol.Fun.symbol lfun
 
-let t_app env name tl = Why3.Term.t_app_infer (get_ls env.context name) tl
+let t_app env name ?result tl =
+  match result with
+  | None -> Why3.Term.t_app_infer (get_ls env.context name) tl
+  | Some oty -> Why3.Term.t_app (get_ls env.context name) tl oty
 
 let is_prop x =
   match x.Why3.Term.t_ty with
@@ -242,14 +245,14 @@ let t_prop env u =
   if is_prop u then u else
     begin
       Qed.Symbol.use env.context.cluster Why3.Theory.bool_theory ;
-      Why3.Term.(t_equ u t_bool_true)
+      Why3.Term.(t_equ_simp u t_bool_true)
     end
 
 let t_bool env u =
   if is_prop u then
     begin
       Qed.Symbol.use env.context.cluster Why3.Theory.bool_theory ;
-      Why3.Term.(t_if u t_bool_true t_bool_false)
+      Why3.Term.(t_if_simp u t_bool_true t_bool_false)
     end
   else u
 
@@ -316,7 +319,8 @@ let rec cc env t : Why3.Term.term =
   | Aset(m,k,v) ->
     t_app env "map.Map.set" [cc_term env m; cc_term env k; cc_term env v]
   | Acst(_,v) ->
-    t_app env "map.Const.const" [cc_term env v]
+    let result = cc_tau env.context @@ Lang.F.typeof t in
+    t_app env "map.Const.const" ~result [cc_term env v]
   | Fun(f, [x]) when Lang.E.(Cfloat.fq32 @= f) ->
     begin match Lang.F.repr x with
       | Kreal q -> const_float env.context Float32 q
