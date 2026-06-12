@@ -786,10 +786,13 @@ module Config = struct
     let add_main_mode modes = (main (), Domain_mode.Mode.all) :: modes in
     let add config (registered : Domain.registered) =
       let name = registered.info.name in
+      let add_name = Datatype.String.Set.add name in
       if not (Parameters.Domains.mem name) && registered.auto_enable () then
-        (* Add the auto-enabled domain to the options so that it appears
-           enabled in the GUI. *)
-        Parameters.Domains.add name;
+        (* Add the auto-enabled domain to the -eva-domains parameter so that
+           it is consistent with the domains actually used by the analysis,
+           but do not clear dependencies as this does not really change the
+           parameter (the domain is already enabled). *)
+        Parameters.Domains.(get () |> add_name |> unsafe_set);
       let enabled = Parameters.Domains.mem name in
       let enable modes = if enabled then add_main_mode modes else modes in
       match find name with
