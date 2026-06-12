@@ -73,6 +73,13 @@ let rec ghost_term_type t =
     ghost_term_type (Ast_types.Acsl.set_element t)
   | _ -> false
 
+let is_frama_c_builtin vi =
+  (* Builtins like Frama_C_show_each or compiler builtins are authorized in
+     ghost code for now. In the longer term we probably want to generate "ghost"
+     versions of the builtins for the ghost code (same thing for libc functions
+     by the way). *)
+  Ast_info.is_frama_c_builtin vi
+
 class visitor = object(self)
   inherit Visitor.frama_c_inplace
 
@@ -162,14 +169,14 @@ class visitor = object(self)
         | Call(_, f, _, _) ->
           begin match Kernel_function.(Option.map get_vi @@ get_called f) with
             | Some fct
-              when not (Ast_info.is_frama_c_builtin fct) && not fct.vghost ->
+              when not (is_frama_c_builtin fct) && not fct.vghost ->
               Error.non_ghost_function_call_in_ghost ~current:true () ; true
             | None ->
               Error.function_pointer_call ~current:true () ; true
             | _ -> false
           end
         | Local_init(_, ConsInit(fct, _, _), _)
-          when not (Ast_info.is_frama_c_builtin fct) && not fct.vghost ->
+          when not (is_frama_c_builtin fct) && not fct.vghost ->
           Error.non_ghost_function_call_in_ghost ~current:true () ; true
         | _ -> false
       in
@@ -182,10 +189,10 @@ class visitor = object(self)
               | Call(_, f, _, _) ->
                 let vi =
                   Kernel_function.(get_vi @@ Option.get @@ get_called f) in
-                if not (Ast_info.is_frama_c_builtin vi) then
+                if not (is_frama_c_builtin vi) then
                   error_if_incompatible lv (Cil.getReturnType (Cil.typeOfLhost f)) f
               | Local_init(_, ConsInit(fct, _, _), _) ->
-                if not (Ast_info.is_frama_c_builtin fct) then
+                if not (is_frama_c_builtin fct) then
                   error_if_incompatible lv (Cil.getReturnType fct.vtype) (Var fct)
               | _ -> ()
             end

@@ -95,10 +95,6 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 (* Classification                                                           *)
 (* ************************************************************************ *)
 
-let is_frama_c_builtin vi =
-  Ast_info.is_frama_c_builtin vi ||
-  Cil_builtins.Builtin_functions.mem vi.vname
-
 let va_builtins = [
   "__builtin_c23_va_start";
   "__builtin_va_start";
@@ -153,7 +149,7 @@ let classify_std env vi = match vi.vname with
   | n when String.starts_with ~prefix:"__sync_" n -> Misc
   | n when is_va_builtin n -> Misc
   (* Anything else *)
-  | _ -> if is_frama_c_builtin vi then Builtin else Unknown
+  | _ -> if Ast_info.is_frama_c_builtin vi then Builtin else Unknown
 
 let classify env vi =
   if  Ast_types.C.is_variadic vi.vtype then begin

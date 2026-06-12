@@ -271,7 +271,7 @@ class vis flag = object(self)
 end
 
 let add_destructor file =
-  let is_builtin fundec = Cil_builtins.is_special_builtin fundec.svar.vname in
+  let is_builtin fundec = Cil_builtins.is_builtin fundec.svar in
   let process_one_global has_grown = function
     | GFun (fundec, _) when not (is_builtin fundec) ->
       let flag = ref false in

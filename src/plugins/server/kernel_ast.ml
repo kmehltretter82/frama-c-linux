@@ -827,7 +827,7 @@ struct
     if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
 
   let is_builtin kf =
-    Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)
+    Ast_info.is_frama_c_builtin (Kernel_function.get_vi kf)
 
   let is_extern kf =
     let vi = Kernel_function.get_vi kf in
