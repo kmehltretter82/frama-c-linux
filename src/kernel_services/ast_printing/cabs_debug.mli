@@ -10,9 +10,9 @@
 open Cabs
 open Format
 
-val pp_cabsloc : formatter -> cabsloc -> unit
-[@@deprecated "Use Cabs.pp_cabsloc instead."]
-[@@migrate { repl = Cabs.pp_cabsloc } ]
+val pp_cabsloc : formatter -> Fileloc.t -> unit
+[@@deprecated "Use Fileloc.pretty instead."]
+[@@migrate { repl = Fileloc.pretty } ]
 
 val pp_storage : formatter -> storage -> unit
 [@@deprecated "Use Cabs.pp_storage instead."]

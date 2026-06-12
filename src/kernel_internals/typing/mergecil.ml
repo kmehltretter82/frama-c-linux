@@ -45,7 +45,7 @@ let mergeInlinesWithAlphaConvert () = Kernel.AggressiveMerging.get ()
  * but only probabilistically accurate *)
 let mergeGlobals = true
 
-let d_nloc fmt (lo: (location * int) option) =
+let d_nloc fmt (lo: (Fileloc.t * int) option) =
   match lo with
     None -> Format.fprintf fmt "None"
   | Some (l, idx) ->
@@ -55,7 +55,7 @@ type ('a, 'b) node =
   { nname: 'a;   (* The actual name *)
     nfidx: int;      (* The file index *)
     ndata: 'b;       (* Data associated with the node *)
-    mutable nloc: (location * int) option;
+    mutable nloc: (Fileloc.t * int) option;
     (* location where defined and index within the file of the definition.
      * If None then it means that this node actually DOES NOT appear in the
      * given file. In rare occasions we need to talk in a given file about
@@ -100,13 +100,13 @@ sig
   val clear_syn: 'a syn_table -> unit
   val mkSelfNode:
     'a eq_table -> 'a syn_table -> int -> H.t -> 'a ->
-    (location * int) option -> (H.t, 'a) node
+    (Fileloc.t * int) option -> (H.t, 'a) node
   val find: bool -> (H.t, 'a) node -> (H.t, 'a) node
   val union: (H.t, 'a) node -> (H.t,'a) node -> (H.t, 'a) node * (unit -> unit)
   val findReplacement:
     bool -> 'a eq_table -> int -> H.t -> ('a * int) option
   val getNode: 'a eq_table -> 'a syn_table -> int ->
-    H.t -> 'a -> (location * int) option -> (H.t, 'a) node
+    H.t -> 'a -> (Fileloc.t * int) option -> (H.t, 'a) node
   (* [doMergeSynonyms eq compare]
      tries to merge synonyms. Do not give an error if they fail to merge
      compare is a comparison function that throws Failure if no match *)
@@ -331,15 +331,15 @@ end
  * name space. Unfortunately, because of the way the C lexer works, type
  * names must be different from variable names!! We one alpha table both for
  * variables and types. *)
-let vtAlpha: location Alpha.alphaTable
+let vtAlpha: Fileloc.t Alpha.alphaTable
   = H.create 57 (* Variables and
                  * types *)
-let sAlpha: location Alpha.alphaTable
+let sAlpha: Fileloc.t Alpha.alphaTable
   = H.create 57 (* Structures and
                  * unions have
                  * the same name
                  * space *)
-let eAlpha: location Alpha.alphaTable
+let eAlpha: Fileloc.t Alpha.alphaTable
   = H.create 57 (* Enumerations *)
 
 let aeAlpha = H.create 57 (* Anonymous enums. *)
@@ -728,9 +728,9 @@ let emittedVarDecls: (string, bool) H.t = H.create 113
 
 (* also keep track of externally-visible function definitions;
  * name maps to declaration, location, and semantic checksum *)
-let emittedFunDefn: (string, fundec * location * int) H.t = H.create 113
+let emittedFunDefn: (string, fundec * Fileloc.t * int) H.t = H.create 113
 (* and same for variable definitions; name maps to GVar fields *)
-let emittedVarDefn: (string, varinfo * init_or_str option * location) H.t = H.create 113
+let emittedVarDefn: (string, varinfo * init_or_str option * Fileloc.t) H.t = H.create 113
 
 (** A mapping from the new names to the original names. Used in PASS2 when we
  * rename variables. *)
@@ -2583,7 +2583,7 @@ let oneFilePass2 (f: file) =
   let processOneGlobal (g: global) : unit =
     let open Current_loc.Operators in
     (* Process a varinfo. Reuse an old one, or rename it if necessary *)
-    let processVarinfo (vi: varinfo) (vloc: location) : varinfo =
+    let processVarinfo (vi: varinfo) (vloc: Fileloc.t) : varinfo =
       if Cil_datatype.Varinfo.Set.mem vi !visited then vi
       else begin
         (* Maybe it is static. Rename it then *)

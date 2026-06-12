@@ -14,7 +14,7 @@ open Contract_types
 
 type t = contract
 
-val create: loc:location -> spec -> t
+val create: loc:Fileloc.t -> spec -> t
 (** Create a contract from a [spec] object (either function spec or statement
     spec) *)
 

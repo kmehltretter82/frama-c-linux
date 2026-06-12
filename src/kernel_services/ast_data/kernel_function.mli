@@ -226,7 +226,7 @@ val get_return_type : t -> typ
     @return the return type of the function
 *)
 
-val get_location: t -> Cil_types.location
+val get_location: t -> Fileloc.t
 val get_global : t -> global
 (** For functions with a declaration and a definition, returns the definition.*)
 

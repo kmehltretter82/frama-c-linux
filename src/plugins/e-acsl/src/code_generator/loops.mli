@@ -26,7 +26,7 @@ val handle_annotations:
 (**************************************************************************)
 
 val mk_nested_loops:
-  loc:location -> (Env.t -> stmt list * Env.t) -> kernel_function -> Env.t ->
+  loc:Fileloc.t -> (Env.t -> stmt list * Env.t) -> kernel_function -> Env.t ->
   lscope_var list -> stmt list * Env.t
 (** [mk_nested_loops ~loc mk_innermost_block kf env lvars] creates nested
     loops (with the proper statements for initializing the loop counters)

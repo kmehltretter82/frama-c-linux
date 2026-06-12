@@ -14,7 +14,7 @@ open Cil_types
 
 (** Generates a predicate characterizing the domain of the l-value. *)
 val export_value :
-  loc:location -> ?name:string list -> lval -> Results.request -> predicate
+  loc:Fileloc.t -> ?name:string list -> lval -> Results.request -> predicate
 
 (**
    Generates a collection of predicates for each l-value that is read by the

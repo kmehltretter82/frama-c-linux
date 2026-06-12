@@ -117,7 +117,7 @@ val mapGlobals: file -> (global -> global) -> unit
 val findOrCreateFunc: file -> string -> typ -> varinfo
 
 (** creates an expression with a fresh id *)
-val new_exp: loc:location -> exp_node -> exp
+val new_exp: loc:Fileloc.t -> exp_node -> exp
 
 (** performs a deep copy of an expression (especially, avoid eid sharing).
     @since Nitrogen-20111001
@@ -146,14 +146,14 @@ val pushGlobal: global -> types: global list ref
 val invalidStmt: stmt
 
 (** Returns a location that ranges over the two locations in arguments. *)
-val range_loc: location -> location -> location
+val range_loc: Fileloc.t -> Fileloc.t -> Fileloc.t
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating initializers} *)
 (* ************************************************************************* *)
 
 (** Make a initializer for zero-ing a data type *)
-val makeZeroInit: loc:location -> typ -> init
+val makeZeroInit: loc:Fileloc.t -> typ -> init
 
 (** Fold over the list of initializers in a Compound (not also the nested
     ones). [doinit] is called on every present initializer, even if it is of
@@ -676,22 +676,22 @@ val mone: loc:Fileloc.t -> exp
     [repr].
     @raise Not_representable if no ikind is provided and the integer is not
     representable. *)
-val kinteger64: loc:location -> ?repr:string -> ?kind:ikind -> Z.t -> exp
+val kinteger64: loc:Fileloc.t -> ?repr:string -> ?kind:ikind -> Z.t -> exp
 
 (** Construct an integer of a given kind. Converts the integer to int64 and
     then uses kinteger64. This might truncate the value if you use a kind
     that cannot represent the given integer. This can only happen for one of
     the Char or Short kinds *)
-val kinteger: loc:location -> ikind -> int -> exp
+val kinteger: loc:Fileloc.t -> ikind -> int -> exp
 
 (** Construct an integer of kind IInt. You can use this always since the
     OCaml integers are 31 bits and are guaranteed to fit in an IInt *)
-val integer: loc:location -> int -> exp
+val integer: loc:Fileloc.t -> int -> exp
 
 (** Constructs a floating point constant.
     @since Oxygen-20120901
 *)
-val kfloat: loc:location -> fkind -> float -> exp
+val kfloat: loc:Fileloc.t -> fkind -> float -> exp
 
 (** True if the given expression is a (possibly cast'ed)
     character or an integer constant *)
@@ -785,7 +785,7 @@ val constFoldOffset: bool -> offset -> offset
 (** Do constant folding on a binary operation. The bulk of the work done by
     [constFold] is done here. If the second argument is true then
     will also compute compiler-dependent expressions such as [sizeof]. *)
-val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
+val constFoldBinOp: loc:Fileloc.t -> bool -> binop -> exp -> exp -> typ -> exp
 
 (** Convert an expression [e] to a boolean expression [e != 0] if [e] is not
     already a boolean.
@@ -817,11 +817,11 @@ val var: varinfo -> lval
 (** Creates an expr representing the variable.
     @since Nitrogen-20111001
 *)
-val evar: ?loc:location -> varinfo -> exp
+val evar: ?loc:Fileloc.t -> varinfo -> exp
 
 (** Make an AddrOf. Given an lvalue of type T will give back an expression of
     type ptr(T). It optimizes somewhat expressions like "& v" and "& v[0]"  *)
-val mkAddrOf: loc:location -> lval -> exp
+val mkAddrOf: loc:Fileloc.t -> lval -> exp
 
 (** Creates an expression corresponding to "&v".
     @since Oxygen-20120901 *)
@@ -830,7 +830,7 @@ val mkAddrOfVi: varinfo -> exp
 (** Like mkAddrOf except if the type of lval is an array then it uses
     StartOf. This is the right operation for getting a pointer to the start
     of the storage denoted by lval. *)
-val mkAddrOrStartOf: loc:location -> lval -> exp
+val mkAddrOrStartOf: loc:Fileloc.t -> lval -> exp
 
 (** Make a Mem, while optimizing AddrOf. The type of the addr must be
     TPtr(t) and the type of the resulting lval is t. Note that in CIL the
@@ -849,7 +849,7 @@ val mkMem: addr:exp -> off:offset -> lval
     - If both types are object pointers, cast to [void*]
     - Else cast to [uintptr_t]
 
-    The [Result.Error] contains an optional [location] to target a specific
+    The [Result.Error] contains an optional [Fileloc.t] to target a specific
     operand and an error message.
 
     @before 33.0-Arsenic the function could raise [AbortFatal] instead of using
@@ -857,15 +857,15 @@ val mkMem: addr:exp -> off:offset -> lval
     parameter [?constfold] was not present and we always applied constant
     folding.
 *)
-val mkBinOp: ?constfold:bool -> loc:location -> binop -> exp -> exp ->
-  (exp, (location option * string)) result
+val mkBinOp: ?constfold:bool -> loc:Fileloc.t -> binop -> exp -> exp ->
+  (exp, (Fileloc.t option * string)) result
 
 (** Same as {!mkBinOp} but handles [Error] by throwing an exception with the
     given message and current location.
     @raise Abortfatal if {!mkBinOp} fails
     @since 33.0-Arsenic
 *)
-val mkBinOp_exn: ?constfold:bool -> loc:location -> binop -> exp -> exp -> exp
+val mkBinOp_exn: ?constfold:bool -> loc:Fileloc.t -> binop -> exp -> exp -> exp
 
 (** Same as {!mkBinOp_exn}
     @before 33.0-Arsenic Performed a systematic cast (unless one of the
@@ -875,7 +875,7 @@ val mkBinOp_exn: ?constfold:bool -> loc:location -> binop -> exp -> exp -> exp
     introduction of this function.
     @since Chlorine-20180501
 *)
-val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp ->
+val mkBinOp_safe_ptr_cmp: loc:Fileloc.t -> binop -> exp ->
   exp -> exp
 [@@deprecated "Use mkBinOp_exn instead, which is now safe to use."]
 [@@migrate { repl = Rel.mkBinOp_exn }]
@@ -972,12 +972,12 @@ val stripCasts: exp -> exp
 val typeOf: exp -> typ
 (** Compute the type of an expression. *)
 
-val typeOf_string_literal: ?loc:location -> string -> typ
+val typeOf_string_literal: ?loc:Fileloc.t -> string -> typ
 (** Returns the type (a char array of fixed length) of a string literal
     @since 32.0-Germanium
 *)
 
-val typeOf_wstring_literal: ?loc:location -> int64 list -> typ
+val typeOf_wstring_literal: ?loc:Fileloc.t -> int64 list -> typ
 (** Return the type (a wchar_t array of fixed length) of a wide string literal
     @since 32.0-Germanium
 *)
@@ -995,15 +995,15 @@ val parseInt: string -> Z.t
 val parseIntRes: string -> (Z.t, string) result
 
 (** Like [parseInt], but converts to an expression. *)
-val parseIntExp: loc:location -> string -> exp
+val parseIntExp: loc:Fileloc.t -> string -> exp
 
 (** Like [parseIntExp], but returns [Error message] in case of failure, instead
     of aborting Frama-C.
     @since 24.0-Chromium *)
-val parseIntExpRes: loc:location -> string -> (exp, string) result
+val parseIntExpRes: loc:Fileloc.t -> string -> (exp, string) result
 
 (** Like [parseInt], but converts to a logic term. *)
-val parseIntLogic: loc:location -> string -> term
+val parseIntLogic: loc:Fileloc.t -> string -> term
 
 val appears_in_expr: varinfo -> exp -> bool
 (** @return true if the given variable appears in the expression. *)
@@ -1047,7 +1047,7 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
     [valid_sid] arguments.
 *)
 val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
-  ?loc:location -> unit -> stmt
+  ?loc:Fileloc.t -> unit -> stmt
 
 (** Create an instruction equivalent to a pure expression. The new instruction
     corresponds to the initialization of a new fresh variable, i.e.
@@ -1056,7 +1056,7 @@ val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
     must be placed directly (modulo non-scoping blocks) inside this block.
 *)
 val mkPureExprInstr:
-  fundec:fundec -> scope:block -> ?loc:location -> exp -> instr
+  fundec:fundec -> scope:block -> ?loc:Fileloc.t -> exp -> instr
 
 (** Create an instruction as above, enclosed in a block
     of a single ([Instr]) statement, which will be the scope of the fresh
@@ -1067,7 +1067,7 @@ val mkPureExprInstr:
 *)
 val mkPureExpr:
   ?ghost:bool -> ?valid_sid:bool -> fundec:fundec ->
-  ?loc:location -> exp -> stmt
+  ?loc:Fileloc.t -> exp -> stmt
 
 (** Make a loop. Can contain Break or Continue.
     The kind of loop (while, for, dowhile) is given by [sattr]
@@ -1117,8 +1117,8 @@ val block_from_unspecified_sequence:
     @before 32.0-Germanium [action] took an expression instead of an lhost.
 *)
 val treat_constructor_as_func:
-  (lval option -> lhost -> exp list -> location -> 'a) ->
-  varinfo -> varinfo -> exp list -> constructor_kind -> location -> 'a
+  (lval option -> lhost -> exp list -> Fileloc.t -> 'a) ->
+  varinfo -> varinfo -> exp list -> constructor_kind -> Fileloc.t -> 'a
 
 (** [find_def_stmt b v] returns the [Local_init] instruction within [b] that
     initializes [v]. [v] must have its [vdefined] field set to true, and be
@@ -1943,7 +1943,7 @@ val intKindForValue: Z.t -> bool -> ikind
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"
     expression if it cannot compute the size. This function is architecture
     dependent, so you should only call this after you call {!Machine.init}.  *)
-val sizeOf: loc:location -> typ -> exp
+val sizeOf: loc:Fileloc.t -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
     architecture dependent, so you should only call this after you call
@@ -1986,7 +1986,7 @@ val bitsOffset: typ -> offset -> int * int
     this after you call {!Machine.init}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
-val create_string_literal: ?loc:Cil_types.location -> string -> varinfo
+val create_string_literal: ?loc:Fileloc.t -> string -> varinfo
 (** creates a new varinfo for holding a string literal
 
     **NB** this function only creates the variable, but does not insert its
@@ -1996,7 +1996,7 @@ val create_string_literal: ?loc:Cil_types.location -> string -> varinfo
     @since 32.0-Germanium
 *)
 
-val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
+val create_wstring_literal: ?loc:Fileloc.t -> int64 list -> varinfo
 (** creates a new varinfo for holding a string literal
 
     **NB** this function only creates the variable, but does not insert its
@@ -2014,7 +2014,7 @@ val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
 (** if the list has 2 elements or more, it will return a block with
     [bscoping=false]
 *)
-val stmt_of_instr_list : ?loc:location -> instr list -> stmtkind
+val stmt_of_instr_list : ?loc:Fileloc.t -> instr list -> stmtkind
 
 (** Convert a C variable into the corresponding logic variable.
     The returned logic variable is unique for a given C variable. *)
@@ -2022,23 +2022,23 @@ val cvar_to_lvar : varinfo -> logic_var
 
 (** Convert a C variable into a logic term.
     @since 24.0-Chromium *)
-val cvar_to_term: loc:location -> varinfo -> term
+val cvar_to_term: loc:Fileloc.t -> varinfo -> term
 
 (** Make a temporary variable to use in annotations *)
 val make_temp_logic_var: logic_type -> logic_var
 
 (** The constant logic term zero.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val lzero : ?loc:location -> unit -> term
+val lzero : ?loc:Fileloc.t -> unit -> term
 
 (** The constant logic term 1. *)
-val lone : ?loc:location -> unit -> term
+val lone : ?loc:Fileloc.t -> unit -> term
 
 (** The constant logic term -1. *)
-val lmone : ?loc:location -> unit -> term
+val lmone : ?loc:Fileloc.t -> unit -> term
 
 (** The given constant logic term *)
-val lconstant : ?loc:location -> Z.t -> term
+val lconstant : ?loc:Fileloc.t -> Z.t -> term
 
 (** Bind all free variables with an universal quantifier *)
 val close_predicate : predicate -> predicate

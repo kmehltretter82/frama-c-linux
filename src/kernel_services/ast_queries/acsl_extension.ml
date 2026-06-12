@@ -13,11 +13,11 @@ open Logic_ptree
 type extension_preprocessor =
   lexpr list -> lexpr list
 type extension_typer =
-  typing_context -> location -> lexpr list -> acsl_extension_kind
+  typing_context -> Fileloc.t -> lexpr list -> acsl_extension_kind
 type extension_preprocessor_block =
   string * extended_decl list -> string * extended_decl list
 type extension_typer_block =
-  typing_context -> location -> string * extended_decl list -> acsl_extension_kind
+  typing_context -> Fileloc.t -> string * extended_decl list -> acsl_extension_kind
 type extension_visitor =
   Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
 type extension_printer =
@@ -26,7 +26,7 @@ type extension_printer =
 type extension_same =
   acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
 type extension_module_importer =
-  module_builder -> location -> string list -> unit
+  module_builder -> Fileloc.t -> string list -> unit
 
 type register_extension =
   plugin:string -> string ->

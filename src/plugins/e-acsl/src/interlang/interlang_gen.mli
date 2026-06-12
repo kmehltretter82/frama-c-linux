@@ -30,7 +30,7 @@ open Interlang
     This value might be locally shadowed during the computation. *)
 type env =
   {kf : Cil_types.kernel_function;
-   loc : Cil_types.location;
+   loc : Fileloc.t;
    vars : exp Cil_datatype.Term.Map.t;
    env : Env.t;
    rte : bool}

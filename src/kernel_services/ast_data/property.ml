@@ -95,7 +95,7 @@ type identified_reachable = {
 type other_loc =
   | OLContract of kernel_function
   | OLStmt of kernel_function * stmt
-  | OLGlob of location
+  | OLGlob of Fileloc.t
 [@@deriving show { with_path = false} ]
 
 type extended_loc =
@@ -127,7 +127,7 @@ and identified_lemma = {
   il_args : string list;
   il_pred : toplevel_predicate;
   il_attrs : attributes;
-  il_loc : location
+  il_loc : Fileloc.t
 } [@@deriving show { with_path = false} ]
 
 and identified_instance = {
@@ -141,13 +141,13 @@ and identified_type_invariant = {
   iti_name : string;
   iti_type : typ;
   iti_pred : predicate;
-  iti_loc : location
+  iti_loc : Fileloc.t
 } [@@deriving show { with_path = false} ]
 
 and identified_global_invariant = {
   igi_name : string;
   igi_pred : predicate;
-  igi_loc : location
+  igi_loc : Fileloc.t
 } [@@deriving show { with_path = false} ]
 
 and identified_other = {

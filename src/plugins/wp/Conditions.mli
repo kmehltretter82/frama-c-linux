@@ -174,7 +174,7 @@ val introduction : sequent -> sequent option
 val introduction_eq : sequent -> sequent
 (** Same as [introduction] but returns the same sequent is None *)
 
-val lemma : loc:location -> pred -> sequent
+val lemma : loc:Fileloc.t -> pred -> sequent
 (** Performs existential, universal and hypotheses introductions *)
 
 val head : step -> pred
@@ -226,7 +226,7 @@ val merge : bundle list -> bundle
     over the list. *)
 
 (** Inserts probes to a sequent. *)
-val probe : loc:location -> ?descr:string -> ?stmt:stmt -> name:string ->
+val probe : loc:Fileloc.t -> ?descr:string -> ?stmt:stmt -> name:string ->
   term -> bundle -> bundle
 
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)

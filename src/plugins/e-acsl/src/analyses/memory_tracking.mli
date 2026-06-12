@@ -36,7 +36,7 @@ val must_monitor_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
 val must_monitor_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
 (** Same as {!must_monitor_vi}, for expressions *)
 
-val found_concurrent_function: loc:location -> varinfo -> unit
+val found_concurrent_function: loc:Fileloc.t -> varinfo -> unit
 (** [found_concurrent_function ~loc fvi] signals to the memory tracking
     sub-system that a concurrent function [fvi] has been found at [loc] while
     parsing the sources. This function needs only to be called if the

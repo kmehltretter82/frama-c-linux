@@ -14,7 +14,7 @@ val is_writing_memory: varinfo -> bool
 (** @return true if the function is a libc function that writes memory. *)
 
 val update_memory_model:
-  loc:location ->
+  loc:Fileloc.t ->
   ?result:lval ->
   Env.t ->
   kernel_function ->

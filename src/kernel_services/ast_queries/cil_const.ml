@@ -121,7 +121,7 @@ let mkCompInfo
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
     (mkfspec: compinfo -> (string * typ * int option * exp option *
-                           attributes * location) list option)
+                           attributes * Fileloc.t) list option)
     (a: attributes) : compinfo =
 
   (* make a new name for anonymous structs *)

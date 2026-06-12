@@ -48,4 +48,4 @@ val get_logic_function_in_axiomatic:
 val clear: unit -> unit
 
 (** Creates a list of global for the elements that have been created *)
-val globals: location -> global list
+val globals: Fileloc.t -> global list

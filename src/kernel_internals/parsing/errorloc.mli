@@ -41,10 +41,10 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
     @since Frama-C+dev *)
 val convert_pos: Lexing.position -> Filepos.t
 
-(** Convert a pair of {!Lexing.position} to a [Cil_types.location] using the
+(** Convert a pair of {!Lexing.position} to a [Fileloc.t] using the
     current parsing context (taking {!setCurrentLine} into account).
     @since Frama-C+dev *)
-val convert_loc: Lexing.position * Lexing.position -> Cil_types.location
+val convert_loc: Lexing.position * Lexing.position -> Fileloc.t
 
 (** prints the line(s) identified by the location, together with [ctx] lines
     of context before and after. [ctx] defaults to 2.
@@ -59,11 +59,11 @@ val convert_loc: Lexing.position * Lexing.position -> Cil_types.location
     line.
 *)
 val pp_context_from_file:
-  ?ctx:int -> Format.formatter -> Cil_types.location -> unit
+  ?ctx:int -> Format.formatter -> Fileloc.t -> unit
 
 (** prints a readable description of a location
     @since 22.0-Titanium *)
-val pp_location: Format.formatter -> Cil_types.location -> unit
+val pp_location: Format.formatter -> Fileloc.t -> unit
 [@@deprecated "Use Fileloc.pretty_long_range instead"]
 
 (** Emits the corresponding error message with some location information.
@@ -72,7 +72,7 @@ val pp_location: Format.formatter -> Cil_types.location -> unit
     i.e. we assume the parser has read an unexpected token.
 *)
 val parse_error:
-  ?loc:Cil_types.location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+  ?loc:Fileloc.t -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 val had_errors : unit -> bool
 (** Has an error been raised since the last call to {!clear_errors}? *)
@@ -89,5 +89,5 @@ val clear_errors : unit -> unit
     [loc] defaults to [Current_loc.get ()].
     @since 31.0-Gallium
 *)
-val abort_context : ?loc:Cil_types.location ->
+val abort_context : ?loc:Fileloc.t ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a

@@ -43,7 +43,7 @@ let trim name =
 (* -------------------------------------------------------------------------- *)
 
 type logic_lemma = {
-  lem_loc : location ;
+  lem_loc : Fileloc.t ;
   lem_name : string ;
   lem_types : string list ;
   lem_labels : logic_label list ;

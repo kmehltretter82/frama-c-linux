@@ -16,9 +16,9 @@ type context
 type pattern
 type value
 
-exception TypeError of location * string
+exception TypeError of Fileloc.t * string
 
-val pattern_loc: pattern -> location
+val pattern_loc: pattern -> Fileloc.t
 
 (** Creates an empty environment.
     @before 33.0-Arsenic the typing context was mandatory.
@@ -31,7 +31,7 @@ val context : ?tc:Logic_typing.typing_context -> unit -> context
     @raise TypeError when the context does not have a typing_context
     @since 33.0-Arsenic
 *)
-val error: context -> location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+val error: context -> Fileloc.t -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (** Parse a pattern and enrich the environment with pattern variables
     @raise TypeError in case of error when context does not have typing_context
@@ -102,7 +102,7 @@ val env : ?raise:bool -> unit -> env
     @raise TypeError when the environment has [raise] set to [true]
     @since 33.0-Arsenic
 *)
-val typecheck_error : env -> location -> ('a, Format.formatter, unit, unit) format4 -> 'a
+val typecheck_error : env -> Fileloc.t -> ('a, Format.formatter, unit, unit) format4 -> 'a
 
 val typecheck_value : env -> ?tau:Lang.F.tau -> value -> unit
 val typecheck_pattern : env -> ?tau:Lang.F.tau -> pattern -> unit

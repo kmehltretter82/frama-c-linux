@@ -37,7 +37,7 @@ let new_monitor
     ~(limit : int)
     ~(kind : split_kind)
     ~(term : split_term)
-    ~(loc : Cil_types.location) =
+    ~(loc : Fileloc.t) =
   {
     split_term = term;
     split_kind = kind;

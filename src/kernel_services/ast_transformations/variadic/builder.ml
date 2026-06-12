@@ -16,7 +16,7 @@ sig
   include (module type of Cil_builder.Stateful ())
 
   (* The loc of the call being translated *)
-  val loc : Cil_types.location
+  val loc : Fileloc.t
 
   (* These two following function stores the built global for later addition
      to the AST *)

@@ -15,7 +15,7 @@ open Analyses_types
 type t
 (** Type to hold the data contributing to an assertion. *)
 
-val empty: loc:location -> kernel_function -> Env.t -> t * Env.t
+val empty: loc:Fileloc.t -> kernel_function -> Env.t -> t * Env.t
 (** Empty assertion context. *)
 
 val no_data: t
@@ -27,17 +27,17 @@ val no_data: t
     it afterwards. For instance there is no following assertion statement. *)
 
 
-val with_data_from: loc:location -> kernel_function -> Env.t -> t -> t * Env.t
+val with_data_from: loc:Fileloc.t -> kernel_function -> Env.t -> t -> t * Env.t
 (** [with_data_from ~loc kf env from] creates a new assertion context with the
     same data than the [from] assertion context.
     If [from] is a "no data" assertion context, then the new context is also a
     "no data" assertion context. *)
 
-val merge_right: loc:location -> Env.t -> t -> t -> t * Env.t
+val merge_right: loc:Fileloc.t -> Env.t -> t -> t -> t * Env.t
 (** [merge_right ~loc env adata1 adata2] merges the assertion data of [adata1]
     into [adata2] if [adata2] is not a "no data" assertion context. *)
 
-val clean: loc:location -> Env.t -> t -> Env.t
+val clean: loc:Fileloc.t -> Env.t -> t -> Env.t
 (** [clean ~loc env adata] generates a call to the C cleanup function for the
     assertion context. This function *must* be used if the assertion context is
     not given to [runtime_check] or [runtime_check_with_msg], otherwise the
@@ -52,7 +52,7 @@ val do_pending_register_data:
 (** [do_pending_register_data] performs all the pending restrations*)
 
 val register:
-  loc:location ->
+  loc:Fileloc.t ->
   ?force:bool ->
   string ->
   exp ->
@@ -65,7 +65,7 @@ val register:
     expression is a constant. *)
 
 val register_term:
-  loc:location ->
+  loc:Fileloc.t ->
   ?force:bool ->
   term ->
   exp ->
@@ -77,7 +77,7 @@ val register_term:
     [register]. *)
 
 val register_pred:
-  loc:location ->
+  loc:Fileloc.t ->
   Env.t ->
   ?force:bool ->
   predicate ->
@@ -90,7 +90,7 @@ val register_pred:
     [register]. *)
 
 val register_pred_or_term:
-  loc:location ->
+  loc:Fileloc.t ->
   Env.t ->
   ?force:bool ->
   pred_or_term ->
@@ -123,7 +123,7 @@ val runtime_check:
 
 val runtime_check_with_msg:
   adata:t ->
-  loc:location ->
+  loc:Fileloc.t ->
   ?name:string ->
   string ->
   pred_kind:predicate_kind ->

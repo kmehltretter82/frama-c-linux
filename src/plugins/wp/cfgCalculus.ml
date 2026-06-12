@@ -132,7 +132,7 @@ struct
     mutable wk: W.t_prop; (* end point *)
   }
 
-  exception NonNaturalLoop of location
+  exception NonNaturalLoop of Fileloc.t
 
   (* --- Annotation Helpers --- *)
 

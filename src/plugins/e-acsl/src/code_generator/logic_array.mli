@@ -8,7 +8,7 @@
 
 open Cil_types
 
-val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
+val comparison_to_exp: loc:Fileloc.t -> kernel_function -> Env.t ->
   name:string -> binop -> exp -> exp -> exp * Env.t
 (** [comparison_to_exp ~loc kf env ~name bop e1 e2] generate the C code
     equivalent to [e1 bop e2].
@@ -28,6 +28,6 @@ end
 
 module Translate_utils : sig
   val comparison_to_exp_ref:
-    (loc:location -> kernel_function -> Env.t -> Analyses_types.number_ty ->
+    (loc:Fileloc.t -> kernel_function -> Env.t -> Analyses_types.number_ty ->
      binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t) ref
 end

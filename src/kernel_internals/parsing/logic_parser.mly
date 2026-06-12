@@ -15,6 +15,10 @@
   open Logic_ptree
   open Logic_utils
 
+  (* Avoid deprecated warning from Logic_ptree.location, remove this type when
+     removing Logic_ptree.location. *)
+  type location = Fileloc.t
+
   let loc (start_pos, end_pos) =
     Errorloc.convert_loc (start_pos, end_pos)
 

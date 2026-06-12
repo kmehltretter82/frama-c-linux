@@ -9,7 +9,7 @@
 open Cil_types
 open Cil_datatype
 
-exception Error of Cil_types.location * string
+exception Error of Fileloc.t * string
 exception Unbound of string
 
 let find_var kf kinstr ?label var =

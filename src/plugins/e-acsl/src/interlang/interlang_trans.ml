@@ -20,7 +20,7 @@ let dkey = Options.Dkey.interlang_translation
 module Conf = struct
   (* The Reader variable of M. See Monad_rws.Conf.env *)
   type env = {kf : Cil_types.kernel_function;
-              loc : Cil_types.location;
+              loc : Fileloc.t;
               adata_register : bool}
 
   (* The State variable of M. The monad generates Cil expressions, all the
@@ -386,7 +386,7 @@ let try_interlang il old =
 type 'a il_compiler = 'a -> Interlang.exp Interlang_gen.m
 
 type 'a compiler =
-  loc:Cil_types.location ->
+  loc:Fileloc.t ->
   adata:Assert.t ->
   env:Env.t ->
   kf:Cil_types.kernel_function ->

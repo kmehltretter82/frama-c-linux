@@ -10,18 +10,18 @@
 
 open Cil_types
 
-val init: loc:location -> exp -> stmt
+val init: loc:Fileloc.t -> exp -> stmt
 (** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)
 
-val init_set: loc:location -> lval -> exp -> exp -> stmt
+val init_set: loc:Fileloc.t -> lval -> exp -> exp -> stmt
 (** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
     or [mpq_init_set*(v, e)] with the good function 'set'
     according to the type of [e] *)
 
-val clear: location -> exp -> stmt
+val clear: Fileloc.t -> exp -> stmt
 (** build stmt [mpz_clear(v)] or [mpq_clear(v)] depending on typ of [v] *)
 
-val assign: loc:location -> lval -> exp -> exp -> stmt
+val assign: loc:Fileloc.t -> lval -> exp -> exp -> stmt
 (** [assign x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
     or [mpq_set*(e)] with the good function 'set'
     according to the type of [e] *)
@@ -33,7 +33,7 @@ module Z : sig
       corresponding to the [bop] arithmetic operation. *)
 
   val new_var:
-    loc:location -> ?scope:Varname.scope -> ?name:string ->
+    loc:Fileloc.t -> ?scope:Varname.scope -> ?name:string ->
     Env.t -> kernel_function -> term option ->
     (varinfo -> exp (* the var as exp *) -> stmt list) ->
     exp * Env.t
@@ -41,24 +41,24 @@ module Z : sig
       {!Mpz.init}. *)
 
   val create:
-    loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
+    loc:Fileloc.t -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
   (** Create an integer number. *)
 
   val add_cast:
-    loc:location -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
+    loc:Fileloc.t -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
     exp * Env.t
   (** Assumes that the given exp is of integer type and casts it into
       the given typ *)
 
   val binop:
-    loc:location -> term option -> binop -> Env.t -> kernel_function ->
+    loc:Fileloc.t -> term option -> binop -> Env.t -> kernel_function ->
     exp -> exp -> exp * Env.t
   (** Applies [binop] to the given expressions. The optional term
       indicates whether the comparison has a correspondence in the logic. *)
 
   val cmp:
-    loc:location -> string -> term option -> binop ->  Env.t ->
+    loc:Fileloc.t -> string -> term option -> binop ->  Env.t ->
     kernel_function -> exp -> exp -> exp * Env.t
     (** Compares two expressions according to the given [binop]. The optional
         term indicates whether the comparison has a correspondence in the
@@ -80,27 +80,27 @@ module Q : sig
       it must be converted into "1/10". *)
 
   val create:
-    loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
+    loc:Fileloc.t -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
   (** Create a rational number. *)
 
-  val cast_to_z: loc:location -> ?name:string -> Env.t -> exp -> exp * Env.t
+  val cast_to_z: loc:Fileloc.t -> ?name:string -> Env.t -> exp -> exp * Env.t
   (** Assumes that the given exp is of real type and casts it into Z *)
 
   val add_cast:
-    loc:location -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
+    loc:Fileloc.t -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
     exp * Env.t
   (** Assumes that the given exp is of real type and casts it into
       the given typ *)
 
   val binop:
-    loc:location -> term option -> binop -> Env.t -> kernel_function ->
+    loc:Fileloc.t -> term option -> binop -> Env.t -> kernel_function ->
     exp -> exp -> exp * Env.t
   (** Applies [binop] to the given expressions. The optional term
       indicates whether the comparison has a correspondence in the logic. *)
 
   val cmp:
-    loc:location -> string -> term option -> binop ->  Env.t ->
+    loc:Fileloc.t -> string -> term option -> binop ->  Env.t ->
     kernel_function -> exp -> exp -> exp * Env.t
     (** Compares two expressions according to the given [binop]. The optional
         term indicates whether the comparison has a correspondence in the

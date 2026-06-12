@@ -18,32 +18,35 @@
 val nextident : int ref
 
 val getident : unit -> int
-val cabslu : Cabs.cabsloc
+val cabslu : Fileloc.t
 
 (* List of comments together with the location where they are found. *)
 module Comments: sig
   val self: State.t
   (* adds a comment at a given location. *)
-  val add: Cabs.cabsloc -> string -> unit
+  val add: Fileloc.t -> string -> unit
   (*  gets all the comment located between the two positions. *)
-  val get: Cabs.cabsloc -> string list
+  val get: Fileloc.t -> string list
   (* iter over all registered comments. *)
-  val iter: (Cabs.cabsloc -> string -> unit) -> unit
+  val iter: (Fileloc.t -> string -> unit) -> unit
   (* fold over all registered comments. *)
-  val fold: (Cabs.cabsloc -> string -> 'a -> 'a) -> 'a -> 'a
+  val fold: (Fileloc.t -> string -> 'a -> 'a) -> 'a -> 'a
 end
 
 val missingFieldDecl :
-  Cabs.cabsloc -> string * Cabs.decl_type * 'a list * Cabs.cabsloc
+  Fileloc.t -> string * Cabs.decl_type * 'a list * Fileloc.t
 val isStatic : Cabs.spec_elem list -> bool
 val isExtern : Cabs.spec_elem list -> bool
 val isInline : Cabs.spec_elem list -> bool
 val isTypedef : Cabs.spec_elem list -> bool
-val get_definitionloc : Cabs.definition -> Cabs.cabsloc
-val get_statementloc : Cabs.statement -> Cabs.cabsloc
+val get_definitionloc : Cabs.definition -> Fileloc.t
+val get_statementloc : Cabs.statement -> Fileloc.t
 val explodeStringToInts : string -> int64 list
 val valueOfDigit : char -> int64
-val d_cabsloc : Cabs.cabsloc Pretty_utils.formatter
+
+val d_cabsloc : Fileloc.t Pretty_utils.formatter
+[@@deprecated "Use Fileloc.pretty instead."]
+[@@migrate { repl = Fileloc.pretty }]
 
 (* hack to avoid shift/reduce conflict is attr parsing. *)
 val push_attr_test: unit -> unit

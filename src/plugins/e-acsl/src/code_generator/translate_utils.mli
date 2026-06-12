@@ -22,7 +22,7 @@ val must_translate_opt: Property.t option -> bool
 
 val gmp_to_sizet:
   adata:Assert.t ->
-  loc:location ->
+  loc:Fileloc.t ->
   name:string ->
   ?check_lower_bound:bool ->
   ?pp:term ->
@@ -38,7 +38,7 @@ val gmp_to_sizet:
     If [pp] is provided, this term is used in the messages of the RTE checks. *)
 
 val comparison_to_exp :
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   Env.t ->
   number_ty ->
@@ -51,7 +51,7 @@ val comparison_to_exp :
 
 val conditional_to_exp:
   ?name:string ->
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   term option ->
   exp ->
@@ -65,7 +65,7 @@ val conditional_to_exp:
 
 val env_of_li:
   adata:Assert.t ->
-  loc:location ->
+  loc:Fileloc.t ->
   kernel_function ->
   Env.t ->
   logic_info ->

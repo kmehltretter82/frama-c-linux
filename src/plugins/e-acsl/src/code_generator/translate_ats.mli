@@ -20,7 +20,7 @@ val for_stmt: Env.t -> kernel_function -> stmt -> Env.t
     current environment. *)
 
 val to_exp:
-  loc:location ->
+  loc:Fileloc.t ->
   adata:Assert.t ->
   kernel_function ->
   Env.t ->

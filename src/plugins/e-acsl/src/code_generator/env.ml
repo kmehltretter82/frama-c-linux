@@ -17,7 +17,7 @@ let dkey = Options.Dkey.env
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
-let gmp_clear_ref : (location -> exp -> stmt) ref =
+let gmp_clear_ref : (Fileloc.t -> exp -> stmt) ref =
   Extlib.mk_fun "gmp_clear"
 
 type localized_scope =

@@ -33,11 +33,11 @@ val is_fc_stdlib_generated: varinfo -> bool
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
 
-val ptr_base: loc:location -> exp -> exp
+val ptr_base: loc:Fileloc.t -> exp -> exp
 (** Takes an expression [e] and return [base] where [base] is the address [p]
     if [e] is of the form [p + i] and [e] otherwise. *)
 
-val ptr_base_and_base_addr: loc:location -> exp -> exp * exp
+val ptr_base_and_base_addr: loc:Fileloc.t -> exp -> exp * exp
 (* Takes an expression [e] and return a tuple [(base, base_addr)] where [base]
    is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
    [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
@@ -67,7 +67,7 @@ val name_of_unop: unop -> string
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)
 
-val make_binop: loc:location -> binop -> exp -> exp -> exp
+val make_binop: loc:Fileloc.t -> binop -> exp -> exp -> exp
 (** Calls {!Cil.mkBinOp_exn} with [constfold] set to [true].
     @since 33.0-Arsenic *)
 
@@ -105,6 +105,6 @@ val labels_are_all_here : logic_label list -> bool
 val unghost_type : typ -> typ
 (** remove all occurrences (also deep ones) of the "ghost" attribute. *)
 
-val get_loc_from_pot : Analyses_types.pred_or_term -> location
+val get_loc_from_pot : Analyses_types.pred_or_term -> Fileloc.t
 
 val get_term_from_pot : Analyses_types.pred_or_term -> term option

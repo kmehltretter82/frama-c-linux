@@ -20,7 +20,7 @@ type t = private
 module type S = sig
   include Datatype.S_with_collections
 
-  val loc : t -> Cil_types.location
+  val loc : t -> Fileloc.t
   (** [loc p] returns the source location of the given position. *)
 
   val pos : t -> Filepos.t

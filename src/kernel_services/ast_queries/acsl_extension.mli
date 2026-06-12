@@ -20,7 +20,7 @@ type extension_preprocessor =
 
 (** Transformers from untyped to typed ACSL extension *)
 type extension_typer =
-  typing_context -> location -> lexpr list -> acsl_extension_kind
+  typing_context -> Fileloc.t -> lexpr list -> acsl_extension_kind
 
 (** Visitor functions for ACSL extensions *)
 type extension_visitor =
@@ -30,10 +30,10 @@ type extension_preprocessor_block =
   string * extended_decl list -> string * extended_decl list
 
 type extension_typer_block =
-  typing_context -> location -> string * extended_decl list -> acsl_extension_kind
+  typing_context -> Fileloc.t -> string * extended_decl list -> acsl_extension_kind
 
 type extension_module_importer =
-  module_builder -> location -> string list -> unit
+  module_builder -> Fileloc.t -> string list -> unit
 
 (** Pretty printers for ACSL extensions *)
 type extension_printer =

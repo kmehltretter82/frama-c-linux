@@ -10,7 +10,7 @@
 open Logic_const
 open Cil_types
 
-exception Not_well_formed of Cil_types.location * string
+exception Not_well_formed of Fileloc.t * string
 exception Unknown_ext
 
 let is_compatible_ltype t1 t2 =

@@ -88,7 +88,7 @@ type 'vertex edge = private {
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : 'vertex transition;
-  edge_loc : location;
+  edge_loc : Fileloc.t;
 }
 
 module G : Graph.Sig.G
@@ -107,7 +107,7 @@ type wto = vertex Wto.partition
 module type Vertex = sig
   include Datatype.S_with_collections
 
-  val loc : t -> location option
+  val loc : t -> Fileloc.t option
   (** [loc v] returns the location corresponding to the vertex if it exists. *)
 end
 
@@ -118,7 +118,7 @@ module Vertex : Vertex with type t = vertex
 module type Edge = sig
   include Datatype.S_with_collections
 
-  val loc : t -> location option
+  val loc : t -> Fileloc.t option
   (** [loc e] returns the location corresponding to the edge if it exists. *)
 end
 

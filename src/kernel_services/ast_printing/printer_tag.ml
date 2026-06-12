@@ -630,7 +630,7 @@ class pos_to_localizable =
   end
 
 (* Returns [true] if the column [col] is within location [loc]. *)
-let location_contains_col (pos_start, pos_end : location) col =
+let location_contains_col (pos_start, pos_end : Fileloc.t) col =
   Filepos.input_column pos_start <= col && col <= Filepos.input_column pos_end
 
 (* Applies several heuristics to try and match the best localizable to a

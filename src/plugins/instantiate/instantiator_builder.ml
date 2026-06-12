@@ -19,7 +19,7 @@ module type Generator_sig = sig
   val retype_args: override_key -> exp list -> exp list
   val args_for_original: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
-  val generate_spec: override_key -> location -> fundec -> funspec
+  val generate_spec: override_key -> Fileloc.t -> fundec -> funspec
 end
 
 module type Instantiator = sig

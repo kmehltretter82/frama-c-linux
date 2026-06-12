@@ -16,7 +16,7 @@ open Cil_types
     or real) or directly a C number type.
     [t_opt] is the term that is represented by the expression [e]. *)
 val add_cast:
-  loc:location ->
+  loc:Fileloc.t ->
   ?name:string ->
   Env.t ->
   kernel_function ->

@@ -13,7 +13,7 @@ open Logic_ptree
 (* --- Pattern Engine                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a loc = { loc : location ; value : 'a }
+type 'a loc = { loc : Fileloc.t ; value : 'a }
 
 type pvar = string loc
 type ast = node loc
@@ -97,7 +97,7 @@ let pattern_loc p = p.loc
 
 let context ?tc () = { typing = tc ; value = false ; pvars = Vmap.empty }
 
-exception TypeError of Cil_types.location * string
+exception TypeError of Fileloc.t * string
 
 let error ctxt loc msg =
   match ctxt.typing with

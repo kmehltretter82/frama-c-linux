@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2026-06-11] Deprecate `Cabs.cabsloc`, `Cil_types.location` and
+              `Logic_ptree.location` and replace them with `Fileloc.t`. The type
+              is equivalent, we just removed an indirection.
 o!  Kernel    [2026-06-11] Refactoring for (logic) type-related functions.
               Many logic functions were moved into a new `Ast_types.Acsl`
               module, many of which were renamed for better consistency. Code

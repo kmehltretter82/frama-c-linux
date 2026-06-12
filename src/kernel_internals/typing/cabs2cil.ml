@@ -632,7 +632,7 @@ let gotoTargetNextAddr: int ref = ref 0
 let transparentUnionArgs : (int * typ) list ref = ref []
 
 let debugLoc = false
-let convLoc (l : cabsloc) =
+let convLoc (l : Fileloc.t) =
   if debugLoc then
     Kernel.debug "convLoc at %a\n" Fileloc.pretty l;
   l
@@ -729,7 +729,7 @@ let initGlobals () =
 let mustTurnIntoDef: bool IH.t = IH.create 117
 
 (* Globals that have already been defined. Indexed by the variable name. *)
-let alreadyDefined: (string, location) H.t = H.create 117
+let alreadyDefined: (string, Fileloc.t) H.t = H.create 117
 
 let isDefined vi = H.mem alreadyDefined vi.vorig_name
 
@@ -869,7 +869,7 @@ let remove_label_env lab =
 type undoScope =
     UndoRemoveFromEnv of bool * string (* boolean indicates whether we should
                                           remove from ghost env only, or both.*)
-  | UndoAlphaEnv of location Alpha.undoAlphaElement list
+  | UndoAlphaEnv of Fileloc.t Alpha.undoAlphaElement list
 
 let scopes :  undoScope list ref list ref = ref []
 
@@ -924,7 +924,7 @@ let addGlobalToEnv ghost name data =
  * first argument is a table mapping name prefixes with the largest suffix
  * used so far for that prefix. The largest suffix is one when only the
  * version without suffix has been used. *)
-let alphaTable : location Alpha.alphaTable = H.create 307
+let alphaTable : Fileloc.t Alpha.alphaTable = H.create 307
 (* vars and enum tags. For composite types we have names like "struct
  * foo" or "union bar" *)
 
@@ -971,7 +971,7 @@ let newAlphaName
     ghost
     (globalscope: bool) (* The name should have global scope *)
     (kind: string)
-    (origname: string) : string * location =
+    (origname: string) : string * Fileloc.t =
   let lookupname = kindPlusName kind origname in
   (* If we are in a scope then it means that we are alpha-converting a local
    * name. Go and add stuff to reset the state of the alpha table but only to
@@ -1904,7 +1904,7 @@ struct
   let skipChunk = empty
 
   (* return can be ghost but only in ghost functions *)
-  let returnChunk ~ghost e (l: location) : chunk =
+  let returnChunk ~ghost e (l: Fileloc.t) : chunk =
     { stmts = [ Cil.mkStmt ~ghost ~valid_sid (Return(e, l)),[],[],[],[] ];
       cases = [];
       locals = [];
@@ -1912,7 +1912,7 @@ struct
       unspecified_order = false;
     }
 
-  let ifChunk ~ghost be (l: location) (t: chunk) (e: chunk) : chunk =
+  let ifChunk ~ghost be (l: Fileloc.t) (t: chunk) (e: chunk) : chunk =
     let effects_t = get_chunk_effects t in
     let effects_e = get_chunk_effects e in
     let (m,r,w,c) = merge_effects effects_t effects_e in
@@ -1996,7 +1996,7 @@ struct
     }
 
   (* can be ghost inside a ghost loop *)
-  let breakChunk ~ghost (l: location) : chunk =
+  let breakChunk ~ghost (l: Fileloc.t) : chunk =
     { stmts = [ Cil.mkStmt ~ghost ~valid_sid (Break l),[],[],[],[] ];
       cases = [];
       unspecified_order = false;
@@ -2005,7 +2005,7 @@ struct
     }
 
   (* can be ghost inside a ghost loop *)
-  let continueChunk ~ghost (l: location) : chunk =
+  let continueChunk ~ghost (l: Fileloc.t) : chunk =
     { stmts = [ Cil.mkStmt ~ghost ~valid_sid (Continue l),[],[],[],[] ];
       cases = [];
       unspecified_order = false;
@@ -2046,7 +2046,7 @@ struct
       statics = [];
     }
 
-  let gotoChunk ~ghost (ln: string) (l: location) : chunk =
+  let gotoChunk ~ghost (ln: string) (l: Fileloc.t) : chunk =
     let dummy = {
       Cil_datatype.Stmt.dummy with labels = [ Label (ln, l, false) ]
     } in
@@ -2075,7 +2075,7 @@ struct
                 unspecified_order = false
     }
 
-  let switchChunk ~ghost (e: exp) (body: chunk) (l: location) =
+  let switchChunk ~ghost (e: exp) (body: chunk) (l: Fileloc.t) =
     (* Make the statement *)
     let defaultSeen = ref false in
     let t = Cil.typeOf e in
@@ -2259,7 +2259,7 @@ let continues : loopstate list ref = ref []
 (* Sometimes we need to create new label names *)
 let newLabelName ghost base = fst (newAlphaName ghost false "label" base)
 
-let continueOrLabelChunk ~ghost (l: location) : chunk =
+let continueOrLabelChunk ~ghost (l: Fileloc.t) : chunk =
   match !continues with
   | [] -> Errorloc.abort_context "continue not in a loop"
   | While lr :: _ ->
@@ -2316,7 +2316,7 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
    * This enables us to raise an error if a local label is defined
    * twice, and we can issue warnings if local labels are declared but
    * never defined. *)
-  val localLabels : (string, location option) H.t = H.create 5
+  val localLabels : (string, Fileloc.t option) H.t = H.create 5
 
   method private addLocalLabels blk =
     List.iter (fun lbl -> H.add localLabels lbl None) blk.blabels
@@ -2397,7 +2397,7 @@ type expAction =
    * should be considered in the
    * effects of current
    * chunk.
-   * The lval list is the list of location that are read to evaluate
+   * The lval list is the list of Fileloc.t that are read to evaluate
    * the location of the lval.
    * The location of lval is guaranteed
    * not to depend on its own value,
@@ -3465,7 +3465,7 @@ let integral_cast ty t =
 
 (* Exception raised by the instance of Logic_typing local to this module.
    See document of [error] below. *)
-exception LogicTypeError of location * string
+exception LogicTypeError of Fileloc.t * string
 
 module C_logic_env =
 struct
@@ -3572,7 +3572,7 @@ let exitScope () =
   loop !this;
   C_logic_env.exit_scope ()
 
-let consLabel ~ghost (l: string) (c: chunk) (loc: location)
+let consLabel ~ghost (l: string) (c: chunk) (loc: Fileloc.t)
     (in_original_program_text : bool) : chunk =
   (* Get the first statement and add the label to it *)
   let labstmt, stmts' = getFirstInChunk ~ghost ~loc c in
@@ -4406,7 +4406,7 @@ and makeVarInfoCabs
     ~(kind:var_decl_kind)
     ?(isgenerated=false)
     ?(referenced=false)
-    (ldecl : location)
+    (ldecl : Fileloc.t)
     (bt, sto, alignas, inline, attrs)
     (n,ndt,a)
   : varinfo =
@@ -4488,7 +4488,7 @@ and makeVarInfoCabs
   vi
 
 (* Process a local variable declaration and allow variable-sized arrays *)
-and makeVarSizeVarInfo ghost (ldecl : location)
+and makeVarSizeVarInfo ghost (ldecl : Fileloc.t)
     spec_res
     (n,ndt,a)
   : varinfo * chunk * exp * bool =
@@ -9006,7 +9006,7 @@ and createLocal ghost ((_, sto, _, _, _) as specs)
     end
 
 and doAliasFun ghost vtype (thisname:string) (othername:string)
-    (sname:single_name) (loc: cabsloc) : unit =
+    (sname:single_name) (loc: Fileloc.t) : unit =
   (* This prototype declares that name is an alias for
      othername, which must be defined in this file *)
   (*   E.log "%s is alias for %s at %a\n" thisname othername  *)
@@ -9258,7 +9258,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         (* Create the formals and add them to the environment. *)
         (* sfg: extract tsets for the formals from dt *)
         let cnt = ref 0 in
-        let doFormal (loc : location) ((fn, ft, fa) as fd) =
+        let doFormal (loc : Fileloc.t) ((fn, ft, fa) as fd) =
           let ghost = ghost || Cil.isGhostFormalVarDecl fd in
           let f = Cil.makeVarinfo ~ghost ~temp:false ~loc false true fn ft in
           f.vattr <- fa;

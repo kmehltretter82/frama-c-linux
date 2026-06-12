@@ -12,11 +12,11 @@ type probe = private {
   id : int;
   name : string ;
   stmt : stmt option ;
-  loc : location ;
+  loc : Fileloc.t ;
 }
 
 val annotations : stmt -> (string * term) list
-val create : loc:location -> ?stmt:stmt -> name:string -> unit -> probe
+val create : loc:Fileloc.t -> ?stmt:stmt -> name:string -> unit -> probe
 
 include Datatype.S_with_collections with type t = probe
 

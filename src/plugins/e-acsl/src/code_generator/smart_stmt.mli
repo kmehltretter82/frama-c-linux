@@ -25,24 +25,24 @@ val block_stmt: block -> stmt
 val block_from_stmts: stmt list -> stmt
 (** Create a block statement from a statement list. *)
 
-val assigns: loc:location -> result:lval -> exp -> stmt
+val assigns: loc:Fileloc.t -> result:lval -> exp -> stmt
 (** [assigns ~loc ~result value] creates a statement to assign the [value]
     expression to the [result] lval. *)
 
-val assigns_field: loc:location -> varinfo -> string -> exp -> stmt
+val assigns_field: loc:Fileloc.t -> varinfo -> string -> exp -> stmt
 (** [assigns_field ~loc vi field value] creates a statement to assign the
     [value] expression to the [field] of the structure in the variable [vi]. *)
 
 val if_stmt:
-  loc:location -> cond:exp -> ?else_blk:block -> block -> stmt
+  loc:Fileloc.t -> cond:exp -> ?else_blk:block -> block -> stmt
 (** [if ~loc ~cond ~then_blk ~else_blk] creates an if statement with [cond]
     as condition and [then_blk] and [else_blk] as respectively "then" block and
     "else" block. *)
 
-val break: loc:location -> stmt
+val break: loc:Fileloc.t -> stmt
 (** Create a break statement *)
 
-val struct_local_init: loc:location -> varinfo -> (string * exp) list -> stmt
+val struct_local_init: loc:Fileloc.t -> varinfo -> (string * exp) list -> stmt
 (** [struct_local_init ~loc vi fields] creates a local initialization for the
     structure variable [vi]. [fields] is a list of couple [(name, e)] where
     [name] is the name of a field in the structure and [e] is the expression to
@@ -52,13 +52,13 @@ val struct_local_init: loc:location -> varinfo -> (string * exp) list -> stmt
 (* E-ACSL specific code: build calls to its RTL API *)
 (* ********************************************************************** *)
 
-val call: loc:location -> ?result:lval -> string -> exp list -> stmt
+val call: loc:Fileloc.t -> ?result:lval -> string -> exp list -> stmt
 (** Construct a call to a function with the given name.
     @raise Not_found if the given string does not represent a function in the
     AST, for instance if the function does not exist. *)
 
 val rtl_call:
-  loc:location -> ?result:lval -> ?prefix:string -> string -> exp list -> stmt
+  loc:Fileloc.t -> ?result:lval -> ?prefix:string -> string -> exp list -> stmt
 (** Construct a call to a library function with the given name.
 
     [prefix] defaults to the E-ACSL RTL API prefix and can be explicitly
@@ -87,14 +87,14 @@ val full_init_stmt: varinfo -> stmt
     initialization of the given varinfo. The varinfo is the address to fully
     initialize, no [addrOf] is taken. *)
 
-val initialize: loc:location -> lval -> stmt
+val initialize: loc:Fileloc.t -> lval -> stmt
 (** Same as [store_stmt] for [__e_acsl_initialize] that observes the
     initialization of the given left-value. *)
 
-val mark_readonly : loc:location -> exp -> stmt
+val mark_readonly : loc:Fileloc.t -> exp -> stmt
 (** Same as [store_stmt] for [__e_acsl_markreadonly] that observes the
     read-onlyness of the given expression. *)
 
-val set_unsound_verdict : loc:location -> stmt
+val set_unsound_verdict : loc:Fileloc.t -> stmt
 (** @return a statement that indicates to the user that from here on all
     verdicts are unsound. *)

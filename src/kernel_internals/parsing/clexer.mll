@@ -98,7 +98,7 @@ let c23_or_later key builder =
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
-  let path (loc : Cil_types.location) = Filepos.path (fst loc) in
+  let path (loc : Fileloc.t) = Filepos.path (fst loc) in
   let filename loc = Filepath.to_string (path loc) in
   let ints loc = List.rev (String.fold_left convert [] (filename loc)) in
   add "__FC_FILENAME__" (fun loc -> CST_STRING (ints loc, loc))

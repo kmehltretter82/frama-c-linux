@@ -45,8 +45,8 @@ val paste_code_annot:
 
 val add_macro: is_global_scope:bool -> string -> Logic_ptree.lexpr -> unit
 val add_global_annot: Logic_ptree.decl list -> unit
-val add_funspec: Logic_ptree.spec -> Cil_types.location -> unit
-val add_annots: ?loop_number:int -> Cil_datatype.Stmt.Set.t -> Cil_types.location -> Logic_ptree.code_annot list -> unit
+val add_funspec: Logic_ptree.spec -> Fileloc.t -> unit
+val add_annots: ?loop_number:int -> Cil_datatype.Stmt.Set.t -> Fileloc.t -> Logic_ptree.code_annot list -> unit
 
 val set_prop_loc: Filepath.t -> int -> unit
 val set_buff_loc: int -> unit
@@ -54,7 +54,7 @@ val set_current_module: is_from_file_name:bool -> string -> unit
 val init_ast:
   file:Filepath.t -> init_module_from_file_name:bool ->init_typenames:bool ->
   Cil_types.file -> unit
-val set_current_function: string*Cil_types.location -> unit
+val set_current_function: string*Fileloc.t -> unit
 val add_buffer: string -> unit
 val buffer: Buffer.t
 

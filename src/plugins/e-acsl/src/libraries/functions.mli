@@ -92,7 +92,7 @@ module Libc: sig
   val is_printf_name: string -> bool
   (** Same as [is_printf] but for strings *)
 
-  val get_printf_argument_str: loc:location -> string -> exp list -> exp
+  val get_printf_argument_str: loc:Fileloc.t -> string -> exp list -> exp
   (** Given the name of a printf-like function and the list of its variadic
       arguments return a literal string expression where each character
       describes the type of an argument from a list. Such characters are also

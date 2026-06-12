@@ -74,7 +74,7 @@ module type Generator_sig = sig
       [Transform] visitor. Note that it must return a [funspec] but should
       {b not} register it in [Annotations] tables.
   *)
-  val generate_spec: override_key -> location -> fundec -> funspec
+  val generate_spec: override_key -> Fileloc.t -> fundec -> funspec
 end
 
 (** Signature of a instantiator.

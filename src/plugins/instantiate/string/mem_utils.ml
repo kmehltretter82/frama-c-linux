@@ -14,7 +14,7 @@ type kind = CPtr | Ptr | Data of typ
 type action = Strip | Id
 type param = string * kind * action
 type proto = kind * param list
-type 'a spec_gen = location -> typ -> term -> term -> term -> 'a
+type 'a spec_gen = Fileloc.t -> typ -> term -> term -> term -> 'a
 
 type pointed_expr_type =
   | Of_null of typ

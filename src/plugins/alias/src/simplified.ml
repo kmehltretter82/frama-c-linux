@@ -22,7 +22,7 @@ let clear_cache () =
   HL.clear cached_lval;
   HE.clear cached_exp
 
-exception Explicit_pointer_address of location
+exception Explicit_pointer_address of Fileloc.t
 
 let check_cast_compatibility e to_type =
   let rec cast_preserves_indirection_level from_type to_type =
