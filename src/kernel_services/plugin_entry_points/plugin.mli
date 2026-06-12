@@ -17,6 +17,18 @@
 *)
 module type S_no_log = sig
 
+  (** Location generated for the plug-in, to be used when we need a location
+      but none is provided.
+      @since Frama-C+dev
+  *)
+  val gen_loc: Fileloc.t
+
+  (** Make a new location for a generated input. The given location is copied
+      except for its origin which will use the plug-in's shortname as generator.
+      @since Frama-C+dev
+  *)
+  val gen_loc_from: Fileloc.t -> Fileloc.t
+
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   (** Create a new group inside the plug-in.
       The given string must be different of all the other group names of this

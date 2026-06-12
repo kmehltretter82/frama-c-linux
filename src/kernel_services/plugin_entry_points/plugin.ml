@@ -24,6 +24,8 @@ let state_ref = Extlib.mk_fun "state_ref"
 (* ************************************************************************* *)
 
 module type S_no_log = sig
+  val gen_loc: Fileloc.t
+  val gen_loc_from: Fileloc.t -> Fileloc.t
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
@@ -196,6 +198,9 @@ struct
 
   let verbose_level = Extlib.mk_fun "verbose_level"
   let debug_level = Extlib.mk_fun "debug_level"
+
+  let gen_loc = Fileloc.generated P.shortname
+  let gen_loc_from loc = Fileloc.generated ~loc P.shortname
 
   (* unused by the kernel: it uses Kernel_log instead;
      see module [L] below *)
