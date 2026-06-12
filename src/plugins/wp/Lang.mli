@@ -627,6 +627,7 @@ sig
 end
 
 val extern : 'a extern -> 'a
+val extern_mk : (Why3.Env.env -> 'a) -> 'a extern
 val extern_tau : string -> tau extern
 val extern_val : string -> term extern
 val extern_map : ('a -> 'b) -> 'a extern -> 'b extern

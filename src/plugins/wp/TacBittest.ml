@@ -24,7 +24,7 @@ let lookup_int e =
 let rec lookup_bittest e =
   match F.repr e with
   | Not e -> lookup_bittest e
-  | Fun(f,[n;ek]) when Lang.E.(Cint.f_bit_test @= f) ->
+  | Fun(f,[n;ek]) when Lang.E.(Cint.p_bit_test @= f) ->
     begin
       match lookup_int ek with
       | Some k when 0 <= k && k < 128 -> Some (n,k)
@@ -48,8 +48,7 @@ class bittestrange =
       let e = Tactical.selected selection in
       match lookup_bittest e with
       | Some (n,k) ->
-        let bit = Cint.bit_test n k in
-        let bit_set = F.p_bool bit in
+        let bit_set = Cint.bit_testk n k in
         let bit_clear = F.p_not bit_set in
         let pos = positive n in
         let pk = power k in

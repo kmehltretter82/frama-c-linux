@@ -352,7 +352,7 @@ let builtin kind ft op xs =
   try impl xs with Not_found ->
     let result = match kind with
       | `Binop | `Unop -> ftau ft
-      | `Rel | `ReV -> Logic.Bool
+      | `Rel | `ReV -> Logic.Prop
     in F.e_fun ~result !@phi xs
 
 let register_builtins ft =

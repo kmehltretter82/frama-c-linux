@@ -23,14 +23,19 @@ struct
   let t_iblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Bool)
   let t_init = Qed.Logic.Array   (Qed.Logic.Int,t_iblock)
 
-  let f_membytes ?coloring descr =
+  let fk_membytes ?coloring endian name =
     Format.kasprintf
-      begin fun name ->
-        let endian = if Machine.little_endian () then "le" else "be" in
-        Format.kasprintf
-          (Lang.extern_f ?coloring)
-          "frama_c_wp.membytes_%s.MemBytes.%s" endian name
-      end descr
+      (Lang.extern_f ?coloring)
+      "frama_c_wp.membytes_%s.MemBytes.%s" endian name
+
+  let f_membytes ?coloring name =
+    let f_le = fk_membytes ?coloring "le" name in
+    let f_be = fk_membytes ?coloring "be" name in
+    Lang.extern_mk @@ fun _env ->
+    if Machine.little_endian () then !@f_le else !@f_be
+
+  let fd_membytes ?coloring descr =
+    Format.kasprintf (f_membytes ?coloring) descr
 
   let f_eqmem = f_membytes "eqmem"
   let f_memcpy = f_membytes "memcpy"
@@ -46,15 +51,15 @@ struct
 
   (* read/write *)
 
-  let readi = Ctypes.i_memo (f_membytes "read_%a" Ctypes.pp_int)
-  let writei = Ctypes.i_memo (f_membytes "write_%a" Ctypes.pp_int)
+  let readi = Ctypes.i_memo (fd_membytes "read_%a" Ctypes.pp_int)
+  let writei = Ctypes.i_memo (fd_membytes "write_%a" Ctypes.pp_int)
 
   let read m i a = e_fun !@(readi i) [ m ; a ]
   let write m i a v = e_fun !@(writei i) [ m ; a ; v ]
 
   (* read/write init *)
-  let read_initd = Why3.Wstdlib.Hint.memo 0 (f_membytes "read_init%d")
-  let write_initd = Why3.Wstdlib.Hint.memo 0 (f_membytes "write_init%d")
+  let read_initd = Why3.Wstdlib.Hint.memo 0 (fd_membytes "read_init%d")
+  let write_initd = Why3.Wstdlib.Hint.memo 0 (fd_membytes "write_init%d")
 
   let read_init m s a = e_fun !@(read_initd s) [ m ; a ]
   let write_init m s a v = e_fun !@(write_initd s) [ m ; a ; v ]

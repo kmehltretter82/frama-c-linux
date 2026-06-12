@@ -205,11 +205,11 @@ struct
   let (@=) a b = !@a == b
 end
 
-let mk_extern compute = { value = None ; env = None ; compute }
+let extern_mk compute = { value = None ; env = None ; compute }
 
 let import_t ~context ts = Qdata (Qed.Symbol.of_ts context ts)
 let extern_c name env = Qdata (Qed.Symbol.find_data env name)
-let extern_t name = mk_extern (extern_c name)
+let extern_t name = extern_mk (extern_c name)
 
 module ADT =
 struct
@@ -469,7 +469,7 @@ let extern_l ?(category=Function) ?(coloring=false) name env =
     e_category = Qed.Kind.map_category extern category ;
   }
 
-let extern_f ?category ?coloring name = mk_extern (extern_l ?category ?coloring name)
+let extern_f ?category ?coloring name = extern_mk (extern_l ?category ?coloring name)
 
 let import_f ~context ls = QFUN {
     e_symbol = Qed.Symbol.of_ls context ls ;
@@ -835,10 +835,10 @@ end
 open F
 
 let extern_data et ts = E.(t_data !@et ts)
-let extern_tau name = mk_extern (fun env -> t_data (extern_c name env) [])
-let extern_val name = mk_extern (fun env -> e_fun (extern_l name env) [])
-let extern_map f e = mk_extern (fun _env -> E.(f !@e))
-let extern_const c = mk_extern (fun _env -> c)
+let extern_tau name = extern_mk (fun env -> t_data (extern_c name env) [])
+let extern_val name = extern_mk (fun env -> e_fun (extern_l name env) [])
+let extern_map f e = extern_mk (fun _env -> E.(f !@e))
+let extern_const c = extern_mk (fun _env -> c)
 let extern_lfun ef es = E.(e_fun !@ef es)
 let extern_pred ef es = E.(p_call !@ef es)
 

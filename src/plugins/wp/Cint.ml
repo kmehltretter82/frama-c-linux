@@ -71,12 +71,11 @@ let f_lsr = Lang.extern_f "frama_c_wp.cbits.Cbits.lsr"
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 let is_bitwised f = List.exists (fun lf -> lf @= f) f_bitwised
-let f_bit_test = Lang.extern_f "frama_c_wp.cbits.Cbits.bit_test"
+let p_bit_test = Lang.extern_f "frama_c_wp.cbits.Cbits.bit_test"
 
-let () = LogicBuiltins.add_builtin "\\bit_test" [Z;Z] f_bit_test
-
-let bit_test e k =
-  e_fun ~result:Logic.Bool !@f_bit_test [e ; e_int k]
+let bitk k e = e_prop @@ p_call !@p_bit_test [e ; k]
+let bit_test e k = p_call !@p_bit_test [e ; k]
+let bit_testk e k = p_call !@p_bit_test [e ; e_int k]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
@@ -464,8 +463,6 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk k e = e_fun ~result:Logic.Bool !@f_bit_test [e;k]
-
 let smp_bitk_positive = function
   | [ a ; k ] -> (* requires k>=0 *)
     begin
@@ -837,7 +834,7 @@ let () =
       begin
         let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-        let bi_lbit = mk_builtin "f_bit" !@f_bit_test smp_bitk_positive in
+        let bi_lbit = mk_builtin "f_bit" !@p_bit_test smp_bitk_positive in
         let bi_lnot = mk_builtin "f_lnot" !@f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved !@f_lnot) in
         let bi_lxor = mk_builtin "f_lxor" !@f_lxor ~eq:smp_eq_with_lxor ~leq:(smp_leq_improved !@f_lxor)
             (smp2 !@f_lxor Z.logxor) in
@@ -1601,13 +1598,13 @@ module MasksDomain = struct
           let mask = snd (Ctypes.bounds iota) in
           reduce ctx x { Masks.top with unset =Z.lognot mask }
         else ctx
-      | Fun(f,[x;k]) when f_bit_test @= f ->
+      | Fun(f,[x;k]) when p_bit_test @= f ->
         let k = match_positive_or_null_integer k in (* may raise Not_found *)
         if Z.leq Z.zero k then
           reduce ctx x { Masks.top with set = two_power_k k }
         else ctx
       | Not x -> begin match F.repr x with
-          | Fun(f,[x;k]) when f_bit_test @= f ->
+          | Fun(f,[x;k]) when p_bit_test @= f ->
             let k = match_positive_or_null_integer k in
             if Z.leq Z.zero k then
               reduce ctx x { Masks.top with unset = two_power_k k }
@@ -1629,7 +1626,7 @@ let mask_simplifier =
   let rewrite_cst ~highest ctx e =
     match F.repr e with
     | Kint _ -> e
-    | Fun(f,[x;k]) when highest && f_bit_test @= f -> (* rewrites [bit_test(x,k)] *)
+    | Fun(f,[x;k]) when highest && p_bit_test @= f -> (* rewrites [bit_test(x,k)] *)
       (try let k = match_positive_or_null_integer k in (* may raise Not_found *)
          let v = MasksDomain.eval ~level:1 ctx x in
          let mask = two_power_k k in (* may raise Not_found *)
