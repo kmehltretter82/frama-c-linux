@@ -29,6 +29,14 @@ module Prototype = struct
   let reprs = [ unknown ]
   let copy = Datatype.identity
 
+  let is_empty =
+    let empty = make () in
+    fun pos ->
+      Filepath.equal pos.path empty.path
+      && pos.offset = empty.offset
+      && pos.line = empty.line
+      && pos.column = empty.column
+
   (* Generated positions are hash-consed to prevent high memory usage. *)
   module StringHashtbl = Hashtbl.Make (String)
 
@@ -167,10 +175,6 @@ let line pos = (original pos).line
 let column pos = (original pos).column
 let origin pos = pos.origin
 
-let is_known pos =
-  match pos.origin with
-  | Original | Preprocessed _ | Included _ -> true
-  | Unknown | Generated _ -> false
 
 let is_preprocessed pos =
   match pos.origin with

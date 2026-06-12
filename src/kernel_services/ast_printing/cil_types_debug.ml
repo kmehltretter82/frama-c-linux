@@ -595,7 +595,7 @@ and pp_location fmt (pos_start,pos_end) =
   p fmt "(%a,%a)" Filepos.pretty_debug pos_start Filepos.pretty_debug pos_end
 
 and pp_if_loc_known prefix suffix fmt loc =
-  if print_locations && Filepos.is_known (fst loc)
+  if print_locations && not (Fileloc.is_empty loc)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 

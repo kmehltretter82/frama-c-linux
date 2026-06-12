@@ -15,7 +15,6 @@ module Prototype = struct
   let unknown = Filepos.(unknown, unknown)
   let reprs = [ unknown ]
   let copy = Datatype.identity
-  let is_known loc = fst loc |> Filepos.is_known
   let hash loc = fst loc |> Filepos.hash
   let pretty_debug = pp
 
@@ -32,7 +31,7 @@ module Prototype = struct
   }
 
   let pretty_generic ~formats fmt (pos_start, pos_end) =
-    if not (Filepos.is_known pos_start) && not (Filepos.is_known pos_end) then
+    if Filepos.is_empty pos_start || Filepos.is_empty pos_end then
       Filepos.pretty fmt pos_start
     else
       let pos_start = Filepos.original pos_start
@@ -120,6 +119,7 @@ let path loc = fst loc |> Filepos.path
 
 let line loc = fst loc |> Filepos.line
 
+let is_empty loc = fst loc |> Filepos.is_empty
 
 (* --- Datatype with comparison/hash on original source positions  --- *)
 

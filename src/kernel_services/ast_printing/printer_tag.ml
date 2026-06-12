@@ -544,7 +544,7 @@ class pos_to_localizable =
     val mutable insideIf = None
 
     method add_range loc (localizable : localizable) =
-      if Fileloc.is_known loc then (
+      if not (Fileloc.is_empty loc) then (
         let p1, p2 = loc in
         if not (Filepath.equal (Filepos.path p1) (Filepos.path p2)) then
           Kernel.debug ~once:true ~dkey

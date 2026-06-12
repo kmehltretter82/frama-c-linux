@@ -61,12 +61,6 @@ val of_lexing_loc : Lexing.position * Lexing.position -> t
 (** Convert a pair of [Fileloc.t] to a [Lexing.position]. *)
 val to_lexing_loc : t -> Lexing.position * Lexing.position
 
-(** [is_known loc] returns true if the location is neither unknown nor
-    generated.
-    @since Frama-C+dev *)
-val is_known : t -> bool
-
-
 (** {2 Accessors } *)
 
 (** Get the first line of the location. *)
@@ -75,6 +69,9 @@ val line : t -> int
 (** Get the file path of the location. *)
 val path : t -> Filepath.t
 
+(** [is_empty loc] returns true if the first position is empty according to
+    {!Filepos.is_empty}. *)
+val is_empty : t -> bool
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

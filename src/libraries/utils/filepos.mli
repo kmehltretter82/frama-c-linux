@@ -76,10 +76,6 @@ val generated : ?pos:t -> string -> t
 (** Special representation of an unknown position. *)
 val unknown : t
 
-(** Return true if the given position is neither unkwnown nor generated. *)
-val is_known : t -> bool
-
-
 (** {2 Conversion from/to Lexing.position } *)
 
 (** Convert a [Lexing.position] to a [Filepos.t]. *)
@@ -144,7 +140,11 @@ val input_column : t -> int
     preprocessed output. *)
 val input_offset : t -> int
 
-(** Returns whether the location is an preprocessed file. If [true] is returned
+(** Return [true] if all values of the given position are the default values
+    of {!make}. *)
+val is_empty : t -> bool
+
+(** Returns whether the location is a preprocessed file. If [true] is returned
     then {!original} will likely not be the identity {!path} and {!line} will
     likely to return different results than {!input_path} and {!input_line}. *)
 val is_preprocessed : t -> bool
