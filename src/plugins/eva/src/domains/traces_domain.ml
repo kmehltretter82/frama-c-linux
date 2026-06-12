@@ -687,9 +687,11 @@ module Traces = struct
     c1.all_edges_ever_created != c2.all_edges_ever_created
 
   let join c1 c2 =
-    if c1.call_declared_function <> c2.call_declared_function
-    then
-      Self.fatal "@[<hv>@[At the same time inside and outside a function call:@]@ %a@ %a@]"
+    if c1 == top || c2 == top then
+      top
+    else if c1.call_declared_function <> c2.call_declared_function then
+      Self.fatal
+        "@[<hv>@[At the same time inside and outside a function call:@]@ %a@ %a@]"
         pretty c1 pretty c2
     else
       match view c1, view c2 with
