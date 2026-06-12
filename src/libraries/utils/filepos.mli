@@ -22,8 +22,6 @@
 type t [@@deriving show]
 
 type origin =
-  | Unknown
-  (** Unknown position. This constructor should be avoided. *)
   | Original
   (** The position is in one of the user input files. *)
   | Generated of string
@@ -76,6 +74,8 @@ val generated : ?pos:t -> string -> t
 
 (** Special representation of an unknown position. *)
 val unknown : t
+[@@deprecated "Use your plug-in generated location via Self.generated or \
+               Self.generated_from instead."]
 
 (** {2 Conversion from/to Lexing.position } *)
 

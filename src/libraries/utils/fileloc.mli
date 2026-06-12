@@ -22,6 +22,8 @@ include Datatype.S_with_collections with type t := t
 
 (** Special representation of an unknown location. *)
 val unknown : t
+[@@deprecated "Use your plug-in generated location via Self.generated or \
+               Self.generated_from instead."]
 
 (** Make a new location for a generated input. The generator name is given as a
     string. If the location is provided, it is copied (except for its origin),

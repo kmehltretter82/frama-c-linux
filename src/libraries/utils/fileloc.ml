@@ -12,8 +12,7 @@ module Prototype = struct
 
   type t = Filepos.t * Filepos.t [@@deriving eq, ord, show]
 
-  let unknown = Filepos.(unknown, unknown)
-  let reprs = [ unknown ]
+  let reprs = [ Filepos.(generated "reprs", generated "reprs") ]
   let copy = Datatype.identity
   let hash loc = fst loc |> Filepos.hash
   let pretty_debug = pp
@@ -127,3 +126,7 @@ module Original = Datatype.Make_with_collections (struct
     type t = Filepos.Original.t * Filepos.Original.t [@@deriving eq, ord]
     let hash loc = fst loc |> Filepos.Original.hash
   end)
+
+(* deprecated *)
+
+let unknown = generated "unknown"
