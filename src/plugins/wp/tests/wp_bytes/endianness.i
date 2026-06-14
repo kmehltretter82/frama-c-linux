@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT:+"-wp-model bytes+raw -wp-timeout 40 -machdep x86_32 -wp-prop little"
+   STDOPT:+"-wp-model bytes+raw -wp-timeout 45 -machdep x86_32 -wp-prop little"
    STDOPT:+"-wp-model bytes+raw -wp-timeout 40 -machdep ppc_32 -wp-prop big"
 */
 

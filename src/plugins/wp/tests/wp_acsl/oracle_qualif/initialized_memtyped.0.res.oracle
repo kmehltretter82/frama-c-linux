@@ -1,4 +1,4 @@
-# frama-c -wp [...]
+# frama-c -wp -wp-timeout 3 [...]
 [kernel] Parsing initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal copy_struct_exits (Cfg) (Unreachable)

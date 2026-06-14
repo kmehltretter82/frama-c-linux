@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-rte -wp-prover=Alt-Ergo,script -wp-prop=-lack @USING_WP_SESSION@
+   OPT: -wp-rte -wp-prop=-lack
 */
 
 typedef unsigned uint32_t ;
@@ -41,6 +41,8 @@ uint64_t BinaryMultiplication (uint32_t a, uint32_t b) {
       //@ assert a4: ok: ((b%2) != 0) ==> 2*x*(b/2) + x == x*b;
       //@ assert a5: ok: ((b%2) == 0) ==> 2*x*(b/2)     == x*b;
       if (b%2) r=r+x;
+      //@ assert dm: (b == 2 * (b/2) + (b%2)) ;
+      //@ assert rm: (0 <= b%2 < 2) ;
       //@ assert a6: ok: r+2*x*(b/2) == \at(a*b, Pre);
       b=b/2;
       if (b==0) break;

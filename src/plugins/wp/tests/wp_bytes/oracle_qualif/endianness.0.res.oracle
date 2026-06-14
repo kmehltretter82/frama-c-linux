@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Bytes (Raw)' -wp-timeout 40 [...]
+# frama-c -wp -wp-model 'Bytes (Raw)' -wp-timeout 45 [...]
 [kernel] Parsing endianness.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards

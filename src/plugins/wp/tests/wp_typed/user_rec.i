@@ -2,6 +2,7 @@
    OPT: -wp-prop=-lack
  */
 /*@ logic integer fact(integer n) = n <= 1 ? 1 : n * fact (n-1) ; */
+/*@ lemma div_self:  lack: \forall integer n ; n != 0 ==> n / n == 1 ; */
 /*@ lemma fact_ge1:  lack: \forall integer n ; fact(n) >= 1 ; */
 /*@ lemma fact_next: lack: \forall integer n,m ;
     0 < n <= m ==> (n*(fact(m)/fact(n))) == (fact(m)/fact(n-1)) ; */
@@ -11,7 +12,7 @@ int F1(int n)
 {
   if (n<=1) return 1;
   int p=1,i=2 ;
-  /*@ 
+  /*@
     loop invariant 2 <= i <= (n+1) ;
     loop invariant p == fact(i-1) ;
     loop assigns p,i;
@@ -45,8 +46,8 @@ int F4(int n)
     loop assigns p,n ;
     loop variant n;
   */
-  while (n > 1) { 
-    p *= n ; n--; 
+  while (n > 1) {
+    p *= n ; n--;
   }
   return p;
 }

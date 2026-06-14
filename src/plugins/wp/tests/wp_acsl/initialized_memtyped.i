@@ -1,3 +1,8 @@
+/*
+  run.config_qualif
+  OPT: -wp-timeout 3
+  */
+
 struct S {
   int x ;
   int y ;

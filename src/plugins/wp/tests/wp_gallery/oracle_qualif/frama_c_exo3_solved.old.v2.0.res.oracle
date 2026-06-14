@@ -1,18 +1,25 @@
-# frama-c -wp -wp-model 'Typed (Ref)' [...]
+# frama-c -wp -wp-rte -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing frama_c_exo3_solved.old.v2.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
+[rte:annot] annotating function equal_elements
 [wp] [Valid] Goal equal_elements_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal equal_elements_terminates (Cfg) (Trivial)
-[wp] Warning: Missing RTE guards
-[wp] 35 goals scheduled
+[wp] 51 goals scheduled
 [wp] [Valid] typed_ref_equal_elements_ensures_v1_good (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_ensures_v2_good (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_ensures_v1_v2_diff (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_2 (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_established (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_preserved (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_set_at_0_established (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_set_at_0_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_2 (Qed)
 [wp] [Valid] typed_ref_equal_elements_assert_set_at_1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_signed_overflow (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_bound_established (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_bound_preserved (Qed)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_seen_sound1_established (Alt-Ergo) (Cached)
@@ -31,44 +38,6 @@
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_v2_sound1_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_v2_sound2_established (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_loop_invariant_v2_sound2_preserved (Alt-Ergo) (Cached)
-[wp] [Valid] typed_ref_equal_elements_loop_assigns (Qed)
-[wp] [Valid] typed_ref_equal_elements_loop_assigns_2 (Qed)
-[wp] [Valid] typed_ref_equal_elements_assigns_part1 (Qed)
-[wp] [Valid] typed_ref_equal_elements_assigns_part2 (Qed)
-[wp] [Valid] typed_ref_equal_elements_assigns_part3 (Qed)
-[wp] [Valid] typed_ref_equal_elements_loop_variant_positive (Qed)
-[wp] [Valid] typed_ref_equal_elements_loop_variant_decrease (Qed)
-[wp] [Valid] typed_ref_equal_elements_loop_variant_2_positive (Qed)
-[wp] [Valid] typed_ref_equal_elements_loop_variant_2_decrease (Qed)
-[wp] Proved goals:   37 / 37
-  Terminating:     1
-  Unreachable:     1
-  Qed:            20
-  Alt-Ergo:       15
-------------------------------------------------------------
- Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           22       15       37       100%
-------------------------------------------------------------
-[wp] frama_c_exo3_solved.old.v2.c:56: Warning: 
-  Memory model hypotheses for function 'equal_elements':
-  /*@
-     behavior wp_typed_ref:
-       requires \valid(v1);
-       requires \valid(v2);
-       requires \separated(v1, v2, a + (..));
-     */
-  void equal_elements(int *a, int *v1, int *v2);
-[wp] Running WP plugin...
-[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
-[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
-[rte:annot] annotating function equal_elements
-[wp] [Valid] Goal equal_elements_terminates (Cfg) (Trivial)
-[wp] 16 goals scheduled
-[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access (Qed)
-[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_2 (Qed)
-[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound (Qed)
-[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_2 (Qed)
-[wp] [Valid] typed_ref_equal_elements_assert_rte_signed_overflow (Qed)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_4 (Alt-Ergo) (Cached)
@@ -80,11 +49,30 @@
 [wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_5 (Qed)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_6 (Qed)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_signed_overflow_2 (Qed)
-[wp] Proved goals:   17 / 17
+[wp] [Valid] typed_ref_equal_elements_loop_assigns (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_assigns_2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part1 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part3 (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_positive (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_decrease (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_2_positive (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_2_decrease (Qed)
+[wp] Proved goals:   53 / 53
   Terminating:     1
-  Qed:            13
-  Alt-Ergo:        3
+  Unreachable:     1
+  Qed:            33
+  Alt-Ergo:       18
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   equal_elements           35       18       53       100%
 ------------------------------------------------------------
+[wp] frama_c_exo3_solved.old.v2.c:56: Warning: 
+  Memory model hypotheses for function 'equal_elements':
+  /*@
+     behavior wp_typed_ref:
+       requires \valid(v1);
+       requires \valid(v2);
+       requires \separated(v1, v2, a + (..));
+     */
+  void equal_elements(int *a, int *v1, int *v2);

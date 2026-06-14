@@ -12,18 +12,6 @@ theory Compound
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
@@ -36,18 +24,6 @@ theory Axiomatic
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   predicate P_P int
   
 end
@@ -56,32 +32,20 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use frama_c_wp.cint.Cint *)
     
-    (* use Compound *)
+    (* use wp.generated.Compound *)
     
-    (* use Axiomatic *)
-    
-    goal wp_goal :
-      forall t:addr -> int, i:int, a:addr.
-       let x = get t (shift_sint32 a i) in
-       region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
+    (* use wp.generated.Axiomatic *)
     
   end
+  
+  goal wp :
+    forall t:addr -> int, i:int, a:addr.
+     let x = get t (shift_sint32 a i) in
+     region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
 [wp] [Unsuccess] typed_f_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
   Terminating:     1
@@ -101,18 +65,6 @@ theory Compound1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint321 (p:addr) (k:int) : addr = shift p k
@@ -125,18 +77,6 @@ theory Axiomatic1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   predicate P_P1 int
   
 end
@@ -145,32 +85,20 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use frama_c_wp.cint.Cint *)
     
-    (* use Compound1 *)
+    (* use wp.generated.Compound1 *)
     
-    (* use Axiomatic1 *)
-    
-    goal wp_goal :
-      forall t:addr -> int, i:int, a:addr.
-       let x = get t (shift_sint321 a i) in
-       region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P1 x
+    (* use wp.generated.Axiomatic1 *)
     
   end
+  
+  goal wp :
+    forall t:addr -> int, i:int, a:addr.
+     let x = get t (shift_sint321 a i) in
+     region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P1 x
 [wp] [Unsuccess] typed_ref_f_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 2
   Terminating:     1

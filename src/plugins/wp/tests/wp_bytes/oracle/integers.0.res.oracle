@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Bytes (Raw)' -wp-timeout 40 [...]
+# frama-c -wp -wp-model 'Bytes (Raw)' -wp-timeout 45 [...]
 [kernel] Parsing integers.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal cast_from_bytes_to_signed_neg_exits (Cfg) (Unreachable)

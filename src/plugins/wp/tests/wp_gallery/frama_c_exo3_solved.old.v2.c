@@ -2,7 +2,7 @@
    OPT: -wp-model Typed+Ref -wp-no-print -wp-rte
 */
 /* run.config_qualif
-   OPT: -wp-model Typed+Ref -then -wp-rte -wp
+   OPT: -wp-model Typed+Ref -wp-rte -wp
 */
 /* ************/
 /* Autre solution d'une proposition de TP donné par Julien à L'IFIPS */
