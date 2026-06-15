@@ -367,8 +367,36 @@ let acsl lf = lfun_observe (ACSL lf)
 let ctor cf = lfun_observe (CTOR cf)
 let lsymbol m = lfun_observe (LFUN m)
 
-let of_qtau : Qed.Symbol.tau -> tau =
-  Kind.map_tau (fun _ -> raise Not_found) (fun d -> Qdata d)
+let of_qtau = Kind.map_tau (fun _ -> raise Not_found) (fun d -> Qdata d)
+
+let unroll = function
+  | Qed.Logic.Data(Qdata d, ts) ->
+    let ty = Qed.Symbol.Data.symbol d in
+    let thy = Qed.Symbol.Data.theory d in
+    begin
+      match ty.ts_def with
+      | Alias tr ->
+        let sigma : tau Why3.Ty.Mtv.t =
+          List.fold_left2
+            (fun s v t -> Why3.Ty.Mtv.add v t s)
+            Why3.Ty.Mtv.empty ty.ts_args ts in
+        let rec instance sigma (ty : Why3.Ty.ty)  =
+          match ty.ty_node with
+          | Tyvar v -> Why3.Ty.Mtv.find v sigma
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_int) ts -> Int
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_real) ts -> Real
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_bool) ts -> Bool
+          | Tyapp(ts,[k;v]) when Why3.Ty.(ts_equal ts_func) ts ->
+            Array(instance sigma k, instance sigma v)
+          | Tyapp(ts, ps) ->
+            let adt = Qdata (Qed.Symbol.of_ts thy ts) in
+            let ts = List.map (instance sigma) ps in
+            Qed.Logic.Data(adt,ts)
+        in (try Some (instance sigma tr) with Not_found -> None)
+      | _ -> None
+    end
+  | _ -> None
+
 
 let compare_tau = Qed.Kind.compare_tau Field.compare ADT.compare
 
@@ -389,7 +417,12 @@ let typecheck category (tr: tau) (ps : tau list) (ts : tau list) =
     | Prop, Prop -> ()
     | Array(a,b), Array(a',b') -> unify a a' ; unify b b'
     | Data(d,ps) , Data(d',ts) when ADT.equal d d' -> unify_all ps ts
-    | _ -> raise Not_found
+    | _ ->
+      match unroll p , unroll t with
+      | Some p , Some t -> unify p t
+      | Some p , None -> unify p t
+      | None , Some t -> unify p t
+      | _ -> raise Not_found
   and merge k t =
     match Qed.Intmap.find k !s with
     | exception Not_found -> s := Qed.Intmap.add k t !s
