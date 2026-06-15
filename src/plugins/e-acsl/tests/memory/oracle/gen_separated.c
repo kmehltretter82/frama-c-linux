@@ -730,7 +730,7 @@ int main(void)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_25,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,
-                                   "sizeof(double)",0,8);
+                                   "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"size",0,
@@ -768,7 +768,7 @@ int main(void)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_23,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,
-                                   "sizeof(double)",0,8);
+                                   "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"size",0,
@@ -1991,7 +1991,7 @@ int main(void)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_67,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_67,
-                                   "sizeof(double)",0,8);
+                                   "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_67,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_67,"size",0,
@@ -2029,7 +2029,7 @@ int main(void)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_64,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
-                                   "sizeof(double)",0,8);
+                                   "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,

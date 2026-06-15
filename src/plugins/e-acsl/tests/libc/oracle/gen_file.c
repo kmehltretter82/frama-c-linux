@@ -749,8 +749,8 @@ int main(void)
                                                       (size_t)__gen_e_acsl_if);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(buf2[0])",
                                  (void *)(buf2));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(int)",
-                                 0,4);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "sizeof(int) * 1",0,4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(int)",
                                  0,4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
