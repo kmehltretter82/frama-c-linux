@@ -264,6 +264,18 @@ let pp_oty fmt = function
 [@@warning "-32"]
 
 let rec cc env t : Why3.Term.term =
+  if Wp_parameters.has_dkey dkey_compile then
+    try
+      let r = cc_any env t in
+      Wp_parameters.debug ~dkey:dkey_compile "@[<hov 2>CC %a@]@ @[<hov 2>RESULT %a : %a@]"
+        Lang.F.pp_term t Why3.Pretty.print_term r pp_oty r.t_ty ; r
+    with exn ->
+      Wp_parameters.debug ~dkey:dkey_compile "@[<hov 2>CC %a@]@ ERROR %s@]"
+        Lang.F.pp_term t (Printexc.to_string exn) ;
+      raise exn
+  else cc_any env t
+
+and cc_any env t =
   try Lang.F.Tmap.find t env.locals with Not_found ->
   match Lang.F.repr t with
   | Fvar _ -> invalid_arg "missing free variable"
@@ -514,27 +526,21 @@ class visitor ctxt c =
     method on_lfun = Qed.Symbol.use_lfun ctxt.cluster
 
     method on_type lt def =
+      let name = Lang.type_id lt in
+      let id = Why3.Ident.id_fresh name in
+      let map i _ = tvar i in
+      let tvs = List.mapi map lt.lt_params in
       match def with
       | Tabs ->
-        let id = Why3.Ident.id_fresh (Lang.type_id lt) in
-        let map i _ = tvar i in
-        let tvs = List.mapi map lt.lt_params in
         let tys = Why3.Ty.create_tysymbol id tvs NoDef in
         let decl = Why3.Decl.create_ty_decl tys in
-        Qed.Symbol.add ctxt.cluster decl
+        TS.update name tys ; Qed.Symbol.add ctxt.cluster decl
       | Tdef t ->
-        let id = Why3.Ident.id_fresh (Lang.type_id lt) in
-        let map i _ = tvar i in
-        let tvs = List.mapi map lt.lt_params in
         let tdef = Option.get (cc_tau ctxt t) in
         let tys = Why3.Ty.create_tysymbol id tvs (Alias tdef) in
-        let decl = Why3.Decl.create_ty_decl tys in
-        Qed.Symbol.add ctxt.cluster decl
+        TS.update name tys ;
+        Qed.Symbol.add ctxt.cluster @@ Why3.Decl.create_ty_decl tys
       | Tsum cases ->
-        let name = Lang.type_id lt in
-        let id = Why3.Ident.id_fresh name in
-        let map i _ = tvar i in
-        let tvs = List.mapi map lt.lt_params in
         let tys = Why3.Ty.create_tysymbol id tvs NoDef in
         TS.update name tys ;
         let tvs = List.map Why3.Ty.ty_var tvs in
@@ -543,20 +549,17 @@ class visitor ctxt c =
         let cases =
           List.map
             (fun (c,targs) ->
-               let name = match c with Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
+               let name = match c with
+                 | Lang.CTOR c -> Lang.ctor_id c
+                 | _ -> assert false in
                let id = Why3.Ident.id_fresh name in
                let ts = List.map (fun t -> Option.get (cc_tau ctxt t)) targs in
                let ls = Why3.Term.create_fsymbol ~constr id ts rty in
                LS.update name ls ;
                ls, List.map (fun _ -> None) ts
             ) cases in
-        let decl = Why3.Decl.create_data_decl [tys,cases] in
-        Qed.Symbol.add ctxt.cluster decl
+        Qed.Symbol.add ctxt.cluster @@ Why3.Decl.create_data_decl [tys,cases]
       | Trec fields ->
-        let name = Lang.type_id lt in
-        let id = Why3.Ident.id_fresh name in
-        let map i _ = tvar i in
-        let tvs = List.mapi map lt.lt_params in
         let tys = Why3.Ty.create_tysymbol id tvs NoDef in
         TS.update name tys ;
         let tvs = List.map Why3.Ty.ty_var tvs in
@@ -572,9 +575,9 @@ class visitor ctxt c =
             ) fields in
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let ctor = Why3.Term.create_fsymbol ~constr:1 id args rty in
-        let decl = Why3.Decl.create_data_decl [tys,[ctor,fields]] in
         CS.update name ctor ;
-        Qed.Symbol.add ctxt.cluster decl
+        Qed.Symbol.add ctxt.cluster @@
+        Why3.Decl.create_data_decl [tys,[ctor,fields]]
 
     method private on_comp_gen kind c fts =
       begin
