@@ -230,6 +230,54 @@ let float_lit ulp (q : Q.t) =
   in lookup ulp v printers
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Exact Float Representation for Why3 Export                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let re_float = Str.regexp
+    "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
+
+let const_float env fk q =
+  let use_hex = true in
+  let qf = Q.to_float q in
+  let qf =
+    match fk with
+    | Ctypes.Float64 -> qf
+    | Ctypes.Float32 -> Floating_point.round_to_single_precision qf
+  in
+  let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) qf in
+  let s = String.lowercase_ascii s in
+  if Str.string_match re_float s 0 then
+    let group n r = try Str.matched_group n r with Not_found -> "" in
+    let neg = Q.sign q < 0 in
+    let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
+    let exp = if String.equal exp "" then None else Some exp in
+    let ts = match fk with
+      | Ctypes.Float32 -> ExportWhy3.CC.find_ts env "frama_c_wp.cfloat.Cfloat.f32"
+      | Ctypes.Float64 -> ExportWhy3.CC.find_ts env "frama_c_wp.cfloat.Cfloat.f64"
+    in
+    let ty = Why3.Ty.ty_app ts [] in
+    let rc = Why3.Number.real_literal ~radix:16 ~neg ~int ~frac ~exp in
+    Why3.Term.t_const (Why3.Constant.ConstReal rc) ty
+  else invalid_arg "Wp.Cfloat.const_float"
+
+let hack_fqexact lf ft =
+  let exact env _tr = function
+    | [x] ->
+      begin
+        match Lang.F.repr x with
+        | Kreal q -> const_float env ft q
+        | _ -> raise Not_found
+      end
+    | _ -> raise Not_found
+  in ExportWhy3.CC.hack lf exact
+
+let () = Context.register
+    begin fun () ->
+      hack_fqexact !@fq32 Float32 ;
+      hack_fqexact !@fq64 Float64 ;
+    end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Finites                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -399,16 +447,20 @@ let hack_sqrt_builtin ft =
   in
   LogicBuiltins.hack name choose
 
-let () =
+let register_builtins ft =
   let open LogicBuiltins in
-  let register_builtin ft =
+  begin
     add_builtin "\\model" [F ft] (f_model ft) ;
     add_builtin "\\delta" [F ft] (f_delta ft) ;
     add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
-    hack_sqrt_builtin ft
-  in
-  register_builtin Float32 ;
-  register_builtin Float64
+    hack_sqrt_builtin ft ;
+  end
+
+let () = Context.register
+    begin fun () ->
+      register_builtins Float32 ;
+      register_builtins Float64 ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)

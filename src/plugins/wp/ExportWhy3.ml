@@ -169,46 +169,17 @@ let const_int z =
   let k = Why3.BigInt.of_string (Z.to_string z) in
   Why3.Term.t_const (Why3.Constant.int_const k) Why3.Ty.ty_int
 
-let const_real ty ~radix ~neg ~int ?(frac="") ?exp () =
-  let rc = Why3.Number.real_literal ~radix ~neg ~int ~frac ~exp in
-  Why3.Term.t_const (Why3.Constant.ConstReal rc) ty
-
 let const_rint z =
   let neg = Z.sign z < 0 in
   let int = Z.to_string (Z.abs z) in
-  const_real Why3.Ty.ty_real ~radix:10 ~neg ~int ()
+  let rc = Why3.Number.real_literal ~radix:10 ~neg ~int ~frac:"" ~exp:None in
+  Why3.Term.t_const (Why3.Constant.ConstReal rc) Why3.Ty.ty_real
 
 let const_qint env (q:Q.t) =
   let rnum = const_rint q.num in
   if Z.is_one q.den
   then rnum
   else t_app env "real.Real.(/)" [ rnum ; const_rint q.den ]
-
-let re_float = Str.regexp
-    "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
-
-let const_float env fk q =
-  let use_hex = true in
-  let qf = Q.to_float q in
-  let qf =
-    match fk with
-    | Ctypes.Float64 -> qf
-    | Ctypes.Float32 -> Floating_point.round_to_single_precision qf
-  in
-  let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) qf in
-  let s = String.lowercase_ascii s in
-  if Str.string_match re_float s 0 then
-    let group n r = try Str.matched_group n r with Not_found -> "" in
-    let neg = Q.sign q < 0 in
-    let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
-    let exp = if String.equal exp "" then None else Some exp in
-    let ts = match fk with
-      | Ctypes.Float32 -> get_ts env "frama_c_wp.cfloat.Cfloat.f32"
-      | Ctypes.Float64 -> get_ts env "frama_c_wp.cfloat.Cfloat.f64"
-    in
-    let ty = Why3.Ty.ty_app ts [] in
-    const_real ty ~radix:16 ~neg ~int ~frac ?exp ()
-  else invalid_arg "Wp.ProverWhy3.const_float"
 
 let rec full_trigger = function
   | Qed.Engine.TgAny -> false
@@ -333,16 +304,6 @@ and cc_any env t =
   | Acst(_,v) ->
     let result = cc_tau env.context @@ Lang.F.typeof t in
     t_app env "map.Const.const" ~result [cc_term env v]
-  | Fun(f, [x]) when Lang.E.(Cfloat.fq32 @= f) ->
-    begin match Lang.F.repr x with
-      | Kreal q -> const_float env.context Float32 q
-      | _ -> raise Not_found
-    end
-  | Fun(f, [x]) when Lang.E.(Cfloat.fq64 @= f) ->
-    begin match Lang.F.repr x with
-      | Kreal q -> const_float env.context Float64 q
-      | _ -> raise Not_found
-    end
   | Fun (fn,ts) ->
     begin
       try
