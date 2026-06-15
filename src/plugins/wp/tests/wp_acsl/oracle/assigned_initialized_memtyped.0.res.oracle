@@ -232,11 +232,11 @@ Assume {
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: (forall a_3 : frama_c_wp.memaddr.MemAddr.addr.
+  Have: (forall a_3 : addr.
          ((forall i_2 : Z. (((i_2 = 0) \/ (i_2 = 2) \/ (i_2 = 4)) ->
            (shift_sint32(a, i_2) != a_3))) ->
          ((m[a_3]=true) <-> (Init_0[a_3]=true)))) /\
-      (forall a_3 : frama_c_wp.memaddr.MemAddr.addr.
+      (forall a_3 : addr.
        ((forall i_2 : Z. (((i_2 = 0) \/ (i_2 = 2) \/ (i_2 = 4)) ->
          (shift_sint32(a, i_2) != a_3))) ->
        (memcpy(Mint_0[a_1 <- 0], a_2, Mint_undef_0, a_2, 10)[a_3] =
@@ -270,7 +270,7 @@ Assume {
   (* Else *)
   Have: 10 <= i_2.
   (* Loop assigns 'CHECK' *)
-  Have: forall a_2 : frama_c_wp.memaddr.MemAddr.addr.
+  Have: forall a_2 : addr.
       ((forall i_5 : Z. (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) ->
         (shift_sint32(a, i_5) != a_2))) ->
       (memcpy(Mint_0[shiftfield_F1_S_i(s) <- 0], a_1, Mint_undef_0, a_1, 10)

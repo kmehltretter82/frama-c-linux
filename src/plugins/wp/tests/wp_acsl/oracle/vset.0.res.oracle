@@ -74,7 +74,7 @@ Prove: !mem(0, L_Set3).
 ------------------------------------------------------------
 
 Goal Check Lemma 'quantify':
-Prove: exists s : set.Set.set(Z). !mem(0, s).
+Prove: exists s : set(Z). !mem(0, s).
 
 ------------------------------------------------------------
 

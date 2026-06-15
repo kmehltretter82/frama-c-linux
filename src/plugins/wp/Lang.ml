@@ -603,7 +603,7 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | Qdata a -> Qed.Symbol.Data.fullname a
+      | Qdata a -> Qed.Symbol.Data.name a
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)

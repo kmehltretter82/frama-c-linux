@@ -82,7 +82,7 @@ Assume {
   (* Heap *)
   Type: (region(array_0.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
   (* Call Effects *)
-  Have: forall a_1 : frama_c_wp.memaddr.MemAddr.addr.
+  Have: forall a_1 : addr.
       ((forall i : Z. (((i = 4) \/ (i = 6)) ->
         (shift_uint8(array_0, i) != a_1))) -> eqmem(m_1, mem_1, a_1, 1)).
 }
