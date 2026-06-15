@@ -232,7 +232,7 @@ let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
 let env_of_li ~adata ~loc kf env li =
   match li.l_var_info.lv_type with
   | Ctype _ | Linteger | Lreal ->
-    let t = Misc.term_of_li li in
+    let t = Terms.of_li li in
     let logic_env = Env.Logic_env.get env in
     let ty = Typing.get_typ ~logic_env t in
     let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in

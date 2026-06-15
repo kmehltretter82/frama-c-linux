@@ -2,6 +2,8 @@
  * COMMENT: Check that the RTE guards are generated at the right place.
 */
 
+#include <stdlib.h>
+
 /*@ ensures
     \let delta = 1;
     \let avg_real = (a+b)/2;
@@ -84,13 +86,32 @@ int main(void) {
   /*@ assert 12 / (v / (y / z)) > 0; */
 
   int c = 98;
-  int t = 1;
-  int f = 2;
-  int ff = 1;
-  /*@ assert 12 / c ? (1 / t) < 3 : (1 / ((f / ff) - 1)) > 0; */
+  int tv = 1;
+  int fv = 2;
+  int ffv = 1;
+  /*@ assert 12 / c ? (1 / tv) < 3 : (1 / ((fv / ffv) - 1)) > 0; */
 
   int *n = &y;
   /*@ assert 12 / *n > 0; */
+
+  int t_1[3] = {1, 2, 3};
+  int t_2[3] = {1, 6, 3};
+  /*@ assert t_1 != t_2; */
+
+  int *ptr_t = t_1;
+  /*@ assert t_1 == (int[])ptr_t; */
+
+  int m[3][2] = {{1, 2}, {3, 4}, {5, 6}};
+  /*@ assert m == m; */
+
+  long i = 1;
+  /*@ assert (float)i == t_1[(int)0.1]; */
+
+  int ***p = malloc(sizeof(int **));
+  *p = malloc(sizeof(int *));
+  **p = malloc(sizeof(int));
+  ***p = 23;
+  /*@ assert ***p / i == 23; */
 
   return 0;
 }

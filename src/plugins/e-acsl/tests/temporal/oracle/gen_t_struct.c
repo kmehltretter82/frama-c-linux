@@ -598,15 +598,22 @@ int main(void)
                                    (void *)(& lp->t.p));
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
                                      "sizeof(char *)",0,sizeof(char *));
-      __gen_e_acsl_assert_data_17.blocking = 1;
-      __gen_e_acsl_assert_data_17.kind = "RTE";
-      __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(&lp->t.p)";
-      __gen_e_acsl_assert_data_17.file = "t_struct.c";
-      __gen_e_acsl_assert_data_17.fct = "main";
-      __gen_e_acsl_assert_data_17.line = 44;
-      __gen_e_acsl_assert_data_17.name = "mem_access";
-      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_17);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
+                                   "\"memory access\": \\valid_read(&lp->t.p)",
+                                   0,__gen_e_acsl_valid_read);
+      /*@ assert E_ACSL: "memory access": \valid_read(&lp->t.p); */
+      {
+        __gen_e_acsl_assert_data_17.blocking = 1;
+        __gen_e_acsl_assert_data_17.kind = "RTE";
+        __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(&lp->t.p)";
+        __gen_e_acsl_assert_data_17.file = "t_struct.c";
+        __gen_e_acsl_assert_data_17.fct = "main";
+        __gen_e_acsl_assert_data_17.line = 44;
+        __gen_e_acsl_assert_data_17.name = "memory access";
+        __e_acsl_assert(__gen_e_acsl_valid_read,
+                        & __gen_e_acsl_assert_data_17);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+      }
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
         {.values = (void *)0};
       __gen_e_acsl_aligned_11 = __e_acsl_aligned((void *)lp->t.p,

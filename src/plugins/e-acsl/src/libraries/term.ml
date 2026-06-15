@@ -8,23 +8,12 @@
 
 open Cil_types
 
-val prel :
-  ?smart:bool ->
-  ?loc:Fileloc.t ->
-  ?names:string list ->
-  relation ->
-  term ->
-  term ->
-  predicate
-(** create a relation predicate. Optimisation depends on the [-e-acsl-O]
-    option and [?smart]. *)
+let strip_shallow_cast t =
+  match t.term_node with
+  | TCast (_,_,t) -> t
+  | _ -> t
 
-val pand :
-  ?smart:bool ->
-  ?loc:Fileloc.t ->
-  ?names:string list ->
-  predicate ->
-  predicate ->
-  predicate
-(** create a conjunction. Optimisation depends on the [-e-acsl-O] option and
-    [?smart]. *)
+let extract_integer t =
+  match (strip_shallow_cast t).term_node with
+  | TConst (Integer (z, _)) -> Some z
+  | _ -> None

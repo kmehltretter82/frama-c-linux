@@ -166,6 +166,9 @@ int main(void)
                                  (void *)(& b));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int *)",0,sizeof(int *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "\\initialized(&b)",0,
+                                 __gen_e_acsl_initialized_5);
     if (__gen_e_acsl_initialized_5) {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)b,sizeof(int),
@@ -174,18 +177,24 @@ int main(void)
                                    (void *)b);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                   "\"memory access\": \\valid_read(b)",0,
+                                   __gen_e_acsl_valid_read);
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and_7 = 0;
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(b)";
-    __gen_e_acsl_assert_data_4.file = "valid_alias.c";
-    __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 14;
-    __gen_e_acsl_assert_data_4.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    /*@ assert E_ACSL: "memory access": \valid_read(b); */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(b)";
+      __gen_e_acsl_assert_data_4.file = "valid_alias.c";
+      __gen_e_acsl_assert_data_4.fct = "main";
+      __gen_e_acsl_assert_data_4.line = 14;
+      __gen_e_acsl_assert_data_4.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"*b",0,*b);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"n",0,n);
     __gen_e_acsl_assert_data_3.blocking = 1;

@@ -84,7 +84,7 @@ let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shift
   | [] ->
     sizes_and_shifts
   | Lvs_quantif(tmin, _, _,  _, tmax) ::_
-    when Misc.term_has_lv_from_vi tmin || Misc.term_has_lv_from_vi tmax ->
+    when Terms.has_lv_from_vi tmin || Terms.has_lv_from_vi tmax ->
     Error.not_yet "\\at with logic variable linked to C variable"
   | Lvs_quantif(tmin, rel1, lv, rel2, tmax) :: lscope' ->
     let t_size = Logic_const.term ~loc (TBinOp(MinusA, tmax, tmin)) Linteger in
@@ -145,7 +145,7 @@ let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shift
     let sizes_and_shifts = (t_size, t_shifted) :: sizes_and_shifts in
     sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope' sizes_and_shifts
   | (Lvs_let(_, t) | Lvs_global(_, t)) :: _
-    when Misc.term_has_lv_from_vi t ->
+    when Terms.has_lv_from_vi t ->
     Error.not_yet "\\at with logic variable linked to C variable"
   | Lvs_let _ :: lscope' ->
     sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope' sizes_and_shifts

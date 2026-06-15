@@ -327,7 +327,7 @@ end = struct
       (* E-ACSL semantic: \base_addr{L}(p) == \at(\base_addr(p), L) *)
       process ?error env (PoT_term t) l
     | Tlet (li, t) ->
-      let lv_term = Misc.term_of_li li in
+      let lv_term = Terms.of_li li in
       let error = do_term ?error env lv_term in
       let lvs = Lvs_let (li.l_var_info, lv_term) in
       let env = { env with lscope = Lscope.add lvs env.lscope } in
@@ -424,7 +424,7 @@ end = struct
       let error = do_term ?error env t in
       process ?error env (PoT_pred p) l
     | Plet (li, p) ->
-      let lv_term = Misc.term_of_li li in
+      let lv_term = Terms.of_li li in
       let error = do_term ?error env lv_term in
       let lvs = Lvs_let (li.l_var_info, lv_term) in
       let env = { env with lscope = Lscope.add lvs env.lscope } in

@@ -322,10 +322,10 @@ module Term_sharing: sig
 end
 =
 struct
-  let terms = Misc.Id_term.Hashtbl.create 7
-  let add t = Misc.Id_term.Hashtbl.add terms t ()
-  let mem t = Misc.Id_term.Hashtbl.mem terms t
-  let clear () = Misc.Id_term.Hashtbl.clear terms
+  let terms = Terms.Id.Hashtbl.create 7
+  let add t = Terms.Id.Hashtbl.add terms t ()
+  let mem t = Terms.Id.Hashtbl.mem terms t
+  let clear () = Terms.Id.Hashtbl.clear terms
 end
 
 (** Module to move labels to an enclosing block *)

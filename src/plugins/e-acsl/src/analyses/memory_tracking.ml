@@ -419,7 +419,7 @@ module rec Transfer
       | Plet(li, _) ->
         if may_alias li then Error.not_yet "let-binding on array or pointer"
         else begin
-          state_ref := register_term kf !state_ref (Misc.term_of_li li);
+          state_ref := register_term kf !state_ref (Terms.of_li li);
           Cil.DoChildren
         end
     method !vterm term =

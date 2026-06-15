@@ -429,42 +429,36 @@ char *__gen_e_acsl_strchr(char const *s, int c)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
+      int __gen_e_acsl_valid_read;
       void *__gen_e_acsl_base_addr;
       void *__gen_e_acsl_base_addr_2;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& __retres),
-                                                      sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&__retres",
-                                   (void *)(& __retres));
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__retres,
+                                                    sizeof(char),
+                                                    (void *)__retres,
+                                                    (void *)(& __retres));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\result",
+                                   (void *)__retres);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "sizeof(char *)",0,sizeof(char *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid_read;
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__retres,
-                                                      sizeof(char),
-                                                      (void *)__retres,
-                                                      (void *)(& __retres));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"__retres",
-                                     (void *)__retres);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                       "sizeof(char)",0,sizeof(char));
-        __gen_e_acsl_and = __gen_e_acsl_valid_read;
+                                     "sizeof(char)",0,sizeof(char));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                   "\"memory access\": \\valid_read(\\result)",
+                                   0,__gen_e_acsl_valid_read);
+      /*@ assert E_ACSL: "memory access": \valid_read(\result); */
+      {
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(\\result)";
+        __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
+        __gen_e_acsl_assert_data_4.fct = "strchr";
+        __gen_e_acsl_assert_data_4.line = 214;
+        __gen_e_acsl_assert_data_4.name = "memory access";
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_4);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
-      else __gen_e_acsl_and = 0;
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(__retres)";
-      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
-      __gen_e_acsl_assert_data_4.fct = "strchr";
-      __gen_e_acsl_assert_data_4.line = 214;
-      __gen_e_acsl_assert_data_4.name = "mem_access";
-      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       /*@ assert Eva: mem_access: \valid_read(__retres); */
       __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_3,"*\\result",
                                     0,*__retres);

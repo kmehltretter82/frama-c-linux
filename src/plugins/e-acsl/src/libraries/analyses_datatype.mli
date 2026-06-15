@@ -42,7 +42,7 @@ module Ival_datatype: Datatype.S_with_collections with type t = ival
 module Profile: sig
   include
     Datatype.S_with_collections
-    with type t = ival Cil_datatype.Logic_var.Map.t
+    with type t = ival Logic_var.Map.t
 
   val make: logic_var list -> ival list -> t
   val is_empty: t -> bool
@@ -126,7 +126,8 @@ module LF_env : sig
 
   (** find all the arguments a recursive function or predicate has been
       called with*)
-  val find_args : logic_info -> Profile.t Misc.Id_term.Hashtbl.t Logic_var.Map.t
+  val find_args :
+    logic_info -> Profile.t Terms.Id.Hashtbl.t Logic_var.Map.t
 
   (** clear the table of intervals for logic function *)
   val clear : unit -> unit

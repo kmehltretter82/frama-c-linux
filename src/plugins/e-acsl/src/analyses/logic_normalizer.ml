@@ -55,7 +55,7 @@ end
 module Predicates = Memo (Id_predicate.Hashtbl)
 
 (** memoization of normalised terms *)
-module Terms = Memo (Misc.Id_term.Hashtbl)
+module Terms = Memo (Terms.Id.Hashtbl)
 
 (** memoization of here-specialised logic definitions *)
 module Here_specialized = Memo (Logic_info.Hashtbl)

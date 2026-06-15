@@ -88,7 +88,7 @@ void nested_loops(void)
         int __gen_e_acsl_forall;
         int __gen_e_acsl_k;
         int __gen_e_acsl_l;
-        int __gen_e_acsl_and_2;
+        int __gen_e_acsl_and_4;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
         __gen_e_acsl_forall = 1;
@@ -99,62 +99,54 @@ void nested_loops(void)
           while (1) {
             if (__gen_e_acsl_l < j) ; else break;
             {
+              int __gen_e_acsl_and_2;
+              int __gen_e_acsl_and_3;
               __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
                 {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                           "__gen_e_acsl_l",0,__gen_e_acsl_l);
-              __gen_e_acsl_assert_data_3.blocking = 1;
-              __gen_e_acsl_assert_data_3.kind = "RTE";
-              __gen_e_acsl_assert_data_3.pred_txt = "__gen_e_acsl_l < 8";
-              __gen_e_acsl_assert_data_3.file = "loop.i";
-              __gen_e_acsl_assert_data_3.fct = "nested_loops";
-              __gen_e_acsl_assert_data_3.line = 19;
-              __gen_e_acsl_assert_data_3.name = "index_bound";
-              __e_acsl_assert(__gen_e_acsl_l < 8,
-                              & __gen_e_acsl_assert_data_3);
-              __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"k",
+                                           0,__gen_e_acsl_k);
+              if (0 <= __gen_e_acsl_k) {
+                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                             "k",0,__gen_e_acsl_k);
+                __gen_e_acsl_and_2 = __gen_e_acsl_k < 4;
+              }
+              else __gen_e_acsl_and_2 = 0;
+              /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
+              {
+                __gen_e_acsl_assert_data_3.blocking = 1;
+                __gen_e_acsl_assert_data_3.kind = "RTE";
+                __gen_e_acsl_assert_data_3.pred_txt = "0 <= k < (int)4";
+                __gen_e_acsl_assert_data_3.file = "loop.i";
+                __gen_e_acsl_assert_data_3.fct = "nested_loops";
+                __gen_e_acsl_assert_data_3.line = 19;
+                __gen_e_acsl_assert_data_3.name = "index out of bounds";
+                __e_acsl_assert(__gen_e_acsl_and_2,
+                                & __gen_e_acsl_assert_data_3);
+                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+              }
               __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
                 {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                           "__gen_e_acsl_l",0,__gen_e_acsl_l);
-              __gen_e_acsl_assert_data_4.blocking = 1;
-              __gen_e_acsl_assert_data_4.kind = "RTE";
-              __gen_e_acsl_assert_data_4.pred_txt = "0 <= __gen_e_acsl_l";
-              __gen_e_acsl_assert_data_4.file = "loop.i";
-              __gen_e_acsl_assert_data_4.fct = "nested_loops";
-              __gen_e_acsl_assert_data_4.line = 19;
-              __gen_e_acsl_assert_data_4.name = "index_bound";
-              __e_acsl_assert(0 <= __gen_e_acsl_l,
-                              & __gen_e_acsl_assert_data_4);
-              __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-              __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-                {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                           "__gen_e_acsl_k",0,__gen_e_acsl_k);
-              __gen_e_acsl_assert_data_5.blocking = 1;
-              __gen_e_acsl_assert_data_5.kind = "RTE";
-              __gen_e_acsl_assert_data_5.pred_txt = "__gen_e_acsl_k < 4";
-              __gen_e_acsl_assert_data_5.file = "loop.i";
-              __gen_e_acsl_assert_data_5.fct = "nested_loops";
-              __gen_e_acsl_assert_data_5.line = 19;
-              __gen_e_acsl_assert_data_5.name = "index_bound";
-              __e_acsl_assert(__gen_e_acsl_k < 4,
-                              & __gen_e_acsl_assert_data_5);
-              __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-              __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-                {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                           "__gen_e_acsl_k",0,__gen_e_acsl_k);
-              __gen_e_acsl_assert_data_6.blocking = 1;
-              __gen_e_acsl_assert_data_6.kind = "RTE";
-              __gen_e_acsl_assert_data_6.pred_txt = "0 <= __gen_e_acsl_k";
-              __gen_e_acsl_assert_data_6.file = "loop.i";
-              __gen_e_acsl_assert_data_6.fct = "nested_loops";
-              __gen_e_acsl_assert_data_6.line = 19;
-              __gen_e_acsl_assert_data_6.name = "index_bound";
-              __e_acsl_assert(0 <= __gen_e_acsl_k,
-                              & __gen_e_acsl_assert_data_6);
-              __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"l",
+                                           0,__gen_e_acsl_l);
+              if (0 <= __gen_e_acsl_l) {
+                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                             "l",0,__gen_e_acsl_l);
+                __gen_e_acsl_and_3 = __gen_e_acsl_l < 8;
+              }
+              else __gen_e_acsl_and_3 = 0;
+              /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
+              {
+                __gen_e_acsl_assert_data_4.blocking = 1;
+                __gen_e_acsl_assert_data_4.kind = "RTE";
+                __gen_e_acsl_assert_data_4.pred_txt = "0 <= l < (int)8";
+                __gen_e_acsl_assert_data_4.file = "loop.i";
+                __gen_e_acsl_assert_data_4.fct = "nested_loops";
+                __gen_e_acsl_assert_data_4.line = 19;
+                __gen_e_acsl_assert_data_4.name = "index out of bounds";
+                __e_acsl_assert(__gen_e_acsl_and_3,
+                                & __gen_e_acsl_assert_data_4);
+                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+              }
               if ((long)t[__gen_e_acsl_k][__gen_e_acsl_l] == __gen_e_acsl_k * (long)__gen_e_acsl_l) 
                 ;
               else {
@@ -178,22 +170,22 @@ void nested_loops(void)
         __gen_e_acsl_assert_data_2.line = 19;
         __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data_2);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"j",0,j);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"j",0,j);
         if (0 <= j) {
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"j",0,j);
-          __gen_e_acsl_and_2 = j <= 8;
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"j",0,j);
+          __gen_e_acsl_and_4 = j <= 8;
         }
-        else __gen_e_acsl_and_2 = 0;
-        __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "Invariant";
-        __gen_e_acsl_assert_data_7.pred_txt = "0 <= j <= 8";
-        __gen_e_acsl_assert_data_7.file = "loop.i";
-        __gen_e_acsl_assert_data_7.fct = "nested_loops";
-        __gen_e_acsl_assert_data_7.line = 17;
-        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_7);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+        else __gen_e_acsl_and_4 = 0;
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "Invariant";
+        __gen_e_acsl_assert_data_5.pred_txt = "0 <= j <= 8";
+        __gen_e_acsl_assert_data_5.file = "loop.i";
+        __gen_e_acsl_assert_data_5.fct = "nested_loops";
+        __gen_e_acsl_assert_data_5.line = 17;
+        __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       }
       /*@ loop invariant 0 <= j <= 8;
           loop invariant
@@ -203,29 +195,29 @@ void nested_loops(void)
       while (j < 8) {
         t[i][j] = i * j;
         {
-          int __gen_e_acsl_and_3;
+          int __gen_e_acsl_and_5;
           int __gen_e_acsl_forall_2;
           int __gen_e_acsl_k_2;
           int __gen_e_acsl_l_2;
           j ++;
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
             {.values = (void *)0};
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"j",0,j);
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"j",0,j);
           if (0 <= j) {
-            __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"j",0,
+            __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"j",0,
                                          j);
-            __gen_e_acsl_and_3 = j <= 8;
+            __gen_e_acsl_and_5 = j <= 8;
           }
-          else __gen_e_acsl_and_3 = 0;
-          __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "Invariant";
-          __gen_e_acsl_assert_data_8.pred_txt = "0 <= j <= 8";
-          __gen_e_acsl_assert_data_8.file = "loop.i";
-          __gen_e_acsl_assert_data_8.fct = "nested_loops";
-          __gen_e_acsl_assert_data_8.line = 17;
-          __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_8);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+          else __gen_e_acsl_and_5 = 0;
+          __gen_e_acsl_assert_data_6.blocking = 1;
+          __gen_e_acsl_assert_data_6.kind = "Invariant";
+          __gen_e_acsl_assert_data_6.pred_txt = "0 <= j <= 8";
+          __gen_e_acsl_assert_data_6.file = "loop.i";
+          __gen_e_acsl_assert_data_6.fct = "nested_loops";
+          __gen_e_acsl_assert_data_6.line = 17;
+          __e_acsl_assert(__gen_e_acsl_and_5,& __gen_e_acsl_assert_data_6);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
             {.values = (void *)0};
           __gen_e_acsl_forall_2 = 1;
           __gen_e_acsl_k_2 = 0;
@@ -235,66 +227,54 @@ void nested_loops(void)
             while (1) {
               if (__gen_e_acsl_l_2 < j) ; else break;
               {
-                __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+                int __gen_e_acsl_and_6;
+                int __gen_e_acsl_and_7;
+                __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
                   {.values = (void *)0};
-                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                             "__gen_e_acsl_l_2",0,
-                                             __gen_e_acsl_l_2);
-                __gen_e_acsl_assert_data_10.blocking = 1;
-                __gen_e_acsl_assert_data_10.kind = "RTE";
-                __gen_e_acsl_assert_data_10.pred_txt = "__gen_e_acsl_l_2 < 8";
-                __gen_e_acsl_assert_data_10.file = "loop.i";
-                __gen_e_acsl_assert_data_10.fct = "nested_loops";
-                __gen_e_acsl_assert_data_10.line = 19;
-                __gen_e_acsl_assert_data_10.name = "index_bound";
-                __e_acsl_assert(__gen_e_acsl_l_2 < 8,
-                                & __gen_e_acsl_assert_data_10);
-                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-                __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                             "k",0,__gen_e_acsl_k_2);
+                if (0 <= __gen_e_acsl_k_2) {
+                  __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                               "k",0,__gen_e_acsl_k_2);
+                  __gen_e_acsl_and_6 = __gen_e_acsl_k_2 < 4;
+                }
+                else __gen_e_acsl_and_6 = 0;
+                /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
+                {
+                  __gen_e_acsl_assert_data_8.blocking = 1;
+                  __gen_e_acsl_assert_data_8.kind = "RTE";
+                  __gen_e_acsl_assert_data_8.pred_txt = "0 <= k < (int)4";
+                  __gen_e_acsl_assert_data_8.file = "loop.i";
+                  __gen_e_acsl_assert_data_8.fct = "nested_loops";
+                  __gen_e_acsl_assert_data_8.line = 19;
+                  __gen_e_acsl_assert_data_8.name = "index out of bounds";
+                  __e_acsl_assert(__gen_e_acsl_and_6,
+                                  & __gen_e_acsl_assert_data_8);
+                  __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+                }
+                __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
                   {.values = (void *)0};
-                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
-                                             "__gen_e_acsl_l_2",0,
-                                             __gen_e_acsl_l_2);
-                __gen_e_acsl_assert_data_11.blocking = 1;
-                __gen_e_acsl_assert_data_11.kind = "RTE";
-                __gen_e_acsl_assert_data_11.pred_txt = "0 <= __gen_e_acsl_l_2";
-                __gen_e_acsl_assert_data_11.file = "loop.i";
-                __gen_e_acsl_assert_data_11.fct = "nested_loops";
-                __gen_e_acsl_assert_data_11.line = 19;
-                __gen_e_acsl_assert_data_11.name = "index_bound";
-                __e_acsl_assert(0 <= __gen_e_acsl_l_2,
-                                & __gen_e_acsl_assert_data_11);
-                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
-                __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
-                  {.values = (void *)0};
-                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
-                                             "__gen_e_acsl_k_2",0,
-                                             __gen_e_acsl_k_2);
-                __gen_e_acsl_assert_data_12.blocking = 1;
-                __gen_e_acsl_assert_data_12.kind = "RTE";
-                __gen_e_acsl_assert_data_12.pred_txt = "__gen_e_acsl_k_2 < 4";
-                __gen_e_acsl_assert_data_12.file = "loop.i";
-                __gen_e_acsl_assert_data_12.fct = "nested_loops";
-                __gen_e_acsl_assert_data_12.line = 19;
-                __gen_e_acsl_assert_data_12.name = "index_bound";
-                __e_acsl_assert(__gen_e_acsl_k_2 < 4,
-                                & __gen_e_acsl_assert_data_12);
-                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
-                __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-                  {.values = (void *)0};
-                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
-                                             "__gen_e_acsl_k_2",0,
-                                             __gen_e_acsl_k_2);
-                __gen_e_acsl_assert_data_13.blocking = 1;
-                __gen_e_acsl_assert_data_13.kind = "RTE";
-                __gen_e_acsl_assert_data_13.pred_txt = "0 <= __gen_e_acsl_k_2";
-                __gen_e_acsl_assert_data_13.file = "loop.i";
-                __gen_e_acsl_assert_data_13.fct = "nested_loops";
-                __gen_e_acsl_assert_data_13.line = 19;
-                __gen_e_acsl_assert_data_13.name = "index_bound";
-                __e_acsl_assert(0 <= __gen_e_acsl_k_2,
-                                & __gen_e_acsl_assert_data_13);
-                __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+                __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                             "l",0,__gen_e_acsl_l_2);
+                if (0 <= __gen_e_acsl_l_2) {
+                  __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                               "l",0,__gen_e_acsl_l_2);
+                  __gen_e_acsl_and_7 = __gen_e_acsl_l_2 < 8;
+                }
+                else __gen_e_acsl_and_7 = 0;
+                /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
+                {
+                  __gen_e_acsl_assert_data_9.blocking = 1;
+                  __gen_e_acsl_assert_data_9.kind = "RTE";
+                  __gen_e_acsl_assert_data_9.pred_txt = "0 <= l < (int)8";
+                  __gen_e_acsl_assert_data_9.file = "loop.i";
+                  __gen_e_acsl_assert_data_9.fct = "nested_loops";
+                  __gen_e_acsl_assert_data_9.line = 19;
+                  __gen_e_acsl_assert_data_9.name = "index out of bounds";
+                  __e_acsl_assert(__gen_e_acsl_and_7,
+                                  & __gen_e_acsl_assert_data_9);
+                  __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+                }
                 if ((long)t[__gen_e_acsl_k_2][__gen_e_acsl_l_2] == __gen_e_acsl_k_2 * (long)__gen_e_acsl_l_2) 
                   ;
                 else {
@@ -307,39 +287,39 @@ void nested_loops(void)
             __gen_e_acsl_k_2 ++;
           }
           e_acsl_end_loop2: ;
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                        "\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l",
                                        0,__gen_e_acsl_forall_2);
-          __gen_e_acsl_assert_data_9.blocking = 1;
-          __gen_e_acsl_assert_data_9.kind = "Invariant";
-          __gen_e_acsl_assert_data_9.pred_txt = "\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l";
-          __gen_e_acsl_assert_data_9.file = "loop.i";
-          __gen_e_acsl_assert_data_9.fct = "nested_loops";
-          __gen_e_acsl_assert_data_9.line = 19;
-          __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_9);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+          __gen_e_acsl_assert_data_7.blocking = 1;
+          __gen_e_acsl_assert_data_7.kind = "Invariant";
+          __gen_e_acsl_assert_data_7.pred_txt = "\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l";
+          __gen_e_acsl_assert_data_7.file = "loop.i";
+          __gen_e_acsl_assert_data_7.fct = "nested_loops";
+          __gen_e_acsl_assert_data_7.line = 19;
+          __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_7);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         }
       }
     }
     {
-      int __gen_e_acsl_and_4;
+      int __gen_e_acsl_and_8;
       i ++;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"i",0,i);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"i",0,i);
       if (0 <= i) {
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"i",0,i);
-        __gen_e_acsl_and_4 = i <= 4;
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"i",0,i);
+        __gen_e_acsl_and_8 = i <= 4;
       }
-      else __gen_e_acsl_and_4 = 0;
-      __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "Invariant";
-      __gen_e_acsl_assert_data_14.pred_txt = "0 <= i <= 4";
-      __gen_e_acsl_assert_data_14.file = "loop.i";
-      __gen_e_acsl_assert_data_14.fct = "nested_loops";
-      __gen_e_acsl_assert_data_14.line = 15;
-      __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_14);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
+      else __gen_e_acsl_and_8 = 0;
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "Invariant";
+      __gen_e_acsl_assert_data_10.pred_txt = "0 <= i <= 4";
+      __gen_e_acsl_assert_data_10.file = "loop.i";
+      __gen_e_acsl_assert_data_10.fct = "nested_loops";
+      __gen_e_acsl_assert_data_10.line = 15;
+      __e_acsl_assert(__gen_e_acsl_and_8,& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
   }
   return;

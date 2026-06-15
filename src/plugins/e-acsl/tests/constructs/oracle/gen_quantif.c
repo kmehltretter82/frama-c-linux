@@ -1301,21 +1301,31 @@ int __gen_e_acsl_implicitly_labelled_here(void)
   while (1) {
     if (__gen_e_acsl_i_15 <= 1U) ; else break;
     {
+      int __gen_e_acsl_and_19;
       int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_5;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_37 =
         {.values = (void *)0};
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_37,
-                                    "__gen_e_acsl_i_15",0,__gen_e_acsl_i_15);
-      __gen_e_acsl_assert_data_37.blocking = 1;
-      __gen_e_acsl_assert_data_37.kind = "RTE";
-      __gen_e_acsl_assert_data_37.pred_txt = "__gen_e_acsl_i_15 < 2";
-      __gen_e_acsl_assert_data_37.file = "quantif.i";
-      __gen_e_acsl_assert_data_37.fct = "implicitly_labelled_here";
-      __gen_e_acsl_assert_data_37.line = 18;
-      __gen_e_acsl_assert_data_37.name = "index_bound";
-      __e_acsl_assert(__gen_e_acsl_i_15 < 2U,& __gen_e_acsl_assert_data_37);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_37);
+      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_37,"i",0,
+                                    __gen_e_acsl_i_15);
+      if (0U <= __gen_e_acsl_i_15) {
+        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_37,"i",0,
+                                      __gen_e_acsl_i_15);
+        __gen_e_acsl_and_19 = __gen_e_acsl_i_15 < 2U;
+      }
+      else __gen_e_acsl_and_19 = 0;
+      /*@ assert E_ACSL: "index out of bounds": 0 <= i < (int)2; */
+      {
+        __gen_e_acsl_assert_data_37.blocking = 1;
+        __gen_e_acsl_assert_data_37.kind = "RTE";
+        __gen_e_acsl_assert_data_37.pred_txt = "0 <= i < (int)2";
+        __gen_e_acsl_assert_data_37.file = "quantif.i";
+        __gen_e_acsl_assert_data_37.fct = "implicitly_labelled_here";
+        __gen_e_acsl_assert_data_37.line = 18;
+        __gen_e_acsl_assert_data_37.name = "index out of bounds";
+        __e_acsl_assert(__gen_e_acsl_and_19,& __gen_e_acsl_assert_data_37);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_37);
+      }
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_38 =
         {.values = (void *)0};
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[__gen_e_acsl_i_15],

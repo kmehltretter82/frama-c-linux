@@ -15,7 +15,7 @@ let dkey = Options.Dkey.rte
 module Guards =
 struct
 
-  module Terms = Misc.Id_term.Hashtbl
+  module Terms = Terms.Id.Hashtbl
 
   let tbl = Terms.create 10
 
@@ -25,10 +25,20 @@ struct
       | Some preds -> Terms.replace tbl t (pred :: preds)
       | None -> Terms.add tbl t [pred]
 
+  let add_list t preds =
+    match Terms.find_opt tbl t with
+    | Some preds' -> Terms.replace tbl t (preds @ preds')
+    | None -> Terms.add tbl t preds
+
   let apply ~default t f =
     match Terms.find_opt tbl t with
     | Some preds -> f preds
     | _ -> default
+
+  let copy t_src t_dst =
+    match Terms.find_opt tbl t_src with
+    | Some preds -> add_list t_dst preds
+    | None -> ()
 
   let remove t = Terms.remove tbl t
 
@@ -48,8 +58,6 @@ end
 module Flags =
 struct
 
-  let removes_trivial () = Options.O.get () > 0
-
   (** [needs_div_mod ()] @return:
       - [true] if the option [-rte-div] from the RTE plugin is used (default);
       - [false] if the option [-rte-no-div] from the RTE plugin is used. *)
@@ -58,11 +66,20 @@ struct
     then RteGen.Options.DoDivMod.get ()
     else true
 
+  (** [needs_mem_access ()] @return:
+      - [true] if the option [-rte-mem] from the RTE plugin is used (default);
+      - [false] if the option [-rte-no-mem] from the RTE plugin is used; *)
+  let needs_mem_access () =
+    if RteGen.Options.DoMemAccess.is_set ()
+    then RteGen.Options.DoMemAccess.get ()
+    else true
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
     each kind of undefined behavior listed below:
-    - division by zero *)
+    - division by zero
+    - memory access (read)
+    - index out of bounds *)
 module Undefined_behaviours =
 struct
 
@@ -74,11 +91,9 @@ struct
       is not equal to [Z.zero]. The guard does not contain directly [divider]
       but a copy of it. *)
   let div_by_zero ~loc divider =
-    let smart = Flags.removes_trivial () in
-    let divider_cpy = Smart_term.copy ~smart divider in
+    let divider_cpy = Smart_term.copy divider in
     let pred =
       Smart_predicate.prel
-        ~smart
         ~loc
         ~names:["division by zero"]
         Rneq
@@ -88,6 +103,34 @@ struct
     preprocess_guard pred;
     pred
 
+  (** [mem_access ~loc lv] creates the predicate that checks if [lv] is a
+       valid read. *)
+  let mem_access ~loc lv =
+    let addr = Terms.mk_TAddrOrTStartOf ~loc lv in
+    let pred =
+      Logic_const.pvalid_read
+        ~loc
+        ~names:["memory access"]
+        (Logic_const.here_label, addr)
+    in
+    preprocess_guard pred;
+    pred
+
+  (** [index_bound ~loc t size] creates the predicate that check if [t] is
+      between [Z.zero] and the array's upper bound regards of its [size]. *)
+  let index_bound ~loc t size =
+    let t_cpy_1 = Smart_term.copy t in
+    let t_cpy_2 = Smart_term.copy t in
+    let pred =
+      Smart_predicate.pand
+
+        ~loc
+        ~names:["index out of bounds"]
+        (Smart_predicate.prel Rle (Logic_const.tint Z.zero) t_cpy_1)
+        (Smart_predicate.prel Rlt t_cpy_2 (Logic_utils.expr_to_term size))
+    in
+    preprocess_guard pred;
+    pred
 end
 
 let rte_visitor =
@@ -102,19 +145,91 @@ let rte_visitor =
         Guards.add orig
           (Undefined_behaviours.div_by_zero ~loc:orig.term_loc divider)
 
+    (** [add_index ~index size] adds [index] as key in [table] with a
+            guard that checks if [index] is between [0] (included) and [size]
+            (excluded). *)
+    method private add_index ~index size =
+      Guards.add index
+        (Undefined_behaviours.index_bound ~loc:index.term_loc index size)
+
+    (**
+       [add_mem_access ~orig lv] checks if the lvalue [lv] is a
+       variable or a dereference (other cases are not checked). In both, it
+       calls the function [unroll_offset] with the information of being a
+       dereference or not through the [~is_deref] argument.
+    *)
+    method private add_mem_access ~orig lv =
+      let rec unroll_offset ~is_deref off typ =
+        match off with
+        | TNoOffset when is_deref ->
+          Guards.add orig
+            (Undefined_behaviours.mem_access ~loc:orig.term_loc lv)
+        | TIndex (index, off) ->
+          begin match Ast_types.C.unroll_node typ with
+            | TArray (typ, Some size) ->
+              self#add_index ~index size;
+              unroll_offset ~is_deref off typ
+            (* if no size provided, then we act as it is a dereferencement. *)
+            | TArray (typ, None) -> unroll_offset ~is_deref:true off typ
+            | _ ->
+              Options.abort "%a is type %a but should be type array"
+                Printer.pp_term_lval lv
+                Printer.pp_typ typ
+          end
+        | TField (fi, off) -> unroll_offset ~is_deref off fi.ftype
+        | _ -> ()
+      in
+      if Flags.needs_mem_access () then
+        match lv with
+        | TVar v, off ->
+          begin match v.lv_type with
+            | Ctype typ -> unroll_offset ~is_deref:false off typ
+            | _ -> ()
+          end
+        | TMem lh, off ->
+          if not @@ Ast_types.Acsl.is_plain_fun @@ Cil.typeOfTermLval lv
+          then begin
+            try
+              unroll_offset ~is_deref:true off @@
+              Ast_types.C.direct_pointed @@
+              Ast_types.Acsl.get_ctype lh.term_type
+            with  | _ ->
+              Options.abort "%a is dereferenced but it is a not pointer type %a"
+                Printer.pp_term_lval lv
+                Printer.pp_logic_type lh.term_type
+          end
+        | _ -> ()
+
+    method add_array_comparison tl tr =
+      let both x y f = f x; f y in
+      both tl tr @@ fun t ->
+      let rt =
+        Logic_const.term
+          ~loc:t.term_loc
+          (TLval (Smart_term.trange_array ~loc:t.term_loc t))
+          (Ast_types.Acsl.direct_array_element t.term_type)
+      in
+      ignore @@ self#vterm rt;
+      Guards.copy rt t
+
     method !vterm t =
       begin match t.term_node with
         | TBinOp ((Div | Mod),_,divider) -> self#add_div_mod ~orig:t divider
+        | TLval lv -> self#add_mem_access ~orig:t lv
         | _ -> ()
       end;
       Cil.DoChildren
 
     method !vpredicate p =
-      begin match p.pred_content with
-        | Paligned (_,v) -> self#add_div_mod ~orig:v v
-        | _ -> ()
-      end;
-      Cil.DoChildren
+      match p.pred_content with
+      | Paligned (_,v) ->
+        self#add_div_mod ~orig:v v;
+        Cil.DoChildren
+      | Prel((Req | Rneq),t1,t2) when Logic_utils.is_C_array t1 &&
+                                      Logic_utils.is_C_array t2 ->
+        self#add_array_comparison t1 t2;
+        Cil.SkipChildren
+      | _ -> (); Cil.DoChildren
   end
 
 let preprocess ast =
