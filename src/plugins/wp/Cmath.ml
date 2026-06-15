@@ -222,14 +222,14 @@ let builtin_sqrt_leq = builtin_positive_leq f_sqrt
 (* --- Exponential                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_exp = f_builtin ~injective:true "\\exp" ~link:"real.ExpLog.exp"
-let f_log = f_builtin "\\log" ~link:"real.ExpLog.log"
-let f_log10 = f_builtin "\\log10" ~link:"real.ExpLog.log10"
-let f_power = f_builtin ~params:[R;Z] "\\pow" ~link:"real.PowerInt.power"
-let f_pow = f_builtin ~params:[R;R] "\\pow" ~link:"real.PowerReal.pow"
+let f_exp = f_builtin ~injective:true "\\exp" ~link:"frama_c_wp.cmath.ExpLog.exp"
+let f_log = f_builtin "\\log" ~link:"frama_c_wp.cmath.ExpLog.log"
+let f_log10 = f_builtin "\\log10" ~link:"frama_c_wp.cmath.ExpLog.log10"
+let f_pow = f_builtin ~params:[R;R] "\\pow" ~link:"frama_c_wp.cmath.ExpLog.pow"
+let f_power_int = f_builtin ~params:[R;Z] "\\pow" ~link:"real.PowerInt.power"
 
 let () = ignore f_log10
-let () = ignore f_power
+let () = ignore f_power_int
 
 let domain_exp _x = true
 let domain_log x = QED.eval_lt e_zero_real x
