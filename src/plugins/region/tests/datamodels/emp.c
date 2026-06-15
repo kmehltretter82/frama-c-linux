@@ -1,0 +1,8 @@
+
+/*@
+datamodel emp {
+  mfield;
+}
+*/
+
+
