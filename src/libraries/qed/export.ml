@@ -330,7 +330,6 @@ struct
       method virtual e_false : cmode -> string
       method virtual pp_int : amode -> Z.t printer
       method virtual pp_real : Q.t printer
-      method virtual is_atomic : term -> bool
 
       (* -------------------------------------------------------------------------- *)
       (* --- Calls                                                              --- *)
@@ -361,7 +360,7 @@ struct
       method private pp_unop ~op fmt x =
         match op with
         | Assoc op | Op op ->
-          if self#op_spaced op (*&& self#is_atomic x*) then
+          if self#op_spaced op then
             fprintf fmt "%s %a" op self#pp_flow x
           else
             fprintf fmt "%s%a" op self#pp_atom x
@@ -735,8 +734,9 @@ struct
           | _ -> fprintf fmt "(%a=%s)" self#pp_do_atom e (self#e_true Cterm)
         else pp fmt e
 
-      method private is_atom e =
+      method is_atomic e =
         match T.repr e with
+        | True | False | Fvar _ | Bvar _ | Fun(_,[]) -> true
         | Fun(f, _) ->
           begin
             match self#link f with
@@ -744,14 +744,16 @@ struct
             | F_assoc _ -> false
             | F_call _ -> self#callstyle <> CallApply
           end
-        | Aget(a,_) -> self#is_atom a
-        | Rget(a,_) -> self#is_atom a
-        | _ -> self#is_atomic e
+        | Acst _ | Rdef _ -> true
+        | Aget(a,_) | Aset(a,_,_) | Rget(a,_) -> self#is_atomic a
+        | Kint z -> Z.leq Z.zero z
+        | Kreal q -> Q.leq Q.zero q
+        | _ -> Tmap.mem e index.share
 
       method private pp_do_atom fmt e =
         try self#pp_var fmt (Tmap.find e index.share)
         with Not_found ->
-          if self#is_atom e
+          if self#is_atomic e
           then self#pp_repr fmt e
           else fprintf fmt "@[<hov 1>(%a)@]" self#pp_repr e ;
           match self#op_scope_for e with

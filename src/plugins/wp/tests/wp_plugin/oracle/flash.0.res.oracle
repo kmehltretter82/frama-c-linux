@@ -61,13 +61,12 @@ Assume {
   Have: (a_5 = a_8) /\ (L_OBSERVER(x_5) = [ a_1 ]) /\
       (x_7 = L_WR_value(a_2, L_WR_access(L_INDEX_init, a_2))).
   (* Call 'RD' *)
-  Have: (a_6 = L_RD_current(RD_time_0)) /\
-      (L_OBSERVER(x_3) = ([ a_1, a_3 ])).
+  Have: (a_6 = L_RD_current(RD_time_0)) /\ (L_OBSERVER(x_3) = [ a_1, a_3 ]).
   (* Call 'WR' *)
   Have: (L_WR_update(L_INDEX_init, a_2) = L_WR_current(x_2)) /\
-      (L_OBSERVER(OBSERVER_time_0) = ([ a_1, a_3, a_4 ])).
+      (L_OBSERVER(OBSERVER_time_0) = [ a_1, a_3, a_4 ]).
   (* Call 'RD' *)
-  Have: (L_OBSERVER(x) = ([ a_1, a_3, a_4, a_1 ])) /\
+  Have: (L_OBSERVER(x) = [ a_1, a_3, a_4, a_1 ]) /\
       (a_7 = L_RD_current(x_1)).
 }
 Prove: L_RD_access(a_7, a) = 2.
@@ -113,13 +112,12 @@ Assume {
   Have: (a_5 = a_8) /\ (L_OBSERVER(x_5) = [ a_1 ]) /\
       (x_7 = L_WR_value(a_2, L_WR_access(L_INDEX_init, a_2))).
   (* Call 'RD' *)
-  Have: (a_6 = L_RD_current(RD_time_0)) /\
-      (L_OBSERVER(x_3) = ([ a_1, a_3 ])).
+  Have: (a_6 = L_RD_current(RD_time_0)) /\ (L_OBSERVER(x_3) = [ a_1, a_3 ]).
   (* Call 'WR' *)
   Have: (L_WR_update(L_INDEX_init, a_2) = L_WR_current(x_2)) /\
-      (L_OBSERVER(OBSERVER_time_0) = ([ a_1, a_3, a_4 ])).
+      (L_OBSERVER(OBSERVER_time_0) = [ a_1, a_3, a_4 ]).
   (* Call 'RD' *)
-  Have: (L_OBSERVER(x) = ([ a_1, a_3, a_4, a_1 ])) /\
+  Have: (L_OBSERVER(x) = [ a_1, a_3, a_4, a_1 ]) /\
       (a_7 = L_RD_current(x_1)).
 }
 Prove: L_RD_access(a_7, a_2) = 1.
@@ -164,12 +162,12 @@ Assume {
   Have: (a_5 = a_8) /\ (L_OBSERVER(x_5) = [ a_1 ]) /\
       (x_7 = L_WR_value(a_2, L_WR_access(L_INDEX_init, a_2))).
   (* Call 'RD' *)
-  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = ([ a_1, a_3 ])).
+  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = [ a_1, a_3 ]).
   (* Call 'WR' *)
   Have: (a_7 = L_WR_current(x_1)) /\
-      (L_OBSERVER(OBSERVER_time_0) = ([ a_1, a_3, a_4 ])).
+      (L_OBSERVER(OBSERVER_time_0) = [ a_1, a_3, a_4 ]).
   (* Call 'RD' *)
-  Have: (L_OBSERVER(x) = ([ a_1, a_3, a_4, a_1 ])) /\
+  Have: (L_OBSERVER(x) = [ a_1, a_3, a_4, a_1 ]) /\
       (L_RD_update(a_6, a) = L_RD_current(RD_time_0)).
 }
 Prove: L_WR_access(a_7, a_2) = 1.
@@ -214,12 +212,12 @@ Assume {
   Have: (a_5 = a_7) /\ (L_OBSERVER(x_5) = [ a_1 ]) /\
       (x_7 = L_WR_value(a_2, L_WR_access(L_INDEX_init, a_2))).
   (* Call 'RD' *)
-  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = ([ a_1, a_3 ])).
+  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = [ a_1, a_3 ]).
   (* Call 'WR' *)
   Have: (L_WR_update(L_INDEX_init, a_2) = L_WR_current(x_1)) /\
-      (L_OBSERVER(OBSERVER_time_0) = ([ a_1, a_3, a_4 ])).
+      (L_OBSERVER(OBSERVER_time_0) = [ a_1, a_3, a_4 ]).
   (* Call 'RD' *)
-  Have: (L_OBSERVER(x) = ([ a_1, a_3, a_4, a_1 ])) /\
+  Have: (L_OBSERVER(x) = [ a_1, a_3, a_4, a_1 ]) /\
       (L_RD_update(a_6, a) = L_RD_current(RD_time_0)).
 }
 Prove: x_12 = (L_RD_value(a, 0) + L_RD_value(a, 1) + L_RD_value(a_2, 0)).
@@ -263,12 +261,12 @@ Assume {
   Have: (a_5 = a_7) /\ (L_OBSERVER(x_5) = [ a_1 ]) /\
       (x_7 = L_WR_value(a_2, L_WR_access(L_INDEX_init, a_2))).
   (* Call 'RD' *)
-  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = ([ a_1, a_3 ])).
+  Have: (a_6 = L_RD_current(x_2)) /\ (L_OBSERVER(x_3) = [ a_1, a_3 ]).
   (* Call 'WR' *)
   Have: (L_WR_update(L_INDEX_init, a_2) = L_WR_current(x_1)) /\
-      (L_OBSERVER(OBSERVER_time_0) = ([ a_1, a_3, a_4 ])).
+      (L_OBSERVER(OBSERVER_time_0) = [ a_1, a_3, a_4 ]).
   (* Call 'RD' *)
-  Have: (L_OBSERVER(x) = ([ a_1, a_3, a_4, a_1 ])) /\
+  Have: (L_OBSERVER(x) = [ a_1, a_3, a_4, a_1 ]) /\
       (L_RD_update(a_6, a) = L_RD_current(RD_time_0)).
 }
 Prove: (L_RD_value(a, 0) + L_RD_value(a_2, 0)) = L_WR_value(a_2, 0).

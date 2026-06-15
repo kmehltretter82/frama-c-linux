@@ -388,7 +388,9 @@ struct
     Format.fprintf fmt "%a with:@." pp_id e ;
     pp_debug (ref Intset.empty) fmt e
 
-  let pretty = debug
+  let printer = ref debug
+
+  let pretty fmt t = !printer fmt t
 
   (* -------------------------------------------------------------------------- *)
   (* --- Symbols                                                            --- *)

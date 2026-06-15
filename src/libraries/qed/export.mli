@@ -81,11 +81,11 @@ sig
       method virtual pp_int : amode -> Z.t printer
       method virtual pp_real : Q.t printer
 
-      method virtual is_atomic : term -> bool
       method virtual op_spaced : string -> bool
       method virtual callstyle : callstyle
       method virtual pp_apply : cmode -> term -> term list printer
       method pp_fun : cmode -> Fun.t -> term list printer
+      method is_atomic : term -> bool
 
       method virtual op_scope : amode -> string option
       method virtual op_real_of_int : op

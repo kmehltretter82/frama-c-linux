@@ -833,6 +833,7 @@ struct
     end
 
   let debugp = QED.debug
+  let () = QED.printer := pp_term
 
   type env = Pretty.env
   let env xs = Pretty.known Pretty.empty xs

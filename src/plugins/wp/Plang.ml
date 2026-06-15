@@ -135,13 +135,6 @@ class engine =
     (* --- Atomicity --- *)
 
     method callstyle = CallVar
-    method is_atomic e =
-      match F.repr e with
-      | Kint z -> Z.leq Z.zero z
-      | Kreal _ -> true
-      | Apply _ -> true
-      | Aset _ | Aget _ | Fun _ -> true
-      | _ -> F.is_simple e
 
     (* --- Operators --- *)
 
@@ -217,6 +210,11 @@ class engine =
       end
 
     (* --- Lists --- *)
+
+    method! is_atomic e =
+      match F.repr e with
+      | Fun(fct,_) when Vlist.f_concat @= fct -> true
+      | _ -> super#is_atomic e
 
     method! pp_fun cmode fct ts =
       if Vlist.f_elt    @= fct then Vlist.elements self ts else

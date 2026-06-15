@@ -27,7 +27,7 @@ Assume {
   (* Goal *)
   When: .0 <= r.
   (* Pre-condition *)
-  Have: (r <= 10.0) /\ (-10.0 <= r).
+  Have: (r <= 10.0) /\ ((-10.0) <= r).
   (* Then *)
   Have: a != 0.
 }

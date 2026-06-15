@@ -9,42 +9,42 @@
 ------------------------------------------------------------
 
 Goal Check Lemma 'test2_ko':
-Prove: L_x_bar(i, s) != ([ i ] ^ s).
+Prove: L_x_bar(i, s) != [ i ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'test2_ok':
-Prove: L_x_bar(i, s) = ([ i ] ^ s).
+Prove: L_x_bar(i, s) = [ i ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'test_ko':
-Prove: L_bar(i, s) != ([ i ] ^ s).
+Prove: L_bar(i, s) != [ i ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'test_ok':
-Prove: L_bar(i, s) = ([ i ] ^ s).
+Prove: L_bar(i, s) = [ i ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'testp2_ko':
-Prove: L_x_foo(a, s) != ([ a ] ^ s).
+Prove: L_x_foo(a, s) != [ a ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'testp2_ok':
-Prove: L_x_foo(a, s) = ([ a ] ^ s).
+Prove: L_x_foo(a, s) = [ a ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'testp_ko':
-Prove: L_foo(a, s) != ([ a ] ^ s).
+Prove: L_foo(a, s) != [ a ] ^ s.
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'testp_ok':
-Prove: L_foo(a, s) = ([ a ] ^ s).
+Prove: L_foo(a, s) = [ a ] ^ s.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

@@ -63,7 +63,7 @@ Assume {
   (* Then *)
   Have: i < n.
   (* Call 'f' *)
-  Have: L_sequence(calls_2) = (a ^ [ 1 ]).
+  Have: L_sequence(calls_2) = a ^ [ 1 ].
   (* Call 'g' *)
   Have: L_sequence(calls_3) = a_1.
   (* Invariant *)
@@ -158,7 +158,7 @@ Assume {
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
   (* Invariant *)
-  Have: L_sequence(calls_2) = (a_1 ^ [ 1 ]).
+  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
   (* Else *)
   Have: n <= i.
   (* Call 'g' *)
@@ -206,13 +206,13 @@ Assume {
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
   (* Invariant *)
-  Have: L_sequence(calls_2) = (a_1 ^ [ 1 ]).
+  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
   Have: L_sequence(calls_3) = a_2.
   (* Call 'f' *)
-  Have: L_sequence(calls_4) = (a_1 ^ [ 1, 2, 1 ]).
+  Have: L_sequence(calls_4) = a_1 ^ [ 1, 2, 1 ].
   (* Invariant *)
   Have: (-1) <= i.
 }

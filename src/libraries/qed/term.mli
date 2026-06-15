@@ -22,6 +22,9 @@ module Make
     (** Prints term in debug mode. *)
     val debug : Format.formatter -> term -> unit
 
+    (** Printer for pretty, defaults to debug. *)
+    val printer : (Format.formatter -> term -> unit) ref
+
     (** {2 Global State}
         One given [term] has valid meaning only for one particular state. *)
 

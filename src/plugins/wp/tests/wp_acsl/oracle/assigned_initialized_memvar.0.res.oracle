@@ -285,7 +285,7 @@ Assume {
   If i_1 = 0
   Then {
     Have: Init_s_1 = Init_s_2.
-    Have: ({ Init_s_2 with Init_F1_S_a = Init_s_2.Init_F1_S_a[0 <- true] }) =
+    Have: { Init_s_2 with Init_F1_S_a = Init_s_2.Init_F1_S_a[0 <- true] } =
         Init_s_0.
   }
   Else {
@@ -293,7 +293,7 @@ Assume {
     If i_1 = 2
     Then {
       Have: (Init_s_3 = Init_s_4) /\ (s_1 = s_2).
-      Have: ({ Init_s_4 with Init_F1_S_a = Init_s_4.Init_F1_S_a[2 <- true] }) =
+      Have: { Init_s_4 with Init_F1_S_a = Init_s_4.Init_F1_S_a[2 <- true] } =
           Init_s_0.
     }
     Else {
@@ -301,8 +301,8 @@ Assume {
       If i_1 = 4
       Then {
         Have: Init_s_5 = Init_s_6.
-        Have: ({ Init_s_6 with Init_F1_S_a = Init_s_6.Init_F1_S_a[4 <- true]
-                 }) = Init_s_0.
+        Have: { Init_s_6 with Init_F1_S_a = Init_s_6.Init_F1_S_a[4 <- true] } =
+            Init_s_0.
       }
       Else { Have: Init_s_5 = Init_s_0. }
     }

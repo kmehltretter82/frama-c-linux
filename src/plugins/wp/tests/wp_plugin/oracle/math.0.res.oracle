@@ -217,7 +217,7 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'sin_asin' in 'ok':
-Assume { (* Goal *) When: (r <= 1.0) /\ (-1.0 <= r). }
+Assume { (* Goal *) When: (r <= 1.0) /\ ((-1.0) <= r). }
 Prove: sin(asin(r)) = r.
 
 ------------------------------------------------------------
@@ -228,7 +228,7 @@ Let r_1 = cos(r). Prove: sin(asin(r_1)) = r_1.
 ------------------------------------------------------------
 
 Goal Post-condition 'cos_acos' in 'ok':
-Assume { (* Goal *) When: (r <= 1.0) /\ (-1.0 <= r). }
+Assume { (* Goal *) When: (r <= 1.0) /\ ((-1.0) <= r). }
 Prove: cos(acos(r)) = r.
 
 ------------------------------------------------------------
