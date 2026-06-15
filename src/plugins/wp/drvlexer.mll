@@ -29,7 +29,6 @@
     | LINK of string
 
   let keywords = [
-    "library" , KEY "library" ;
     "type" , KEY "type" ;
     "ctor" , KEY "ctor" ;
     "logic" , KEY "logic" ;
