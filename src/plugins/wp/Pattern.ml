@@ -418,7 +418,7 @@ let rec pmatch env (p : pattern) e =
     pmatch env pa a ; pmatch env pk k ; pmatch env pv v
   | Field(pv,fid) , Rget(v,fd) when Lang.Field.name fd = fid ->
     pmatch env pv v
-  | Call(fid,ps,trail) , Fun(lf,es) when Lang.Fun.fullname lf = fid ->
+  | Call(fid,ps,trail) , Fun(lf,es) when Lang.Fun.name lf = fid ->
     begin
       match Lang.Fun.category lf with
       | Operator op ->
@@ -641,7 +641,7 @@ let psequent ctxt sigma (seq : Conditions.sequent) =
 
 let () = Lang.on_lfun
     begin fun lf ->
-      let id = "lf:" ^ Lang.Fun.fullname lf in
+      let id = "lf:" ^ Lang.Fun.name lf in
       Tactical.add_computer id (Lang.F.e_fun lf)
     end
 
