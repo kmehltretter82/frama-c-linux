@@ -28,7 +28,7 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let has_fc_builtin_attr v = Ast_attributes.contains "FC_BUILTIN" v.vattr
+let has_fc_builtin_attr v = Ast_attributes.(contains fc_builtin v.vattr)
 
 (* [VP] Should we projectify this ?*)
 let special_builtins_table = ref Datatype.String.Set.empty
@@ -66,8 +66,6 @@ module Builtin_functions =
    [b] is true if the built-in is variadic, false otherwise. *)
 let add_builtin ?(prefix="__builtin_") s t l b =
   Builtin_functions.add (prefix ^ s) (t, l, b)
-
-let () = Ast_attributes.register (AttrName true) "FC_BUILTIN"
 
 let custom_builtins = Queue.create ()
 

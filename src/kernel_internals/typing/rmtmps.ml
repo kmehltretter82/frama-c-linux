@@ -215,7 +215,7 @@ let hasExportingAttribute funvar =
 let isExportedRoot global =
   let result, reason = match global with
     | GVar ({vstorage = Static} as v, _, _) when
-        Ast_attributes.contains "FC_BUILTIN" v.vattr ->
+        Ast_attributes.(contains fc_builtin v.vattr) ->
       true, "FC_BUILTIN attribute"
     | GVar ({vstorage = Static}, _, _) ->
       false, "static variable"
@@ -234,17 +234,17 @@ let isExportedRoot global =
     | GFunDecl(_,v,_) when Ast_attributes.contains "alias" v.vattr ->
       true, "has GCC alias attribute"
     | GFunDecl(_,v,_) | GVarDecl(v,_) when
-        Ast_attributes.contains "FC_BUILTIN" v.vattr ->
+        Ast_attributes.(contains fc_builtin v.vattr) ->
       true, "has FC_BUILTIN attribute"
     | GAnnot _ -> true, "global annotation"
     | GType (t, _) when
-        Ast_attributes.contains "FC_BUILTIN" t.ttype.tattr ->
+        Ast_attributes.(contains fc_builtin t.ttype.tattr) ->
       true, "has FC_BUILTIN attribute"
     | GCompTag (c,_) | GCompTagDecl (c,_) when
-        Ast_attributes.contains "FC_BUILTIN" c.cattr ->
+        Ast_attributes.(contains fc_builtin c.cattr) ->
       true, "has FC_BUILTIN attribute"
     | GEnumTag (e, _) | GEnumTagDecl (e,_) when
-        Ast_attributes.contains "FC_BUILTIN" e.eattr ->
+        Ast_attributes.(contains fc_builtin e.eattr) ->
       true, "has FC_BUILTIN attribute"
     | _ ->
       false, "neither fundef nor vardef nor annotation"
@@ -320,7 +320,7 @@ class markReachableVisitor
       | GVarDecl (varinfo, _)
       | GFunDecl (_,varinfo, _)
       | GFun ({svar = varinfo}, _) ->
-        if not (Ast_attributes.contains "FC_BUILTIN" varinfo.vattr) then
+        if not (Ast_attributes.(contains fc_builtin varinfo.vattr)) then
           begin
             Kernel.debug ~dkey "marking reachable: function %s" varinfo.vname;
             InfoHashtbl.replace reachable_tbl (Var varinfo) true;
@@ -558,7 +558,7 @@ class markReferencedVisitor = object (self)
   val inside_typ : typ Stack.t = Stack.create ()
 
   method private reference varinfo loc =
-    if not (Ast_attributes.contains "FC_BUILTIN" varinfo.vattr) then begin
+    if not (Ast_attributes.(contains fc_builtin varinfo.vattr)) then begin
       Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
       Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
       varinfo.vreferenced <- true;
@@ -792,21 +792,21 @@ let removeUnmarked isRoot ast reachable_tbl =
     (* unused global types, variables, and functions are simply removed *)
     | GType (t, _) ->
       is_reachable reachable_tbl (Type t) ||
-      Ast_attributes.contains "FC_BUILTIN" t.ttype.tattr
+      Ast_attributes.(contains fc_builtin t.ttype.tattr)
       || isRoot global
     | GCompTag (c,_) | GCompTagDecl (c,_) ->
       is_reachable reachable_tbl (Comp c) ||
-      Ast_attributes.contains "FC_BUILTIN" c.cattr || isRoot global
+      Ast_attributes.(contains fc_builtin c.cattr) || isRoot global
     | GEnumTag (e, _) | GEnumTagDecl (e,_) ->
       is_reachable reachable_tbl (Enum e) ||
-      Ast_attributes.contains "FC_BUILTIN" e.eattr || isRoot global
+      Ast_attributes.(contains fc_builtin e.eattr) || isRoot global
     | GVar (v, _, _) ->
       is_reachable reachable_tbl (Var v) ||
-      Ast_attributes.contains "FC_BUILTIN" v.vattr || isRoot global
+      Ast_attributes.(contains fc_builtin v.vattr) || isRoot global
     | GVarDecl (v, _)
     | GFunDecl (_,v, _)->
       is_reachable reachable_tbl (Var v) ||
-      Ast_attributes.contains "FC_BUILTIN" v.vattr ||
+      Ast_attributes.(contains fc_builtin v.vattr) ||
       (if isRoot global then true else (Cil.removeFormalsDecl v; false))
     (* keep FC_BUILTIN, as some plug-ins might want to use them later
        for semi-legitimate reasons. *)
@@ -832,7 +832,7 @@ let removeUnmarked isRoot ast reachable_tbl =
       end
       in
       ((is_reachable reachable_tbl (Var func.svar))
-       || Ast_attributes.contains "FC_BUILTIN" func.svar.vattr
+       || Ast_attributes.(contains fc_builtin func.svar.vattr)
        || isRoot global) &&
       (ignore (Cil.visitCilBlock remove_blocals func.sbody);
        remove_unused_labels func;

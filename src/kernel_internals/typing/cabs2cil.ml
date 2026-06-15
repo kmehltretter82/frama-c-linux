@@ -2675,7 +2675,7 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
   cabsPushGlobal (GFunDecl (funspec, v, Cil_builtins.builtinLoc));
   Cil.unsafeSetFormalsDecl v args;
   if force_keep then
-    v.vattr <- Ast_attributes.add ("FC_BUILTIN",[]) v.vattr;
+    v.vattr <- Ast_attributes.(add (fc_builtin,[]) v.vattr);
   v
 
 (*  builtin is never ghost *)
@@ -8399,7 +8399,9 @@ and createGlobal loc ghost logic_spec
        coding rule MSC38-C" n
   end;
   let is_fc_builtin {Cabs.expr_node=enode} =
-    match enode with Cabs.VARIABLE "FC_BUILTIN" -> true | _ -> false
+    match enode with
+    | Cabs.VARIABLE v -> v = Ast_attributes.fc_builtin
+    | _ -> false
   in
   let is_fc_stdlib {Cabs.expr_node=enode} =
     match enode with

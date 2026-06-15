@@ -36,6 +36,9 @@ val anonymous_attribute : attribute
 (** Internal attributes of Frama-C.  *)
 val fc_internal_attributes : string list
 
+(** Attribute for Frama-C builtins *)
+val fc_builtin : string
+
 (** Attribute for globals in Frama-C's libc (extern or not) that are internal to
     Frama-C. *)
 val fc_stdlib_internal : string

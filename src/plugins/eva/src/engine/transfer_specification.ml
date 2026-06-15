@@ -522,7 +522,7 @@ module Make (Engine: Engine_Subset) = struct
         | FreeAllocAny -> ()
         | _ ->
           let vi = Kernel_function.get_vi kf in
-          if not (Ast_attributes.contains "FC_BUILTIN" vi.vattr) then
+          if not (Ast_attributes.(contains fc_builtin vi.vattr)) then
             Self.warning ~current:true ~once:true
               "ignoring unsupported allocates clause"
       ) behaviors
