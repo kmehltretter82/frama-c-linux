@@ -304,9 +304,9 @@ and cc_any env t =
   | Mul ts ->
     cc_arith env ~i:"int.Int.(*)" ~r:"real.Real.(*)" ts
   | Mod(a,b) ->
-    t_app env "int.ComputerDivision.mod" [ cc_term env a; cc_term env b ]
+    t_app env "frama_c_wp.cdiv.Cdiv.mod" [ cc_term env a; cc_term env b ]
   | Div(a,b) ->
-    cc_binop env ~i:"int.ComputerDivision.div" ~r:"real.Real.(/)" a b
+    cc_binop env ~i:"frama_c_wp.cdiv.Cdiv.div" ~r:"real.Real.(/)" a b
   | Lt (a,b) ->
     cc_binop env ~i:"int.Int.(<)" ~r:"real.Real.(<)" a b
   | Leq (a,b) ->

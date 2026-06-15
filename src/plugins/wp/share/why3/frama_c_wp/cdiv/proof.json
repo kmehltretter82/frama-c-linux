@@ -1,0 +1,19 @@
+{
+  "profile": [],
+  "proofs": {
+    "Cdiv": {
+      "cdiv_inv": { "prover": "z3", "time": 0.015 },
+      "cdiv_neutral": { "prover": "alt-ergo", "time": 0.02 },
+      "euclidian": { "prover": "alt-ergo", "time": 0.022 },
+      "remainder": { "prover": "alt-ergo", "time": 0.033 },
+      "remainder_ext": {
+        "tactic": "split_vc",
+        "children": [
+          { "prover": "alt-ergo", "time": 0.03 },
+          { "prover": "cvc5", "time": 0.148 },
+          { "prover": "alt-ergo", "time": 0.043 }
+        ]
+      }
+    }
+  }
+}

@@ -40,7 +40,7 @@ end
        addr -> addr, l1:addr, l2:addr.
        P_reachable malloc1 mptr1 l1 l2 -> not P_reachable malloc mptr l1 l2
     
-    (* use int.ComputerDivision *)
+    (* use frama_c_wp.cdiv.Cdiv *)
     
     inductive P_is_gcd int int int =
       | Q_P_is_gcd_gcd_zero : forall n:int. P_is_gcd n 0 n
@@ -99,7 +99,7 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use int.ComputerDivision *)
+    (* use frama_c_wp.cdiv.Cdiv *)
     
     inductive P_is_gcd1 int int int =
       | Q_P_is_gcd_gcd_zero1 : forall n:int. P_is_gcd1 n 0 n
@@ -116,7 +116,7 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use int.ComputerDivision *)
+    (* use frama_c_wp.cdiv.Cdiv *)
     
     inductive P_is_gcd2 int int int =
       | Q_P_is_gcd_gcd_zero2 : forall n:int. P_is_gcd2 n 0 n

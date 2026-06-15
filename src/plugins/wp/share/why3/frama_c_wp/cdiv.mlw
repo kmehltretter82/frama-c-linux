@@ -1,0 +1,36 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  SPDX-License-Identifier LGPL-2.1                                      *)
+(*  Copyright (C)                                                         *)
+(*  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  *)
+(*                                                                        *)
+(**************************************************************************)
+
+module Cdiv
+
+  use int.Int
+  use int.ComputerDivision as CD
+
+  function div (x y : int) : int = CD.div x y
+  function mod (x y : int) : int = CD.mod x y
+
+  lemma euclidian : forall n d:int [(div n d),(mod n d)].
+    d <> 0 -> n = div n d * d + mod n d
+
+  lemma remainder : forall n d:int [mod n d].
+    ((n >= 0) -> (d > 0) ->  0 <= mod n d <  d) /\
+    ((n <= 0) -> (d > 0) -> -d <  mod n d <= 0) /\
+    ((n >= 0) -> (d < 0) ->  0 <= mod n d < -d) /\
+    ((n <= 0) -> (d < 0) ->  d <  mod n d <= 0)
+
+  lemma cdiv_neutral : forall a:int [div a 1]. div a 1 = a
+  lemma cdiv_inv : forall a:int [div a a]. a<>0 -> div a a = 1
+
+  lemma remainder_ext :
+    forall a,b,n:int.
+    0 <= a -> 0 <= b -> 0 <= b-a < n ->
+    mod a n = mod b n -> a = b
+  by b - a = n * (div (b - a) n) + mod (b - a) n
+  so (div b n) - (div a n) = div (b - a) n
+
+end
