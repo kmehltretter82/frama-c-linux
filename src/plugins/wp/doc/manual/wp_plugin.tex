@@ -1672,17 +1672,6 @@ Summary of \textsf{WP} options related to probes and counter-examples generation
   avoid any clash with extensions from other plugins.
 \end{description}
 
-\subsection{Additional Proof Libraries}
-\label{prooflibs}
-
-It is possible to add additional bases of knowledge to decision
-procedures thanks to the following option:
-\begin{description}
-\item[\tt -wp-share <dir>] modifies the default directory where
-  resources are found.  This option can be useful for running a modified or
-  patched distribution of \textsf{WP}.
-\end{description}
-
 \subsection{Linking \textsf{ACSL} Symbols to External Libraries}
 \label{drivers}
 
@@ -1690,7 +1679,7 @@ procedures thanks to the following option:
 instead of using custom drivers. See Section~\ref{importer} for details.
 
 Besides additional proof libraries, it is also possible to
-\emph{link} declared \textsf{ACSL} symbols to external or predefined
+link declared \textsf{ACSL} symbols to external or predefined
 symbols. In such case, the corresponding \textsf{ACSL} definitions,
 if any, are not exported by \textsf{WP}s.
 
@@ -1700,86 +1689,44 @@ to load one or several drivers with the following \textsf{WP} plug-in option:
 \item[\tt -wp-driver <file,\ldots>] load specified driver files.
 \end{description}
 
+Declared logic types, constructors, logic functions and logic predicates can be
+linked to external Why3 library symbols, or aliased to other existing ACSL
+builtins or declared symbols.
+
 \newcommand{\ccc}{\texttt{,}\ldots\texttt{,}}
-\newcommand{\user}[1]{\texttt{"}\textit{#1}\texttt{"}}
+\newcommand{\user}{\texttt{"why3-symbol"}}
 Each driver file contains a list of bindings with the following syntax:
 \begin{center}
-  \begin{tabular}{|l}
-  \texttt{library} \user{lib}\verb':' \user{lib} \ldots \user{lib} \\
-  \quad\begin{tabular}{rll}
+  \begin{tabular}{|rlll}
   \rule{0em}{1.2em}
-  \textit{group}.\textit{field} &\texttt{:=} \textit{string} \\
-  \textit{group}.\textit{field} &\texttt{+=} \textit{string} \\
-  \texttt{type} & \textit{symbol} & \verb'=' \user{link} \verb';' \\
-  \texttt{ctor} & \textit{type} \textit{symbol}
-                   \verb'(' \textit{type}\ccc\textit{type} \verb')'
-                 & \verb'=' \user{link} \verb';' \\
-  \texttt{logic} & \textit{type} \textit{symbol}
-                   \verb'(' \textit{type}\ccc\textit{type} \verb')'
-                 & \verb'=' \textit{property-tags} \user{link} \verb';' \\
+  \texttt{type} & \textit{symbol} & \verb'='  \verb';' \\
   \texttt{predicate} & \textit{symbol}
                    \verb'(' \textit{type}\ccc\textit{type} \verb')'
-                 & \verb'=' \user{link} \verb';'
-  \end{tabular}
+                 & \verb'=' \user \verb';' \\
+  \texttt{ctor} & \textit{type} \textit{symbol}
+                   \verb'(' \textit{type}\ccc\textit{type} \verb')'
+                 & \verb'=' \user \verb';' \\
+  \texttt{logic} & \textit{type} \textit{symbol}
+                   \verb'(' \textit{type}\ccc\textit{type} \verb')'
+                 & \verb'=' \textit{property-tags} \user \verb';' \\
   \end{tabular}
 \end{center}
 
-It is also possible to define \emph{aliases} to other ACSL symbols, rather
+It is also possible to define \emph{aliases} with other ACSL symbols, rather
 than external links. In this case, you may replace \verb+=+ by
-\verb+:=+ and use an ACSL identifier in place of the external \user{link}.
+\verb+:=+ and use an ACSL identifier in place of the external \user.
 No property tag is allowed when defining aliases.
 
-Library specification is optional and applies to subsequent linked
-symbols. If provided, the \textsf{WP} plug-in automatically loads the
-specified external libraries when linked symbols are used in a
-goal. Dependencies among libraries can also be specified, after the
-'\verb':''.
-
-Generic \textit{group}.\textit{field} options have a specific
-value for each theory. The binding applies to the current theory.
-Binding with the \verb':=' operator
-resets the option to the singleton of the given string
-and binding with the \verb'+=' operator
-adds the given string to the current value of the option.
-The following options are defined by the plugin:
-\texttt{why3.file} and \texttt{why3.import}.
-
-\textsf{C}-Comments are allowed in the file. For overloaded
-\textsf{ACSL} symbols, it is necessary to provide one \user{link} symbol for
-each existing signature. The same \user{link} symbol is used for all provers,
-and must be defined in the specified libraries, or in the external
-ones (see~\ref{prooflibs}).
-
-Alternatively, a link-name can be an arbitrary string
-with patterns substituted by arguments, \verb="(%1+%2)"= for instance.
-
-When a library \user{lib} is specified, the loaded module depends on the
-option:
-\begin{center}\tt
-  \begin{tabular}{lll}
-    \textrm{Option} & \textrm{Format} \\
-    \hline
-    why3.file & \verb+path.why[:name][:as]+ \\
-    why3.import & \verb+theory[:as]+ \\
-  \end{tabular}
-\end{center}
-
-Precise meaning of formats is given by the following examples (all filenames are relatives to the driver file's directory):
-\begin{description}
-\item[\tt why3.file="mydir/foo.why"] Imports theory \verb+foo.Foo+ from directory \verb+mydir+.
-\item[\tt why3.file="mydir/foo.why:Bar"] Imports theory \verb+foo.Bar+ from directory \verb+mydir+.
-\item[\tt why3.file="mydir/foo.why:Bar:T"] Imports theory \verb+foo.Bar as T+ from directory \verb+mydir+.
-\item[\tt why3.import="foo.Bar"] Imports theory \verb+foo.Bar+ with no additional includes.
-\item[\tt why3.import="foo.Bar:T"] Imports theory \verb+foo.Bar as T+ with no additional includes.
-\end{description}
-
-See also the default \textsf{WP} driver file, in \verb+[wp-share]/wp.driver+.
+\textsf{C}-Comments are allowed in the file. For overloaded \textsf{ACSL}
+symbols, it is necessary to provide one \user symbol for each existing
+signature. See also the default \textsf{WP} driver file for examples of external
+links, in file \verb+wp.driver+ of the shared library.
 
 Optional \textit{property-tags} can be given to
-\texttt{logic} \user{link} symbols to allow the \textsf{WP} plugin to perform
+\texttt{logic} \user symbols to allow the \textsf{WP} plugin to perform
 additional simplifications (See section~\ref{wp-simplifier}).  Tags
 consist of an identifier with column (`\verb+:+'), sometimes followed
-by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-driver-tags}.
+by an ACSL symbol. The available tags are depicted on figure~\ref{wp-driver-tags}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1791,21 +1738,14 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
 \texttt{associative:} & specify an associative symbol:
                         $(x \odot y) \odot z = x \odot (y \odot z)$ \\
 \texttt{ac:} & shortcut for \texttt{associative:} \texttt{commutative:} \\
-\texttt{left:}  & balance the operator on left during export to solvers (requires the associative tag):
-                  $x \odot y \odot z = (x \odot y) \odot z$ \\
-\texttt{right:} & balance the operator on right during export to solvers (requires the associative tag):
-                      $x \odot y \odot z = x \odot (y \odot z)$ \\
-\texttt{absorbent:} \user{a-link}\texttt{:} & specify \user{a-link} as being the absorbent element of the symbol: \\
-                     & $\user{a-link} \odot x = \user{a-link}$ \\
-                     & $x \odot \user{a-link} = \user{a-link}$ \\
-\texttt{neutral:} \user{e-link}\texttt{:} & specify \user{e-link} as being the neutral element of the symbol: \\
-                     &  $\user{e-link} \odot x = x$ \\
-                     &  $x \odot \user{e-link} = x$ \\
+\texttt{absorbent} \textit{e}\texttt{:} & specify the ACSL absorbent element of the operator: \\
+                     & $e \odot x = x \odot e = e$ \\
+\texttt{neutral} \textit{e}\texttt{:} & specify the ACSL neutral element of the operator: \\
+                     &  $e \odot x = x \odot e = x$ \\
 \texttt{invertible:} & specify simplification relying on the existence of an inverse: \\
                      &  $x \odot y = x \odot z \Longleftrightarrow y = z$ \\
                      &  $y \odot x = z \odot x \Longleftrightarrow y = z$ \\
 \texttt{idempotent:} & specify an idempotent symbol: $x \odot x = x$ \\
-\hline
 \texttt{injective:} &  specify an injective function:\\
                       & $f(x_1,\ldots,x_n) = f(y_1,\ldots,y_n) \Longrightarrow \forall i \; x_i = y_i$ \\
 \texttt{constructor:} & specify an injective function, that constructs different values
