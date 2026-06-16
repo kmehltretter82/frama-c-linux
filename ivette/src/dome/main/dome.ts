@@ -732,7 +732,7 @@ export function start(): void {
   app.whenReady().then(() => {
     if (DEVEL) {
       installExtension(REACT_DEVELOPER_TOOLS)
-        .then((name) => console.log(`[Dome] Added Extension:  ${name}`))
+        .then((name) => console.log(`[Dome] Added Extension:  ${name.name}`))
         .catch((err) => console.warn('[Dome] Extension error: ', err));
     }
   });
