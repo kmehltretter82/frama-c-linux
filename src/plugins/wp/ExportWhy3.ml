@@ -317,14 +317,18 @@ and cc_any env t =
         let ts = List.map (cc_term env) ts in
         let tr = cc_tau env.context @@ Lang.F.typeof t in
         let ls = cc_lfun fn in
+        let call xs =
+          match ls.ls_value with
+          | None -> Why3.Term.t_app_infer ls xs
+          | Some _ -> Why3.Term.t_app ls xs tr
+        in
         if is_assoc fn then
           let rec foldop = function
             | [] -> failwith "Empty associative operator"
             | [a] -> a
-            | a::ops -> Why3.Term.t_app ls [a;foldop ops] tr
+            | a::ops -> call [a;foldop ops]
           in foldop ts
-        else
-          Why3.Term.t_app ls ts tr
+        else call ts
     end
   | Rget(e,fd) ->
     Why3.Term.t_app_infer (cc_field fd) [cc_term env e]
