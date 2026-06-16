@@ -100,7 +100,7 @@ let typeof = function
   | Term(_,lv) ->
     Ast_types.Acsl.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
 
-open Printer_tag
+open Server.Printer_tag
 
 let marker = function
   | Exp(stmt,e) | Ret(stmt,e) -> PExp(None,Kstmt stmt,e)

@@ -10,6 +10,7 @@ open Cil_types
 open Dive_types
 
 module Graph = Dive_graph
+module Printer_tag = Server.Printer_tag
 
 let dkey = Self.register_category "build"
 

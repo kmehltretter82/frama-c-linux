@@ -23,6 +23,7 @@ import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Locations from './Locations';
+import * as RichText from 'frama-c/richtext';
 
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
@@ -76,13 +77,15 @@ function textToTree(t: text): Tree | undefined {
       return [{ text: t, from, to }, to];
     }
     if (t.length < 2 || typeof t[0] !== 'string') return [undefined, from];
+    const [tag, rest] = RichText.extractSemanticTag(t);
     const children: Tree[] = []; let acc = from;
-    for (const child of t.slice(1)) {
+    for (const child of rest) {
       const [node, to] = aux(child, acc);
       if (node) children.push(node);
       acc = to;
     }
-    return [{ marker: Ast.jMarker(t[0]), from, to: acc, children }, acc];
+    const marker = tag && tag.kind === 'code' ? tag.marker : "";
+    return [{ marker: Ast.jMarker(marker), from, to: acc, children }, acc];
   }
   const [res] = aux(t, 0);
   return res;

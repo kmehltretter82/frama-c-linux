@@ -7,7 +7,6 @@
 }
 
 * {
-  user-select: none;
   box-sizing: border-box;
   margin: 0 ;
   padding: 0 ;
@@ -85,6 +84,7 @@ div.dome-dragged {
 /* --- Text Properties                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+/* Simple labels. */
 .dome-text-label {
     font-family: sans-serif ;
     user-select: none ;
@@ -92,6 +92,7 @@ div.dome-dragged {
     text-overflow: ellipsis ;
 }
 
+/* Title and headings. */
 .dome-text-title {
     font-family: sans-serif ;
     font-size: larger ;
@@ -101,6 +102,7 @@ div.dome-dragged {
     text-overflow: ellipsis ;
 }
 
+/* Description, textbook content. */
 .dome-text-descr {
     font-weight: lighter ;
     font-family: sans-serif ;
@@ -110,6 +112,7 @@ div.dome-dragged {
     text-overflow: ellipsis ;
 }
 
+/* Selectable textual information. */
 .dome-text-data {
     cursor: text ;
     user-select: text ;
@@ -118,6 +121,7 @@ div.dome-dragged {
     text-overflow: clip ;
 }
 
+/* Selectable inlined source-code content. */
 .dome-text-code {
     cursor: text ;
     user-select: text ;
@@ -127,6 +131,7 @@ div.dome-dragged {
     text-overflow: clip ;
 }
 
+/* Selectable inlined source-code content with default cursor. */
 .dome-text-cell {
     cursor: default ;
     user-select: text ;
@@ -136,6 +141,7 @@ div.dome-dragged {
     text-overflow: clip ;
 }
 
+/* Non-selectable inlined source-code content with default cursor. */
 .dome-text-item {
     cursor: default ;
     user-select: none ;
