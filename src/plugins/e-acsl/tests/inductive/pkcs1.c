@@ -2,7 +2,7 @@
    COMMENT: Formal Verification of PKCS#1 Signature Parser using Frama-C
    COMMENT: https://doi.org/10.1007/978-3-032-10794-7_17
    COMMENT: artificially rendered translatable: bound prev_pars, nest_prev_pars
-   STDOPT: +"-eva-unroll-recursive-calls 5"
+   STDOPT: +"-eva-unroll-recursive-calls 1"
 */
 
 #include "limits.h"
