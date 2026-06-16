@@ -38,38 +38,46 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
   {
     int __gen_e_acsl_initialized;
-    int __gen_e_acsl_and;
+    int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& q),
                                                     sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&q",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&q",
                                  (void *)(& q));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(int *)",0,sizeof(int *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\\initialized(&q)",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "uninitialized: \\initialized(&q)",0,
                                  __gen_e_acsl_initialized);
-    if (__gen_e_acsl_initialized) {
-      int __gen_e_acsl_valid;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
-                                          (void *)(& q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"q",
-                                   (void *)q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\valid(q)",
-                                   0,__gen_e_acsl_valid);
-      __gen_e_acsl_and = __gen_e_acsl_valid;
+    /*@ assert E_ACSL: uninitialized: \initialized(&q); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&q)";
+      __gen_e_acsl_assert_data_3.file = "t_fptr.c";
+      __gen_e_acsl_assert_data_3.fct = "main";
+      __gen_e_acsl_assert_data_3.line = 19;
+      __gen_e_acsl_assert_data_3.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
-    else __gen_e_acsl_and = 0;
+    __gen_e_acsl_valid = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
+                                        (void *)(& q));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"q",(void *)q);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\valid(q)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(q)";
     __gen_e_acsl_assert_data_2.file = "t_fptr.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 19;
-    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(q); */ ;

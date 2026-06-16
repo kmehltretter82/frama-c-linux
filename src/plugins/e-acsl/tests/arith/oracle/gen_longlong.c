@@ -11,7 +11,9 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
   unsigned long long __retres;
   int tmp;
   unsigned long long tmp_0;
+  __e_acsl_store_block((void *)(& __retres),8UL);
   if (n <= 1U) {
+    __e_acsl_full_init((void *)(& __retres));
     __retres = 1ULL;
     goto return_label;
   }
@@ -19,11 +21,17 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
   tmp = (int)tmp_0;
   tmp *= tmp;
   if (n % 2U == 0U) {
+    __e_acsl_full_init((void *)(& __retres));
     __retres = (unsigned long long)tmp;
     goto return_label;
   }
+  __e_acsl_full_init((void *)(& __retres));
   __retres = (unsigned long long)(x * (unsigned int)tmp);
-  return_label: return __retres;
+  return_label:
+  {
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
 }
 
 int main(void)
@@ -31,16 +39,43 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   unsigned long long x = my_pow(2U,63U);
+  __e_acsl_store_block((void *)(& x),8UL);
+  __e_acsl_full_init((void *)(& x));
   {
     __e_acsl_mpz_t __gen_e_acsl_;
+    int __gen_e_acsl_initialized;
     __e_acsl_mpz_t __gen_e_acsl_x;
     __e_acsl_mpz_t __gen_e_acsl_mul;
     __e_acsl_mpz_t __gen_e_acsl__2;
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl_mod;
-    long __gen_e_acsl_mod_2;
+    long __gen_e_acsl__3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_,2L);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
+                                                    sizeof(unsigned long long));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&x",
+                                 (void *)(& x));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(unsigned long long)",0,
+                                   sizeof(unsigned long long));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&x)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&x); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&x)";
+      __gen_e_acsl_assert_data_2.file = "longlong.i";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 19;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gmpz_init(__gen_e_acsl_x);
     __gmpz_import(__gen_e_acsl_x,1UL,1,8UL,0,0UL,(void const *)(& x));
     __gmpz_init(__gen_e_acsl_mul);
@@ -55,7 +90,7 @@ int main(void)
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __gen_e_acsl_mod_2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
+    __gen_e_acsl__3 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
     __e_acsl_assert_register_ulonglong(& __gen_e_acsl_assert_data,"x",0,x);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
@@ -63,7 +98,7 @@ int main(void)
     __gen_e_acsl_assert_data.file = "longlong.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 19;
-    __e_acsl_assert(__gen_e_acsl_mod_2 == 1L,& __gen_e_acsl_assert_data);
+    __e_acsl_assert(__gen_e_acsl__3 == 1L,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_x);
@@ -74,6 +109,7 @@ int main(void)
   }
   /*@ assert (2 * x + 1) % 2 == 1; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
 }

@@ -1,59 +1,155 @@
 EVERY ASSERTION SHOULD PRINT ITS DATA IN EXECUTION LOG
 printed_data.c: In function 'main'
+printed_data.c:69: RTE valid:
+	uninitialized:
+		\initialized(&int_bool).
+	With values at failure point:
+	- uninitialized: \initialized(&int_bool): 1
+	- sizeof(_Bool): 1
+	- &int_bool: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:69: Assertion valid:
 	\let x = int_bool; \true.
 	With values at failure point:
 	- int_bool: 1
+printed_data.c: In function 'main'
+printed_data.c:71: RTE valid:
+	uninitialized:
+		\initialized(&int_char).
+	With values at failure point:
+	- uninitialized: \initialized(&int_char): 1
+	- sizeof(char): 1
+	- &int_char: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:71: Assertion valid:
 	\let x = int_char; \true.
 	With values at failure point:
 	- int_char: 127
 printed_data.c: In function 'main'
+printed_data.c:73: RTE valid:
+	uninitialized:
+		\initialized(&int_schar).
+	With values at failure point:
+	- uninitialized: \initialized(&int_schar): 1
+	- sizeof(signed char): 1
+	- &int_schar: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:73: Assertion valid:
 	\let x = int_schar; \true.
 	With values at failure point:
 	- int_schar: 127
+printed_data.c: In function 'main'
+printed_data.c:75: RTE valid:
+	uninitialized:
+		\initialized(&int_uchar).
+	With values at failure point:
+	- uninitialized: \initialized(&int_uchar): 1
+	- sizeof(unsigned char): 1
+	- &int_uchar: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:75: Assertion valid:
 	\let x = int_uchar; \true.
 	With values at failure point:
 	- int_uchar: 255
 printed_data.c: In function 'main'
+printed_data.c:77: RTE valid:
+	uninitialized:
+		\initialized(&int_int).
+	With values at failure point:
+	- uninitialized: \initialized(&int_int): 1
+	- sizeof(int): 4
+	- &int_int: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:77: Assertion valid:
 	\let x = int_int; \true.
 	With values at failure point:
 	- int_int: 2147483647
+printed_data.c: In function 'main'
+printed_data.c:79: RTE valid:
+	uninitialized:
+		\initialized(&int_uint).
+	With values at failure point:
+	- uninitialized: \initialized(&int_uint): 1
+	- sizeof(unsigned int): 4
+	- &int_uint: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:79: Assertion valid:
 	\let x = int_uint; \true.
 	With values at failure point:
 	- int_uint: 4294967295
 printed_data.c: In function 'main'
+printed_data.c:81: RTE valid:
+	uninitialized:
+		\initialized(&int_short).
+	With values at failure point:
+	- uninitialized: \initialized(&int_short): 1
+	- sizeof(short): 2
+	- &int_short: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:81: Assertion valid:
 	\let x = int_short; \true.
 	With values at failure point:
 	- int_short: 32767
+printed_data.c: In function 'main'
+printed_data.c:83: RTE valid:
+	uninitialized:
+		\initialized(&int_ushort).
+	With values at failure point:
+	- uninitialized: \initialized(&int_ushort): 1
+	- sizeof(unsigned short): 2
+	- &int_ushort: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:83: Assertion valid:
 	\let x = int_ushort; \true.
 	With values at failure point:
 	- int_ushort: 65535
 printed_data.c: In function 'main'
+printed_data.c:85: RTE valid:
+	uninitialized:
+		\initialized(&int_long).
+	With values at failure point:
+	- uninitialized: \initialized(&int_long): 1
+	- sizeof(long): 8
+	- &int_long: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:85: Assertion valid:
 	\let x = int_long; \true.
 	With values at failure point:
 	- int_long: 9223372036854775807
+printed_data.c: In function 'main'
+printed_data.c:87: RTE valid:
+	uninitialized:
+		\initialized(&int_ulong).
+	With values at failure point:
+	- uninitialized: \initialized(&int_ulong): 1
+	- sizeof(unsigned long): 8
+	- &int_ulong: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:87: Assertion valid:
 	\let x = int_ulong; \true.
 	With values at failure point:
 	- int_ulong: 18446744073709551615
 printed_data.c: In function 'main'
+printed_data.c:89: RTE valid:
+	uninitialized:
+		\initialized(&int_llong).
+	With values at failure point:
+	- uninitialized: \initialized(&int_llong): 1
+	- sizeof(long long): 8
+	- &int_llong: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:89: Assertion valid:
 	\let x = int_llong; \true.
 	With values at failure point:
 	- int_llong: 9223372036854775807
+printed_data.c: In function 'main'
+printed_data.c:91: RTE valid:
+	uninitialized:
+		\initialized(&int_ullong).
+	With values at failure point:
+	- uninitialized: \initialized(&int_ullong): 1
+	- sizeof(unsigned long long): 8
+	- &int_ullong: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:91: Assertion valid:
 	\let x = int_ullong; \true.
@@ -66,15 +162,39 @@ int_mpz != 0x7fffffffffffffffLL * 2ULL + 1ULL.
 	With values at failure point:
 	- int_mpz: 18446744073709551616
 printed_data.c: In function 'main'
+printed_data.c:98: RTE valid:
+	uninitialized:
+		\initialized(&real_float).
+	With values at failure point:
+	- uninitialized: \initialized(&real_float): 1
+	- sizeof(float): 4
+	- &real_float: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:98: Assertion valid:
 	\let x = real_float; \true.
 	With values at failure point:
 	- real_float: 3.402823e+38
 printed_data.c: In function 'main'
+printed_data.c:100: RTE valid:
+	uninitialized:
+		\initialized(&real_double).
+	With values at failure point:
+	- uninitialized: \initialized(&real_double): 1
+	- sizeof(double): 8
+	- &real_double: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:100: Assertion valid:
 	\let x = real_double; \true.
 	With values at failure point:
 	- real_double: 1.797693e+308
+printed_data.c: In function 'main'
+printed_data.c:102: RTE valid:
+	uninitialized:
+		\initialized(&real_ldouble).
+	With values at failure point:
+	- uninitialized: \initialized(&real_ldouble): 1
+	- sizeof(long double): 16
+	- &real_ldouble: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:102: Assertion valid:
 	\let x = real_ldouble; \true.
@@ -85,6 +205,14 @@ printed_data.c:104: Assertion valid:
 	\let real_mpq = 0.1; real_mpq != 1.
 	With values at failure point:
 	- real_mpq: 1/10
+printed_data.c: In function 'main'
+printed_data.c:109: RTE valid:
+	uninitialized:
+		\initialized(&ptr).
+	With values at failure point:
+	- uninitialized: \initialized(&ptr): 1
+	- sizeof(void *): 8
+	- &ptr: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:109: Assertion valid:
 	ptr != (void *)0.
@@ -115,65 +243,209 @@ printed_data.c:128: Assertion valid:
 	With values at failure point:
 	- union1: <union>
 printed_data.c: In function 'main'
+printed_data.c:133: RTE valid:
+	uninitialized:
+		\initialized(&enum_bool).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_bool): 1
+	- sizeof(enum EBool): 4
+	- &enum_bool: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:133: Assertion valid:
 	\let x = enum_bool; \true.
 	With values at failure point:
 	- enum_bool: <enum> 1
+printed_data.c: In function 'main'
+printed_data.c:135: RTE valid:
+	uninitialized:
+		\initialized(&enum_char).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_char): 1
+	- sizeof(enum EChar): 4
+	- &enum_char: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:135: Assertion valid:
 	\let x = enum_char; \true.
 	With values at failure point:
 	- enum_char: <enum> 127
 printed_data.c: In function 'main'
+printed_data.c:137: RTE valid:
+	uninitialized:
+		\initialized(&enum_schar).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_schar): 1
+	- sizeof(enum ESChar): 4
+	- &enum_schar: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:137: Assertion valid:
 	\let x = enum_schar; \true.
 	With values at failure point:
 	- enum_schar: <enum> 127
+printed_data.c: In function 'main'
+printed_data.c:139: RTE valid:
+	uninitialized:
+		\initialized(&enum_uchar).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_uchar): 1
+	- sizeof(enum EUChar): 4
+	- &enum_uchar: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:139: Assertion valid:
 	\let x = enum_uchar; \true.
 	With values at failure point:
 	- enum_uchar: <enum> 255
 printed_data.c: In function 'main'
+printed_data.c:141: RTE valid:
+	uninitialized:
+		\initialized(&enum_int).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_int): 1
+	- sizeof(enum EInt): 4
+	- &enum_int: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:141: Assertion valid:
 	\let x = enum_int; \true.
 	With values at failure point:
 	- enum_int: <enum> 2147483647
+printed_data.c: In function 'main'
+printed_data.c:143: RTE valid:
+	uninitialized:
+		\initialized(&enum_uint).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_uint): 1
+	- sizeof(enum EUInt): 4
+	- &enum_uint: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:143: Assertion valid:
 	\let x = enum_uint; \true.
 	With values at failure point:
 	- enum_uint: <enum> 4294967295
 printed_data.c: In function 'main'
+printed_data.c:145: RTE valid:
+	uninitialized:
+		\initialized(&enum_short).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_short): 1
+	- sizeof(enum EShort): 4
+	- &enum_short: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:145: Assertion valid:
 	\let x = enum_short; \true.
 	With values at failure point:
 	- enum_short: <enum> 32767
+printed_data.c: In function 'main'
+printed_data.c:147: RTE valid:
+	uninitialized:
+		\initialized(&enum_ushort).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_ushort): 1
+	- sizeof(enum EUShort): 4
+	- &enum_ushort: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:147: Assertion valid:
 	\let x = enum_ushort; \true.
 	With values at failure point:
 	- enum_ushort: <enum> 65535
 printed_data.c: In function 'main'
+printed_data.c:149: RTE valid:
+	uninitialized:
+		\initialized(&enum_long).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_long): 1
+	- sizeof(enum ELong): 8
+	- &enum_long: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:149: Assertion valid:
 	\let x = enum_long; \true.
 	With values at failure point:
 	- enum_long: <enum> 9223372036854775807
+printed_data.c: In function 'main'
+printed_data.c:151: RTE valid:
+	uninitialized:
+		\initialized(&enum_ulong).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_ulong): 1
+	- sizeof(enum EULong): 8
+	- &enum_ulong: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:151: Assertion valid:
 	\let x = enum_ulong; \true.
 	With values at failure point:
 	- enum_ulong: <enum> 18446744073709551615
 printed_data.c: In function 'main'
+printed_data.c:153: RTE valid:
+	uninitialized:
+		\initialized(&enum_llong).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_llong): 1
+	- sizeof(enum ELLong): 8
+	- &enum_llong: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:153: Assertion valid:
 	\let x = enum_llong; \true.
 	With values at failure point:
 	- enum_llong: <enum> 9223372036854775807
 printed_data.c: In function 'main'
+printed_data.c:155: RTE valid:
+	uninitialized:
+		\initialized(&enum_ullong).
+	With values at failure point:
+	- uninitialized: \initialized(&enum_ullong): 1
+	- sizeof(enum EULLong): 8
+	- &enum_ullong: 0x000000
+printed_data.c: In function 'main'
 printed_data.c:155: Assertion valid:
 	\let x = enum_ullong; \true.
 	With values at failure point:
 	- enum_ullong: <enum> 18446744073709551615
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&a).
+	With values at failure point:
+	- uninitialized: \initialized(&a): 1
+	- sizeof(int): 4
+	- &a: 0x000000
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&b).
+	With values at failure point:
+	- uninitialized: \initialized(&b): 1
+	- sizeof(int): 4
+	- &b: 0x000000
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&a).
+	With values at failure point:
+	- uninitialized: \initialized(&a): 1
+	- sizeof(int): 4
+	- &a: 0x000000
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&b).
+	With values at failure point:
+	- uninitialized: \initialized(&b): 1
+	- sizeof(int): 4
+	- &b: 0x000000
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&a).
+	With values at failure point:
+	- uninitialized: \initialized(&a): 1
+	- sizeof(int): 4
+	- &a: 0x000000
+printed_data.c: In function 'main'
+printed_data.c:161: RTE valid:
+	uninitialized:
+		\initialized(&b).
+	With values at failure point:
+	- uninitialized: \initialized(&b): 1
+	- sizeof(int): 4
+	- &b: 0x000000
 printed_data.c: In function 'main'
 printed_data.c:161: Assertion valid:
 	\let c = a + b; a != b && c == a + b.

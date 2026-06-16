@@ -181,9 +181,35 @@ int main(void)
     __e_acsl_full_init((void *)(& heap_pair));
     {
       int __gen_e_acsl_initialized_7;
+      int __gen_e_acsl_initialized_8;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& heap_pair->a),
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& heap_pair),
+                                                        sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&heap_pair",
+                                   (void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_7);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_8.blocking = 1;
+        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_8.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_8.fct = "main";
+        __gen_e_acsl_assert_data_8.line = 26;
+        __gen_e_acsl_assert_data_8.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_7,
+                        & __gen_e_acsl_assert_data_8);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+      }
+      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& heap_pair->a),
                                                         sizeof(int32_t));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                    "&heap_pair->a",(void *)(& heap_pair->a));
@@ -191,99 +217,101 @@ int main(void)
                                      "sizeof(int32_t)",0,sizeof(int32_t));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "\\initialized(&heap_pair->a)",0,
-                                   __gen_e_acsl_initialized_7);
+                                   __gen_e_acsl_initialized_8);
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "Assertion";
       __gen_e_acsl_assert_data_7.pred_txt = "!\\initialized(&heap_pair->a)";
       __gen_e_acsl_assert_data_7.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 26;
-      __e_acsl_assert(! __gen_e_acsl_initialized_7,
+      __e_acsl_assert(! __gen_e_acsl_initialized_8,
                       & __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
     /*@ assert !\initialized(&heap_pair->a); */ ;
     {
-      int __gen_e_acsl_initialized_8;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      int __gen_e_acsl_initialized_9;
+      int __gen_e_acsl_initialized_10;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& heap_pair->b),
-                                                        sizeof(int32_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(& heap_pair),
+                                                        sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
+                                   "&heap_pair",(void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_9);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_10.blocking = 1;
+        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_10.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_10.fct = "main";
+        __gen_e_acsl_assert_data_10.line = 27;
+        __gen_e_acsl_assert_data_10.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_9,
+                        & __gen_e_acsl_assert_data_10);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+      }
+      __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& heap_pair->b),
+                                                         sizeof(int32_t));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
                                    "&heap_pair->b",(void *)(& heap_pair->b));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
                                      "sizeof(int32_t)",0,sizeof(int32_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                    "\\initialized(&heap_pair->b)",0,
-                                   __gen_e_acsl_initialized_8);
-      __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "Assertion";
-      __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_8.file = "struct_initialized.c";
-      __gen_e_acsl_assert_data_8.fct = "main";
-      __gen_e_acsl_assert_data_8.line = 27;
-      __e_acsl_assert(! __gen_e_acsl_initialized_8,
-                      & __gen_e_acsl_assert_data_8);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+                                   __gen_e_acsl_initialized_10);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "Assertion";
+      __gen_e_acsl_assert_data_9.pred_txt = "!\\initialized(&heap_pair->b)";
+      __gen_e_acsl_assert_data_9.file = "struct_initialized.c";
+      __gen_e_acsl_assert_data_9.fct = "main";
+      __gen_e_acsl_assert_data_9.line = 27;
+      __e_acsl_assert(! __gen_e_acsl_initialized_10,
+                      & __gen_e_acsl_assert_data_9);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
     /*@ assert !\initialized(&heap_pair->b); */ ;
     __e_acsl_initialize((void *)(& heap_pair->a),sizeof(int32_t));
     heap_pair->a = 3;
     {
-      int __gen_e_acsl_initialized_9;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(& heap_pair->a),
-                                                        sizeof(int32_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
-                                   "&heap_pair->a",(void *)(& heap_pair->a));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
-                                     "sizeof(int32_t)",0,sizeof(int32_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                   "\\initialized(&heap_pair->a)",0,
-                                   __gen_e_acsl_initialized_9);
-      __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "Assertion";
-      __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&heap_pair->a)";
-      __gen_e_acsl_assert_data_9.file = "struct_initialized.c";
-      __gen_e_acsl_assert_data_9.fct = "main";
-      __gen_e_acsl_assert_data_9.line = 29;
-      __e_acsl_assert(__gen_e_acsl_initialized_9,
-                      & __gen_e_acsl_assert_data_9);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-    }
-    /*@ assert \initialized(&heap_pair->a); */ ;
-    {
-      int __gen_e_acsl_initialized_10;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& heap_pair->b),
-                                                         sizeof(int32_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
-                                   "&heap_pair->b",(void *)(& heap_pair->b));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
-                                     "sizeof(int32_t)",0,sizeof(int32_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                   "\\initialized(&heap_pair->b)",0,
-                                   __gen_e_acsl_initialized_10);
-      __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "Assertion";
-      __gen_e_acsl_assert_data_10.pred_txt = "!\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_10.file = "struct_initialized.c";
-      __gen_e_acsl_assert_data_10.fct = "main";
-      __gen_e_acsl_assert_data_10.line = 30;
-      __e_acsl_assert(! __gen_e_acsl_initialized_10,
-                      & __gen_e_acsl_assert_data_10);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-    }
-    /*@ assert !\initialized(&heap_pair->b); */ ;
-    __e_acsl_initialize((void *)(& heap_pair->b),sizeof(int32_t));
-    heap_pair->b = 4;
-    {
       int __gen_e_acsl_initialized_11;
+      int __gen_e_acsl_initialized_12;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(& heap_pair->a),
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(& heap_pair),
+                                                         sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
+                                   "&heap_pair",(void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_11);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_12.blocking = 1;
+        __gen_e_acsl_assert_data_12.kind = "RTE";
+        __gen_e_acsl_assert_data_12.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_12.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_12.fct = "main";
+        __gen_e_acsl_assert_data_12.line = 29;
+        __gen_e_acsl_assert_data_12.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_11,
+                        & __gen_e_acsl_assert_data_12);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+      }
+      __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& heap_pair->a),
                                                          sizeof(int32_t));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
                                    "&heap_pair->a",(void *)(& heap_pair->a));
@@ -291,40 +319,168 @@ int main(void)
                                      "sizeof(int32_t)",0,sizeof(int32_t));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                    "\\initialized(&heap_pair->a)",0,
-                                   __gen_e_acsl_initialized_11);
+                                   __gen_e_acsl_initialized_12);
       __gen_e_acsl_assert_data_11.blocking = 1;
       __gen_e_acsl_assert_data_11.kind = "Assertion";
       __gen_e_acsl_assert_data_11.pred_txt = "\\initialized(&heap_pair->a)";
       __gen_e_acsl_assert_data_11.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_11.fct = "main";
-      __gen_e_acsl_assert_data_11.line = 32;
-      __e_acsl_assert(__gen_e_acsl_initialized_11,
+      __gen_e_acsl_assert_data_11.line = 29;
+      __e_acsl_assert(__gen_e_acsl_initialized_12,
                       & __gen_e_acsl_assert_data_11);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
     }
     /*@ assert \initialized(&heap_pair->a); */ ;
     {
-      int __gen_e_acsl_initialized_12;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      int __gen_e_acsl_initialized_13;
+      int __gen_e_acsl_initialized_14;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& heap_pair->b),
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(& heap_pair),
+                                                         sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
+                                   "&heap_pair",(void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_13);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_14.blocking = 1;
+        __gen_e_acsl_assert_data_14.kind = "RTE";
+        __gen_e_acsl_assert_data_14.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_14.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_14.fct = "main";
+        __gen_e_acsl_assert_data_14.line = 30;
+        __gen_e_acsl_assert_data_14.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_13,
+                        & __gen_e_acsl_assert_data_14);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
+      }
+      __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(& heap_pair->b),
                                                          sizeof(int32_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,
                                    "&heap_pair->b",(void *)(& heap_pair->b));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
                                      "sizeof(int32_t)",0,sizeof(int32_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                    "\\initialized(&heap_pair->b)",0,
-                                   __gen_e_acsl_initialized_12);
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "Assertion";
-      __gen_e_acsl_assert_data_12.pred_txt = "\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_12.file = "struct_initialized.c";
-      __gen_e_acsl_assert_data_12.fct = "main";
-      __gen_e_acsl_assert_data_12.line = 33;
-      __e_acsl_assert(__gen_e_acsl_initialized_12,
-                      & __gen_e_acsl_assert_data_12);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+                                   __gen_e_acsl_initialized_14);
+      __gen_e_acsl_assert_data_13.blocking = 1;
+      __gen_e_acsl_assert_data_13.kind = "Assertion";
+      __gen_e_acsl_assert_data_13.pred_txt = "!\\initialized(&heap_pair->b)";
+      __gen_e_acsl_assert_data_13.file = "struct_initialized.c";
+      __gen_e_acsl_assert_data_13.fct = "main";
+      __gen_e_acsl_assert_data_13.line = 30;
+      __e_acsl_assert(! __gen_e_acsl_initialized_14,
+                      & __gen_e_acsl_assert_data_13);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+    }
+    /*@ assert !\initialized(&heap_pair->b); */ ;
+    __e_acsl_initialize((void *)(& heap_pair->b),sizeof(int32_t));
+    heap_pair->b = 4;
+    {
+      int __gen_e_acsl_initialized_15;
+      int __gen_e_acsl_initialized_16;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(& heap_pair),
+                                                         sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,
+                                   "&heap_pair",(void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_15);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_16.blocking = 1;
+        __gen_e_acsl_assert_data_16.kind = "RTE";
+        __gen_e_acsl_assert_data_16.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_16.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_16.fct = "main";
+        __gen_e_acsl_assert_data_16.line = 32;
+        __gen_e_acsl_assert_data_16.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_15,
+                        & __gen_e_acsl_assert_data_16);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+      }
+      __gen_e_acsl_initialized_16 = __e_acsl_initialized((void *)(& heap_pair->a),
+                                                         sizeof(int32_t));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
+                                   "&heap_pair->a",(void *)(& heap_pair->a));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
+                                     "sizeof(int32_t)",0,sizeof(int32_t));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
+                                   "\\initialized(&heap_pair->a)",0,
+                                   __gen_e_acsl_initialized_16);
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "Assertion";
+      __gen_e_acsl_assert_data_15.pred_txt = "\\initialized(&heap_pair->a)";
+      __gen_e_acsl_assert_data_15.file = "struct_initialized.c";
+      __gen_e_acsl_assert_data_15.fct = "main";
+      __gen_e_acsl_assert_data_15.line = 32;
+      __e_acsl_assert(__gen_e_acsl_initialized_16,
+                      & __gen_e_acsl_assert_data_15);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+    }
+    /*@ assert \initialized(&heap_pair->a); */ ;
+    {
+      int __gen_e_acsl_initialized_17;
+      int __gen_e_acsl_initialized_18;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_17 = __e_acsl_initialized((void *)(& heap_pair),
+                                                         sizeof(int32_pair_t *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
+                                   "&heap_pair",(void *)(& heap_pair));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_18,
+                                     "sizeof(int32_pair_t *)",0,
+                                     sizeof(int32_pair_t *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
+                                   "uninitialized: \\initialized(&heap_pair)",
+                                   0,__gen_e_acsl_initialized_17);
+      /*@ assert E_ACSL: uninitialized: \initialized(&heap_pair); */
+      {
+        __gen_e_acsl_assert_data_18.blocking = 1;
+        __gen_e_acsl_assert_data_18.kind = "RTE";
+        __gen_e_acsl_assert_data_18.pred_txt = "\\initialized(&heap_pair)";
+        __gen_e_acsl_assert_data_18.file = "struct_initialized.c";
+        __gen_e_acsl_assert_data_18.fct = "main";
+        __gen_e_acsl_assert_data_18.line = 33;
+        __gen_e_acsl_assert_data_18.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_17,
+                        & __gen_e_acsl_assert_data_18);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
+      }
+      __gen_e_acsl_initialized_18 = __e_acsl_initialized((void *)(& heap_pair->b),
+                                                         sizeof(int32_t));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
+                                   "&heap_pair->b",(void *)(& heap_pair->b));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
+                                     "sizeof(int32_t)",0,sizeof(int32_t));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
+                                   "\\initialized(&heap_pair->b)",0,
+                                   __gen_e_acsl_initialized_18);
+      __gen_e_acsl_assert_data_17.blocking = 1;
+      __gen_e_acsl_assert_data_17.kind = "Assertion";
+      __gen_e_acsl_assert_data_17.pred_txt = "\\initialized(&heap_pair->b)";
+      __gen_e_acsl_assert_data_17.file = "struct_initialized.c";
+      __gen_e_acsl_assert_data_17.fct = "main";
+      __gen_e_acsl_assert_data_17.line = 33;
+      __e_acsl_assert(__gen_e_acsl_initialized_18,
+                      & __gen_e_acsl_assert_data_17);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     }
     /*@ assert \initialized(&heap_pair->b); */ ;
     __e_acsl_delete_block((void *)(& heap_pair));

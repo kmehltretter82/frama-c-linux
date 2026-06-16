@@ -78,7 +78,8 @@ int main(void) {
   simple_loop();
   nested_loop();
 
-  char *x;
+  char *x = malloc(sizeof(char));
+  *x = 'x';
   unsigned int v = 1;
   /*@ assert \aligned(x,v); */
   /*@ assert \aligned(x,alignof(char)); */

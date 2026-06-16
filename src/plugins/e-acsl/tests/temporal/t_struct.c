@@ -28,25 +28,25 @@ int main(void) {
   t1.p = &a;
   t1.q = t1.p;
   /*@assert \valid(t1.p) && \valid(t1.q);  */
-  /*@assert !\valid(t2.p) && !\valid(t2.q);  */
+  /*@assert ! (\initialized(&t2.p) && \valid(t2.p)) && !(\initialized(&t2.q) && \valid(t2.q));  */
 
   t2 = t1;
   /*@assert \valid(t2.p) && \valid(t2.q);  */
 
   t2.p = NULL;
   t2.q = malloc(4);
-  /*@assert ! \valid(t2.p) && \valid(t2.q);  */
+  /*@assert ! (\initialized(&t2.p) && \valid(t2.p)) && \valid(t2.q);  */
 
   l.t = t2;
-  /*@assert ! \valid(l.t.p) && \valid(l.t.q); */
+  /*@assert ! (\initialized(&l.t.p) && \valid(l.t.p)) && \valid(l.t.q); */
 
   lp = &l;
-  /*@assert ! \valid(lp->t.p); */
+  /*@assert ! (\initialized(&lp->t.p) && \valid(lp->t.p)); */
 
   tarr[0] = t2;
-  /*@assert ! \valid(tarr[0].p) && \valid(tarr[0].q) ; */
+  /*@assert ! (\initialized(&tarr[0].p) && \valid(tarr[0].p)) && \valid(tarr[0].q) ; */
 
   larr[0] = l;
-  /*@assert ! \valid(larr[0].t.p) && \valid(larr[0].t.q) ; */
+  /*@assert ! (\initialized(&larr[0].t.p) && \valid(larr[0].t.p)) && \valid(larr[0].t.q) ; */
   return 0;
 }

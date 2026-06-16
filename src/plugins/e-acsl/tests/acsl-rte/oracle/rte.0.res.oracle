@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] rte.c:108: Warning: 
+[e-acsl] rte.c:109: Warning: 
   E-ACSL construct `R to Int' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] rte.c:69: Warning: 
@@ -36,12 +36,35 @@
 [eva:alarm] rte.c:53: Warning: 
   assertion 'E_ACSL,index out of bounds' got status unknown.
 [eva:alarm] rte.c:53: Warning: 
+  assertion 'E_ACSL,uninitialized' got status unknown.
+[eva:alarm] rte.c:53: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.c:53: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:53: Warning: loop invariant got status unknown.
 [eva:alarm] rte.c:53: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:53: Warning: 
   accessing uninitialized left-value.
   assert \initialized(&a[__gen_e_acsl_i_2]);
-[eva:alarm] rte.c:83: Warning: 
-  accessing uninitialized left-value. assert \initialized(&x);
+[eva:alarm] rte.c:84: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:85: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:100: Warning: assertion got status unknown.
+[eva:alarm] rte.c:103: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:103: Warning: 
+  signed overflow. assert -9223372036854775808 <= __gen_e_acsl__6 - 1;
+[eva:alarm] rte.c:103: Warning: 
+  assertion 'E_ACSL,memory access' got status unknown.
+[eva:alarm] rte.c:103: Warning: assertion got status unknown.
+[eva:alarm] rte.c:106: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:106: Warning: assertion got status unknown.
+[eva:alarm] rte.c:115: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:115: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:115: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.

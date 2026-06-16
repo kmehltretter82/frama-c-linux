@@ -15,6 +15,7 @@ let stmt ?warn:_ kf stmt =
     ~flags:(RteGen.Flags.default
               ~div_mod:false
               ~mem_access:false
+              ~initialized:Kernel_function.Set.empty
               ())
     kf stmt
 
@@ -23,6 +24,7 @@ let exp ?warn:_ kf stmt e =
     ~flags:(RteGen.Flags.default
               ~div_mod:false
               ~mem_access:false
+              ~initialized:Kernel_function.Set.empty
               ())
     kf stmt e
 

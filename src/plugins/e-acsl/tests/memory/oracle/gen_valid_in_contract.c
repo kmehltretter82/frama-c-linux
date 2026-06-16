@@ -82,66 +82,58 @@ struct list *__gen_e_acsl_f(struct list *l)
                                         (void *)l,(void *)(& l));
     if (! __gen_e_acsl_valid) __gen_e_acsl_or = 1;
     else {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& l->next),
-                                                      sizeof(struct list *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid_read;
-        int __gen_e_acsl_aligned;
-        int __gen_e_acsl_valid_2;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data =
-          {.values = (void *)0};
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
-                                                      sizeof(struct list *),
-                                                      (void *)(& l->next),
-                                                      (void *)0);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&l->next",
-                                     (void *)(& l->next));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                       "sizeof(struct list *)",0,
-                                       sizeof(struct list *));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                     "\"memory access\": \\valid_read(&l->next)",
-                                     0,__gen_e_acsl_valid_read);
-        /*@ assert E_ACSL: "memory access": \valid_read(&l->next); */
-        {
-          __gen_e_acsl_assert_data.blocking = 1;
-          __gen_e_acsl_assert_data.kind = "RTE";
-          __gen_e_acsl_assert_data.pred_txt = "\\valid_read(&l->next)";
-          __gen_e_acsl_assert_data.file = "valid_in_contract.c";
-          __gen_e_acsl_assert_data.fct = "f";
-          __gen_e_acsl_assert_data.line = 17;
-          __gen_e_acsl_assert_data.name = "memory access";
-          __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-        }
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
-                                                _Alignof(struct list));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                       "alignof(struct list)",0,
-                                       _Alignof(struct list));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l->next",
-                                     (void *)l->next);
-        __gen_e_acsl_assert_data_2.blocking = 1;
-        __gen_e_acsl_assert_data_2.kind = "RTE";
-        __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l->next,alignof(struct list))";
-        __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
-        __gen_e_acsl_assert_data_2.fct = "f";
-        __gen_e_acsl_assert_data_2.line = 17;
-        __gen_e_acsl_assert_data_2.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
-                                              sizeof(struct list),
-                                              (void *)l->next,
-                                              (void *)(& l->next));
-        __gen_e_acsl_and = __gen_e_acsl_valid_2;
+      int __gen_e_acsl_valid_read;
+      int __gen_e_acsl_aligned;
+      int __gen_e_acsl_valid_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
+                                                    sizeof(struct list *),
+                                                    (void *)(& l->next),
+                                                    (void *)0);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&l->next",
+                                   (void *)(& l->next));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                     "sizeof(struct list *)",0,
+                                     sizeof(struct list *));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                   "\"memory access\": \\valid_read(&l->next)",
+                                   0,__gen_e_acsl_valid_read);
+      /*@ assert E_ACSL: "memory access": \valid_read(&l->next); */
+      {
+        __gen_e_acsl_assert_data.blocking = 1;
+        __gen_e_acsl_assert_data.kind = "RTE";
+        __gen_e_acsl_assert_data.pred_txt = "\\valid_read(&l->next)";
+        __gen_e_acsl_assert_data.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data.fct = "f";
+        __gen_e_acsl_assert_data.line = 17;
+        __gen_e_acsl_assert_data.name = "memory access";
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
       }
-      else __gen_e_acsl_and = 0;
-      __gen_e_acsl_or = ! __gen_e_acsl_and;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
+                                              _Alignof(struct list));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                     "alignof(struct list)",0,
+                                     _Alignof(struct list));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l->next",
+                                   (void *)l->next);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l->next,alignof(struct list))";
+      __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_2.fct = "f";
+      __gen_e_acsl_assert_data_2.line = 17;
+      __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
+                                            sizeof(struct list),
+                                            (void *)l->next,
+                                            (void *)(& l->next));
+      __gen_e_acsl_or = ! __gen_e_acsl_valid_2;
     }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_or);

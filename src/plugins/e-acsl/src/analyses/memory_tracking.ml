@@ -395,7 +395,7 @@ module rec Transfer
     | LBpred _ -> Options.fatal "unexpected predicate"
     | LBinductive _ -> Options.fatal "unexpected inductive definitions"
 
-  let register_object kf state_ref = object(self)
+  and register_object kf state_ref = object
     inherit Visitor.frama_c_inplace
     method !vpredicate_node = function
       | Pvalid(_, t) | Pvalid_read(_, t)
@@ -423,18 +423,18 @@ module rec Transfer
           Cil.DoChildren
         end
     method !vterm term =
-      (* registering each guards associated to [term] *)
-      Rte_analysis.iter_on_guards term
-        (fun p ->
-           Error.handle
-             (fun () -> ignore (self#vpredicate_node p.pred_content)) ());
+      state_ref := register_rte_guards kf term !state_ref;
       match term.term_node with
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) | Tlet(_, t) ->
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
       | Tapp (_, _, tlist) ->
-        state_ref := List.fold_left (register_term kf) !state_ref tlist;
-        Cil.DoChildren
+        begin try
+            state_ref := List.fold_left (register_term kf) !state_ref tlist;
+            Cil.DoChildren
+          with Error.Not_yet _ as exn ->
+            Cil.DoChildrenPost (fun _ -> raise exn)
+        end
       | TConst _ | TSizeOf _ | TAlignOf _  | Tnull | Ttype _
       | Tempty_set ->
         (* no left-value inside inside: skip for efficiency *)
@@ -455,6 +455,16 @@ module rec Transfer
       | TVar _ | TResult _ ->
         Cil.SkipChildren
   end
+
+  and register_rte_guards kf term state =
+    let state_ref = ref state in
+    Rte_analysis.iter_on_guards term (fun pred ->
+        Error.handle
+          (fun () ->
+             ignore @@
+             Visitor.visitFramacPredicate (register_object kf state_ref) pred)
+          ());
+    !state_ref
 
   let register_predicate kf pred state =
     let state_ref = ref state in

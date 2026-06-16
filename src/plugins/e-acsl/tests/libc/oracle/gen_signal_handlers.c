@@ -70,9 +70,36 @@ void test_sighandler(void)
   }
   /*@ assert signal_status == 0; */ ;
   void (* res_sig)(int ) = __gen_e_acsl_signal(2,& signal_handler);
+  __e_acsl_store_block((void *)(& res_sig),8UL);
+  __e_acsl_full_init((void *)(& res_sig));
   {
+    int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& res_sig),
+                                                    sizeof(void (*)(int )));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&res_sig",
+                                 (void *)(& res_sig));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "sizeof(void (*)(int ))",0,
+                                   sizeof(void (*)(int )));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "uninitialized: \\initialized(&res_sig)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&res_sig); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&res_sig)";
+      __gen_e_acsl_assert_data_3.file = "signal_handlers.c";
+      __gen_e_acsl_assert_data_3.fct = "test_sighandler";
+      __gen_e_acsl_assert_data_3.line = 20;
+      __gen_e_acsl_assert_data_3.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"res_sig",
                                  (void *)res_sig);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&SIG_ERR",
@@ -89,38 +116,67 @@ void test_sighandler(void)
   }
   /*@ assert ok_signal: res_sig != &SIG_ERR; */ ;
   int res_raise = __gen_e_acsl_raise(2);
+  __e_acsl_store_block((void *)(& res_raise),4UL);
+  __e_acsl_full_init((void *)(& res_raise));
   {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    int __gen_e_acsl_initialized_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"res_raise",0,
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& res_raise),
+                                                      sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&res_raise",
+                                 (void *)(& res_raise));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                 "uninitialized: \\initialized(&res_raise)",
+                                 0,__gen_e_acsl_initialized_2);
+    /*@ assert E_ACSL: uninitialized: \initialized(&res_raise); */
+    {
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&res_raise)";
+      __gen_e_acsl_assert_data_5.file = "signal_handlers.c";
+      __gen_e_acsl_assert_data_5.fct = "test_sighandler";
+      __gen_e_acsl_assert_data_5.line = 23;
+      __gen_e_acsl_assert_data_5.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized_2,
+                      & __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"res_raise",0,
                                  res_raise);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "res_raise == 0";
-    __gen_e_acsl_assert_data_3.file = "signal_handlers.c";
-    __gen_e_acsl_assert_data_3.fct = "test_sighandler";
-    __gen_e_acsl_assert_data_3.line = 23;
-    __gen_e_acsl_assert_data_3.name = "ok_raise";
-    __e_acsl_assert(res_raise == 0,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "res_raise == 0";
+    __gen_e_acsl_assert_data_4.file = "signal_handlers.c";
+    __gen_e_acsl_assert_data_4.fct = "test_sighandler";
+    __gen_e_acsl_assert_data_4.line = 23;
+    __gen_e_acsl_assert_data_4.name = "ok_raise";
+    __e_acsl_assert(res_raise == 0,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert ok_raise: res_raise == 0; */ ;
   {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                  "signal_status",0,signal_status);
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "signal_status == 2";
-    __gen_e_acsl_assert_data_4.file = "signal_handlers.c";
-    __gen_e_acsl_assert_data_4.fct = "test_sighandler";
-    __gen_e_acsl_assert_data_4.line = 25;
-    __gen_e_acsl_assert_data_4.name = "status_changed";
-    __e_acsl_assert(signal_status == 2,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "signal_status == 2";
+    __gen_e_acsl_assert_data_6.file = "signal_handlers.c";
+    __gen_e_acsl_assert_data_6.fct = "test_sighandler";
+    __gen_e_acsl_assert_data_6.line = 25;
+    __gen_e_acsl_assert_data_6.name = "status_changed";
+    __e_acsl_assert(signal_status == 2,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
   /*@ assert status_changed: signal_status == 2; */ ;
+  __e_acsl_delete_block((void *)(& res_raise));
+  __e_acsl_delete_block((void *)(& res_sig));
   return;
 }
 
@@ -142,6 +198,7 @@ int main(void)
 int __gen_e_acsl_raise(int sig)
 {
   int __retres;
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -162,6 +219,7 @@ int __gen_e_acsl_raise(int sig)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   __retres = raise(sig);
+  __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }
 
@@ -212,6 +270,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
   void (*__gen_e_acsl_at_2)(int );
   __fc_sighandler_t __gen_e_acsl_at;
   void (*__retres)(int );
+  __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_and;
     int __gen_e_acsl_and_2;
@@ -579,6 +638,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
 }

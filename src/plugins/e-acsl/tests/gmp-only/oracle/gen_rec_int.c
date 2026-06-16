@@ -20,17 +20,64 @@ int main(void)
   __e_acsl_store_block((void *)(& i),4UL);
   __e_acsl_full_init((void *)(& i));
   {
+    int __gen_e_acsl_initialized;
     __e_acsl_mpz_t __gen_e_acsl_i;
     __e_acsl_mpz_t __gen_e_acsl_identity_4;
-    __e_acsl_mpz_t __gen_e_acsl_i_2;
+    int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
+                                                    sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&i",
+                                 (void *)(& i));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&i)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&i); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&i)";
+      __gen_e_acsl_assert_data_2.file = "rec_int.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 9;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gmpz_init_set_si(__gen_e_acsl_i,(long)i);
     __gen_e_acsl_identity(& __gen_e_acsl_identity_4,
                           (__e_acsl_mpz_struct *)__gen_e_acsl_i);
-    __gmpz_init_set_si(__gen_e_acsl_i_2,(long)i);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& i),
+                                                      sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&i",
+                                 (void *)(& i));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "uninitialized: \\initialized(&i)",0,
+                                 __gen_e_acsl_initialized_2);
+    /*@ assert E_ACSL: uninitialized: \initialized(&i); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&i)";
+      __gen_e_acsl_assert_data_3.file = "rec_int.c";
+      __gen_e_acsl_assert_data_3.fct = "main";
+      __gen_e_acsl_assert_data_3.line = 9;
+      __gen_e_acsl_assert_data_3.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized_2,
+                      & __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_identity_4),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_2));
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,i);
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,"identity(i)",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_identity_4));
@@ -45,7 +92,6 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_i);
     __gmpz_clear(__gen_e_acsl_identity_4);
-    __gmpz_clear(__gen_e_acsl_i_2);
   }
   /*@ assert identity(i) == i; */ ;
   __retres = 0;

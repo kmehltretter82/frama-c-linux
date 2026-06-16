@@ -46,59 +46,43 @@ int main(int argc, char **argv)
   __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   {
-    int __gen_e_acsl_initialized;
-    int __gen_e_acsl_and;
+    int __gen_e_acsl_aligned;
+    int __gen_e_acsl_valid_read;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& _G[0].str),
-                                                    sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&_G[0].str",
-                                 (void *)(& _G[0].str));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "sizeof(char *)",0,sizeof(char *));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)_G[0].str,_Alignof(char));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "alignof(char)",0,_Alignof(char));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"_G[0].str",
+                                 (void *)_G[0].str);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(_G[0].str,alignof(char))";
+    __gen_e_acsl_assert_data_2.file = "bts2191.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 14;
+    __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0].str,
+                                                  sizeof(char),
+                                                  (void *)_G[0].str,
+                                                  (void *)(& _G[0].str));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"_G[0].str",
+                                 (void *)_G[0].str);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(char)",
+                                   0,sizeof(char));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized(&_G[0].str)",0,
-                                 __gen_e_acsl_initialized);
-    if (__gen_e_acsl_initialized) {
-      int __gen_e_acsl_aligned;
-      int __gen_e_acsl_valid_read;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned = __e_acsl_aligned((void *)_G[0].str,
-                                              _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"_G[0].str",
-                                   (void *)_G[0].str);
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(_G[0].str,alignof(char))";
-      __gen_e_acsl_assert_data_2.file = "bts2191.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 14;
-      __gen_e_acsl_assert_data_2.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0].str,
-                                                    sizeof(char),
-                                                    (void *)_G[0].str,
-                                                    (void *)(& _G[0].str));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"_G[0].str",
-                                   (void *)_G[0].str);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                     "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                   "\\valid_read(_G[0].str)",0,
-                                   __gen_e_acsl_valid_read);
-      __gen_e_acsl_and = __gen_e_acsl_valid_read;
-    }
-    else __gen_e_acsl_and = 0;
+                                 "\\valid_read(_G[0].str)",0,
+                                 __gen_e_acsl_valid_read);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(_G[0].str)";
     __gen_e_acsl_assert_data.file = "bts2191.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 14;
-    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid_read(_G[0].str); */ ;

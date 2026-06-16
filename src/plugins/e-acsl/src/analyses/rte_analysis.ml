@@ -73,13 +73,24 @@ struct
     if RteGen.Options.DoMemAccess.is_set ()
     then RteGen.Options.DoMemAccess.get ()
     else true
+
+  (** [needs_initialized ()] @return
+      - [true] if the option [-rte-initialized] from the RTE plugin has at least
+        one element in its set;
+      - [false] if the option [-rte-no-initialized] from the RTE plugin is used
+        (default); *)
+  let needs_initialized () =
+    if RteGen.Options.DoInitialized.is_set ()
+    then not @@ RteGen.Options.DoInitialized.is_empty ()
+    else true
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
     each kind of undefined behavior listed below:
     - division by zero
     - memory access (read)
-    - index out of bounds *)
+    - index out of bounds
+    - initialization *)
 module Undefined_behaviours =
 struct
 
@@ -123,11 +134,20 @@ struct
     let t_cpy_2 = Smart_term.copy t in
     let pred =
       Smart_predicate.pand
-
         ~loc
         ~names:["index out of bounds"]
         (Smart_predicate.prel Rle (Logic_const.tint Z.zero) t_cpy_1)
         (Smart_predicate.prel Rlt t_cpy_2 (Logic_utils.expr_to_term size))
+    in
+    preprocess_guard pred;
+    pred
+
+  (** [initialized ~loc ?label lv typ] creates the predicate that check if [lv]
+      is initialized. *)
+  let initialized ~loc ?(label = Logic_const.here_label) lv =
+    let addr = Terms.mk_TAddrOrTStartOf ~loc lv in
+    let pred =
+      Logic_const.pinitialized ~loc ~names:["uninitialized"] (label, addr)
     in
     preprocess_guard pred;
     pred
@@ -138,7 +158,7 @@ let rte_visitor =
 
     inherit E_acsl_visitor.visitor dkey
 
-    (** [add_div_mod orig divider] adds an entry for [orig] if [divider] can
+    (** [add_div_mod ~orig divider] adds an entry for [orig] if [divider] can
         be equal to zero. *)
     method private add_div_mod ~orig divider =
       if Flags.needs_div_mod () then
@@ -212,10 +232,29 @@ let rte_visitor =
       ignore @@ self#vterm rt;
       Guards.copy rt t
 
+    (** [add_initialized ~orig ~loc divider] adds an entry for [orig] if [lv]
+        is a variable. *)
+    method add_initialized ~orig ~loc lv typ =
+      let needs_guard lv =
+        match lv with
+        | TVar { lv_origin = Some vi }, _ ->
+          not (vi.vglob || vi.vformal || vi.vtemp) &&
+          not (Ast_types.C.is_struct_or_union typ)
+        | _ -> false
+      in
+      if Flags.needs_initialized () && needs_guard lv then
+        Guards.add orig (Undefined_behaviours.initialized ~loc lv)
+
     method !vterm t =
       begin match t.term_node with
         | TBinOp ((Div | Mod),_,divider) -> self#add_div_mod ~orig:t divider
-        | TLval lv -> self#add_mem_access ~orig:t lv
+        | TLval lv ->
+          begin match Ast_types.Acsl.unroll t.term_type with
+            | Ctype typ ->
+              self#add_mem_access ~orig:t lv;
+              self#add_initialized ~orig:t ~loc:t.term_loc lv typ
+            | _ -> ()
+          end
         | _ -> ()
       end;
       Cil.DoChildren

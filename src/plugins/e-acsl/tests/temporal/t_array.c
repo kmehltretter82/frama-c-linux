@@ -11,6 +11,6 @@ int main() {
 
   /*@assert \valid(src[0]);   */
   /*@assert \valid(src[1]);   */
-  /*@assert ! \valid(src[2]); */
+  /*@assert ! (\initialized(&src[2]) && \valid(src[2])); */
   return 0;
 }

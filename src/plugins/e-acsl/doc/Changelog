@@ -29,6 +29,9 @@ Plugin E-ACSL <next-release>
                             relies on an internal implementation of E-ACSL
                             rather than on the RTE plugin
 -  E-ACSL     [2026-06-09] Add optimisation flag for hypothesis gathering
+-  E-ACSL     [2026-06-16] Reduce costs for checking “memory access” RTEs at
+                           runtime in the case of nested dereferencing and fix
+                           "initialization" RTEs semantics.
 -  E-ACSL     [2026-05-20] New option -e-acsl-O <n> that configures the level
                            of optimization. Default is 2. Replaces
                            -e-acsl-interlang-opt.
