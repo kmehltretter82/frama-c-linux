@@ -41,13 +41,14 @@ include Datatype.S_with_collections with type t := t
 
 (** {2 Pretty printing } *)
 
-(** Pretty prints a position in the format [<file>:<line>] or, if the column
-    number is available, in the format [<file>:<line>:<char>]. *)
+(** Pretty prints a position in the format [<file>:<line>], with variants for
+    unknown files or generated positions. *)
 val pretty : Format.formatter -> t -> unit
 
 (** Pretty prints a position in the format ["<file>", line <line>] or, if the
     column number is available, in the format
-    ["<file>", line <line>, character <char>] *)
+    ["<file>", line <line>, character <char>], with variants for unknown files
+    or generated positions. *)
 val pretty_long : Format.formatter -> t -> unit
 
 (** Debug printer. Prints the internal representation of locations. *)
@@ -139,6 +140,10 @@ val input_column : t -> int
     position is in a preprocessed code, it returns the offset in the
     preprocessed output. *)
 val input_offset : t -> int
+
+(** If the origine of the position is [Generated name], return [Some name] else
+    return [None]. *)
+val generated_by : t -> string option
 
 (** Return [true] if all values of the given position are the default values
     of {!make}. *)
