@@ -14,6 +14,9 @@ open Ctypes
 open Lang
 open Lang.F
 
+val ft32 : adt extern
+val ft64 : adt extern
+
 val f32 : tau extern
 val f64 : tau extern
 

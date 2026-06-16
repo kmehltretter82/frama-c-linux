@@ -20,8 +20,11 @@ open Lang.F
 (* --- Library                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f32 = Lang.extern_tau "frama_c_wp.cfloat.Cfloat.f32"
-let f64 = Lang.extern_tau "frama_c_wp.cfloat.Cfloat.f64"
+let ft32 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f32"
+let ft64 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f64"
+
+let f32 = Lang.extern_map (fun adt -> Lang.t_data adt []) ft32
+let f64 = Lang.extern_map (fun adt -> Lang.t_data adt []) ft64
 
 let ftau = function
   | Float32 -> !@f32
