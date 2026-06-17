@@ -406,10 +406,7 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
       in
       (e, adata), env)
 
-and to_exp_il ~rte p =
-  if rte && not @@ Options.Optimisations.Omit_rte.get ()
-  then M.not_covered ~pre:"with RTE" Printer.pp_predicate p
-  else predicate_content_to_exp_il p
+and to_exp_il p = predicate_content_to_exp_il p
 
 (** [to_exp ~adata ?inplace ?name kf ?rte env p] converts an ACSL predicate into
     a corresponding C expression.
@@ -431,7 +428,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let e, adata, env =
     Interlang_trans.try_il_compiler ~loc ~adata ~env ~kf
-      (to_exp_il ~rte)
+      (to_exp_il)
       (to_exp_old ~rte ?name ?inplace)
       p
   in
@@ -474,7 +471,7 @@ let do_it kf env p =
 
 let rte_guards_to_exp_il t =
   Rte_analysis.fold_guards_il ~default:(M.return []) t @@ fun p guards ->
-  let* e : IL.rte = M.map (Interlang.Rte.make p) @@ to_exp_il ~rte:true p in
+  let* e : IL.rte = M.map (Interlang.Rte.make p) @@ to_exp_il p in
   let* guards = guards in
   M.return (e :: guards)
 

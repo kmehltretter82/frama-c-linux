@@ -109,7 +109,7 @@ int __gen_e_acsl_sorted(int *t, int n)
     __e_acsl_store_block((void *)(& t),8UL);
     __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_i = 0 + 1;
+    __gen_e_acsl_i = 1;
     while (1) {
       if (__gen_e_acsl_i < n) ; else break;
       {

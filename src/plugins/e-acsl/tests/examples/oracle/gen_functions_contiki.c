@@ -138,7 +138,7 @@ long __gen_e_acsl_length_here(struct list *l)
 long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
 {
   long __gen_e_acsl_if_3;
-  if (n < 0U) __gen_e_acsl_if_3 = -1;
+  if (n < 0U) __gen_e_acsl_if_3 = -1L;
   else {
     long __gen_e_acsl_if_2;
     if (l == (struct list *)0) __gen_e_acsl_if_2 = n;
@@ -150,7 +150,7 @@ long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
         (l->next,n + 1U);
         __gen_e_acsl_if = __gen_e_acsl_length_aux_here_3;
       }
-      else __gen_e_acsl_if = -1;
+      else __gen_e_acsl_if = -1L;
       __gen_e_acsl_if_2 = __gen_e_acsl_if;
     }
     __gen_e_acsl_if_3 = __gen_e_acsl_if_2;

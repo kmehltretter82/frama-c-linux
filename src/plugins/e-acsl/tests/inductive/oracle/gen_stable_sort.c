@@ -762,7 +762,11 @@ void __gen_e_acsl_min_sort(int *t, int n)
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_2,"size",0,
                                   __gen_e_acsl_size);
     if (__gen_e_acsl_size <= 0L) __gen_e_acsl_if = 0L;
-    else __gen_e_acsl_if = __gen_e_acsl_size;
+    else {
+      __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_2,"size",0,
+                                    __gen_e_acsl_size);
+      __gen_e_acsl_if = __gen_e_acsl_size;
+    }
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)t + 0),
                                         (size_t)__gen_e_acsl_if,(void *)t,
                                         (void *)(& t));
@@ -770,8 +774,6 @@ void __gen_e_acsl_min_sort(int *t, int n)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(int)",
                                  0,4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_2,"size",0,
-                                  __gen_e_acsl_size);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(t + (0 .. n - 1))",0,
                                  __gen_e_acsl_valid);

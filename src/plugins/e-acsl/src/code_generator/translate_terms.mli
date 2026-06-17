@@ -63,8 +63,7 @@ module Translate_predicates : sig
      exp * Assert.t * Env.t)
       ref
 
-  val to_exp_il_ref :
-    (rte:bool -> predicate Interlang_trans.il_compiler) ref
+  val to_exp_il_ref : (predicate Interlang_trans.il_compiler) ref
 
   val rte_guards_to_exp_old_ref:
     ( loc:Fileloc.t ->

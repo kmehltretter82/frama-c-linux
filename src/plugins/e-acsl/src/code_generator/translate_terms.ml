@@ -54,8 +54,8 @@ module Translate_predicates = struct
     !to_exp_ref ~adata ?inplace ?name kf ?rte env p
 
   let to_exp_il_ref :
-    (rte:bool -> predicate Interlang_trans.il_compiler) ref
-    = ref @@ fun ~rte:_ _p ->
+    (predicate Interlang_trans.il_compiler) ref
+    = ref @@ fun _p ->
     Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_il_ref"
 
   let to_exp_il p = !to_exp_il_ref p
@@ -392,7 +392,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:(PoT_term t) ty
   | Tif (p, t1, t2) ->
     let* logic_env = M.read_logic_env in
-    let* e1 = Translate_predicates.to_exp_il ~rte:true p in
+    let* e1 = Translate_predicates.to_exp_il p in
     let* e2 = to_exp_il t1 in
     let+ e3 = to_exp_il t2 in
     Interlang.Exp.conditional
@@ -1020,11 +1020,6 @@ and to_exp_il_with_rtes ?inplace t =
 
 and to_exp_il ?inplace t =
   let* {env} = M.read in
-  let* () =
-    if Env.generate_rte env
-    then M.not_covered ~pre:"with RTE" Printer.pp_term t
-    else M.return ()
-  in
   let* e = to_exp_il_with_rtes ?inplace t in
   let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
     | None -> e

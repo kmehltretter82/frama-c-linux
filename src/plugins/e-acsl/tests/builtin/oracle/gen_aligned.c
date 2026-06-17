@@ -535,8 +535,7 @@ int main(void)
                       & __gen_e_acsl_assert_data_20);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
     }
-    __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)i0,
-                                              (unsigned long)(2 - 2));
+    __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)i0,0UL);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,"i0",
                                  (void *)i0);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,

@@ -111,7 +111,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_x_2 = 0 + 1;
+    __gen_e_acsl_x_2 = 1;
     while (1) {
       if (__gen_e_acsl_x_2 <= 1) ; else break;
       if (__gen_e_acsl_x_2 == 1) ;
@@ -663,7 +663,7 @@ int main(void)
     __gen_e_acsl_i_6 = 0;
     while (1) {
       if (__gen_e_acsl_i_6 < 10) ; else break;
-      __gen_e_acsl_j = 1 + 1;
+      __gen_e_acsl_j = 2;
       while (1) {
         if (__gen_e_acsl_j <= 11) ; else break;
         __gen_e_acsl_k = 2;
@@ -776,7 +776,7 @@ int main(void)
       __gen_e_acsl_j_3 = __gen_e_acsl_i_8 + 1;
       while (1) {
         if (__gen_e_acsl_j_3 <= 10) ; else break;
-        __gen_e_acsl_k_3 = 1 + 1;
+        __gen_e_acsl_k_3 = 2;
         while (1) {
           if (__gen_e_acsl_k_3 < 11) ; else break;
           {
@@ -828,7 +828,7 @@ int main(void)
     __gen_e_acsl_i_9 = 0;
     while (1) {
       if (__gen_e_acsl_i_9 < 10) ; else break;
-      __gen_e_acsl_j_4 = 1 + 1;
+      __gen_e_acsl_j_4 = 2;
       while (1) {
         if (__gen_e_acsl_j_4 <= 11) ; else break;
         __gen_e_acsl_k_4 = 2;
@@ -938,7 +938,7 @@ int main(void)
     __gen_e_acsl_i_11 = 0;
     while (1) {
       if (__gen_e_acsl_i_11 < 10) ; else break;
-      __gen_e_acsl_j_6 = 1 + 1;
+      __gen_e_acsl_j_6 = 2;
       while (1) {
         if (__gen_e_acsl_j_6 <= 11) ; else break;
         __gen_e_acsl_k_6 = 2;
@@ -1051,7 +1051,7 @@ int main(void)
       __gen_e_acsl_j_8 = __gen_e_acsl_i_13 + 1;
       while (1) {
         if (__gen_e_acsl_j_8 <= 10) ; else break;
-        __gen_e_acsl_k_8 = 1 + 1;
+        __gen_e_acsl_k_8 = 2;
         while (1) {
           if (__gen_e_acsl_k_8 < 11) ; else break;
           {

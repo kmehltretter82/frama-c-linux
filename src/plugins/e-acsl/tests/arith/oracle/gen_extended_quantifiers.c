@@ -385,7 +385,7 @@ int main(void)
       __gen_e_acsl_cond_7 = __gen_e_acsl_k_7 > 10;
       if (__gen_e_acsl_cond_7) break;
       else {
-        __gen_e_acsl_lambda_7 = -2147483647 - 1;
+        __gen_e_acsl_lambda_7 = -2147483648L;
         /*@ assert
               Eva: signed_overflow:
                 -9223372036854775808 <=
@@ -684,14 +684,15 @@ int main(void)
       if (__gen_e_acsl_cond_13) break;
       else {
         {
-          __e_acsl_mpz_t __gen_e_acsl__9;
+          __e_acsl_mpz_t __gen_e_acsl_mul_2;
           /*@ assert
                 Eva: signed_overflow: 2 * __gen_e_acsl_k_13 <= 2147483647;
           */
-          __gmpz_init_set_si(__gen_e_acsl__9,(long)(2 * __gen_e_acsl_k_13));
+          __gmpz_init_set_si(__gen_e_acsl_mul_2,
+                             (long)(2 * __gen_e_acsl_k_13));
           __gmpz_set(__gen_e_acsl_lambda_13,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
-          __gmpz_clear(__gen_e_acsl__9);
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2));
+          __gmpz_clear(__gen_e_acsl_mul_2);
         }
         __gmpz_mul(__gen_e_acsl_accumulator_13,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_13),
@@ -713,14 +714,15 @@ int main(void)
       if (__gen_e_acsl_cond_14) break;
       else {
         {
-          __e_acsl_mpz_t __gen_e_acsl__10;
+          __e_acsl_mpz_t __gen_e_acsl_mul_3;
           /*@ assert
                 Eva: signed_overflow: 2 * __gen_e_acsl_k_14 <= 2147483647;
           */
-          __gmpz_init_set_si(__gen_e_acsl__10,(long)(2 * __gen_e_acsl_k_14));
+          __gmpz_init_set_si(__gen_e_acsl_mul_3,
+                             (long)(2 * __gen_e_acsl_k_14));
           __gmpz_set(__gen_e_acsl_lambda_14,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__10));
-          __gmpz_clear(__gen_e_acsl__10);
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_3));
+          __gmpz_clear(__gen_e_acsl_mul_3);
         }
         __gmpz_mul(__gen_e_acsl_accumulator_14,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_14),
