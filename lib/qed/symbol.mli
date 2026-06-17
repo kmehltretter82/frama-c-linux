@@ -30,6 +30,10 @@ val fields : data -> field list
 (** @raise Not_found for non-record data *)
 val field : data -> string -> field
 
+(** Fields are re-ordered if necessary.
+    @raise Invalid_arg for empty fields *)
+val record : (field * term) list -> term
+
 (** Ordering with respect to field declaration order in record *)
 val by_field_rank : field -> field -> int
 
@@ -112,6 +116,16 @@ val use_lfun : cluster -> lfun -> unit
 val new_data : cluster -> Why3.Ty.tysymbol -> data
 val new_lfun : cluster -> Why3.Term.lsymbol -> lfun
 val close : cluster -> Why3.Theory.theory
+
+(** {2 Declaration Factory} *)
+
+(** Declares a new record type in the provided cluster.
+    Returns a tuple [d,c,fs] with the created datatype [d], its constructor [c] and
+    the associated fields [fs]. *)
+val new_record :
+  cluster -> ?loc:Why3.Loc.position -> ?name:string ->
+  (string * Why3.Ty.ty) list ->
+  data * lfun * field list
 
 (** {2 Symbol Modules} *)
 

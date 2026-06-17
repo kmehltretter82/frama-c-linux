@@ -211,6 +211,13 @@ let field data fd =
 
 let by_field_rank (Field a) (Field b) = b.rank - a.rank
 
+let record = function
+  | [] -> invalid_arg "Qed.Symbol.record"
+  | ((Field { ls },_)::_) as fvs ->
+    let fvs = List.sort (fun (f,_) (g,_) -> by_field_rank f g) fvs in
+    let ts = List.map snd fvs in
+    Why3.Term.t_app_infer ls ts
+
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Functions & Predicates                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -350,6 +357,10 @@ let of_oty context ?sigma = function
   | None -> Logic.Prop
   | Some ty -> of_ty ?sigma context ty
 
+(* -------------------------------------------------------------------------- *)
+(* --- Typechecking                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
 let rec unify sigma (ty : Why3.Ty.ty) (t : tau) =
   match ty.ty_node, t with
   | Tyapp(ts,[]) , Int when Why3.Ty.(ts_equal ts ts_int) -> ()
@@ -387,6 +398,10 @@ let apply (Fun f) ?result ts =
   Option.iter (unify_opt s f.ls.ls_value) result ;
   of_oty ~sigma:!s (context f.ct) f.ls.ls_value
 
+(* -------------------------------------------------------------------------- *)
+(* --- Functions                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
 let signature (Fun f) =
   let r = ref 0 in
   let s = ref Why3.Ty.Mtv.empty in
@@ -414,5 +429,40 @@ let definition (Fun f) =
         Why3.Decl.find_logic_definition (context f.ct).th_known f.ls
       with _ -> None
     in f.def <- Some def ; def
+
+(* -------------------------------------------------------------------------- *)
+(* --- Declarations                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let new_record cluster ?loc ?(name="record") fds =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let mk = Why3.Ident.id_fresh ?loc (name ^ "'mk") in
+  let tvs =
+    List.fold_left
+      (fun tvs (_,ty) -> Why3.Ty.ty_freevars tvs ty)
+      Why3.Ty.Stv.empty fds in
+  let tvs = Why3.Ty.Stv.elements tvs in
+  let ts = Why3.Ty.create_tysymbol id tvs NoDef in
+  let fts = List.map snd fds in
+  let tr = Why3.Ty.ty_app ts (List.map Why3.Ty.ty_var tvs) in
+  let prjs =
+    List.map
+      (fun (fd,ty) ->
+         let id = Why3.Ident.id_fresh ?loc fd in
+         let fs = Why3.Term.create_fsymbol ~proj:true id [tr] ty in
+         Some fs
+      ) fds in
+  let { cluster = ct } = cluster in
+  let data = Data { ct ; ts ; cs = None ; fs = None } in
+  let fields = List.mapi
+      (fun rank prj ->
+         Field { ct ; rank ; ls = Option.get prj ; data }
+      ) prjs in
+  let ls = Why3.Term.create_lsymbol ~constr:1 mk fts (Some tr) in
+  let record = Fun { ct ; ls ; def = None } in
+  let ctors = [ls,prjs] in
+  let decl = Why3.Decl.create_data_decl [ts,[ls,prjs]] in
+  let Data d = data in d.fs <- Some fields ; d.cs <- Some ctors ;
+  add cluster decl ; data, record, fields
 
 (* -------------------------------------------------------------------------- *)
