@@ -119,11 +119,18 @@ val close : cluster -> Why3.Theory.theory
 
 (** {2 Declaration Factory} *)
 
+(** Declares a new abstract datatype in the provided cluster.
+    Returns a tuple [d,cs] with the created datatype [d] and its constructors [cs]. *)
+val new_datatype :
+  cluster -> ?loc:Why3.Loc.position -> name:string ->
+  (string * Why3.Ty.ty list) list ->
+  data * lfun list
+
 (** Declares a new record type in the provided cluster.
     Returns a tuple [d,c,fs] with the created datatype [d], its constructor [c] and
     the associated fields [fs]. *)
 val new_record :
-  cluster -> ?loc:Why3.Loc.position -> ?name:string ->
+  cluster -> ?loc:Why3.Loc.position -> name:string ->
   (string * Why3.Ty.ty) list ->
   data * lfun * field list
 

@@ -434,14 +434,35 @@ let definition (Fun f) =
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_record cluster ?loc ?(name="record") fds =
+let new_datatype cluster ?loc ~name ctors =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let tvs =
+    Why3.Ty.Stv.elements @@
+    List.fold_left
+      (fun tvs (_,ts) -> List.fold_left Why3.Ty.ty_freevars tvs ts)
+      Why3.Ty.Stv.empty ctors in
+  let ts = Why3.Ty.create_tysymbol id tvs NoDef in
+  let tr = Why3.Ty.ty_app ts (List.map Why3.Ty.ty_var tvs) in
+  let constr = List.length ctors in
+  let ctors : Why3.Decl.constructor list =
+    List.map
+      (fun (name,tys) ->
+         let id = Why3.Ident.id_fresh ?loc name in
+         Why3.Term.create_fsymbol ~constr id tys tr,
+         List.map (fun _ -> None) tys
+      ) ctors in
+  let { cluster = ct } = cluster in
+  Data { ct ; ts ; cs = Some ctors ; fs = None },
+  List.map (fun (ls,_) -> Fun { ct ; ls ; def = None }) ctors
+
+let new_record cluster ?loc ~name fds =
   let id = Why3.Ident.id_fresh ?loc name in
   let mk = Why3.Ident.id_fresh ?loc (name ^ "'mk") in
   let tvs =
+    Why3.Ty.Stv.elements @@
     List.fold_left
       (fun tvs (_,ty) -> Why3.Ty.ty_freevars tvs ty)
       Why3.Ty.Stv.empty fds in
-  let tvs = Why3.Ty.Stv.elements tvs in
   let ts = Why3.Ty.create_tysymbol id tvs NoDef in
   let fts = List.map snd fds in
   let tr = Why3.Ty.ty_app ts (List.map Why3.Ty.ty_var tvs) in
