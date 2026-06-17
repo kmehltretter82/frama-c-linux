@@ -20,6 +20,11 @@ let stmt ?warn:_ kf stmt =
               ~pointer_value:false
               ~left_shift_negative:false
               ~right_shift_negative:false
+              ~signed_downcast:false
+              ~unsigned_downcast:false
+              ~pointer_downcast:false
+              ~float_to_int:false
+              ~shift:false
               ())
     kf stmt
 
@@ -33,6 +38,11 @@ let exp ?warn:_ kf stmt e =
               ~pointer_value:false
               ~left_shift_negative:false
               ~right_shift_negative:false
+              ~signed_downcast:false
+              ~unsigned_downcast:false
+              ~pointer_downcast:false
+              ~float_to_int:false
+              ~shift:false
               ())
     kf stmt e
 

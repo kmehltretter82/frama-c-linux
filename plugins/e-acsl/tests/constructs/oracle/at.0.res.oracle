@@ -27,6 +27,8 @@
 [eva:alarm] at.i:47: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] at.i:47: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] at.i:47: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at.i:47: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -36,6 +38,8 @@
 [eva:alarm] at.i:51: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] at.i:51: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] at.i:51: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at.i:51: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -43,6 +47,8 @@
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] at.i:49: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] at.i:49: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
 [eva:alarm] at.i:49: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at.i:49: Warning: 

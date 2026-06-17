@@ -534,6 +534,7 @@ int main(void)
     while (i < 0) {
       {
         int __gen_e_acsl_aligned;
+        int __gen_e_acsl_and;
         int __gen_e_acsl_valid_read;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
@@ -556,6 +557,29 @@ int main(void)
           __gen_e_acsl_assert_data_2.name = "pointer alignment";
           __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,i);
+        if ((-9223372036854775807L-1L) <= (long)i) {
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,i);
+          __gen_e_acsl_and = (long)i <= 9223372036854775807L;
+        }
+        else __gen_e_acsl_and = 0;
+        /*@ assert
+              E_ACSL: "signed downcast":
+                -9223372036854775808 <= i <= 9223372036854775807;
+        */
+        {
+          __gen_e_acsl_assert_data_3.blocking = 1;
+          __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
+          __gen_e_acsl_assert_data_3.pred_txt = "-9223372036854775808 <= i <= 9223372036854775807";
+          __gen_e_acsl_assert_data_3.file = "bts2252.c";
+          __gen_e_acsl_assert_data_3.fct = "main";
+          __gen_e_acsl_assert_data_3.line = 17;
+          __gen_e_acsl_assert_data_3.name = "signed downcast";
+          __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_3);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         }
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
                                                       sizeof(char),

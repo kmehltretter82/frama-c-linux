@@ -67,8 +67,12 @@ Options taking a string as argument should preferably be written
 -e-acsl-O-hyp-gath  (O ≥ 1) hypothesis gathering (in inductive extraction)
                     (set by default, opposite option is
                     -e-acsl-O-no-hyp-gath)
+-e-acsl-O-implicit-downcast  (O ≤ 2) generate RTE guards for implicit
+                    downcast done by the translation (set by default,
+                    opposite option is -e-acsl-O-no-implicit-downcast)
 -e-acsl-O-no-gmp-only  opposite of -e-acsl-O-gmp-only (set by default)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
+-e-acsl-O-no-implicit-downcast  opposite of -e-acsl-O-implicit-downcast
 -e-acsl-O-no-print-values  opposite of -e-acsl-O-print-values
 -e-acsl-O-no-rte    opposite of -e-acsl-O-rte
 -e-acsl-O-no-rte-initialized  opposite of -e-acsl-O-rte-initialized (set by
