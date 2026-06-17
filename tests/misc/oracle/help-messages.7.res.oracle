@@ -78,9 +78,13 @@ Options taking a string as argument should preferably be written
                     -e-acsl-O-no-hyp-gath)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
 -e-acsl-O-no-omit-rte  opposite of -e-acsl-O-omit-rte (set by default)
+-e-acsl-O-no-omit-trivial-rte  opposite of -e-acsl-O-omit-trivial-rte
 -e-acsl-O-no-smart-il  opposite of -e-acsl-O-smart-il
 -e-acsl-O-omit-rte  (O ≥ 3) omit RTE guard generation for specifications
                     (opposite option is -e-acsl-O-no-omit-rte)
+-e-acsl-O-omit-trivial-rte  (O ≥ 1) omit trivial RTE guard generation for
+                    specifications (set by default, opposite option is
+                    -e-acsl-O-no-omit-trivial-rte)
 -e-acsl-O-smart-il  (O ≥ 1) optimises expressions using smart constructors
                     (set by default, opposite option is
                     -e-acsl-O-no-smart-il)

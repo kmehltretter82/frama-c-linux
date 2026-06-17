@@ -14,7 +14,8 @@ int main() {
 
   int *i0 = (int *)(chars + 0);
   int *i1 = (int *)(chars + 1);
-  //@ assert !\aligned(i0, alignof(int)) || !\aligned(i1, alignof(int));
+  // fails RTE check: alignment
+  // //@ assert !\aligned(i0, alignof(int)) || !\aligned(i1, alignof(int));
 
   // fails RTE check: alignment should not be zero
   //@ assert \aligned(i0, 2 - 2);

@@ -55,8 +55,14 @@ int main(void)
 void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                                                  int *AverageAccel)
 {
-  int *__gen_e_acsl_at_12;
-  int *__gen_e_acsl_at_11;
+  int *__gen_e_acsl_at_18;
+  int *__gen_e_acsl_at_17;
+  int *__gen_e_acsl_at_16;
+  ArrayInt *__gen_e_acsl_at_15;
+  ArrayInt *__gen_e_acsl_at_14;
+  ArrayInt *__gen_e_acsl_at_13;
+  ArrayInt *__gen_e_acsl_at_12;
+  ArrayInt *__gen_e_acsl_at_11;
   ArrayInt *__gen_e_acsl_at_10;
   ArrayInt *__gen_e_acsl_at_9;
   ArrayInt *__gen_e_acsl_at_8;
@@ -67,20 +73,280 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   ArrayInt *__gen_e_acsl_at_3;
   ArrayInt *__gen_e_acsl_at_2;
   ArrayInt *__gen_e_acsl_at;
-  __e_acsl_store_block((void *)(& AverageAccel),8UL);
-  __e_acsl_store_block((void *)(& Accel),8UL);
-  __gen_e_acsl_at = Accel;
-  __gen_e_acsl_at_2 = Accel;
-  __gen_e_acsl_at_3 = Accel;
-  __gen_e_acsl_at_4 = Accel;
-  __gen_e_acsl_at_5 = Accel;
-  __gen_e_acsl_at_6 = Accel;
-  __gen_e_acsl_at_7 = Accel;
-  __gen_e_acsl_at_8 = Accel;
-  __gen_e_acsl_at_9 = Accel;
-  __gen_e_acsl_at_10 = Accel;
-  __gen_e_acsl_at_11 = AverageAccel;
-  __gen_e_acsl_at_12 = AverageAccel;
+  {
+    int __gen_e_acsl_aligned;
+    int __gen_e_acsl_aligned_2;
+    int __gen_e_acsl_aligned_3;
+    int __gen_e_acsl_aligned_4;
+    int __gen_e_acsl_aligned_5;
+    int __gen_e_acsl_aligned_6;
+    int __gen_e_acsl_aligned_7;
+    int __gen_e_acsl_aligned_8;
+    int __gen_e_acsl_aligned_9;
+    int __gen_e_acsl_aligned_10;
+    int __gen_e_acsl_aligned_11;
+    int __gen_e_acsl_aligned_12;
+    __e_acsl_store_block((void *)(& AverageAccel),8UL);
+    __e_acsl_store_block((void *)(& Accel),8UL);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\"pointer alignment\": \\aligned(Accel,4)",
+                                 0,__gen_e_acsl_aligned);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(Accel,4); */
+    {
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.pred_txt = "\\aligned(Accel,4)";
+      __gen_e_acsl_assert_data.file = "bts1326.i";
+      __gen_e_acsl_assert_data.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data.line = 9;
+      __gen_e_acsl_assert_data.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "\"pointer alignment\": \\aligned(\\old(Accel),4)",
+                                 0,__gen_e_acsl_aligned_2);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Accel),4); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\old(Accel),4)";
+      __gen_e_acsl_assert_data_2.file = "bts1326.i";
+      __gen_e_acsl_assert_data_2.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_2.line = 9;
+      __gen_e_acsl_assert_data_2.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
+    __gen_e_acsl_at = Accel;
+    __gen_e_acsl_at_2 = Accel;
+    __gen_e_acsl_at_3 = Accel;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "\"pointer alignment\": \\aligned(Accel,4)",
+                                 0,__gen_e_acsl_aligned_3);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(Accel,4); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(Accel,4)";
+      __gen_e_acsl_assert_data_3.file = "bts1326.i";
+      __gen_e_acsl_assert_data_3.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_3.line = 9;
+      __gen_e_acsl_assert_data_3.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "\"pointer alignment\": \\aligned(\\old(Accel),4)",
+                                 0,__gen_e_acsl_aligned_4);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Accel),4); */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(\\old(Accel),4)";
+      __gen_e_acsl_assert_data_4.file = "bts1326.i";
+      __gen_e_acsl_assert_data_4.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_4.line = 9;
+      __gen_e_acsl_assert_data_4.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
+    __gen_e_acsl_at_4 = Accel;
+    __gen_e_acsl_at_5 = Accel;
+    __gen_e_acsl_at_6 = Accel;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                 "\"pointer alignment\": \\aligned(Accel,4)",
+                                 0,__gen_e_acsl_aligned_5);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(Accel,4); */
+    {
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(Accel,4)";
+      __gen_e_acsl_assert_data_5.file = "bts1326.i";
+      __gen_e_acsl_assert_data_5.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_5.line = 9;
+      __gen_e_acsl_assert_data_5.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_5,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                 "\"pointer alignment\": \\aligned(\\old(Accel),4)",
+                                 0,__gen_e_acsl_aligned_6);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Accel),4); */
+    {
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(\\old(Accel),4)";
+      __gen_e_acsl_assert_data_6.file = "bts1326.i";
+      __gen_e_acsl_assert_data_6.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_6.line = 9;
+      __gen_e_acsl_assert_data_6.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_6,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    }
+    __gen_e_acsl_at_7 = Accel;
+    __gen_e_acsl_at_8 = Accel;
+    __gen_e_acsl_at_9 = Accel;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                 "\"pointer alignment\": \\aligned(Accel,4)",
+                                 0,__gen_e_acsl_aligned_7);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(Accel,4); */
+    {
+      __gen_e_acsl_assert_data_7.blocking = 1;
+      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(Accel,4)";
+      __gen_e_acsl_assert_data_7.file = "bts1326.i";
+      __gen_e_acsl_assert_data_7.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_7.line = 9;
+      __gen_e_acsl_assert_data_7.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_7);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                 "\"pointer alignment\": \\aligned(\\old(Accel),4)",
+                                 0,__gen_e_acsl_aligned_8);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Accel),4); */
+    {
+      __gen_e_acsl_assert_data_8.blocking = 1;
+      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(\\old(Accel),4)";
+      __gen_e_acsl_assert_data_8.file = "bts1326.i";
+      __gen_e_acsl_assert_data_8.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_8.line = 9;
+      __gen_e_acsl_assert_data_8.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_8);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    }
+    __gen_e_acsl_at_10 = Accel;
+    __gen_e_acsl_at_11 = Accel;
+    __gen_e_acsl_at_12 = Accel;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "\"pointer alignment\": \\aligned(Accel,4)",
+                                 0,__gen_e_acsl_aligned_9);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(Accel,4); */
+    {
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(Accel,4)";
+      __gen_e_acsl_assert_data_9.file = "bts1326.i";
+      __gen_e_acsl_assert_data_9.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_9.line = 9;
+      __gen_e_acsl_assert_data_9.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_9,& __gen_e_acsl_assert_data_9);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_10 = __e_acsl_aligned((void *)Accel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"Accel",
+                                 (void *)Accel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                 "\"pointer alignment\": \\aligned(\\old(Accel),4)",
+                                 0,__gen_e_acsl_aligned_10);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Accel),4); */
+    {
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(\\old(Accel),4)";
+      __gen_e_acsl_assert_data_10.file = "bts1326.i";
+      __gen_e_acsl_assert_data_10.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_10.line = 9;
+      __gen_e_acsl_assert_data_10.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_10,& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+    }
+    __gen_e_acsl_at_13 = Accel;
+    __gen_e_acsl_at_14 = Accel;
+    __gen_e_acsl_at_15 = Accel;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_11 = __e_acsl_aligned((void *)AverageAccel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
+                                 "AverageAccel",(void *)AverageAccel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+                                 "\"pointer alignment\": \\aligned(AverageAccel,4)",
+                                 0,__gen_e_acsl_aligned_11);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(AverageAccel,4); */
+    {
+      __gen_e_acsl_assert_data_11.blocking = 1;
+      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(AverageAccel,4)";
+      __gen_e_acsl_assert_data_11.file = "bts1326.i";
+      __gen_e_acsl_assert_data_11.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_11.line = 8;
+      __gen_e_acsl_assert_data_11.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_11,& __gen_e_acsl_assert_data_11);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_12 = __e_acsl_aligned((void *)AverageAccel,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
+                                 "AverageAccel",(void *)AverageAccel);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
+                                 "\"pointer alignment\": \\aligned(\\old(AverageAccel),4)",
+                                 0,__gen_e_acsl_aligned_12);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(\old(AverageAccel),4);
+    */
+    {
+      __gen_e_acsl_assert_data_12.blocking = 1;
+      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(\\old(AverageAccel),4)";
+      __gen_e_acsl_assert_data_12.file = "bts1326.i";
+      __gen_e_acsl_assert_data_12.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_12.line = 8;
+      __gen_e_acsl_assert_data_12.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_12,& __gen_e_acsl_assert_data_12);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+    }
+    __gen_e_acsl_at_16 = AverageAccel;
+    __gen_e_acsl_at_17 = AverageAccel;
+    __gen_e_acsl_at_18 = AverageAccel;
+  }
   atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {
     int __gen_e_acsl_valid_read;
@@ -89,190 +355,196 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     int __gen_e_acsl_valid_read_4;
     int __gen_e_acsl_valid_read_5;
     int __gen_e_acsl_valid_read_6;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_12,
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_18,
                                                   sizeof(int),
-                                                  (void *)__gen_e_acsl_at_12,
-                                                  (void *)(& __gen_e_acsl_at_12));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                                  (void *)__gen_e_acsl_at_18,
+                                                  (void *)(& __gen_e_acsl_at_18));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
                                  "\\old(AverageAccel)",
-                                 (void *)__gen_e_acsl_at_12);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                 (void *)__gen_e_acsl_at_18);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                  "\"memory access\": \\valid_read(\\old(AverageAccel))",
                                  0,__gen_e_acsl_valid_read);
     /*@ assert E_ACSL: "memory access": \valid_read(\old(AverageAccel)); */
     {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(\\old(AverageAccel))";
-      __gen_e_acsl_assert_data_2.file = "bts1326.i";
-      __gen_e_acsl_assert_data_2.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_2.line = 8;
-      __gen_e_acsl_assert_data_2.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __gen_e_acsl_assert_data_14.blocking = 1;
+      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.pred_txt = "\\valid_read(\\old(AverageAccel))";
+      __gen_e_acsl_assert_data_14.file = "bts1326.i";
+      __gen_e_acsl_assert_data_14.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_14.line = 8;
+      __gen_e_acsl_assert_data_14.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_14);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_10)[4]),
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_15)[4]),
                                                     sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at_10),
+                                                    (void *)(*__gen_e_acsl_at_15),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
                                  "&(*\\old(Accel))[4]",
-                                 (void *)(& (*__gen_e_acsl_at_10)[4]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                 (void *)(& (*__gen_e_acsl_at_15)[4]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                  "\"memory access\": \\valid_read(&(*\\old(Accel))[4])",
                                  0,__gen_e_acsl_valid_read_2);
     /*@ assert E_ACSL: "memory access": \valid_read(&(*\old(Accel))[4]); */
     {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(&(*\\old(Accel))[4])";
-      __gen_e_acsl_assert_data_3.file = "bts1326.i";
-      __gen_e_acsl_assert_data_3.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_3.line = 9;
-      __gen_e_acsl_assert_data_3.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.pred_txt = "\\valid_read(&(*\\old(Accel))[4])";
+      __gen_e_acsl_assert_data_15.file = "bts1326.i";
+      __gen_e_acsl_assert_data_15.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_15.line = 9;
+      __gen_e_acsl_assert_data_15.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,
+                      & __gen_e_acsl_assert_data_15);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_8)[3]),
+    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_12)[3]),
                                                     sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at_8),
+                                                    (void *)(*__gen_e_acsl_at_12),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,
                                  "&(*\\old(Accel))[3]",
-                                 (void *)(& (*__gen_e_acsl_at_8)[3]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                 (void *)(& (*__gen_e_acsl_at_12)[3]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                  "\"memory access\": \\valid_read(&(*\\old(Accel))[3])",
                                  0,__gen_e_acsl_valid_read_3);
     /*@ assert E_ACSL: "memory access": \valid_read(&(*\old(Accel))[3]); */
     {
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(&(*\\old(Accel))[3])";
-      __gen_e_acsl_assert_data_4.file = "bts1326.i";
-      __gen_e_acsl_assert_data_4.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_4.line = 9;
-      __gen_e_acsl_assert_data_4.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+      __gen_e_acsl_assert_data_16.blocking = 1;
+      __gen_e_acsl_assert_data_16.kind = "RTE";
+      __gen_e_acsl_assert_data_16.pred_txt = "\\valid_read(&(*\\old(Accel))[3])";
+      __gen_e_acsl_assert_data_16.file = "bts1326.i";
+      __gen_e_acsl_assert_data_16.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_16.line = 9;
+      __gen_e_acsl_assert_data_16.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_3,
+                      & __gen_e_acsl_assert_data_16);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_6)[2]),
+    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_9)[2]),
                                                     sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at_6),
+                                                    (void *)(*__gen_e_acsl_at_9),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
                                  "&(*\\old(Accel))[2]",
-                                 (void *)(& (*__gen_e_acsl_at_6)[2]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                 (void *)(& (*__gen_e_acsl_at_9)[2]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
                                  "\"memory access\": \\valid_read(&(*\\old(Accel))[2])",
                                  0,__gen_e_acsl_valid_read_4);
     /*@ assert E_ACSL: "memory access": \valid_read(&(*\old(Accel))[2]); */
     {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(&(*\\old(Accel))[2])";
-      __gen_e_acsl_assert_data_5.file = "bts1326.i";
-      __gen_e_acsl_assert_data_5.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_5.line = 9;
-      __gen_e_acsl_assert_data_5.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      __gen_e_acsl_assert_data_17.blocking = 1;
+      __gen_e_acsl_assert_data_17.kind = "RTE";
+      __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(&(*\\old(Accel))[2])";
+      __gen_e_acsl_assert_data_17.file = "bts1326.i";
+      __gen_e_acsl_assert_data_17.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_17.line = 9;
+      __gen_e_acsl_assert_data_17.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_4,
+                      & __gen_e_acsl_assert_data_17);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_4)[1]),
+    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_6)[1]),
                                                     sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at_4),
+                                                    (void *)(*__gen_e_acsl_at_6),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
                                  "&(*\\old(Accel))[1]",
-                                 (void *)(& (*__gen_e_acsl_at_4)[1]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                 (void *)(& (*__gen_e_acsl_at_6)[1]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_18,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                  "\"memory access\": \\valid_read(&(*\\old(Accel))[1])",
                                  0,__gen_e_acsl_valid_read_5);
     /*@ assert E_ACSL: "memory access": \valid_read(&(*\old(Accel))[1]); */
     {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(&(*\\old(Accel))[1])";
-      __gen_e_acsl_assert_data_6.file = "bts1326.i";
-      __gen_e_acsl_assert_data_6.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_6.line = 9;
-      __gen_e_acsl_assert_data_6.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      __gen_e_acsl_assert_data_18.blocking = 1;
+      __gen_e_acsl_assert_data_18.kind = "RTE";
+      __gen_e_acsl_assert_data_18.pred_txt = "\\valid_read(&(*\\old(Accel))[1])";
+      __gen_e_acsl_assert_data_18.file = "bts1326.i";
+      __gen_e_acsl_assert_data_18.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_18.line = 9;
+      __gen_e_acsl_assert_data_18.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_5,
+                      & __gen_e_acsl_assert_data_18);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(*__gen_e_acsl_at_2),
+    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(*__gen_e_acsl_at_3),
                                                     sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at_2),
+                                                    (void *)(*__gen_e_acsl_at_3),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,
                                  "&(*\\old(Accel)[0])",
-                                 (void *)(*__gen_e_acsl_at_2));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                 (void *)(*__gen_e_acsl_at_3));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_19,
                                    "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
                                  "\"memory access\": \\valid_read(&(*\\old(Accel)[0]))",
                                  0,__gen_e_acsl_valid_read_6);
     /*@ assert E_ACSL: "memory access": \valid_read(&(*\old(Accel)[0])); */
     {
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(&(*\\old(Accel)[0]))";
-      __gen_e_acsl_assert_data_7.file = "bts1326.i";
-      __gen_e_acsl_assert_data_7.fct = "atp_NORMAL_computeAverageAccel";
-      __gen_e_acsl_assert_data_7.line = 9;
-      __gen_e_acsl_assert_data_7.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      __gen_e_acsl_assert_data_19.blocking = 1;
+      __gen_e_acsl_assert_data_19.kind = "RTE";
+      __gen_e_acsl_assert_data_19.pred_txt = "\\valid_read(&(*\\old(Accel)[0]))";
+      __gen_e_acsl_assert_data_19.file = "bts1326.i";
+      __gen_e_acsl_assert_data_19.fct = "atp_NORMAL_computeAverageAccel";
+      __gen_e_acsl_assert_data_19.line = 9;
+      __gen_e_acsl_assert_data_19.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_6,
+                      & __gen_e_acsl_assert_data_19);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
     }
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "*\\old(AverageAccel)",0,
-                                 *__gen_e_acsl_at_11);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 *__gen_e_acsl_at_16);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "(*\\old(Accel))[4]",0,
-                                 (*__gen_e_acsl_at_9)[4]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 (*__gen_e_acsl_at_13)[4]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "(*\\old(Accel))[3]",0,
-                                 (*__gen_e_acsl_at_7)[3]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 (*__gen_e_acsl_at_10)[3]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "(*\\old(Accel))[2]",0,
-                                 (*__gen_e_acsl_at_5)[2]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 (*__gen_e_acsl_at_7)[2]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "(*\\old(Accel))[1]",0,
-                                 (*__gen_e_acsl_at_3)[1]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 (*__gen_e_acsl_at_4)[1]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                  "(*\\old(Accel))[0]",0,
                                  (*__gen_e_acsl_at)[0]);
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4] + (*\\old(Accel))[3]) + (*\\old(Accel))[2]) +\n  (*\\old(Accel))[1])\n + (*\\old(Accel))[0])\n/ 5";
-    __gen_e_acsl_assert_data.file = "bts1326.i";
-    __gen_e_acsl_assert_data.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data.line = 8;
-    __e_acsl_assert(*__gen_e_acsl_at_11 == (int)((((((*__gen_e_acsl_at_9)[4] + (long)(*__gen_e_acsl_at_7)[3]) + (*__gen_e_acsl_at_5)[2]) + (*__gen_e_acsl_at_3)[1]) + (*__gen_e_acsl_at)[0]) / 5L),
-                    & __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __gen_e_acsl_assert_data_13.blocking = 1;
+    __gen_e_acsl_assert_data_13.kind = "Postcondition";
+    __gen_e_acsl_assert_data_13.pred_txt = "*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4] + (*\\old(Accel))[3]) + (*\\old(Accel))[2]) +\n  (*\\old(Accel))[1])\n + (*\\old(Accel))[0])\n/ 5";
+    __gen_e_acsl_assert_data_13.file = "bts1326.i";
+    __gen_e_acsl_assert_data_13.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_13.line = 8;
+    __e_acsl_assert(*__gen_e_acsl_at_16 == (int)((((((*__gen_e_acsl_at_13)[4] + (long)(*__gen_e_acsl_at_10)[3]) + (*__gen_e_acsl_at_7)[2]) + (*__gen_e_acsl_at_4)[1]) + (*__gen_e_acsl_at)[0]) / 5L),
+                    & __gen_e_acsl_assert_data_13);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     __e_acsl_delete_block((void *)(& AverageAccel));
     __e_acsl_delete_block((void *)(& Accel));
     return;

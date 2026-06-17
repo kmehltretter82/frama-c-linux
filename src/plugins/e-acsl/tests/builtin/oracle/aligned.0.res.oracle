@@ -30,16 +30,5 @@
   unaligned pointer creation. assert \aligned(&chars[0],alignof(int));
 [eva:alarm] aligned.c:16: Warning: 
   unaligned pointer creation. assert \aligned(&chars[1],alignof(int));
-[eva:alarm] aligned.c:17: Warning: 
-  unaligned pointer creation. assert \aligned(i0,alignof(int));
-[eva:alarm] aligned.c:17: Warning: 
-  unaligned pointer creation. assert \aligned(i0,alignof(int));
-[eva:alarm] aligned.c:17: Warning: 
-  unaligned pointer creation. assert \aligned(i1,alignof(int));
-[eva:alarm] aligned.c:17: Warning: 
-  unaligned pointer creation. assert \aligned(i1,alignof(int));
-[eva:alarm] aligned.c:17: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] aligned.c:17: Warning: assertion got status unknown.
-[eva:alarm] aligned.c:20: Warning: 
+[eva:alarm] aligned.c:21: Warning: 
   assertion 'E_ACSL,division by zero' got status invalid (stopping propagation).

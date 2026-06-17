@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-* E-ACSL     [2026-06-30] Fix the lack of 'pointer alignment' RTE guard when
+                           aliasing is possible
 -  E-ACSL     [2026-06-11] Add optimisation flag for omitting RTE generation
 -  E-ACSL     [2026-06-09] Add optimisation flag for hypothesis gathering
 -  E-ACSL     [2026-06-16] Reduce costs for checking “memory access” RTEs at
