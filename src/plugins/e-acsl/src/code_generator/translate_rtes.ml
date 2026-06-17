@@ -53,7 +53,7 @@ let exp ?filter kf env e =
   Assert.do_pending_register_data env
 
 let () =
-  Translate_terms.translate_rte_exp_ref := exp;
+  Translate_terms.Translate_rtes.exp_ref := exp;
   Translate_predicates.Translate_rtes.translate_rte_annots_ref := rte_annots;
   Translate_predicates.Translate_rtes.translate_rte_exp_ref := exp;
   Logic_array.Translate_rtes.exp_ref := exp

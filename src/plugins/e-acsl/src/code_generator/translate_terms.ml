@@ -22,15 +22,20 @@ open Interlang_gen.M.Operators
 
 (********************** Forward references ********************************)
 
-let translate_rte_exp_ref
-  : (?filter:(code_annotation -> bool) ->
-     kernel_function ->
-     Env.t ->
-     exp ->
-     Env.t) ref
-  =
-  ref (fun ?filter:_ _kf _env _e ->
-      Extlib.mk_labeled_fun "translate_rte_exp_ref")
+module Translate_rtes = struct
+  let exp_ref
+    : (?filter:(code_annotation -> bool) ->
+       kernel_function ->
+       Env.t ->
+       exp ->
+       Env.t) ref
+    =
+    ref (fun ?filter:_ _kf _env _e ->
+        Extlib.mk_labeled_fun "translate_rte_exp_ref")
+
+  let exp ?filter kf env e =
+    !exp_ref ?filter kf env e
+end
 
 module Translate_predicates = struct
   let to_exp_ref :
@@ -1044,7 +1049,7 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
           context_insensitive_term_to_exp_old ?inplace ~adata kf env t
         in
         let env =
-          if generate_rte then !translate_rte_exp_ref kf env e else env
+          if generate_rte then Translate_rtes.exp kf env e else env
         in
         let cast = Typing.get_cast ~logic_env t in
         let name = if name = "" then None else Some name in
