@@ -209,38 +209,38 @@ let rec parse_region (env:env) p =
 let parse_case p =
   match p.extended_node with
   | Ext_lexpr(e) when e.ext_name = "pinvariant" ->
-      ()
+    ()
   | Ext_lexpr(e) when e.ext_name = "pframe" ->
-      ()
+    ()
   | Ext_lexpr(e) when e.ext_name = "pwhen" ->
-      ()
+    ()
   | Ext_lexpr(e) ->
-      Options.error ~current:true "The clause %s should not be used directly \
-      inside a pcase." e.ext_name;
+    Options.error ~current:true "The clause %s should not be used directly \
+    inside a pcase." e.ext_name;
   | Ext_extension(ext) ->
-      Options.error ~current:true "The clause %s should not be used directly \
-      inside a pcase." ext.gext_name;
-      ()
+    Options.error ~current:true "The clause %s should not be used directly \
+    inside a pcase." ext.gext_name;
+    ()
 
 let parse_datamodel p =
   match p.extended_node with
   | Ext_lexpr(e) when e.ext_name = "pmodel" ->
-      ()
+    ()
   | Ext_lexpr(e) when e.ext_name = "pinvariant" ->
-      ()
+    ()
   | Ext_lexpr(e) when e.ext_name = "pframe" ->
-      ()
+    ()
   | Ext_lexpr(e) ->
-      Options.error ~current:true "The clause %s should not be used directly \
-      inside a datamodel." e.ext_name;
-      ()
+    Options.error ~current:true "The clause %s should not be used directly \
+    inside a datamodel." e.ext_name;
+    ()
   | Ext_extension(ext) when ext.gext_name = "pcase" ->
-      List.iter parse_case ext.gext_content;
-      ()
+    List.iter parse_case ext.gext_content;
+    ()
   | Ext_extension(ext) ->
-      Options.error ~current:true "The clause %s should not be used directly \
-      inside a datamodel." ext.gext_name;
-      ()
+    Options.error ~current:true "The clause %s should not be used directly \
+    inside a datamodel." ext.gext_name;
+    ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Spec Typechecking & Printing                                       --- *)
