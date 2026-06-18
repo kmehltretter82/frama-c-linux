@@ -29,7 +29,7 @@ let to_string ip =
   | Some (kind, txt) ->
     let kf = kf_of_property ip in
     let loc =
-      if not (Fileloc.is_known loc) then
+      if Fileloc.is_empty loc then
         Kernel_function.get_location kf
       else loc
     in
