@@ -842,7 +842,7 @@ let do_warning kf ?(loc=Kernel_function.get_location kf) funspec = function
           Kernel_function.pretty kf source
     in
     Kernel.warning
-      ~once:true ~source:(Fileloc.loc_start loc) ~wkey:Kernel.wkey_missing_spec
+      ~once:true ~source:loc ~wkey:Kernel.wkey_missing_spec
       "@[%a.@ See -generated-spec-* options for more info.@]"
       Format.pp_print_text msg
 

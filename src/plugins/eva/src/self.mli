@@ -103,12 +103,12 @@ val wkey_acsl_unsupported : warn_category
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
-  ?pos:Position.t -> ?current:bool -> ?source:Filepos.t ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fileloc.t ->
   ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  ?pos:Position.t -> ?current:bool -> ?source:Filepos.t ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fileloc.t ->
   ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 

@@ -839,7 +839,7 @@ let rec global_annot_pass1 g =
       let g = global_annot_without_irrelevant_attributes g in
       let g' = global_annot_without_irrelevant_attributes (snd node.ndata) in
       if not (Logic_utils.is_same_global_annotation g g') then
-        Kernel.warning ~source:(Fileloc.loc_start loc)
+        Kernel.warning ~source:loc
           "Overlapping volatile specification: \
            volatile location %a already associated to a %a function in \
            annotation at loc %a. Ignoring new binding."

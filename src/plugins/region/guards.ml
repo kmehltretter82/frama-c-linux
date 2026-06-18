@@ -66,7 +66,7 @@ and exp env e =
   | CastE(t,e) when
       Ast_types.C.is_fun_or_ptr t &&
       not (Ast_types.C.is_fun_or_ptr @@ Cil.typeOf e) ->
-    Options.not_yet_implemented ~source:(Fileloc.loc_start e.eloc)
+    Options.not_yet_implemented ~source:e.eloc
       "Integral to pointer casts"
   | CastE(_,e) ->
     Option.map (fun (_,r) -> false,r) @@ exp env e
@@ -121,7 +121,7 @@ let requires ~spec node p =
 let subst ~loc kf es t =
   match Logic_subst.term (Kernel_function.get_formals kf) es t
   with Some t -> t | None ->
-    Options.abort ~source:(Fileloc.loc_start loc)
+    Options.abort ~source:loc
       "Can not evaluate term (%a)@ from function %a at call site"
       Printer.pp_term t Kernel_function.pretty kf
 
@@ -185,7 +185,7 @@ let call env stmt fct es =
         List.iter (fun kf -> call_kf env stmt kf es) kfs
       | None ->
         Options.not_yet_implemented
-          ~source:(Fileloc.loc_start @@ Cil_datatype.Stmt.loc stmt)
+          ~source:(Cil_datatype.Stmt.loc stmt)
           "Dynamic call without @call annotation"
     end
 
@@ -262,7 +262,7 @@ let add_annotation ?kf ?emitter ?(names=[]) ?(hyps=[]) stmt guard =
     let ips = Property.ip_of_code_annot kf stmt ca in
     let status = Property_status.False_if_reachable in
     List.iter (fun ip -> Property_status.emit e ~hyps ip status) ips ;
-    Options.warning ~source:(Fileloc.loc_start loc) "Invalid side-condition: %a"
+    Options.warning ~source:loc "Invalid side-condition: %a"
       Printer.pp_predicate (of_guard @@ falsy guard)
 
 (* -------------------------------------------------------------------------- *)

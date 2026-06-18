@@ -91,14 +91,14 @@ let pp_numbered_stacks fmt callstacks =
 let wkey_stmt = Self.register_warn_category "stmt"
 
 let warn_nonterminating_statement stmt callstacks =
-  Self.warning ~wkey:wkey_stmt ~source:(Fileloc.loc_start (Stmt.loc stmt))
+  Self.warning ~wkey:wkey_stmt ~source:(Stmt.loc stmt)
     "non-terminating %a@\n%a"
     pretty_stmt_kind stmt pp_numbered_stacks callstacks
 
 let wkey_dead = Self.register_warn_category "dead-code"
 
 let warn_dead_code stmt =
-  Self.warning ~wkey:wkey_dead ~source:(Fileloc.loc_start (Stmt.loc stmt))
+  Self.warning ~wkey:wkey_dead ~source:(Stmt.loc stmt)
     "%a is syntactically unreachable" pretty_stmt_kind stmt
 
 class dead_cc_collector kf = object
@@ -148,7 +148,7 @@ let wkey_unreachable = Self.register_warn_category "unreachable"
 let warn_unreachable_statement stmt =
   Self.warning
     ~wkey:wkey_unreachable
-    ~source:(Fileloc.loc_start (Stmt.loc stmt))
+    ~source:(Stmt.loc stmt)
     "unreachable %a" pretty_stmt_kind stmt
 
 class unreachable_stmt_visitor kf to_ignore = object
@@ -270,7 +270,7 @@ let collect_nonterminating_statements fd nonterm_stacks =
       match stmt.skind with
       | Block _ -> (* do not compute; already done for the block stmts *) ()
       | _ ->
-        let source = Fileloc.loc_start (Stmt.loc stmt) in
+        let source = Stmt.loc stmt in
         Self.debug ~source "processing stmt:@ %a" Printer.pp_stmt stmt;
         let process_callstack cs =
           if Eva.Results.(after stmt |> in_callstack cs |> is_empty) then

@@ -50,7 +50,7 @@ let rterm = ref (fun _ _ -> assert false)
 let rec add_addr_offset ~loc (env:env) (ty:typ) (r:node) = function
   | TNoOffset -> ty,r
   | TModel _ ->
-    Options.not_yet_implemented ~source:(Fileloc.loc_start loc)
+    Options.not_yet_implemented ~source:loc
       "Unsupported model fields"
   | TField (f,offset) ->
     add_addr_offset ~loc env f.ftype (Memory.add_field r f) offset
@@ -62,7 +62,7 @@ let rec add_addr_offset ~loc (env:env) (ty:typ) (r:node) = function
 let rec add_term_offset ~loc (env:env) (d:domain) = function
   | TNoOffset -> d
   | TModel _ ->
-    Options.not_yet_implemented ~source:(Fileloc.loc_start loc)
+    Options.not_yet_implemented ~source:loc
       "Unsupported model fields"
   | TField (f,offset) ->
     add_term_offset ~loc env (merge_field d f) offset
@@ -105,7 +105,7 @@ let rec update_offset ~loc (env:env) loffest d =
   | TNoOffset -> d
   | TField(fd,offset) -> Domain.field fd @@ update_offset ~loc env offset d
   | TModel _ ->
-    Options.not_yet_implemented ~source:(Fileloc.loc_start loc)
+    Options.not_yet_implemented ~source:loc
       "Unsupported model fields"
   | TIndex(_,offset) -> Domain.array @@ update_offset ~loc env offset d
 
@@ -170,7 +170,7 @@ let rec add_term (env:env) (t:term) : domain =
         Domain.pure
       | _ ->
         Options.not_yet_implemented
-          ~source:(Fileloc.loc_start t.term_loc) "Unsupported complex \\let"
+          ~source:t.term_loc "Unsupported complex \\let"
     end
   | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
@@ -210,7 +210,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     add_predicate env p2
   | Plet _ ->
     Options.not_yet_implemented
-      ~source:(Fileloc.loc_start p.pred_loc)
+      ~source:p.pred_loc
       "Unsupported complex \\let-bindings"
   | Papp(f,_,ts) -> ignore @@ call env.map f @@ List.map (add_term env) ts
 

@@ -93,7 +93,7 @@ let print_calldeps () =
           Kernel_function.get_type kf
         | [] ->
           From_parameters.fatal
-            ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc s))
+            ~source:(Cil_datatype.Stmt.loc s)
             "Invalid call %a@." Printer.pp_stmt s
     in
     (fun fmt ->

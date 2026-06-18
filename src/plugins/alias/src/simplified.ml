@@ -39,7 +39,7 @@ let check_cast_compatibility e to_type =
     (* emit a warning for unsafe casts, but not for the NULL pointer *)
     Options.warning
       ~once:true
-      ~source:(Fileloc.loc_start e.eloc)
+      ~source:e.eloc
       ~wkey:Options.Warn.unsafe_cast
       "unsafe cast from %a to %a; analysis may be unsound"
       Printer.pp_typ from_type Printer.pp_typ to_type

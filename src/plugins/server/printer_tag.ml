@@ -709,7 +709,8 @@ let pos_to_localizable ?(precise_col=false) pos =
       None
   with
   | Not_found ->
-    Kernel.debug ~once:true ~source:pos "no matching localizable found";
+    Kernel.debug ~once:true ~source:(Fileloc.from_position pos)
+      "no matching localizable found";
     None
 
 (* -------------------------------------------------------------------------- *)

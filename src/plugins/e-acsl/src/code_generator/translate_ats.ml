@@ -531,7 +531,7 @@ let to_exp ~loc ~adata kf env pot label =
     let potstr =
       match pot with PoT_term _ -> "Term" | PoT_pred _ -> "Predicate"
     in
-    Options.abort ~source:(Fileloc.loc_start loc)
+    Options.abort ~source:loc
       "%s '%a' was used before being translated.@ \
        This usually happens when using a label defined after the place@ \
        where the %s should be translated"

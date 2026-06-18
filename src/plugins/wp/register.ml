@@ -425,7 +425,7 @@ let do_wpo_success ~shell ~cache goal success =
         begin
           let proof, target = Wpo.get_proof goal in
           if proof <> `Passed then
-            let source = Fileloc.loc_start (Property.location target) in
+            let source = Property.location target in
             Wp_parameters.warning ~once:true ~source "Failed smoke-test"
         end ;
     end

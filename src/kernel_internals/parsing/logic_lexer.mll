@@ -315,8 +315,7 @@
     | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
 
-  let check_ext_plugin loc plugin tok =
-    let source = Fileloc.loc_start loc in
+  let check_ext_plugin source plugin tok =
     match tok with
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
@@ -337,8 +336,7 @@
       tok
     | _ -> raise Parsing.Parse_error
 
-  let check_ext_importer loc plugin tok =
-    let source = Fileloc.loc_start loc in
+  let check_ext_importer source plugin tok =
     match tok with
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
@@ -571,8 +569,8 @@ and hash = parse
                      int_of_string s
                    with Failure _ ->
                      (* the int is too big. *)
-                     Kernel.warning
-                       ~source:(Errorloc.convert_pos lexbuf.lex_start_p)
+                     let source = Errorloc.convert_loc (lexbuf.lex_start_p, lexbuf.lex_start_p) in
+                     Kernel.warning ~source
                        "Bad line number in preprocessed file: %s"  s;
                      (-1)
                  in
@@ -618,13 +616,14 @@ and comment = parse
   let parse_from_position f (pos, s : Filepos.t * string) =
     let open Current_loc.Operators in
     let lb = from_string s in
-    let get_loc () = Errorloc.convert_pos lb.Lexing.lex_curr_p in
+    let get_pos () = Errorloc.convert_pos lb.Lexing.lex_curr_p in
+    let get_loc () = Fileloc.from_position (get_pos ()) in
     let<> UpdatedCurrentLoc = Fileloc.from_position pos in
     let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Filepos.to_lexing_pos pos);
     try
       let res = f token lb in
-      Some (get_loc (), res)
+      Some (get_pos (), res)
     with
       | Failure s -> (* raised by the lexer itself, through [f] *)
           warn ~source:(get_loc ()) "lexing error: %s" s; None
@@ -633,10 +632,10 @@ and comment = parse
         None
       | Error (_, m) -> warn ~source:(get_loc ()) "%s" m; None
       | Logic_utils.Not_well_formed (loc, m) ->
-        warn ~source:(Fileloc.loc_start loc) "%s" m; None
+        warn ~source:loc "%s" m; None
       | Logic_utils.Unknown_ext -> None
-      | Log.FeatureRequest(source,_,msg) ->
-        let source = Option.value ~default:(get_loc ()) source in
+      | Log.FeatureRequest(pos,_,msg) ->
+        let source = Option.fold ~none:(get_loc ()) ~some:Fileloc.from_position pos in
         warn ~source "unimplemented ACSL feature: %s" msg; None
       | Log.(AbortError _ | AbortFatal _) as exn -> raise exn
       | exn ->

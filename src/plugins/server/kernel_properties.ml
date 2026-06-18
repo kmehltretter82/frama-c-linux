@@ -237,9 +237,9 @@ let find_alarm = function
 let is_libc ip =
   match Property.source ip with
   | None -> false
-  | Some position ->
+  | Some loc ->
     let libc_path = Kernel.Share.get_dir "libc" in
-    Filepath.is_relative ~base:libc_path (Filepos.path position)
+    Filepath.is_relative ~base:libc_path (Fileloc.path loc)
 
 let model = States.model ()
 

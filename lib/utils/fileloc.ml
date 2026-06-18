@@ -101,6 +101,10 @@ let generated ?loc generator_name =
 
 (* --- Conversion from/to Lexing.position  --- *)
 
+let of_lexing_pos pos =
+  let pos = Filepos.of_lexing_pos pos in
+  pos, pos
+
 let of_lexing_loc (pos1, pos2) =
   Filepos.of_lexing_pos pos1, Filepos.of_lexing_pos pos2
 

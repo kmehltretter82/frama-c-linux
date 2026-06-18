@@ -188,7 +188,7 @@ let mk_logic_pointer_or_StartOf t =
   if isLogicPointer t then
     if is_C_array t then mk_logic_StartOf t else t
   else
-    Kernel.fatal ~source:(Fileloc.loc_start t.term_loc)
+    Kernel.fatal ~source:t.term_loc
       "%a is neither a pointer nor a C array" !Cil.pp_term_ref t
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
@@ -1987,7 +1987,7 @@ let merge_assigns_list l1 l2 =
            useful to specify a \from clause (and is removed without one)*)
         if not (Logic_const.is_result asgn1.it_content) then begin
           let loc = asgn1.it_content.term_loc in
-          Kernel.warning ~once:true ~source:(Fileloc.loc_start loc)
+          Kernel.warning ~once:true ~source:loc
             "location %a is not present in all assigns clauses"
             !Cil.pp_identified_term_ref asgn1;
         end;
@@ -2001,7 +2001,7 @@ let merge_assigns_list l1 l2 =
         else begin
           let loc1 = asgn1.it_content.term_loc in
           let loc2 = asgn2.it_content.term_loc in
-          Kernel.warning ~once:true ~source:(Fileloc.loc_start loc1)
+          Kernel.warning ~once:true ~source:loc1
             "@[incompatible@ from@ clauses (%a:'%a'@ and@ %a:'%a').@ \
              Keeping@ only@ the first@ one.@]"
             Fileloc.pretty loc1 !Cil.pp_from_ref cl1

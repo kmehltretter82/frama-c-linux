@@ -382,7 +382,7 @@ let parse_error ?loc msg =
       Format.fprintf fmt ",@ before or at token: %s" token
   in
   Format.kasprintf (fun str ->
-      Kernel.feedback ~source:(Fileloc.loc_start loc) "%s:@." str
+      Kernel.feedback ~source:loc "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "Location: @[<hv>%a%a@]\n"
               Fileloc.pretty_long_with_inclusions loc
@@ -408,7 +408,7 @@ let abort_context ?(loc=Current_loc.get ()) msg =
     Format.pp_print_newline fmt ();
     pp_context_from_file fmt loc
   in
-  Kernel.abort ~source:(Fileloc.loc_start loc) ~append msg
+  Kernel.abort ~source:loc ~append msg
 
 let hadErrors = ref false
 let had_errors () = !hadErrors

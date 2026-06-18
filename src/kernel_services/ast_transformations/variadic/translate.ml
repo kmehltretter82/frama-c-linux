@@ -274,7 +274,7 @@ let translate_variadics (file : file) =
           when Ast_types.C.is_variadic vi.vtype
             && Ast_info.is_frama_c_builtin vi ->
           Kernel.not_yet_implemented
-            ~source:(Fileloc.loc_start exp.eloc)
+            ~source:exp.eloc
             "Option %s doesn't handle calls to a pointer to the \
              variadic builtin %s."
             Kernel.VariadicTranslation.name vi.vname

@@ -171,7 +171,7 @@ let inconsistent_builtin_typ kf = function
    function [kf], if its type is compatible with [expected_typ] and it has a
    suitable specification. *)
 let prepare_builtin kf name builtin expected_typ =
-  let source = Fileloc.loc_start (Kernel_function.get_location kf) in
+  let source = Kernel_function.get_location kf in
   if inconsistent_builtin_typ kf expected_typ
   then warn_incompatible_type ~source name kf
   else
@@ -210,11 +210,11 @@ let prepare_builtins () =
 (* Emits warning if builtin [name] overrides function definition [kf], or if
    the Frama-C specification of [kf] is missing. *)
 let check_builtin kf (name, _, _) =
-  let source = Fileloc.loc_start (Kernel_function.get_location kf) in
+  let source = Kernel_function.get_location kf in
   if not (Kernel_function.is_in_libc kf || is_frama_c_builtin kf)
   then warn_user_specification ~source kf;
   let is_internal = Filepath.is_relative ~base:System_config.Share.libc in
-  if Kernel_function.is_definition kf && not (is_internal (Filepos.path source))
+  if Kernel_function.is_definition kf && not (is_internal (Fileloc.path source))
   then warn_builtin_override ~source kf name
 
 let find_builtin_override kf =

@@ -78,12 +78,12 @@ let valid key builder =
 
 let unsupported key =
   let msg f k = Format.fprintf f "%s is currently unsupported by Frama-C." k in
-  add key (fun loc -> Kernel.abort ~source:(Fileloc.loc_start loc) "%a" msg key)
+  add key (fun source -> Kernel.abort ~source "%a" msg key)
 
 let compiler (name, is_machdep) key builder =
   let wkey = Kernel.wkey_conditional_feature in
-  let warning loc =
-    Kernel.warning ~wkey ~source:(Fileloc.loc_start loc)
+  let warning source =
+    Kernel.warning ~wkey ~source
       "%s is a %s extension, use a %s-based machdep to enable it."
         key name name ;
     IDENT key
@@ -387,7 +387,7 @@ let annot_lex initial rule lexbuf =
   try rule lexbuf
   with Parsing.Parse_error ->
     let start = Lexing.lexeme_start_p lexbuf in
-    let source = E.convert_pos start in
+    let source = Fileloc.from_position (E.convert_pos start) in
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation" ;
     initial lexbuf
 
@@ -576,7 +576,7 @@ rule initial = parse
     let last = content.[len - 1] in
     if (last = 'd' || last = 'D') && not (Machine.gccMode ()) then begin
        Kernel.warning ~wkey:Kernel.wkey_conditional_feature
-          ~source:(Fileloc.loc_start loc) ~once:true
+          ~source:loc ~once:true
           "'d' suffix in a floating literal (%s) is a GCC extension, \
            use a GCC-based machdep to enable it" content;
        (* drop the suffix *)

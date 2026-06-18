@@ -189,7 +189,7 @@ let check_variant_relation = function
   | (_, None) -> ()
   | ({ term_loc }, Some rel) ->
     Wp_parameters.hypothesis
-      ~source:(Fileloc.loc_start term_loc) ~once:true
+      ~source:term_loc ~once:true
       "'%a' relation must be well-founded" Cil_printer.pp_logic_info rel
 
 let get_decreases_goal kf =
@@ -402,11 +402,11 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
           begin fun l ca ->
             match ca.annot_content with
             | AStmtSpec _ when not @@ is_assembly stmt ->
-              let source = Fileloc.loc_start (Cil_datatype.Stmt.loc stmt) in
+              let source = Cil_datatype.Stmt.loc stmt in
               Wp_parameters.warning ~once:true ~source
                 "Statement specifications not yet supported (skipped)." ; l
             | AInvariant(_,false,_) ->
-              let source = Fileloc.loc_start (Cil_datatype.Stmt.loc stmt) in
+              let source = Cil_datatype.Stmt.loc stmt in
               Wp_parameters.warning ~once:true ~source
                 "Generalized invariant not yet supported (skipped)." ; l
             | AAssert(_,a) ->
@@ -501,7 +501,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
           if Wp_parameters.TerminatesVariantHyp.get () then begin
             if Logic_utils.is_same_predicate t Logic_const.pfalse then
               Wp_parameters.warning
-                ~source:(Fileloc.loc_start loc) ~once:true
+                ~source:loc ~once:true
                 "Loop variant is always trivially verified \
                  (terminates \\false)" ;
             Logic_const.pimplies (t, v)

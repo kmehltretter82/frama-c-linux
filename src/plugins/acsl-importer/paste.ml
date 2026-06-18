@@ -957,7 +957,7 @@ let set_current_function (fct, loc) =
   with
     Not_found ->
     Options.annot_error
-      ~source:(Fileloc.loc_start loc)
+      ~source:loc
       "could not find function %s for ACSL importer." fct;
     current_function := None
 
@@ -1100,9 +1100,9 @@ let integral_cast ty t =
   if Options.AddonIntegerCast.get () then
     begin
       let loc = t.term_loc in
-      let source = Fileloc.loc_start loc in
       let ty = Ast_types.C.remove_attributes_for_logic_type ty in
-      Options.warning ~wkey:Options.wkey_integer_cast ~source "Casting term %a of type %a into type %a."
+      Options.warning ~wkey:Options.wkey_integer_cast ~source:loc
+        "Casting term %a of type %a into type %a."
         Printer.pp_term t Printer.pp_logic_type Linteger Printer.pp_typ ty;
       Logic_const.tcast ~loc t ty
     end
@@ -1114,7 +1114,7 @@ let integral_cast ty t =
 let lt_error loc fmt =
   Options.annot_warning
     ~raising:(fun () -> raise Exit)
-    ~source:(Fileloc.loc_start loc)
+    ~source:loc
     fmt
 
 let lt_on_error action finally arg =
@@ -1166,7 +1166,7 @@ let add_global_annot g_annots =
 (** Add a function contract. *)
 let add_funspec spec loc =
   try
-    let kf = with_current_function ~source:(Fileloc.loc_start (loc)) () in
+    let kf = with_current_function ~source:loc () in
     let file = !current_module in
     let scope = !current_scope in
     let module LT =
@@ -1341,7 +1341,7 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
 
 let add_annots ?loop_number stmts loc annots =
   try
-    let kf = with_current_function ~source:(Fileloc.loc_start loc) () in
+    let kf = with_current_function ~source:loc () in
     let file = !current_module in
     S_Stmt.iter (add_annots_aux kf file ?loop_number loc annots) stmts
   with | Kf_not_found ->

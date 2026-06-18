@@ -73,7 +73,7 @@ let pp_regions fmt = function
 
 type env = {
   context: Logic_typing.typing_context ;
-  mutable source: Filepos.t ;
+  mutable source: Fileloc.t ;
   mutable named: string ;
   mutable flags: Attr.flags ;
   mutable rpaths: path list ;
@@ -180,7 +180,7 @@ let rec parse_region (env:env) p =
   | PLvar "\\garbage"   -> env.flags <- Attr.add `Garbage   env.flags
   | PLvar "\\validread"  -> env.flags <- Attr.add `Validread  env.flags
   | PLnamed( name , p ) ->
-    flush (Fileloc.loc_start p.lexpr_loc) env ;
+    flush p.lexpr_loc env ;
     env.named <- name ;
     parse_region env p
   | PLrange(Some a,Some b) ->
@@ -266,7 +266,7 @@ let of_behavior bhv = List.concat_map of_extension bhv.b_extended
 
 let typecheck typing_context loc ps =
   let env = {
-    source = Fileloc.loc_start loc ;
+    source = loc ;
     named = "" ;
     flags = Attr.empty ;
     context = typing_context ;
@@ -274,7 +274,7 @@ let typecheck typing_context loc ps =
   } in
   List.iter (parse_region env) ps ;
   let id = !kspec in incr kspec ;
-  flush (Fileloc.loc_start loc) env ;
+  flush loc env ;
   Hashtbl.add registry id @@ List.rev env.regions ;
   Ext_id id
 

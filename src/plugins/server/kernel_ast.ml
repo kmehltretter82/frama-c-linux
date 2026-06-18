@@ -78,7 +78,7 @@ struct
       begin
         match List.assoc "file" assoc, List.assoc "line" assoc with
         | `String path, `Int line ->
-          Log.source ~file:(Filepath.of_string path) ~line
+          Filepos.make ~path:(Filepath.of_string path) ~line ~offset:0 ()
         | _, _ -> fail ()
         | exception Not_found -> fail ()
       end

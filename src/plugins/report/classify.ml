@@ -25,8 +25,8 @@ let string_of_action = function
   | ERROR -> "ERROR"
 
 let pp_action fmt a = Format.pp_print_string fmt (string_of_action a)
-let pp_source fmt =
-  function None -> () | Some lex -> Filepos.pretty fmt lex
+
+let pp_source fmt = Option.iter (Filepos.pretty fmt)
 
 type rule = {
   r_id: string ;
@@ -165,12 +165,14 @@ let configure file =
       | `List values -> List.iter add_rule values
       | _ -> failwith "Array expected"
     with
-    | Json.Error(file,line,msg) ->
-      let source = Log.source ~file ~line in
+    | Json.Error(path,line,msg) ->
+      let pos = Filepos.make ~path ~line ~offset:0 () in
+      let source = Fileloc.from_position pos in
       R.abort ~source "%s" msg
     | WrongFormat msg ->
-      let file = Filepath.of_string file in
-      let source = Log.source ~file ~line:1 in
+      let path = Filepath.of_string file in
+      let pos = Filepos.make ~path ~line:1 ~offset:0 () in
+      let source = Fileloc.from_position pos in
       R.abort ~source "%s" msg
     | Sys_error msg ->
       R.abort "%s" msg
@@ -428,7 +430,7 @@ let monitor_status properties ip =
   if monitored_property ip then
     let name = Property.Names.get_prop_name_id ip in
     let lookup = find properties.ps_rules in
-    let source = Property.source ip in
+    let source = Option.map Fileloc.start_pos (Property.source ip) in
     let unclassified () =
       let e_id = "unclassified." ^ properties.ps_name in
       let e_title = name in

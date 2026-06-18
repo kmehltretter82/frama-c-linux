@@ -126,7 +126,7 @@ class visit_assembly =
            specified outputs and inputs. *)
         let mem_clobbered = List.mem "memory" asm_clobbers in
         if  mem_clobbered then begin
-          let source = Fileloc.loc_start (Cil_datatype.Instr.loc i) in
+          let source = Cil_datatype.Instr.loc i in
           let once = true in
           Kernel.warning
             ~once ~source ~wkey:Kernel.wkey_asm

@@ -453,12 +453,12 @@ let wkey_acsl_unsupported =
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
-  ?pos:Position.t -> ?current:bool -> ?source:Filepos.t ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fileloc.t ->
   ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  ?pos:Position.t -> ?current:bool -> ?source:Filepos.t ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fileloc.t ->
   ?stacktrace:bool -> ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
@@ -485,7 +485,7 @@ let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
   match pos with
   | Some pos ->
     let callstack = Position.callstack pos in
-    let source = Option.value ~default:(Position.pos pos) source
+    let source = Option.value ~default:(Position.loc pos) source
     (* Append callstack if requested *)
     and append = append_callstack ?stacktrace ?append ~callstack in
     aborter ?current:None ~source ~append

@@ -171,7 +171,7 @@ let all_call_input_nodes ~caller:pdg_caller ~callee:(kf_callee, pdg_callee) call
     let sgn = FctIndex.sgn (PdgTypes.Pdg.get_index pdg_callee) in
     PdgIndex.Signature.fold_all_inputs test_in [] sgn
   with PdgTypes.Pdg.Top ->
-    Options.warning ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc call_stmt)) ~once:true
+    Options.warning ~source:(Cil_datatype.Stmt.loc call_stmt) ~once:true
       "skipping impact within imprecisely analyzed function %a"
       Kernel_function.pretty kf_callee;
     []
@@ -191,7 +191,7 @@ let all_call_out_nodes ~callee ~caller call_stmt =
     PdgIndex.Signature.fold_all_outputs test_out [] call_sgn
   with PdgTypes.Pdg.Top ->
     Options.warning
-      ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc call_stmt))
+      ~source:(Cil_datatype.Stmt.loc call_stmt)
       ~once:true
       "cannot propagate impact into imprecisely analyzed caller function %a"
       Kernel_function.pretty (Kernel_function.find_englobing_kf call_stmt);

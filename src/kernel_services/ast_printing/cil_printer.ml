@@ -1054,7 +1054,7 @@ class cil_printer () = object (self)
         (* If this fails, it's likely that an extension interfered
            with the AddrOf *)
         | _ ->
-          Kernel.fatal ~source:(Fileloc.loc_start loc)
+          Kernel.fatal ~source:loc
             "Encountered unexpected call to %s with dest %a"
             vi.vname self#exp adest
       in
@@ -1105,7 +1105,7 @@ class cil_printer () = object (self)
     | Call(_, Var vi, _, loc)
       when vi.vname = "__builtin_types_compatible_p"
         && not state.print_cil_as_is ->
-      Kernel.fatal ~source:(Fileloc.loc_start loc)
+      Kernel.fatal ~source:loc
         "__builtin_types_compatible_p: cabs2cil should have added sizeof to \
          the arguments."
 
@@ -1124,7 +1124,7 @@ class cil_printer () = object (self)
             self#offset offset
             instr_terminator
         | _ ->
-          Kernel.fatal ~source:(Fileloc.loc_start loc)
+          Kernel.fatal ~source:loc
             "__builtin_offsetof: invalid argument."
       end
 

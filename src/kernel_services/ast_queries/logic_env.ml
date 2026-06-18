@@ -54,10 +54,8 @@ let preprocess_extension_block = Extensions.preprocess_block
 let extension_from = Extensions.extension_from
 let importer_from = Extensions.importer_from
 
-let error loc fstring =
-  Kernel.abort
-    ~source:(Fileloc.loc_start loc)
-    ("In annotation: " ^^ fstring)
+let error source fstring =
+  Kernel.abort ~source ("In annotation: " ^^ fstring)
 
 module Logic_builtin =
   State_builder.Hashtbl

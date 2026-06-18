@@ -4831,7 +4831,7 @@ let find_def_stmt b v =
   in
   try
     fold_local_init b action ();
-    Kernel.fatal ~source:(Fileloc.loc_start v.vdecl)
+    Kernel.fatal ~source:v.vdecl
       "inconsistent AST: local variable %a is supposed to be initialized, \
        but no initialization statement found." !pp_varinfo_ref v
   with M.Found s -> s
@@ -5961,8 +5961,7 @@ and mkBinOp_exn ?constfold ~loc op e1 e2 =
   | Ok e -> e
   | Error (loc, msg) ->
     let current = Option.is_none loc in
-    let source = Option.map Fileloc.loc_start loc in
-    Kernel.fatal ~current ?source "Cil.mkBinOp: typing expression '%a' failed: %s"
+    Kernel.fatal ~current ?source:loc "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
 and expression_to_bool e =

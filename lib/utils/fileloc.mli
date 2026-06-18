@@ -59,6 +59,10 @@ val pretty_debug: t Pretty_utils.formatter
 
 (** {2 Conversion from/to Lexing.position } *)
 
+(** Convert a [Lexing.position] to a [Fileloc.t].
+    @since Frama-C+dev *)
+val of_lexing_pos : Lexing.position -> t
+
 (** Convert a pair of [Lexing.position] to a [Fileloc.t]. *)
 val of_lexing_loc : Lexing.position * Lexing.position -> t
 

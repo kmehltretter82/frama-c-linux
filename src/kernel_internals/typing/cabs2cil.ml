@@ -528,7 +528,7 @@ let check_aligned attrs =
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
 let process_pragmas_pack_align_comp_attributes loc ci cattrs =
-  let source = Fileloc.loc_end loc in
+  let source = Fileloc.from_position (Fileloc.loc_end loc) in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->
@@ -650,18 +650,16 @@ let isOldStyleVarArgTypeName n =
    or the result of a comparison.
 *)
 let check_logical_operand e t =
-  let source = Fileloc.loc_start e.expr_loc in
   match Ast_types.C.unroll_node t with
   | TInt IBool ->
-    Kernel.warning ~wkey:Kernel.wkey_cert_exp_46 ~source
+    Kernel.warning ~wkey:Kernel.wkey_cert_exp_46 ~source:e.expr_loc
       "operand of bitwise operator has boolean type"
   | _ ->
     let rec aux = function
       | { expr_node = Cabs.PAREN e} -> aux e
       | { expr_node = Cabs.BINARY (bop,_,_); expr_loc }
         when is_relational_bop bop ->
-        let source = Fileloc.loc_start expr_loc in
-        Kernel.warning ~wkey:Kernel.wkey_cert_exp_46 ~source
+        Kernel.warning ~wkey:Kernel.wkey_cert_exp_46 ~source:expr_loc
           "operand of bitwise operator is a logical relation"
       | _ -> (* EXP 46 does not forbid something like
                 (x && y) & z, even though the logical and returns 0 or 1 as
@@ -1280,7 +1278,7 @@ let findCompType ghost kind name tattr =
         begin
           if not (Machine.gccMode ()) then
             Kernel.error ~once:true
-              ~source:(Fileloc.loc_start @@ Current_loc.get ())
+              ~source:(Current_loc.get ())
               "forward declaration of enum %s" (Machdep.allowed_machdep "GCC");
           cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
         end;
@@ -1598,7 +1596,7 @@ struct
           let first_stmt =
             (fun (s,_,_,_,_) -> s) (List.last stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-            ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc first_stmt))
+            ~source:(Cil_datatype.Stmt.loc first_stmt)
             "Potential unsequenced side-effects"
         end;
         let b =
@@ -1625,7 +1623,7 @@ struct
           let first_stmt =
             (fun (s,_,_,_,_) -> s) (List.last c.stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-            ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc first_stmt))
+            ~source:(Cil_datatype.Stmt.loc first_stmt)
             "Potential unsequenced side-effects" end;
         let kind = UnspecifiedSequence (List.rev c.stmts) in
         if c.locals <> [] || c.statics <> [] then begin
@@ -2097,7 +2095,7 @@ struct
         let e' = Cil.mkCast ~newt:t e in
         (match Cil.constFoldToInt e, Cil.constFoldToInt e' with
          | Some i1, Some i2 when not (Z.equal i1 i2) ->
-           Kernel.feedback ~once:true ~source:(Fileloc.loc_start e.eloc)
+           Kernel.feedback ~once:true ~source:e.eloc
              "Case label %a exceeds range of %a for switch expression. \
               Nothing to worry."
              Cil_printer.pp_exp e Cil_printer.pp_typ t;
@@ -4439,7 +4437,7 @@ and makeVarInfoCabs
   in
   if Ast_attributes.contains "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
-    let source = Fileloc.loc_start ldecl in
+    let source = ldecl in
     if Ast_types.C.is_fun vtype then
       Kernel.warning ~wkey ~source "only objects can be thread-local"
     else if not isglobal && (sto = NoStorage || sto = Register) then
@@ -5081,7 +5079,7 @@ and makeCompType loc ghost (isstruct: bool)
     let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
       : fieldinfo list =
-      let source = Fileloc.loc_start cloc in
+      let source = cloc in
       let<> UpdatedCurrentLoc = cloc in
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
@@ -5132,7 +5130,7 @@ and makeCompType loc ghost (isstruct: bool)
         match widtho with
         | None -> None, ftype
         | Some w -> begin
-            let source = Fileloc.loc_start w.expr_loc in
+            let source = w.expr_loc in
             (match Ast_types.C.unroll_node ftype with
              | TInt _ -> ()
              | TEnum _ -> ()
@@ -5190,7 +5188,7 @@ and makeCompType loc ghost (isstruct: bool)
         else
           begin
             if fbitfield = Some 0 then
-              Kernel.error ~source:(Fileloc.loc_start cloc)
+              Kernel.error ~source
                 "named bitfield (%s) with zero width" n;
             n
           end
@@ -5239,11 +5237,11 @@ and makeCompType loc ghost (isstruct: bool)
         match Cil.constFoldToInt ~machdep:true cond_exp with
         | Some i ->
           if Z.is_zero i then
-            Kernel.error ~source:(Fileloc.loc_start loc)
+            Kernel.error ~source:loc
               "static assertion failed%s%s@."
               (if s <> "" then ": " else "") s
         | None ->
-          Kernel.error ~source:(Fileloc.loc_start loc)
+          Kernel.error ~source:loc
             "failed to evaluate constant expression in static assertion:@ \
              @[%a@]"
             Cprint.print_expression e
@@ -5258,8 +5256,7 @@ and makeCompType loc ghost (isstruct: bool)
   let check f =
     try
       let oldf = Hashtbl.find fld_table f.fname in
-      let source = Fileloc.loc_start f.floc in
-      Kernel.error ~source
+      Kernel.error ~source:f.floc
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
         f.fname Cil_printer.pp_typ (mk_tcomp comp)
@@ -8017,7 +8014,7 @@ and doInit local_env asconst preinit so acc initl =
     let acc', preinit', initl' =
       doInit local_env asconst preinit so' acc charinits in
     if initl' <> [] then
-      Kernel.warning ~source:(Fileloc.loc_start e.expr_loc)
+      Kernel.warning ~source:e.expr_loc
         "Too many initializers for character array %t" whoami;
     (* Advance past the array *)
     advanceSubobj so;
@@ -8372,7 +8369,7 @@ and doInit local_env asconst preinit so acc initl =
           else
             (top (Cabs.ATINDEX_INIT(
                  { expr_node = Cabs.CONSTANT(Cabs.CONST_INT(string_of_int i));
-                   expr_loc = loc},
+                   expr_loc = Fileloc.range ~start_loc:idxs.expr_loc ~end_loc:idxe.expr_loc},
                  Cabs.NEXT_INIT)), ie)
             :: loop (i + 1)
         in
@@ -8496,8 +8493,7 @@ and createGlobal loc ghost logic_spec
                 known_behaviors vi (Some(get_formals vi)) vi.vtype spec
             in
             update_funspec_in_theFile vi spec
-          with LogicTypeError (loc, msg) ->
-            let source = Fileloc.loc_start loc in
+          with LogicTypeError (source, msg) ->
             Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
               "%s. Ignoring specification of function %s" msg vi.vname
       end ;
@@ -8556,8 +8552,7 @@ and createGlobal loc ghost logic_spec
                          first time we see the declaration.
                       *)
                       Ltyping.funspec [] vi None vi.vtype spec
-                    with LogicTypeError (loc, msg) ->
-                      let source = Fileloc.loc_start loc in
+                    with LogicTypeError (source, msg) ->
                       Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
                         "%s. Ignoring specification of function %s" msg vi.vname;
                       Cil.empty_funspec ()
@@ -8584,8 +8579,7 @@ and createGlobal loc ghost logic_spec
                  let spec =
                    try
                      Ltyping.funspec behaviors vi None vi.vtype spec
-                   with LogicTypeError (loc, msg) ->
-                     let source = Fileloc.loc_start loc in
+                   with LogicTypeError (source, msg) ->
                      Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
                        "%s. Ignoring specification of function %s"
                        msg vi.vname;
@@ -9108,8 +9102,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
               (s2c
                  (Cil.mkStmtOneInstr ~ghost ~valid_sid (Code_annot (spec,loc'))))
               res
-          with LogicTypeError (loc, msg) ->
-            let source = Fileloc.loc_start loc in
+          with LogicTypeError (source, msg) ->
             Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
               "%s. Ignoring code annotation" msg;
             res
@@ -9221,8 +9214,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       in
       if Ast_attributes.contains "thread" funattr then begin
         let wkey = Kernel.wkey_inconsistent_specifier in
-        let source = Fileloc.loc_start funloc in
-        Kernel.warning ~wkey ~source "only objects can be thread-local"
+        Kernel.warning ~wkey ~source:funloc "only objects can be thread-local"
       end;
       (* Format.printf "Attrs are %a@." d_attrlist funattr; *)
       Cil.update_var_type !currentFunctionFDEC.svar ftyp;
@@ -9383,8 +9375,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
                  !currentFunctionFDEC.svar
                  (Some !currentFunctionFDEC.sformals)
                  !currentFunctionFDEC.svar.vtype spec
-           with LogicTypeError (loc, msg) ->
-             let source = Fileloc.loc_start loc in
+           with LogicTypeError (source, msg) ->
              Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
                "%s. Ignoring logic specification of function %s"
                msg !currentFunctionFDEC.svar.vname);
@@ -9583,8 +9574,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
                  (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
              cabsPushGlobal (GAnnot(tdecl,Current_loc.get ()))
-         with LogicTypeError (loc, msg) ->
-           let source = Fileloc.loc_start loc in
+         with LogicTypeError (source, msg) ->
            Kernel.warning
              ~wkey:Kernel.wkey_annot_error ~source
              "%s. Ignoring global annotation" msg
@@ -9808,7 +9798,7 @@ and doBody local_env (blk: Cabs.block) : chunk =
                    true
                  | CODE_ANNOT
                      (Logic_ptree.AExtended(_,is_loop,ext),loc) ->
-                   let source = Fileloc.loc_start loc in
+                   let source = loc in
                    let kind =
                      Logic_env.extension_category ~plugin:ext.ext_plugin ext.ext_name
                    in
@@ -9872,8 +9862,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       List.map
         (Ltyping.code_annot
            loc local_env.known_behaviors (Ctype !currentReturnType)) a
-    with LogicTypeError (loc, msg) ->
-      let source = Fileloc.loc_start loc in
+    with LogicTypeError (source, msg) ->
       Kernel.warning
         ~wkey:Kernel.wkey_annot_error ~source
         "%s. Ignoring loop annotation" msg;
@@ -10260,8 +10249,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
             loc' local_env.known_behaviors (Ctype !currentReturnType) a
         in
         s2c (Cil.mkStmtOneInstr ~ghost ~valid_sid (Code_annot (typed_annot,loc')))
-      with LogicTypeError (loc, msg) ->
-        let source = Fileloc.loc_start loc in
+      with LogicTypeError (source, msg) ->
         Kernel.warning
           ~wkey:Kernel.wkey_annot_error ~source
           "%s. Ignoring code annotation" msg;
@@ -10277,8 +10265,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
             (Ctype !currentReturnType) (Logic_ptree.AStmtSpec ([],a))
         in
         s2c (Cil.mkStmtOneInstr ~ghost ~valid_sid (Code_annot (spec,loc')))
-      with LogicTypeError (loc, msg) ->
-        let source = Fileloc.loc_start loc in
+      with LogicTypeError (source, msg) ->
         Kernel.warning
           ~wkey:Kernel.wkey_annot_error ~source
           "%s. Ignoring code annotation" msg;

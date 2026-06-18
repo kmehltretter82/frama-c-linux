@@ -1920,8 +1920,7 @@ struct
                     | TFloat fk -> fkind_to_string fk
                     | _ -> Kernel.fatal "floating point type expected"
                   in
-                  let source = Fileloc.loc_start loc in
-                  Kernel.warning ~source
+                  Kernel.warning ~source:loc
                     ~wkey:Kernel.wkey_acsl_float_compare
                     "comparing two %s values as real values. You might \
                      want to use \\%s_%s instead" kind
@@ -3923,7 +3922,7 @@ struct
     append_loop_labels (append_here_label (append_pre_label (Lenv.empty())))
 
   let code_annot loc current_behaviors current_return_type ca =
-    let source = Fileloc.loc_start loc in
+    let source = loc in
     let annot = match ca with
       | AAssert (behav,{tp_kind = kind; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
@@ -4359,7 +4358,7 @@ struct
     match def.l_body with
     | LBnone -> (pos_use, neg_use)
     | LBreads _ | LBinductive _ ->
-      Kernel.fatal ~source:(Fileloc.loc_start loc) "Unexpected definition in a \\let"
+      Kernel.fatal ~source:loc "Unexpected definition in a \\let"
     | LBterm t ->
       find_occurrences_term def.l_var_info ~polarity ~pos_use ~neg_use t
     | LBpred p ->

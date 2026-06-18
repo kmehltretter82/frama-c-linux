@@ -151,7 +151,7 @@ let add_call m s r fct es =
         List.iter (fun kf -> add_kf_call m s r kf vs) kfs
       | None ->
         Options.not_yet_implemented
-          ~source:(Fileloc.loc_start @@ Stmt.loc s)
+          ~source:(Stmt.loc s)
           "Dynamic call without @call annotation"
     end
 
@@ -182,7 +182,7 @@ let add_instr ~map ~stmt = function
 
   | Code_annot _ -> ()
   | Asm _ ->
-    Options.warning ~source:(Fileloc.loc_start @@ Stmt.loc stmt)
+    Options.warning ~source:(Stmt.loc stmt)
       "Inline assembly not supported (ignored)"
 
 (* -------------------------------------------------------------------------- *)

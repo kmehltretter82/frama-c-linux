@@ -57,19 +57,19 @@ val descr : driver -> string
 val is_default : driver -> bool
 val compare : driver -> driver -> int
 
-val add_type : ?source:Filepos.t ->
+val add_type : ?source:Fileloc.t ->
   string -> link:string -> unit
 
-val add_alias : source:Filepos.t ->
+val add_alias : source:Fileloc.t ->
   string -> kind list -> alias:string -> unit
 
-val add_ctor : source:Filepos.t ->
+val add_ctor : source:Fileloc.t ->
   string -> kind list -> link:string -> unit
 
-val add_logic : source:Filepos.t ->
+val add_logic : source:Fileloc.t ->
   ?category:category -> kind -> string -> kind list -> link:string -> unit
 
-val add_predicate : source:Filepos.t ->
+val add_predicate : source:Fileloc.t ->
   string -> kind list -> link:string -> unit
 
 type builtin =

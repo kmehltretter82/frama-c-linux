@@ -68,7 +68,7 @@ let doomed_if_valid p = p.p_doomed
 let unreachable_if_valid p = p.p_unreachable
 
 let mk_part pid (k, n) = { pid with p_part = Some (k,n) }
-let source_of_id p = Fileloc.loc_start (Property.location p.p_prop)
+let source_of_id p = Property.location p.p_prop
 
 exception Found of int
 let num_of_bhv_from bhv (out, _) =

@@ -108,7 +108,7 @@ let add_fun_task model pool ~kf ?infos ?bhvs ?target () =
   end
 
 let notyet prop =
-  let source = Fileloc.loc_start (Property.location prop) in
+  let source = Property.location prop in
   Wp_parameters.warning ~once:true ~source
     "Not yet implemented wp for '%a'" Property.pretty prop
 
@@ -251,7 +251,7 @@ struct
                          collection := Bag.concat !collection wcs
                        with WP.NonNaturalLoop loc ->
                          Wp_parameters.error
-                           ~source:(Fileloc.loc_start loc)
+                           ~source:loc
                            "Non-natural loop detected in function '%a'.@\n\
                             This case is not supported yet \
                             (skipped verification)."

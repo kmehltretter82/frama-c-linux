@@ -929,8 +929,7 @@ else_part:
     { in_ghost_block ~battrs:[ (Ast_attributes.frama_c_ghost_else , []) ] $2 }
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 | LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement {
-    let loc = Errorloc.convert_loc $sloc in
-    let source = Fileloc.loc_start loc in
+    let source = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source
       "Invalid ghost else ignored" ;
     in_block $loc($5) $5
@@ -1072,9 +1071,8 @@ declaration:                                /* ISO 6.7.*/
     let loc = Errorloc.convert_loc ($symbolstartpos,$endpos) in
     let decls = Option.value ~default:[] decls in
     if !Lexerhack.is_typedef () && decls = [] then begin
-      let source = Fileloc.loc_start loc in
       let wkey = Kernel.wkey_unnamed_typedef in
-      Kernel.warning ~source ~wkey "typedef without a name"
+      Kernel.warning ~source:loc ~wkey "typedef without a name"
     end;
     !Lexerhack.reset_typedef();
     doDeclaration spec loc (fst specif) decls
@@ -1176,8 +1174,7 @@ decl_spec_list:
 | type_spec pragma* (* pragma accepted by GCC *) decl_spec_list_opt_no_named {
     let pragmas = $2 in
     if pragmas != [] then begin
-      let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
-      let source = Fileloc.loc_start loc in
+      let source = Cabshelper.get_definitionloc (List.hd pragmas) in
       Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
         ~once:true ~source
         "Discarding _Pragma's in function declaration"
@@ -1193,8 +1190,7 @@ decl_spec_list_no_restriction:
 | type_spec pragma* (* pragma accepted by GCC *) decl_spec_list_opt_no_named {
     let pragmas = $2 in
     if pragmas != [] then begin
-      let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
-      let source = Fileloc.loc_start loc in
+      let source = Cabshelper.get_definitionloc (List.hd pragmas) in
       Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
         ~once:true ~source
         "Discarding _Pragma's in function declaration"
@@ -1331,7 +1327,7 @@ enumerator:
     let attrs = $2 in
     let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
-      ~source:(Fileloc.loc_start loc)
+      ~source:loc
       "Discarding attributes in enumerator (unsupported feature): %a"
       Cprint.print_attributes attrs;
     ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
@@ -1341,7 +1337,7 @@ enumerator:
     let attrs = $2 in
     let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
-      ~source:(Fileloc.loc_start loc)
+      ~source:loc
       "Discarding attributes in enumerator (unsupported feature): %a"
       Cprint.print_attributes attrs;
     ($1, $4, loc)

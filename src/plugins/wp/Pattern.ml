@@ -653,7 +653,7 @@ let () = Lang.on_field
 
 let log_error ~loc msg =
   Wp_parameters.logwith (fun _evt -> raise Not_found)
-    ~source:(Fileloc.loc_start loc) msg
+    ~source:loc msg
 
 let getvar env (x : string loc) : Tactical.selection =
   try Vmap.find x.value env
@@ -804,7 +804,7 @@ let env ?(raise=false) () = {
 let typecheck_error env loc msg =
   if env.raise
   then Format.kasprintf (fun e -> raise (TypeError(loc, e))) msg
-  else Wp_parameters.error ~source:(Fileloc.loc_start loc) msg
+  else Wp_parameters.error ~source:loc msg
 
 let tc_merge env ~loc ~expected va =
   let v = vmerge va expected in

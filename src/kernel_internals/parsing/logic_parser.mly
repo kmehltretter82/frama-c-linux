@@ -22,8 +22,8 @@
   let loc (start_pos, end_pos) =
     Errorloc.convert_loc (start_pos, end_pos)
 
-  let pos pos =
-    Errorloc.convert_pos pos
+  let from_pos pos =
+    Errorloc.convert_loc (pos, pos)
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
 
@@ -496,11 +496,11 @@ lexpr_inner:
 | VALID_READ opt_label_1 LPAR lexpr RPAR { info $sloc (PLvalid_read ($2,$4)) }
 | VALID_FUNCTION LPAR lexpr RPAR { info $sloc (PLvalid_function $3) }
 | VALID_INDEX opt_label_1 LPAR lexpr COMMA lexpr RPAR {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   obsolete ~source "\\valid_index(addr,idx)" ~now:"\\valid(addr+idx)";
   info $sloc (PLvalid ($2,info $sloc (PLbinop ($4, Badd, $6)))) }
 | VALID_RANGE opt_label_1 LPAR lexpr COMMA lexpr COMMA lexpr RPAR {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   obsolete "\\valid_range(addr,min,max)"
     ~source ~now:"\\valid(addr+(min..max))";
   info $sloc (PLvalid
@@ -516,22 +516,22 @@ lexpr_inner:
 | ALLOCABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLallocable ($2,$4)) }
 | FREEABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLfreeable ($2,$4)) }
 | ALLOCATION opt_label_1 LPAR lexpr RPAR
-  { let source = pos $symbolstartpos in
+  { let source = from_pos $symbolstartpos in
     Kernel.not_yet_implemented ~source "\\allocation" }
 | AUTOMATIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\automatic" }
 | DYNAMIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\dynamic" }
 | REGISTER {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\register" }
 | STATIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\static" }
 | UNALLOCATED {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\unallocated" }
 | NULL { info $sloc PLnull }
 | constant { info $sloc (PLconstant $1) }
@@ -735,7 +735,7 @@ abs_param_type_list:
 | /* empty */    { [ ] }
 | abs_param_list { $1 }
 | abs_param_list COMMA DOTDOTDOT {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "variadic C function types"
   }
 ;
@@ -1517,7 +1517,7 @@ loop_grammar_extension:
       | _ -> raise Not_found
     end
   with Not_found ->
-    Kernel.fatal ~source:(pos $startpos($2))
+    Kernel.fatal ~source:(loc ($startpos($2), $startpos($2)))
       "%s is not a code annotation extension. Parser got wrong lexeme." name
 }
 ;
@@ -1571,7 +1571,7 @@ code_annotation:
         | _ -> raise Not_found
       end
     with Not_found ->
-      Kernel.fatal ~source:(pos $startpos($1))
+      Kernel.fatal ~source:(from_pos $startpos($1))
         "%s is not a code annotation extension. Parser got wrong lexeme" name
   }
 ;
@@ -1748,7 +1748,7 @@ push_module_name:
 ext_loader:
 | IDENTIFIER COLON {
     Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown
-      ~source:(Fileloc.loc_start (loc $sloc))
+      ~source:(loc $sloc)
       "Ignoring unregistered module importer extension '%s'" $1;
     raise Unknown_ext
   }

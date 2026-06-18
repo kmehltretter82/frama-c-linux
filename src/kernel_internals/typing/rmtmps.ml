@@ -93,8 +93,7 @@ let categorizePragmas ast =
   (* populate these name collections in light of each pragma *)
   let considerPragma =
 
-    let badPragma location pragma =
-      let source = Fileloc.loc_start location in
+    let badPragma source pragma =
       Kernel.warning ~source "Invalid argument to pragma %s" pragma
     in
 
@@ -561,26 +560,26 @@ class markReferencedVisitor = object (self)
   method private reference varinfo loc =
     if not (Ast_attributes.(contains fc_builtin varinfo.vattr)) then begin
       Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
-      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+      Kernel.debug ~source:loc ~dkey
         "referenced: fun %s" varinfo.vname;
       varinfo.vreferenced <- true;
     end
 
   method! vglob = function
     | GType (typeinfo, loc) ->
-      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+      Kernel.debug ~source:loc ~dkey
         "referenced: type %s" typeinfo.tname;
       typeinfo.treferenced <- true;
       DoChildren
     | GCompTag (compinfo, loc)
     | GCompTagDecl (compinfo, loc) ->
-      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+      Kernel.debug ~source:loc ~dkey
         "referenced: comp %s" compinfo.cname;
       compinfo.creferenced <- true;
       DoChildren
     | GEnumTag (enuminfo, loc)
     | GEnumTagDecl (enuminfo, loc) ->
-      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+      Kernel.debug ~source:loc ~dkey
         "referenced: enum %s" enuminfo.ename;
       enuminfo.ereferenced <- true;
       DoChildren

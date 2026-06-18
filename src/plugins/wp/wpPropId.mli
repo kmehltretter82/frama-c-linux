@@ -27,7 +27,7 @@ val doomed_if_valid : prop_id -> Property.t list
 (** Stmt that is unreachable in case the PO is valid. *)
 val unreachable_if_valid : prop_id -> Property.other_loc
 
-val source_of_id : prop_id -> Filepos.t
+val source_of_id : prop_id -> Fileloc.t
 
 (*----------------------------------------------------------------------------*)
 

@@ -456,7 +456,7 @@ let merge_rtl_spec rtl_prj rtl_global =
       (* Add the updated spec to the user's kf *)
       try Annotations.add_spec Options.emitter user_kf spec
       with Annotations.AlreadySpecified(clauses) ->
-        Options.error ~source:(Fileloc.loc_start @@ Kernel_function.get_location user_kf)
+        Options.error ~source:(Kernel_function.get_location user_kf)
           "Found inconsistent specification for function %a (clause%s: %a)"
           Cil_printer.pp_varinfo vi
           (if 1 < List.length clauses then "s" else "")

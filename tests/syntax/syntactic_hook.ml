@@ -29,8 +29,7 @@ let visitor = new visit;;
 Frontc.add_syntactic_transformation (Cabsvisit.visitCabsFile visitor);;
 
 let warn_pure_exp f e =
-  let loc = e.eloc in
-  Kernel.warning ~source:(fst loc)
+  Kernel.warning ~source:e.eloc
     "[SH]: function %s, pure expression %a is dropped"
     f (Cil_printer.pp_exp) e
 ;;
@@ -38,7 +37,7 @@ let warn_pure_exp f e =
 Cabs2cil.register_ignore_pure_exp_hook warn_pure_exp;;
 
 let warn_proto vi =
-  Kernel.warning ~source:(fst vi.vdecl) "[SH]: implicit declaration for prototype %a"
+  Kernel.warning ~source:vi.vdecl "[SH]: implicit declaration for prototype %a"
     (Format.pp_print_string) vi.vname
 ;;
 
@@ -47,7 +46,7 @@ Cabs2cil.register_implicit_prototype_hook warn_proto
 
 let warn_distinct oldvi vi =
   Kernel.warning
-    ~source:(fst vi.vdecl)
+    ~source:vi.vdecl
     "[SH]: definition of %a does not use exactly the same prototype as \
      declared on line %d"
     Format.pp_print_string vi.vname
@@ -57,14 +56,14 @@ let warn_distinct oldvi vi =
 Cabs2cil.register_different_decl_hook warn_distinct;;
 
 let warn_local_func vi =
-  Kernel.warning ~source:(fst vi.vdecl)
+  Kernel.warning ~source:vi.vdecl
     "[SH]: definition of local function %a" Format.pp_print_string vi.vname
 ;;
 
 Cabs2cil.register_local_func_hook warn_local_func;;
 
 let warn_drop_effect olde e =
-  Kernel.warning ~source:(fst e.eloc)
+  Kernel.warning ~source:e.eloc
     "[SH]: dropping side effect in sizeof: %a is converted to %a"
     Cprint.print_expression olde
     Cil_printer.pp_exp e
@@ -73,8 +72,7 @@ let warn_drop_effect olde e =
 Cabs2cil.register_ignore_side_effect_hook warn_drop_effect
 
 let warn_cond_effect orig e =
-  let source = fst e.expr_loc in
-  Kernel.warning ~source
+  Kernel.warning ~source:e.expr_loc
     "@[<hov 0>[SH]: side effect of@ @[<hov 2>expression %a@]@ \
      occurs in conditional part of@ @[<hov 2>expression %a@].@ \
      It is not always executed.@]"
@@ -86,8 +84,7 @@ Cabs2cil.register_conditional_side_effect_hook warn_cond_effect
 let process_new_global =
   let seen_vi = Cil_datatype.Varinfo.Hashtbl.create 10 in
   fun vi exists ->
-    let source = fst vi.vdecl in
-    Kernel.feedback ~source
+    Kernel.feedback ~source:vi.vdecl
       "New global node introducing identifier %s(%d)" vi.vname vi.vid;
     if exists then begin
       Kernel.feedback "New occurrence of existing identifier %s" vi.vname;
