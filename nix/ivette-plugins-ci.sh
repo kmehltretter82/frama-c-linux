@@ -31,21 +31,23 @@ git_current_branch="$(git branch --show-current)"
 : "${git_current_branch:=${CI_COMMIT_REF_NAME:-}}"
 echo "currently on branch $git_current_branch"
 
-temporary="$(mktemp -d)"
-callsite="$(pwd)"
+if [[ "$CI" != "true" ]]; then
+  temporary="$(mktemp -d)"
+  callsite="$(pwd)"
 
-cleanup () {
-  cd "$callsite"
-  if [[ -n $temporary ]];
-  then rm -rf "$temporary"
-  fi
-  git worktree prune
-}
+  cleanup () {
+    cd "$callsite"
+    if [[ -n $temporary ]];
+    then rm -rf "$temporary"
+    fi
+    git worktree prune
+  }
 
-trap cleanup EXIT
+  trap cleanup EXIT
 
-git worktree add "$temporary" "$(git rev-parse HEAD)"
-cd "$temporary"
+  git worktree add "$temporary" "$(git rev-parse HEAD)"
+  cd "$temporary"
+fi
 
 declare -A plugins=( )
 declare -A ivette_plugins=( )
