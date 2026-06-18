@@ -57,7 +57,8 @@ struct
         else Self.wkey_missing_loop_unroll
       in
       Self.warning
-        ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
+        ~wkey ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc stmt))
+        ~once:true
         "%s loop without unroll annotation" loop_kind
 
   let unroll loop =

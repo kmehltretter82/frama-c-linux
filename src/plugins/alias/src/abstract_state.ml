@@ -628,7 +628,7 @@ let assignment s lv exp : state =
       if List.mem v2 (G.psucc s.graph v1) || List.mem v1 (G.psucc s.graph v2)
       then
         let () =
-          Options.warning ~source:(fst e.eloc)
+          Options.warning ~source:(Fileloc.loc_start e.eloc)
             "ignoring assignment of the form: %a = %a"
             Printer.pp_lval lv Printer.pp_exp e;
         in s
@@ -842,7 +842,9 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
         | None -> None
         | Some lv -> Some (lv, Lval.simplify formal)
       with Explicit_pointer_address loc ->
-        Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
+        Options.warning
+          ~source:(Fileloc.loc_start loc)
+          ~wkey:Options.Warn.unsupported_address
           "unsupported feature: explicit pointer address: %a; analysis may be unsound"
           Printer.pp_exp arg;
         None

@@ -580,8 +580,9 @@ class erase_exn =
         | [] -> loc
         | [x] -> Cil_datatype.Stmt.loc x
         | x::tl ->
-          fst (Cil_datatype.Stmt.loc x),
-          snd (Cil_datatype.Stmt.loc (List.last tl))
+          let loc_start = Cil_datatype.Stmt.loc x
+          and loc_end = Cil_datatype.Stmt.loc (List.last tl) in
+          Fileloc.range ~loc_start ~loc_end
       in
       let add_unreachable_block b =
         Cil.mkStmt (If(Cil.zero ~loc, b, Cil.mkBlock [], loc))

@@ -94,11 +94,12 @@ let categorizePragmas ast =
   let considerPragma =
 
     let badPragma location pragma =
-      Kernel.warning ~source:location "Invalid argument to pragma %s" pragma
+      let source = Fileloc.loc_start location in
+      Kernel.warning ~source "Invalid argument to pragma %s" pragma
     in
 
     function
-    | GPragma (("cilnoremove" as directive, args), (location,_)) ->
+    | GPragma (("cilnoremove" as directive, args), location) ->
       (* a very flexible pragma: can retain typedefs, enums,
        * structs, unions, or globals (functions or variables) *)
       begin
@@ -560,23 +561,27 @@ class markReferencedVisitor = object (self)
   method private reference varinfo loc =
     if not (Ast_attributes.(contains fc_builtin varinfo.vattr)) then begin
       Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
-      Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
+      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+        "referenced: fun %s" varinfo.vname;
       varinfo.vreferenced <- true;
     end
 
   method! vglob = function
     | GType (typeinfo, loc) ->
-      Kernel.debug ~source:(fst loc) ~dkey "referenced: type %s" typeinfo.tname;
+      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+        "referenced: type %s" typeinfo.tname;
       typeinfo.treferenced <- true;
       DoChildren
     | GCompTag (compinfo, loc)
     | GCompTagDecl (compinfo, loc) ->
-      Kernel.debug ~source:(fst loc) ~dkey "referenced: comp %s" compinfo.cname;
+      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+        "referenced: comp %s" compinfo.cname;
       compinfo.creferenced <- true;
       DoChildren
     | GEnumTag (enuminfo, loc)
     | GEnumTagDecl (enuminfo, loc) ->
-      Kernel.debug ~source:(fst loc) ~dkey "referenced: enum %s" enuminfo.ename;
+      Kernel.debug ~source:(Fileloc.loc_start loc) ~dkey
+        "referenced: enum %s" enuminfo.ename;
       enuminfo.ereferenced <- true;
       DoChildren
     | GVar (varinfo, _, loc) | GFun ({svar = varinfo}, loc) ->

@@ -84,7 +84,7 @@ let rec transpose_precondition stmt pid kf func args =
      assert (Cil_datatype.Varinfo.equal vkf (Kernel_function.get_vi kf))
    | _ ->
      let loc = Cil_datatype.Stmt.loc stmt in
-     Kernel.debug ~source:(fst loc)
+     Kernel.debug ~source:(Fileloc.loc_start loc)
        "Adding precondition for call to %a through pointer"
        Kernel_function.pretty kf;
      add_called_function stmt kf;
@@ -139,7 +139,7 @@ let all_call_preconditions_at ~warn_missing kf stmt =
       (pid_spec, pid_call) :: properties
     else (
       if warn_missing then
-        Kernel.fatal ~source:(fst (Cil_datatype.Stmt.loc stmt))
+        Kernel.fatal ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc stmt))
           "Preconditions %a for %a not yet registered at this statement"
           Printer.pp_identified_predicate precond Kernel_function.pretty kf;
       properties)

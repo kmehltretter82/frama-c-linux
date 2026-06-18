@@ -27,6 +27,9 @@ open Cabshelper
    removing Logic_ptree.location. *)
 type location = Fileloc.t
 
+let loc_range {expr_loc = loc_start} {expr_loc = loc_end} =
+  Fileloc.range ~loc_start ~loc_end
+
 (*
 ** Expression building
 *)
@@ -35,11 +38,12 @@ let smooth_expression lst =
   | [] -> Kernel.fatal "empty COMMA expression, should not happen"
   | [expr] -> expr
   | hd :: _ ->
-    let beg_loc = fst hd.expr_loc in
-    let end_loc = snd (List.last lst).expr_loc in
-    { expr_loc = (beg_loc,end_loc); expr_node = COMMA (lst) }
+    let expr_loc = loc_range hd (List.last lst) in
+    { expr_loc; expr_node = COMMA (lst) }
 
-let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
+let merge_string (c1, loc_start) (l2, loc_end) =
+  let loc = Fileloc.range ~loc_start ~loc_end in
+  c1 :: l2, loc
 
 (* To be called only inside a grammar rule. *)
 let make_expr start_end_pos expr_node =
@@ -119,16 +123,16 @@ let doDeclaration logic_spec (loc: Fileloc.t) (specs: spec_elem list) (nl: init_
     let logic_spec =
       match logic_spec with
       | None -> None
-      | Some (loc, _ as ls) -> begin
+      | Some (pos_start, _ as ls) -> begin
           Option.map
-            (fun (loc', spec) ->
+            (fun (pos_end, spec) ->
                let name =
                  match nl with
                  | [ (n,_,_,_),_ ] -> n
                  | _ -> "unknown function"
                in
                check_funspec_abrupt_clauses name spec;
-               (spec, (loc, loc')))
+               (spec, Fileloc.make ~pos_start ~pos_end))
             (Logic_lexer.spec ls)
         end
     in
@@ -926,7 +930,8 @@ else_part:
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 | LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement {
     let loc = Errorloc.convert_loc $sloc in
-    Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
+    let source = Fileloc.loc_start loc in
+    Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source
       "Invalid ghost else ignored" ;
     in_block $loc($5) $5
   }
@@ -942,8 +947,9 @@ statement:
 | SPEC annotated_statement {
     let bs = $2 in
     match Logic_lexer.spec $1 with
-    | Some (loc',spec) ->
-      let spec = no_ghost [Cabs.CODE_SPEC (spec, (fst $1, loc'))] in
+    | Some (pos_end,spec) ->
+      let loc = Fileloc.make ~pos_start:(fst $1) ~pos_end in
+      let spec = no_ghost [Cabs.CODE_SPEC (spec, loc)] in
       spec @ $2
     | None -> bs
   }
@@ -961,20 +967,17 @@ statement:
     no_ghost [SWITCH (smooth_expression $2, in_block $loc($3) $3, loc)]
   }
 | opt_loop_annotations WHILE paren_comma_expression annotated_statement {
-    let first = Errorloc.convert_pos $startpos($2) in
-    let last = Errorloc.convert_pos $endpos in
-    no_ghost [WHILE ($1, smooth_expression $3, in_block $loc($4) $4, (first,last))]
+    let loc = Errorloc.convert_loc ($startpos($2), $endpos) in
+    no_ghost [WHILE ($1, smooth_expression $3, in_block $loc($4) $4, loc)]
   }
 | opt_loop_annotations DO annotated_statement WHILE paren_comma_expression SEMICOLON {
-    let first = Errorloc.convert_pos $startpos($2) in
-    let last = Errorloc.convert_pos $endpos in
-    no_ghost [DOWHILE ($1, smooth_expression $5, in_block $loc($3) $3, (first,last))]
+    let loc = Errorloc.convert_loc ($startpos($2), $endpos) in
+    no_ghost [DOWHILE ($1, smooth_expression $5, in_block $loc($3) $3, loc)]
   }
 | opt_loop_annotations FOR LPAREN for_clause opt_expression SEMICOLON
   opt_expression RPAREN annotated_statement {
-    let first = Errorloc.convert_pos $startpos($2) in
-    let last = Errorloc.convert_pos $endpos in
-    no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, (first,last))]
+    let loc = Errorloc.convert_loc ($startpos($2), $endpos) in
+    no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, loc)]
   }
 | id = id_or_typename_as_id COLON s = annotated_statement {
     let loc = Errorloc.convert_loc $loc(id) in
@@ -1069,7 +1072,7 @@ declaration:                                /* ISO 6.7.*/
     let loc = Errorloc.convert_loc ($symbolstartpos,$endpos) in
     let decls = Option.value ~default:[] decls in
     if !Lexerhack.is_typedef () && decls = [] then begin
-      let source = fst loc in
+      let source = Fileloc.loc_start loc in
       let wkey = Kernel.wkey_unnamed_typedef in
       Kernel.warning ~source ~wkey "typedef without a name"
     end;
@@ -1174,8 +1177,9 @@ decl_spec_list:
     let pragmas = $2 in
     if pragmas != [] then begin
       let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
+      let source = Fileloc.loc_start loc in
       Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
-        ~once:true ~source:(fst loc)
+        ~once:true ~source
         "Discarding _Pragma's in function declaration"
     end;
     SpecType(fst $1) :: $3, snd $1
@@ -1190,8 +1194,9 @@ decl_spec_list_no_restriction:
     let pragmas = $2 in
     if pragmas != [] then begin
       let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
+      let source = Fileloc.loc_start loc in
       Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
-        ~once:true ~source:(fst loc)
+        ~once:true ~source
         "Discarding _Pragma's in function declaration"
     end;
     SpecType(fst $1) :: $3, snd $1
@@ -1326,7 +1331,7 @@ enumerator:
     let attrs = $2 in
     let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
-      ~source:(fst loc)
+      ~source:(Fileloc.loc_start loc)
       "Discarding attributes in enumerator (unsupported feature): %a"
       Cprint.print_attributes attrs;
     ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
@@ -1336,7 +1341,7 @@ enumerator:
     let attrs = $2 in
     let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
-      ~source:(fst loc)
+      ~source:(Fileloc.loc_start loc)
       "Discarding attributes in enumerator (unsupported feature): %a"
       Cprint.print_attributes attrs;
     ($1, $4, loc)
@@ -1517,9 +1522,11 @@ function_def: /* (* ISO 6.9.1 *) */
     let spec_loc =
       Option.bind
         (fun s ->
-            let loc = fst s in
+            let pos_start = fst s in
             Option.map
-              (fun (loc', spec) -> spec, (loc, loc'))
+              (fun (pos_end, spec) ->
+                let loc = Fileloc.make ~pos_start ~pos_end in
+                spec, loc)
               (Logic_lexer.spec s))
         s
     in
@@ -1697,10 +1704,7 @@ postfix_attr:
 /* (* use a VARIABLE "" so that the parentheses are printed *) */
 | id_or_typename_as_id LPAREN RPAREN {
     let loc1 = Errorloc.convert_loc $loc($1) in
-    let loc2 =
-      Errorloc.convert_pos $startpos($2),
-      Errorloc.convert_pos $endpos($3)
-    in
+    let loc2 = Errorloc.convert_loc ($startpos($2), $endpos($3)) in
     let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
     let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
     make_expr $sloc (CALL(f, [arg],[]))

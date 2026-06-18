@@ -26,8 +26,10 @@
     Errorloc.convert_pos pos
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
-  let loc_start x = fst x.lexpr_loc
-  let loc_end x = snd x.lexpr_loc
+
+  let loc_range {lexpr_loc = loc_start} {lexpr_loc = loc_end} =
+    Fileloc.range ~loc_start ~loc_end
+
 
   let info start_end x = loc_info (loc start_end) x
 
@@ -35,14 +37,14 @@
   let rec pland p1 p2 =
     match p2.lexpr_node with
       | PLand (p3,p4) ->
-        let loc = (loc_start p1, loc_end p3) in
+        let loc = loc_range p1 p3 in
         PLand(loc_info loc (pland p1 p3),p4)
       | _ -> PLand(p1,p2)
 
   let rec plor p1 p2 =
     match p2.lexpr_node with
       | PLor(p3,p4) ->
-        let loc = (loc_start p1, loc_end p3) in
+        let loc = loc_range p1 p3 in
         PLor(loc_info loc (plor p1 p3),p4)
       | _ -> PLor(p1,p2)
 
@@ -410,7 +412,7 @@ lexpr_rel:
 | lexpr_end_rel  { $1 }
 | lexpr_inner rel_list
       { let rel, rhs, _, oth_rel = $2 in
-        let loc = loc_start $1, loc_end rhs in
+        let loc = loc_range $1 rhs in
         let relation = loc_info loc (PLrel($1,rel,rhs)) in
         match oth_rel with
             None -> relation
@@ -444,12 +446,12 @@ rel_list:
     let (sense, correct) = relation_sense $1 sense
     in
     if correct then
-      let loc = loc_start $2, loc_end rhs in
+      let loc = loc_range $2 rhs in
       let my_rel = loc_info loc (PLrel($2,next_rel,rhs)) in
       let oth_rel = match oth_rel with
           None -> my_rel
         | Some rel ->
-	    let loc = loc_start $2, loc_end rel in
+	    let loc = loc_range $2 rel in
 	    loc_info loc (pland my_rel rel)
       in
       $1,$2,sense,Some oth_rel
@@ -1746,7 +1748,7 @@ push_module_name:
 ext_loader:
 | IDENTIFIER COLON {
     Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown
-      ~source:(fst (loc $sloc))
+      ~source:(Fileloc.loc_start (loc $sloc))
       "Ignoring unregistered module importer extension '%s'" $1;
     raise Unknown_ext
   }

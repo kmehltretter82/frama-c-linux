@@ -10,7 +10,7 @@
     the current location then you can use some built-in logging functions that
     will print the location.
 *)
-include State_builder.Ref with type data = Filepos.t * Filepos.t
+include State_builder.Ref with type data = Fileloc.t
 
 (** [with_loc loc f x] set the current location to [loc], which can be used
     with [Current_loc.get ()] or via the option [~current] in Log functions.

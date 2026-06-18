@@ -37,7 +37,7 @@ let create_const_list loc kind low high =
   in aux [] high
 
 let range low high =
-  let loc = fst low.eloc, snd high.eloc in
+  let loc = Fileloc.range ~loc_start:low.eloc ~loc_end:high.eloc in
   match (Cil.constFold true low).enode, (Cil.constFold true high).enode with
     Const(CInt64(low,kind,_)), Const(CInt64(high,_,_)) ->
     create_const_list loc kind low high

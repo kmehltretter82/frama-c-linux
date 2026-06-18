@@ -121,9 +121,9 @@ let convert_location (wloc : Why3.Loc.position option) : Fileloc.t =
   | Some loc ->
     let (file,lstart,cstart,lend,cend) = Why3.Loc.get loc in
     let path = F.of_string file in
-    let pstart = Filepos.make ~path ~line:lstart ~column:cstart ~offset:0 () in
-    let pend = Filepos.make ~path ~line:lend ~column:cend ~offset:0 () in
-    (pstart, pend)
+    let pos_start = Filepos.make ~path ~line:lstart ~column:cstart ~offset:0 () in
+    let pos_end = Filepos.make ~path ~line:lend ~column:cend ~offset:0 () in
+    Fileloc.make ~pos_start ~pos_end
   | None -> Wp_parameters.gen_loc
 
 (* -------------------------------------------------------------------------- *)

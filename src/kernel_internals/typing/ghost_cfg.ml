@@ -101,7 +101,7 @@ let nextNonGhostSync stmt =
   fst (do_find (StmtSet.empty, StmtSet.empty) stmt)
 
 let alteredCFG stmt =
-  error ~once:true ~source:(fst (Stmt.loc stmt))
+  error ~once:true ~source:(Fileloc.loc_start (Stmt.loc stmt))
     "Ghost code breaks CFG starting at:@.%a"
     Cil_printer.pp_stmt stmt
 

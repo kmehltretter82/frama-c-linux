@@ -82,7 +82,7 @@ module Location: sig
       column number is available, in the format
       ["<file>", line <line>, character <char>] *)
   val pretty_line: t Pretty_utils.formatter
-  [@@migrate { repl = fun fmt loc -> Filepos.pretty_long fmt (fst loc) }]
+  [@@migrate { repl = fun fmt loc -> Filepos.pretty_long fmt (Fileloc.loc_start loc) }]
 
   (** Pretty prints the ocaml internal representation of a location, for debug
       purposes.

@@ -78,12 +78,12 @@ let valid key builder =
 
 let unsupported key =
   let msg f k = Format.fprintf f "%s is currently unsupported by Frama-C." k in
-  add key (fun loc -> Kernel.abort ~source:(fst loc) "%a" msg key)
+  add key (fun loc -> Kernel.abort ~source:(Fileloc.loc_start loc) "%a" msg key)
 
 let compiler (name, is_machdep) key builder =
   let wkey = Kernel.wkey_conditional_feature in
   let warning loc =
-    Kernel.warning ~wkey ~source:(fst loc)
+    Kernel.warning ~wkey ~source:(Fileloc.loc_start loc)
       "%s is a %s extension, use a %s-based machdep to enable it."
         key name name ;
     IDENT key
@@ -99,8 +99,7 @@ let c23_or_later key builder =
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
-  let path (loc : Fileloc.t) = Filepos.path (fst loc) in
-  let filename loc = Filepath.to_string (path loc) in
+  let filename loc = Filepath.to_string (Fileloc.path loc) in
   let ints loc = List.rev (String.fold_left convert [] (filename loc)) in
   add "__FC_FILENAME__" (fun loc -> CST_STRING (ints loc, loc))
 
@@ -393,7 +392,7 @@ let annot_lex initial rule lexbuf =
     initial lexbuf
 
 let make_annot ~one_line default lexbuf s =
-  let start = snd !annot_start_pos in
+  let start = Fileloc.loc_end !annot_start_pos in
   match Logic_lexer.annot (start, s) with
   (* error occurred and annotation is discarded. Find a normal token. *)
   | None -> default lexbuf
@@ -577,7 +576,7 @@ rule initial = parse
     let last = content.[len - 1] in
     if (last = 'd' || last = 'D') && not (Machine.gccMode ()) then begin
        Kernel.warning ~wkey:Kernel.wkey_conditional_feature
-          ~source:(fst loc) ~once:true
+          ~source:(Fileloc.loc_start loc) ~once:true
           "'d' suffix in a floating literal (%s) is a GCC extension, \
            use a GCC-based machdep to enable it" content;
        (* drop the suffix *)
@@ -840,7 +839,9 @@ and annot_token = parse
     {
     if is_ghost_annot ()
     then begin
-      let loc = (fst (get_ghost_annot_start()), snd (currentLoc())) in
+      let loc_start = get_ghost_annot_start ()
+      and loc_end = currentLoc () in
+      let loc = Fileloc.range ~loc_start ~loc_end in
       parse_error ~loc "Ghost multi-line annotation not terminated"
     end;
     let s = Buffer.contents buf in

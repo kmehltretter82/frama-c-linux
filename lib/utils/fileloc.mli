@@ -16,7 +16,7 @@
     @before 33.0-Arsenic This module was {!Cil_datatype.Location}.
 *)
 
-type t = Filepos.t * Filepos.t [@@deriving show]
+type t [@@deriving show]
 
 include Datatype.S_with_collections with type t := t
 
@@ -67,6 +67,14 @@ val to_lexing_loc : t -> Lexing.position * Lexing.position
 
 (** {2 Accessors } *)
 
+(** Get the starting position of a location
+    @since Frama-C+dev. *)
+val loc_start : t -> Filepos.t
+
+(** Get the ending position of a location
+    @since Frama-C+dev. *)
+val loc_end : t -> Filepos.t
+
 (** Get the first line of the location. *)
 val line : t -> int
 
@@ -76,6 +84,29 @@ val path : t -> Filepath.t
 (** [is_empty loc] returns true if the first position is empty according to
     {!Filepos.is_empty}. *)
 val is_empty : t -> bool
+
+(** {2 Constructors } *)
+
+(** It is not recommended to manipulate / create locations manually, only the
+    parser should do it. But if really necessary, these functions provides
+    ways to to it. *)
+
+(** Create a location between a starting and ending position.
+    @since Frama-C+dev *)
+val make : pos_start:Filepos.t -> pos_end:Filepos.t -> t
+
+(** Convert a location to a pair of positions.
+    @since Frama-C+dev *)
+val extract :  t -> Filepos.t * Filepos.t
+
+(** Create a location from the given position.
+    @since Frama-C+dev *)
+val from_position : Filepos.t -> t
+
+(** Create a location which ranges from the start of the first location to the
+    end of the second one.
+    @since Frama-C+dev *)
+val range : loc_start:t -> loc_end:t -> t
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

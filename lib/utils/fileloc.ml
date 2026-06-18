@@ -110,11 +110,26 @@ let to_lexing_loc (pos1, pos2) =
 
 (* --- Accessors  --- *)
 
+let loc_start = fst
+
+let loc_end = snd
+
 let path loc = fst loc |> Filepos.path
 
 let line loc = fst loc |> Filepos.line
 
 let is_empty loc = fst loc |> Filepos.is_empty
+
+(* --- Constructors --- *)
+
+let make ~pos_start ~pos_end = (pos_start, pos_end)
+
+let extract = Fun.id
+
+let from_position pos = (pos, pos)
+
+let range ~loc_start:(loc_start, _) ~loc_end:(_, loc_end) =
+  (loc_start, loc_end)
 
 (* --- Datatype with comparison/hash on original source positions  --- *)
 

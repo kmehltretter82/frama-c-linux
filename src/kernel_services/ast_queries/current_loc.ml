@@ -14,7 +14,7 @@ include State_builder.Ref
       let default () = Kernel.gen_loc
     end)
 
-let () = Log.set_current_source (fun () -> fst (get ()))
+let () = Log.set_current_source (fun () -> Fileloc.loc_start (get ()))
 
 let with_loc loc f x =
   let oldLoc = get () in

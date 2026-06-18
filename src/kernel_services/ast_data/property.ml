@@ -370,7 +370,7 @@ let source ip =
   let loc = location ip in
   if Fileloc.is_empty loc
   then None
-  else Some (fst loc)
+  else Some (Fileloc.loc_start loc)
 
 (* Pretty information about the localization of a IPPropertyInstance *)
 let pretty_instance_location fmt (kf, stmt) =

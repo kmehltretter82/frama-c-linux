@@ -62,7 +62,7 @@ let unroll op = function
 
 let assoc op a b =
   {
-    loc = fst a.loc, snd b.loc ;
+    loc = Fileloc.range ~loc_start:a.loc ~loc_end:b.loc ;
     value = Assoc(op,unroll op a @ unroll op b) ;
   }
 
@@ -70,7 +70,7 @@ let implies a b =
   let hs = unroll `And a in
   let hs,p = match b.value with Implies(rs,p) -> hs @ rs , p | _ -> hs, b in
   {
-    loc = fst a.loc, snd b.loc ;
+    loc = Fileloc.range ~loc_start:a.loc ~loc_end:b.loc ;
     value = Implies (hs, p) ;
   }
 
@@ -652,7 +652,8 @@ let () = Lang.on_field
     end
 
 let log_error ~loc msg =
-  Wp_parameters.logwith (fun _evt -> raise Not_found) ~source:(fst loc) msg
+  Wp_parameters.logwith (fun _evt -> raise Not_found)
+    ~source:(Fileloc.loc_start loc) msg
 
 let getvar env (x : string loc) : Tactical.selection =
   try Vmap.find x.value env
@@ -803,7 +804,7 @@ let env ?(raise=false) () = {
 let typecheck_error env loc msg =
   if env.raise
   then Format.kasprintf (fun e -> raise (TypeError(loc, e))) msg
-  else Wp_parameters.error ~source:(fst loc) msg
+  else Wp_parameters.error ~source:(Fileloc.loc_start loc) msg
 
 let tc_merge env ~loc ~expected va =
   let v = vmerge va expected in

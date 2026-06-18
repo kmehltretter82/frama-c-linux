@@ -44,13 +44,13 @@ let add_dpoints_to env tgt = function
   | Some src -> Memory.add_points_to tgt src
   | None ->
     let loc = Access.location env.context in
-    Options.warning ~wkey ~source:(fst loc)
+    Options.warning ~wkey ~source:(Fileloc.loc_start loc)
       "No pointer found in assigns-\\from to pointer location(s)"
 
 let add_points_to env tgt = function
   | FromAny ->
     let loc = Access.location env.context in
-    Options.warning ~wkey ~source:(fst loc)
+    Options.warning ~wkey ~source:(Fileloc.loc_start loc)
       "Missing \\from in assigns to pointer location(s)"
   | From [] -> () (* avoid warning for purely allocating functions *)
   | From deps ->
@@ -115,7 +115,7 @@ let add_writes_from ~loc env (lv : term_lval) ~(from:deps) =
     add_write_compound env lv ty tgt from
   else
     Options.not_yet_implemented
-      ~source:(fst loc)
+      ~source:(Fileloc.loc_start loc)
       "Unsupported assigns to type (%a)" Printer.pp_typ ty
 
 let is_result = function (TResult _,_) -> true | _ -> false
@@ -136,11 +136,11 @@ let rec add_assigns_from env ~iscalled ~from tgt =
   | Tunion ts | Tinter ts -> List.iter (add_assigns_from env ~iscalled ~from) ts
   | Tcomprehension _ ->
     Options.not_yet_implemented
-      ~source:(fst tgt.term_loc)
+      ~source:(Fileloc.loc_start tgt.term_loc)
       "Unsupported set-comprehension"
   | Tlet _ ->
     Options.not_yet_implemented
-      ~source:(fst tgt.term_loc)
+      ~source:(Fileloc.loc_start tgt.term_loc)
       "Unsupported \\let-assigns"
   | Tif (c,tt,te) ->
     add_predicate env c ;
@@ -151,7 +151,7 @@ let rec add_assigns_from env ~iscalled ~from tgt =
   | Tapp _ | Tlambda _ | TDataCons _
   | Tbase_addr _ | Toffset (_, _) | Tblock_length _ | Tnull
   | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set | Trange _ ->
-    Options.warning ~source:(fst tgt.term_loc)
+    Options.warning ~source:(Fileloc.loc_start tgt.term_loc)
       "Non-assignable term (skipped)@ (%a)"
       Printer.pp_term tgt
 
@@ -176,7 +176,7 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
   | WritesAny ->
     if called <> None then
       let loc = Kernel_function.get_location kf in
-      Options.warning ~wkey ~source:(fst loc)
+      Options.warning ~wkey ~source:(Fileloc.loc_start loc)
         "Precise assigns are required for calls"
   | Writes ws as asgn ->
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
@@ -195,7 +195,7 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
          Ast_types.C.is_fun_or_ptr @@ Kernel_function.get_return_type kf
       then
         let loc = Access.location context in
-        Options.warning ~wkey ~source:(fst loc)
+        Options.warning ~wkey ~source:(Fileloc.loc_start loc)
           "Missing assigns \\result \\from for returned pointer"
 
 let add_allocation ~map ~called ~kf ~ki ~bhv ~formals ~result alloc =
@@ -205,7 +205,7 @@ let add_allocation ~map ~called ~kf ~ki ~bhv ~formals ~result alloc =
     ignore map ; ignore called ; ignore ki ;
     ignore bhv ; ignore formals ; ignore result ;
     let loc = Kernel_function.get_location kf in
-    Options.not_yet_implemented ~source:(fst loc )
+    Options.not_yet_implemented ~source:(Fileloc.loc_start loc )
       "Unsupported \\allocates and \\frees"
 (* | FreeAlloc (its1, its2) ->
    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
@@ -244,7 +244,7 @@ let rec add_extension ~map ~called ~kf ~ki ~formals ~result acsl =
         List.iter (Logic.add_object env) (Spec.of_extid id)
     else
       let loc = Access.location context in
-      Options.not_yet_implemented ~source:(fst loc)
+      Options.not_yet_implemented ~source:(Fileloc.loc_start loc)
         "Unsupported \\%s:%s extensions" acsl.ext_plugin acsl.ext_name
 
   | Ext_terms ts -> List.iter (iadd_term env) ts
@@ -317,7 +317,7 @@ let add_code_annot ~map ~kf ~stmt ~result ca =
   | AAllocation (_,FreeAlloc _) ->
     let loc = Cil_datatype.Stmt.loc stmt in
     Options.not_yet_implemented
-      ~source:(fst loc)
+      ~source:(Fileloc.loc_start loc)
       "Unsupported \\allocates and \\frees" ;
     (*TODO FIX THIS, Cf. assigns & add_allocates *)
   | AExtended (_,_, acsl) ->

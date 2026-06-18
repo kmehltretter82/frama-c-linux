@@ -63,8 +63,11 @@ end
 let initial_state = ref @@ Some Abstract_state.empty
 
 let warn_unsupported_explicit_pointer pp_obj obj loc =
-  Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
-    "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
+  Options.warning
+    ~source:(Fileloc.loc_start loc)
+    ~wkey:Options.Warn.unsupported_address
+    "unsupported feature: explicit pointer address: %a; analysis may be unsound"
+    pp_obj obj
 
 let do_assignment (lv:lval) exp_o (s:Abstract_state.t) : Abstract_state.t =
   try Abstract_state.assignment s lv exp_o
@@ -152,7 +155,9 @@ let do_function_call (stmt:stmt) state (res : lval option) (f : lhost) (args: ex
       | (None, _) -> None
       | (Some a, Some summary) -> Some (Abstract_state.call a res args summary)
       | (Some a, None) ->
-        Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
+        Options.warning
+          ~wkey:Options.Warn.undefined_function
+          ~once:true ~source:(Fileloc.loc_start loc)
           "function %a has no definition" Printer.pp_lhost f;
         Some a
     in
@@ -171,7 +176,7 @@ let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_stat
   | Call (res,ef,es,loc) -> do_function_call s a res ef es loc
   | Asm (_,_,_,loc) ->
     Options.warning
-      ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
+      ~source:(Fileloc.loc_start loc) ~wkey:Options.Warn.unsupported_asm
       "unsupported feature: assembler code; skipping";
     a
 
@@ -248,7 +253,7 @@ let analyse_function (kf:kernel_function) =
       let return_stmt = Kernel_function.find_return kf in
       try Stmt_table.find return_stmt
       with Not_found ->
-        let source, _ = Kernel_function.get_location kf in
+        let source = Fileloc.loc_start (Kernel_function.get_location kf) in
         Options.warning ~source ~wkey:Options.Warn.no_return_stmt
           "function %a does not return; analysis may be unsound"
           Kernel_function.pretty kf;

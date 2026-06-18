@@ -947,7 +947,7 @@ let set_current_module ~is_from_file_name m =
 
 let find_kf fct = SymbolIndex.find_kf ~file:!current_module fct
 
-let set_current_function (fct,(source,_loc2)) =
+let set_current_function (fct, loc) =
   set_current_scope MacroIndex.Sfunction ;
   Options.debug ~level:2 ~dkey
     "Set current function to %S@." fct ;
@@ -956,7 +956,9 @@ let set_current_function (fct,(source,_loc2)) =
     Options.debug ~level:2 ~dkey "FUNCTION %s@." fct
   with
     Not_found ->
-    Options.annot_error ~source "could not find function %s for ACSL importer." fct;
+    Options.annot_error
+      ~source:(Fileloc.loc_start loc)
+      "could not find function %s for ACSL importer." fct;
     current_function := None
 
 exception Kf_not_found
@@ -997,9 +999,11 @@ let parse_global s =
   match Logic_lexer.annot (get_buff_loc (), s) with
   | Some (_, Logic_ptree.Adecl decls) ->
     (* update starting annotation location *)
-    List.map (fun d -> {d with Logic_ptree.decl_loc
-                               = (get_prop_loc (),
-                                  snd d.Logic_ptree.decl_loc)})
+    List.map (fun d ->
+        let pos_start = get_prop_loc () in
+        let pos_end = Fileloc.loc_end d.Logic_ptree.decl_loc in
+        let loc = Fileloc.make ~pos_start ~pos_end in
+        Logic_ptree.{d with decl_loc = loc})
       decls
   | _ -> Options.abort "[Syntax error] Unallowed global annotation."
 
@@ -1007,18 +1011,20 @@ let parse_global s =
 let parse_spec s =
   match Logic_lexer.spec (get_buff_loc (), s) with
   | Some (loc2, a) -> (* update starting annotation location *)
-    a, (get_prop_loc (), loc2)
+    a, Fileloc.make ~pos_start:(get_prop_loc ()) ~pos_end:loc2
   | None -> Options.abort "[Syntax error] Invalid function contract"
 
 (** Parse a code annotation. *)
 let parse_annots s =
+  let pos_start = get_prop_loc () in
+  let make_loc = Fileloc.make ~pos_start in
   match Logic_lexer.annot (get_buff_loc (), s) with
-  | Some (_,Logic_ptree.Acode_annot ((_loc1,loc2),a)) ->
+  | Some (_,Logic_ptree.Acode_annot (loc,a)) ->
     (* update starting annotation location *)
-    (get_prop_loc (), loc2), [a]
-  | Some (_,Logic_ptree.Aloop_annot ((_loc1,loc2),a)) ->
+    make_loc ~pos_end:(Fileloc.loc_end loc), [a]
+  | Some (_,Logic_ptree.Aloop_annot (loc,a)) ->
     (* update starting annotation location *)
-    (get_prop_loc (), loc2), a
+    make_loc ~pos_end:(Fileloc.loc_end loc), a
   | _ ->
     Options.abort "[Syntax error] Unallowed annotation."
 
@@ -1094,7 +1100,7 @@ let integral_cast ty t =
   if Options.AddonIntegerCast.get () then
     begin
       let loc = t.term_loc in
-      let source = fst loc in
+      let source = Fileloc.loc_start loc in
       let ty = Ast_types.C.remove_attributes_for_logic_type ty in
       Options.warning ~wkey:Options.wkey_integer_cast ~source "Casting term %a of type %a into type %a."
         Printer.pp_term t Printer.pp_logic_type Linteger Printer.pp_typ ty;
@@ -1105,7 +1111,11 @@ let integral_cast ty t =
 
 
 (* messages that leads also to an annor_error in raising Exit*)
-let lt_error (source, _ ) fmt = Options.annot_warning ~raising:(fun () -> raise Exit) ~source fmt
+let lt_error loc fmt =
+  Options.annot_warning
+    ~raising:(fun () -> raise Exit)
+    ~source:(Fileloc.loc_start loc)
+    fmt
 
 let lt_on_error action finally arg =
   try action arg
@@ -1156,7 +1166,7 @@ let add_global_annot g_annots =
 (** Add a function contract. *)
 let add_funspec spec loc =
   try
-    let kf = with_current_function ~source:(fst (loc)) () in
+    let kf = with_current_function ~source:(Fileloc.loc_start (loc)) () in
     let file = !current_module in
     let scope = !current_scope in
     let module LT =
@@ -1331,7 +1341,7 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
 
 let add_annots ?loop_number stmts loc annots =
   try
-    let kf = with_current_function ~source:(fst (loc)) () in
+    let kf = with_current_function ~source:(Fileloc.loc_start loc) () in
     let file = !current_module in
     S_Stmt.iter (add_annots_aux kf file ?loop_number loc annots) stmts
   with | Kf_not_found ->

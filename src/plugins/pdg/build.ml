@@ -535,7 +535,8 @@ let finalize_pdg pdg from_opt =
         with Kernel_function.No_Statement ->
           Pdg_parameters.abort "No return in a declaration"
       in
-      Pdg_parameters.warning ~once:true ~source:(fst (Stmt.loc ret))
+      Pdg_parameters.warning ~once:true
+        ~source:(Fileloc.loc_start (Stmt.loc ret))
         "no final state. Probably unreachable...";
       None
   in
@@ -712,7 +713,7 @@ let process_call pdg state stmt lvaloption func argl _loc =
     | [] ->
       let stmt_str = Format.asprintf "%a" Printer.pp_stmt stmt in
       Pdg_parameters.not_yet_implemented
-        ~source:(fst (Cil_datatype.Stmt.loc stmt))
+        ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc stmt))
         "pdg with an unknown function call: %s" stmt_str
     | st :: [] -> st
     | st :: other_states ->

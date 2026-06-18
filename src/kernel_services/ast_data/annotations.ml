@@ -1541,7 +1541,7 @@ let do_add_code_annot ~keep_empty emitter ?kf stmt ca =
     (match v with
      | [] -> fill_tables ca (Property.ip_of_code_annot kf stmt ca)
      | _ ->
-       let source = fst (Cil_datatype.Stmt.loc stmt) in
+       let source = Fileloc.loc_start (Cil_datatype.Stmt.loc stmt) in
        Kernel.fatal ~source
          "trying to register a second variant for statement %a"
          Stmt.pretty stmt)

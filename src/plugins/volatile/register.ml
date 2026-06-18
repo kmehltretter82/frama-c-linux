@@ -501,7 +501,8 @@ let add_eventual_cast_to_expression lval_typ e =
   let newt = Ast_types.C.remove_attributes_for_c_cast lval_typ in
   let e' = Cil.mkCast ~force:false ~newt e in
   if e' != e then
-    Options.warning ~source:(fst e.eloc) ~once:true ~wkey:wkey_cast_insertion
+    Options.warning ~source:(Fileloc.loc_start e.eloc) ~once:true
+      ~wkey:wkey_cast_insertion
       "@[<hov 0>Cast to (%a) inserted@ for expression (%a)@ of type (%a)@]"
       Typ.pretty newt Exp.pretty e Typ.pretty (Cil.typeOf e);
   e'
@@ -510,14 +511,14 @@ let add_eventual_cast_to_param arg_typ param =
   let newt = Ast_types.C.remove_attributes_for_c_cast arg_typ in
   let param' = Cil.mkCast ~force:false ~newt param in
   if param' != param then
-    Options.warning ~source:(fst param.eloc) ~once:true
+    Options.warning ~source:(Fileloc.loc_start param.eloc) ~once:true
       ~wkey:wkey_cast_insertion
       "@[<hov 0>Cast to (%a) inserted@ for parameter (%a)@ of type (%a)@]"
       Typ.pretty newt Exp.pretty param Typ.pretty (Cil.typeOf param);
   param'
 
 let do_pointer_call ~loc ~index ~transform f es =
-  let source = fst loc in
+  let source = Fileloc.loc_start loc in
   match get_pointer_call ~index ~source f with
   | None -> None
   | Some vf ->
@@ -602,7 +603,7 @@ let build_volatile_table vmap =
       match L_MAP.find_opt path map with
       | Some old ->
         if not (Varinfo.equal old fct) then
-          Options.warning ~source:(fst loc) ~once:true
+          Options.warning ~source:(Fileloc.loc_start loc) ~once:true
             ~wkey:wkey_duplicated_access_function
             "%s access function already defined for %a"
             kind L_PATH.pretty path;
@@ -617,7 +618,7 @@ let build_volatile_table vmap =
             vmap.rd <- add_fct "read" loc vmap.rd p fct_rd;
             vmap.wr <- add_fct "write" loc vmap.wr p fct_wr;
           with L_PATH.Unsupported ->
-            Options.error ~source:(fst loc)
+            Options.error ~source:(Fileloc.loc_start loc)
               "Unsupported l-value in volatile clause: %a@."
               Identified_term.pretty l
         ) tset
@@ -650,7 +651,7 @@ let get_wkeys ~is_complete =
 
 let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   let typ = Cil.typeOfLval lval in
-  let source = fst (Current_loc.get ()) in
+  let source = Fileloc.loc_start (Current_loc.get ()) in
   let warn_access = if is_wr_access then "write" else "read" in
   (* Can raise L_PATH.Unsupported via L_PATH.of_lval *)
   let get_volatile_access ~is_complete =
@@ -900,13 +901,13 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               let transform = Visitor_behavior.Memo.varinfo self#behavior in
               match do_pointer_call ~loc ~index ~transform f xs with
               | Some (fn, g, ys) ->
-                Options.warning ~source:(fst loc) ~once:true
+                Options.warning ~source:(Fileloc.loc_start loc) ~once:true
                   ~wkey:wkey_transformed_call
                   "%a: use pointer function '%s'"
                   Fileloc.pretty loc fn;
                 Call (result, g, ys, loc)
               | None ->
-                Options.warning ~source:(fst loc) ~once:true
+                Options.warning ~source:(Fileloc.loc_start loc) ~once:true
                   ~wkey:wkey_untransformed_call
                   "Original pointer function kept"; i
           end
@@ -946,7 +947,9 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             let typ_exp = Cil.typeOf exp in
             match Ast_types.C.unroll_node typ_exp with
             | TPtr typ_pointed when Ast_types.C.is_volatile typ_pointed ->
-              Options.warning ~source:(fst (Current_loc.get ())) ~once:true
+              Options.warning
+                ~source:(Fileloc.loc_start (Current_loc.get ()))
+                ~once:true
                 ~wkey:wkey_volatile_cast
                 "Cast from type with volatile attribute (%a) to %a. Detection of \
                  volatile access may fail."

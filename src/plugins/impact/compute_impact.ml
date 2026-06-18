@@ -418,7 +418,8 @@ let downward_calls_inputs wl =
     analysis. *)
 let all_upward_callers wl kfs =
   let aux_call (caller, pdg_caller) (callee, pdg_callee) callsite =
-    Options.debug ~level:2 ~source:(fst (Cil_datatype.Stmt.loc callsite))
+    Options.debug ~level:2
+      ~source:(Fileloc.loc_start (Cil_datatype.Stmt.loc callsite))
       "Found call %a -> %a"
       Kernel_function.pretty caller Kernel_function.pretty callee;
     let nodes =

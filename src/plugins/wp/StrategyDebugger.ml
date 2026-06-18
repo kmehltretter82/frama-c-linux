@@ -68,8 +68,8 @@ struct
     Jrecord [ "offset", Jnumber ; "length", Jnumber ]
 
   let to_json (loc : t) =
-    let offset = Filepos.input_offset (fst loc) in
-    let length = Filepos.input_offset (snd loc) - offset in
+    let offset = Filepos.input_offset (Fileloc.loc_start loc) in
+    let length = Filepos.input_offset (Fileloc.loc_end loc) - offset in
     `Assoc [ "offset", `Int offset ; "length", `Int length ]
 
   let of_json _ =
@@ -215,12 +215,12 @@ let parse_string s =
     String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
   let pbeg = Filepos.make ~path ~line:0 ~column:0 ~offset:0 () in
   let pend = Filepos.make ~path ~line ~column ~offset:0 () in
+  let loc = Fileloc.make ~pos_start:pbeg ~pos_end:pend in
   let lb = Lexing.from_string s in
   let get_loc () =
-    Filepos.of_lexing_pos @@ Lexing.lexeme_start_p lb,
-    Filepos.of_lexing_pos @@ Lexing.lexeme_end_p lb
+    Fileloc.of_lexing_loc (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
   in
-  let<> UpdatedCurrentLoc = (pbeg, pend) in
+  let<> UpdatedCurrentLoc = loc in
   set_initial_position lb (Filepos.to_lexing_pos pbeg);
   try Logic_parser.lexpr_list_eof Logic_lexer.token lb
   with

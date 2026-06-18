@@ -1046,7 +1046,7 @@ class cil_printer () = object (self)
          three-argument call: the last argument is the address of the
          destination *)
     | Call(None, Var vi,
-           [dest; {enode = SizeOf t}; adest], (l,_))
+           [dest; {enode = SizeOf t}; adest], loc)
       when vi.vname = "__builtin_va_arg"
         && not state.print_cil_as_is ->
       let destlv = match (Cil.stripCasts adest).enode with
@@ -1054,7 +1054,7 @@ class cil_printer () = object (self)
         (* If this fails, it's likely that an extension interfered
            with the AddrOf *)
         | _ ->
-          Kernel.fatal ~source:l
+          Kernel.fatal ~source:(Fileloc.loc_start loc)
             "Encountered unexpected call to %s with dest %a"
             vi.vname self#exp adest
       in
@@ -1102,14 +1102,14 @@ class cil_printer () = object (self)
         (self#typ None) t1
         (self#typ None) t2
         instr_terminator
-    | Call(_, Var vi, _, (l,_))
+    | Call(_, Var vi, _, loc)
       when vi.vname = "__builtin_types_compatible_p"
         && not state.print_cil_as_is ->
-      Kernel.fatal ~source:l
+      Kernel.fatal ~source:(Fileloc.loc_start loc)
         "__builtin_types_compatible_p: cabs2cil should have added sizeof to \
          the arguments."
 
-    | Call(dest, Var vi, [ arg ], (l, _))
+    | Call(dest, Var vi, [ arg ], loc)
       when vi.vname = "__builtin_offsetof"
         && not state.print_cil_as_is ->
       begin
@@ -1123,7 +1123,9 @@ class cil_printer () = object (self)
             (self#typ None) (Cil.typeOfLhost host)
             self#offset offset
             instr_terminator
-        | _ -> Kernel.fatal ~source:l "__builtin_offsetof: invalid argument."
+        | _ ->
+          Kernel.fatal ~source:(Fileloc.loc_start loc)
+            "__builtin_offsetof: invalid argument."
       end
 
     | Call(dest,e,args,_) -> pp_call dest e fmt args

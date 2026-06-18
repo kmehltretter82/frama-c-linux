@@ -4051,8 +4051,6 @@ let interpret_character_constant char_list =
 
 let invalidStmt = mkStmt (Instr (Skip Kernel.gen_loc))
 
-let range_loc loc1 loc2 = fst loc1, snd loc2
-
 (* JS 2012/11/16: probably broken since it may call constFold on some exp: this
    operation modifies this expression in-place! *)
 let compareConstant c1 c2 =
@@ -4833,7 +4831,7 @@ let find_def_stmt b v =
   in
   try
     fold_local_init b action ();
-    Kernel.fatal ~source:(fst v.vdecl)
+    Kernel.fatal ~source:(Fileloc.loc_start v.vdecl)
       "inconsistent AST: local variable %a is supposed to be initialized, \
        but no initialization statement found." !pp_varinfo_ref v
   with M.Found s -> s
@@ -5963,7 +5961,7 @@ and mkBinOp_exn ?constfold ~loc op e1 e2 =
   | Ok e -> e
   | Error (loc, msg) ->
     let current = Option.is_none loc in
-    let source = Option.map fst loc in
+    let source = Option.map Fileloc.loc_start loc in
     Kernel.fatal ~current ?source "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
@@ -6837,3 +6835,6 @@ let typeDeepDropAllAttributes t =
 (* Deprecated *)
 
 let mkBinOp_safe_ptr_cmp = mkBinOp_exn ~constfold:false
+
+let range_loc loc_start loc_end =
+  Fileloc.range ~loc_start ~loc_end

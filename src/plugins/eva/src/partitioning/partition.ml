@@ -491,7 +491,7 @@ struct
   exception Split_limit of Z.t option
 
   let split_by_value ~monitor state exp =
-    let source = fst monitor.split_loc in
+    let source = Fileloc.loc_start monitor.split_loc in
     let module SplitValues = Z.Set in
     let valuation, ival = evaluate_exp_to_ival ~source state exp in
     (* Build a state with the lvalue set to a singleton *)
@@ -560,7 +560,7 @@ struct
     | True -> [ Z.one, state ]
     | False -> [ Z.zero, state ]
     | Unknown ->
-      let source = fst (predicate.Cil_types.pred_loc) in
+      let source = Fileloc.loc_start (predicate.Cil_types.pred_loc) in
       let aux positive =
         let+ state' =
           Abstract.Dom.reduce_by_predicate env state predicate positive in
@@ -658,7 +658,7 @@ struct
           let limit = try match limit_kind with
             | ExpLimit cil_exp ->
               let exp = Eva_ast.translate_exp cil_exp
-              and source = fst cil_exp.eloc in
+              and source = Fileloc.loc_start cil_exp.eloc in
               eval_exp_to_int ~source x exp
             | IntLimit i -> i
             | AutoUnroll (loop, min_unroll, max_unroll) ->

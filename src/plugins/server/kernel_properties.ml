@@ -280,7 +280,7 @@ let () = States.column model ~name:"kinstr"
 let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
     ~data:(module Kernel_ast.Position)
-    ~get:(fun ip -> Property.location ip |> fst)
+    ~get:(fun ip -> Property.location ip |> Fileloc.loc_start)
 
 let () = States.column model ~name:"from_libc"
     ~descr:(Md.plain "Is the property from the Frama-C libc?")

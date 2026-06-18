@@ -33,7 +33,7 @@ let to_string ip =
         Kernel_function.get_location kf
       else loc
     in
-    let loc = split_pos (fst loc) in
+    let loc = split_pos (Fileloc.loc_start loc) in
     (loc, Kernel_function.get_name kf, kind, status, txt)
 
 (* Compute the lines to export as a .csv, then sorts them *)

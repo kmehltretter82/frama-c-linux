@@ -58,7 +58,7 @@ let remove_uninteresting_variables_loc loc =
   Locations.filter_base keep_base loc
 
 let error_io_whole_memory op =
-  let source = fst (RW.loc op) in
+  let source = Fileloc.loc_start (RW.loc op) in
   Mt_self.error ~source ~once:true
     "@[%a of the whole memory.@ Ignoring to allow Mthread to continue, \
      but the analysis will not be correct.@]"

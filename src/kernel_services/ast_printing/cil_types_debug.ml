@@ -590,9 +590,9 @@ and pp_lexing_position fmt lexing_position =
     lexing_position.Lexing.pos_fname lexing_position.Lexing.pos_lnum
     lexing_position.Lexing.pos_bol lexing_position.Lexing.pos_cnum
 
-and pp_location fmt (pos_start,pos_end) =
+and pp_location fmt loc =
   let p = if print_locations then Format.fprintf else Format.ifprintf in
-  p fmt "(%a,%a)" Filepos.pretty_debug pos_start Filepos.pretty_debug pos_end
+  p fmt "(%a)" Fileloc.pretty_debug loc
 
 and pp_if_loc_known prefix suffix fmt loc =
   if print_locations && not (Fileloc.is_empty loc)

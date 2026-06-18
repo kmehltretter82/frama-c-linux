@@ -185,7 +185,7 @@ and term env (t : term) : domain =
       | LBpred _ -> Domain.pure
       | _ ->
         Options.not_yet_implemented
-          ~source:(fst t.term_loc) "Unsupported complex \\let"
+          ~source:(Fileloc.loc_start t.term_loc) "Unsupported complex \\let"
     end
   | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure

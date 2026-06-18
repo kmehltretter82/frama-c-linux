@@ -315,7 +315,8 @@
     | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
 
-  let check_ext_plugin source plugin tok =
+  let check_ext_plugin loc plugin tok =
+    let source = Fileloc.loc_start loc in
     match tok with
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
@@ -336,7 +337,8 @@
       tok
     | _ -> raise Parsing.Parse_error
 
-  let check_ext_importer source plugin tok =
+  let check_ext_importer loc plugin tok =
+    let source = Fileloc.loc_start loc in
     match tok with
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
@@ -405,13 +407,13 @@ rule token = parse
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Errorloc.convert_loc loc in
      let tok = identifier ~plugin:(Some plugin) name cabsloc in
-     check_ext_importer (fst cabsloc) plugin tok
+     check_ext_importer cabsloc plugin tok
      }
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Errorloc.convert_loc loc in
      let tok = identifier ~plugin:(Some plugin) name cabsloc in
-     check_ext_plugin (fst cabsloc) plugin tok
+     check_ext_plugin cabsloc plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
   | ( rIdentifier "::")+     xIdentifier      { longident lexbuf }
@@ -617,7 +619,7 @@ and comment = parse
     let open Current_loc.Operators in
     let lb = from_string s in
     let get_loc () = Errorloc.convert_pos lb.Lexing.lex_curr_p in
-    let<> UpdatedCurrentLoc = (pos, pos) in
+    let<> UpdatedCurrentLoc = Fileloc.from_position pos in
     let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Filepos.to_lexing_pos pos);
     try
@@ -631,7 +633,7 @@ and comment = parse
         None
       | Error (_, m) -> warn ~source:(get_loc ()) "%s" m; None
       | Logic_utils.Not_well_formed (loc, m) ->
-        warn ~source:(fst loc) "%s" m; None
+        warn ~source:(Fileloc.loc_start loc) "%s" m; None
       | Logic_utils.Unknown_ext -> None
       | Log.FeatureRequest(source,_,msg) ->
         let source = Option.value ~default:(get_loc ()) source in

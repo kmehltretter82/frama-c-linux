@@ -126,8 +126,8 @@ let pp_stmt kloc fmt stmt =
     Format.fprintf fmt "instruction%a" (pp_kloc kloc) loc
   | Instr (Asm(_,_,_,loc)) ->
     Format.fprintf fmt "assembly%a%a" pp_labels stmt (pp_kloc kloc) loc
-  | Instr (Skip(_,loc)) ->
-    Format.fprintf fmt "program point%a%a" pp_labels stmt (pp_kloc kloc) (loc,loc)
+  | Instr (Skip loc) ->
+    Format.fprintf fmt "program point%a%a" pp_labels stmt (pp_kloc kloc) loc
   | Instr (Code_annot(ca,loc)) ->
     Format.fprintf fmt "%a%a" pp_code_annot ca (pp_kloc kloc) loc
   | Return(_,loc) -> Format.fprintf fmt "return%a" (pp_kloc kloc) loc
