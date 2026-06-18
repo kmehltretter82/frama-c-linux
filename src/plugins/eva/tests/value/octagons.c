@@ -1,5 +1,5 @@
 /* run.config*
-   ENV: FC_DETERMINISTIC yes
+   ENV: FRAMAC_DETERMINISTIC yes
    STDOPT: +"-eva-domains octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
 */
 

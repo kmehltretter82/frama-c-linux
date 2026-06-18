@@ -1,7 +1,7 @@
-  $ PTESTS_TESTING=1 frama-c-script estimate-difficulty --no-cloc estimate-difficulty.c
+  $ FRAMAC_TESTING=yes frama-c-script estimate-difficulty --no-cloc estimate-difficulty.c
   Building callgraph...
   Computing data about libc/POSIX functions...
-  [recursion] found recursive cycle near estimate-difficulty.c:18: f -> f
+  [recursion] found recursive cycle near estimate-difficulty.c:19: f -> f
   Estimating difficulty for 10 function calls...
   WARNING: setjmp is known to be problematic for code analysis
   Function-related warnings: 1

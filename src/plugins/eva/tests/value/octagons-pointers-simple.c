@@ -1,5 +1,5 @@
 /* run.config*
-   ENV: FC_DETERMINISTIC yes
+   ENV: FRAMAC_DETERMINISTIC yes
    STDOPT: +"-no-warn-unaligned-pointer -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
 */
 

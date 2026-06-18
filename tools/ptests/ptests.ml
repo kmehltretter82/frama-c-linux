@@ -736,7 +736,7 @@ end = struct
         opts="";
         exit_code=None;
         macros=config.dc_macros;
-        env_var=[];
+        env_var=config.dc_env_var;
         logs=[];
         bins=[];
         deps={ load_plugin=None;

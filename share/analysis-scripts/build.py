@@ -125,7 +125,7 @@ framac_bin = Path(
     or sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
 )
 
-under_test = os.getenv("PTESTS_TESTING")
+under_test = os.getenv("FRAMAC_TESTING")
 
 # Prepare blug-related variables and functions ################################
 

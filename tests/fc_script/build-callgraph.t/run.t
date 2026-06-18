@@ -1,4 +1,4 @@
-  $ PTESTS_TESTING=1 frama-c-script heuristic-print-callgraph build-callgraph.c
+  $ FRAMAC_TESTING=yes frama-c-script heuristic-print-callgraph build-callgraph.c
   build-callgraph.c:3: main -> strlen
   build-callgraph.c:15: fn1 -> Frama_C_show_each_1
   build-callgraph.c:16: fn1 -> Frama_C_show_each_2

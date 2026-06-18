@@ -813,7 +813,7 @@ module type Hashconsing_tbl =
 
 let deterministic =
   Option.fold ~none:false ~some:String.means_yes
-    (Sys.getenv_opt "FC_DETERMINISTIC")
+    (Sys.getenv_opt "FRAMAC_DETERMINISTIC")
 
 module Hashconsing_tbl =
   (val if deterministic

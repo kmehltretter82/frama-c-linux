@@ -213,8 +213,8 @@ have \ocpindent installed to launch these targets.
 
 \section{Testing}\label{adv:ptests}\index{Test|bfit}
 
-In this section, we present \ptests, a tool provided by \framac in order to
-perform non-regression and unit tests.
+In this section, we present how \framac can be tested, notably using \ptests, a
+tool provided by \framac in order to perform non-regression and unit tests.
 
 \begin{important}
   Historically, \ptests has been developed before \framac switched to Dune.
@@ -871,6 +871,37 @@ one for regular tests (if more than one \verb|OPT|).\\
 \hline
 \caption{Predefined macros for ptests}\label{tab:ptests-macros}
 \end{longtable}
+
+\subsection{Testing mode for runtime test execution}\label{sec:testing-mode}
+
+\nscodeidxdef{Test}{FRAMAC\_TESTING}
+\framac uses the environment variable \texttt{FRAMAC\_TESTING} to determine
+whether it is running inside a test or not. When set to \texttt{yes},
+\framac will execute optional inlined test code at runtime, which can
+be useful to perform additional tests and verification (even costly).
+
+There are several ways to set this variable, depending on the test framework
+used: via \ptests \texttt{ENV} directive, via dune \texttt{setenv} action or
+manually exporting this variable before running \framac. It must be set to
+\texttt{yes}.
+
+\scodeidxdef{Cmdline}{inside\_tests}
+This variable controls the value of \texttt{Cmdline.inside\_tests}, which
+is available in \framac's API and can be used to guard tests, for example:
+
+\begin{lstlisting}[language=OCaml]
+(* Lets say add has some preconditions, which in practice are
+    supposed to be always true, so we don't want to impact performances
+    and verify everytime. *)
+let add x y =
+  if Cmdline.inside_tests then
+    (* Only check preconditions during tests *)
+    assert (x > 0 && y < 100);
+  x + y
+\end{lstlisting}
+
+During tests, this assertion will be checked for each call, and in normal
+execution we ignore it.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
