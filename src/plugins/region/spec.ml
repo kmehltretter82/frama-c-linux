@@ -232,14 +232,16 @@ let parse_datamodel p =
     ()
   | Ext_lexpr(e) ->
     Options.error ~current:true "The clause %s should not be used directly \
-    inside a datamodel." e.ext_name;
+                                 inside a datamodel."
+      e.ext_name;
     ()
   | Ext_extension(ext) when ext.gext_name = "pcase" ->
     List.iter parse_case ext.gext_content;
     ()
   | Ext_extension(ext) ->
     Options.error ~current:true "The clause %s should not be used directly \
-    inside a datamodel." ext.gext_name;
+                                 inside a datamodel."
+      ext.gext_name;
     ()
 
 (* -------------------------------------------------------------------------- *)
