@@ -1,3 +1,7 @@
+/* run.config*
+   EXIT: 1
+*/
+
 //@ pmodel (int) a;
 //@ pframe a;
 //@ pwhen a;
