@@ -435,13 +435,17 @@ and to_exp_old_with_rtes ~adata ?(inplace=false) kf env t =
     context_insensitive_term_to_exp_old ~adata ~inplace kf env t
   in
   let loc = t.term_loc in
-  let env = Translate_predicates.rte_guards_to_exp_old ~loc ~kf t env in
+  let env =
+    Translate_predicates.rte_guards_to_exp_old
+      ~loc ~kf (Logic_normalizer.get_orig_term t) env
+  in
   (exp, adata, env, strnum, name)
 
 and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   let loc = t.term_loc in
   let early_rte_guards_to_exp_old =
-    Translate_predicates.rte_guards_to_exp_old ~loc ~kf t
+    Translate_predicates.rte_guards_to_exp_old
+      ~loc ~kf (Logic_normalizer.get_orig_term t)
   in
   let t = Logic_normalizer.get_term t in
   let open Current_loc.Operators in
