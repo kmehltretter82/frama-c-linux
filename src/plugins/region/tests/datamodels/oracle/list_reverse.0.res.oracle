@@ -1,0 +1,15 @@
+[kernel] Parsing list_reverse.c (with preprocessing)
+[kernel:annot:missing-spec] list_reverse.c:12: Warning: 
+  Neither code nor explicit assigns for function newcell, generating default
+  clauses. See -generated-spec-* options for more info.
+[region] Function reverse:
+  R0001: -RW- p (list *) 64b (*R0002) (singleton) ;
+  R0002: ---- 128b { #64b; .next: R0003; } ;
+  R0003: -RW- (struct Cell *) 64b (*R0002) ;
+  R0004: IRW- q (list *) 64b (*R0002) (singleton) (allocated) ;
+  R0005: IR-- tmp_0 (list *) 64b (*R0002) (singleton) (allocated) ;
+  R0006: --W- \result (list *) 64b (*R0002) ;
+[region] annotating function reverse
+[region] Function newcell:
+  R0001: -RW- \result (list *) 64b (*R0002) ;
+  R0002: ---- 0b ;

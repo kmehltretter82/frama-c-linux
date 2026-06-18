@@ -1,0 +1,18 @@
+[kernel] Parsing error.c (with preprocessing)
+[region] error.c:6: User Error: 
+  The clause pmodel should not be used at top-level.
+[region] error.c:7: User Error: 
+  The clause pframe should not be used at top-level.
+[region] error.c:8: User Error: 
+  The clause pwhen should not be used at top-level.
+[region] error.c:9: User Error: 
+  The clause pinvariant should not be used at top-level.
+[region] error.c:10: User Error: 
+  The clause pcase should not be used at top-level.
+[region] error.c:13: User Error: 
+  The clause pcase should not be used directly inside a pcase.
+[region] error.c:13: User Error: 
+  The clause pwhen should not be used directly inside a datamodel.
+[region] Deferred error message was emitted during execution:
+  error.c:6: The clause pmodel should not be used at top-level.
+[kernel] Plug-in region aborted: invalid user input.
