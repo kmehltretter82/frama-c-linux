@@ -281,7 +281,7 @@ let typecheck_dm _ _ ps =
 
 let typecheck_fail clause _ _ _ =
   Options.error ~current:true "The clause %s should not be used at top-level."
-  clause;
+    clause;
   Ext_id 0
 
 let typecheck_tmp _ _ _ =
