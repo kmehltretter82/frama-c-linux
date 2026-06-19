@@ -614,7 +614,7 @@ struct
   let () =
     let get (tag, _) =
       let pos = fst (Printer_tag.loc_of_localizable tag) in
-      if Filepos.is_known pos then Some pos else None
+      if Filepos.is_empty pos then None else Some pos
     in
     States.option
       ~name:"sloc"

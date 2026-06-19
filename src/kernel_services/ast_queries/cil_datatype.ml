@@ -182,7 +182,7 @@ end
 module Location = struct
   include Fileloc
   let dummy = unknown
-  let is_unknown loc = not (is_known loc)
+  let is_unknown loc = is_empty loc
   let compare_start_semantic = compare
   let equal_start_semantic = equal
   let pretty_line fmt loc = Filepos.pretty_long fmt (fst loc)

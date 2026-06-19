@@ -1,0 +1,55 @@
+[kernel] Parsing auto_enabled_domain.c (with preprocessing)
+[eva:builtins:missing-spec] auto_enabled_domain.c:18: Warning: 
+  The builtin for function sqrt will not be used, as its frama-c libc specification is not available.
+[eva:experimental] Warning: The taint domain is experimental.
+[eva] Analyzing a complete application starting at main
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[kernel:annot:missing-spec] auto_enabled_domain.c:22: Warning: 
+  Neither code nor specification for function sqrt, generating default assigns.
+  See -generated-spec-* options for more info.
+[eva:progress] 
+  computing for function sqrt <- main.
+  Called from auto_enabled_domain.c:22.
+[eva] using specification for function sqrt
+[eva:progress] Done for function sqrt
+[eva:progress] 
+  computing for function sqrt <- main.
+  Called from auto_enabled_domain.c:23.
+[eva:progress] Done for function sqrt
+[eva:builtins:missing-spec] auto_enabled_domain.c:16: Warning: 
+  No Frama-C libc specification found for function strlen, for which a builtin is used; its soundness relies on the specification provided by the user.
+[eva:progress] auto_enabled_domain.c:25: Call to builtin strlen
+[eva:progress] auto_enabled_domain.c:25: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva:progress] auto_enabled_domain.c:26: Call to builtin strlen
+[eva:progress] auto_enabled_domain.c:26: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  d ∈ [-inf .. inf] ∪ {NaN}
+  s ∈ {11}
+  __retres ∈ {0}
+[from] Computing for function main
+[from] Computing for function sqrt <-main
+[from] Done for function sqrt
+[from] Computing for function strlen <-main
+[from] Done for function strlen
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function sqrt:
+  \result FROM x
+[from] Function strlen:
+  \result FROM \nothing
+[from] Function main:
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+    d; s; __retres
+[inout] Inputs for function main:
+    \nothing

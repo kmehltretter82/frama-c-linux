@@ -66,7 +66,7 @@ debug = args.debug
 no_cloc = args.no_cloc
 verbose = args.verbose
 
-under_test = os.getenv("PTESTS_TESTING")
+under_test = os.getenv("FRAMAC_TESTING")
 
 fclog.init(debug, verbose)
 

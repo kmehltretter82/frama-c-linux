@@ -56,7 +56,7 @@ struct
     Kernel.debug ~dkey:Kernel.dkey_comments
       "@[<hv>Searching for comments between positions@ %a@ and@ %a@.@]"
       Filepos.pretty_debug first Filepos.pretty_debug last;
-    if not (Filepos.is_known first) || not (Filepos.is_known last)
+    if Filepos.is_empty first || Filepos.is_empty last
     then begin
       Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";
       []

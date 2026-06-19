@@ -307,9 +307,9 @@ module Hashconsing_tbl_weak: Hashconsing_tbl
 module Hashconsing_tbl_not_weak: Hashconsing_tbl
 
 (** Weak or non-weak hashconsing tables, depending on environment variable
-    [FC_DETERMINISTIC] (set to [yes] to enable this).
+    [FRAMAC_DETERMINISTIC] (set to [yes] to enable this).
     @before 33.0-Arsenic used {!Cmdline.deterministic} instead of
-    [FC_DETERMINISTIC].
+    [FRAMAC_DETERMINISTIC].
     @since Aluminium-20160501  *)
 module Hashconsing_tbl: Hashconsing_tbl
 

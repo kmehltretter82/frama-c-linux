@@ -185,7 +185,7 @@ struct
   let datatype_descr, packed_descr = mk_full_descr (Descr.of_type T.ty)
   let reprs = T.reprs (* [Type.reprs] is not usable in the "no-obj" mode *)
 
-  let %test_unit _ =
+  let%test_unit _ =
     if pretty != undefined then (* Test defined pretty functions *)
       at_exit (* Do not test now as some pretty printers are not yet defined *)
         (fun () ->

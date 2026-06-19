@@ -1195,7 +1195,11 @@ struct
     (* ********************************************************************** *)
 
     let set c = As_string.set (string_of_collection c)
-    let unsafe_set c = As_string.unsafe_set (string_of_collection c)
+    let unsafe_set c =
+      (* [As_string.unsafe_set] does not clear dependencies, so we need to
+         clear [S] which is used as a cache by function [get] above.  *)
+      S.clear ();
+      As_string.unsafe_set (string_of_collection c)
 
     let convert_and_apply f = fun old new_ ->
       f
