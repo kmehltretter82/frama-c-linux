@@ -6,22 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Testlib
+
 (** Command-line flags *)
 let verbosity = ref 1
 
 let cmp_cmd = "diff --new-file -q"
 let diff_cmd = "diff --new-file"
-
-(* ------------------------------- *)
-
-module Filename = struct
-  include Filename
-  let concat =
-    if Sys.os_type = "Win32" then
-      fun a b -> a ^ "/" ^ b
-    else
-      concat
-end
 
 (* ------------------------------- *)
 
@@ -164,25 +155,6 @@ let extract filters targets = function
   | stdfile -> function
     | ""  -> fun _   -> filters,(stdfile::targets)
     | tmp -> fun cmd -> ((cmd,stdfile)::filters),(tmp::stdfile::targets)
-
-type wtest = {
-  info: (string [@default ""]); (* info *)
-  dir: (string [@default ""]); (* test directory *)
-  cmd: (string [@default "echo unknown command"]);
-  ret_code: (int [@default 0]);
-  out: (string [@default "" (* bin target built by the command *) ]); (* sdtout target *)
-  err: (string [@default "" (* bin target built by the command *) ]); (* stderr target *)
-  tmpout: (string [@default ""]); (* temporary file to filter stdout result *)
-  tmperr: (string [@default ""]); (* temporary file to filter stderr result *)
-  sedout: (string [@default ""]); (* filter command for the stdout result *)
-  sederr: (string [@default ""]); (* filter command for the stderr result *)
-  bin: (string list [@default []]); (* binary targets (without oracles) *)
-  log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
-  oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
-  oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
-}
-[@@deriving of_yojson]
 
 let wrapper json test =
   let sed,logs = extract [] test.log test.out test.tmpout test.sedout in

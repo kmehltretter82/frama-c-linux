@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Testlib
+
 (** Command-line flags *)
 
 let verbosity = ref 0
@@ -32,42 +34,6 @@ type env_t = {
 ; dune_alias: string
 ; absolute_cwd: string
 }
-
-module Filename = struct
-  include Filename
-  let concat =
-    if Sys.os_type = "Win32" then fun a b -> a ^ "/" ^ b else concat
-
-  let cygpath r =
-    let cmd =
-      Format.sprintf
-        "bash -c \"cygpath -m %s\""
-        (String.escaped (String.escaped r))
-    in
-    let in_channel  = Unix.open_process_in cmd in
-    let result = input_line in_channel in
-    ignore(Unix.close_process_in in_channel);
-    result
-
-  let temp_file =
-    if Sys.os_type = "Win32" then
-      fun a b -> cygpath (temp_file a b)
-    else
-      fun a b -> temp_file a b
-  [@@ warning "-32"]
-
-  let sanitize f = String.escaped f
-
-  let sanitize_with_space =
-    let regexp = Str.regexp "[\\] " in
-    let subst = Str.global_replace regexp " " in
-    subst
-
-  let remove_extension_opt suffixes name =
-    let ext = extension name in
-    if (String.equal "" ext) || not (List.mem ext suffixes) then name
-    else remove_extension name
-end
 
 let str_string_match1 regexp line pos =
   if Str.string_match regexp line pos then
@@ -1432,25 +1398,6 @@ let redirection ?reslog ?errlog cmd =
   | Some res, Some err -> Format.sprintf "%s > %S 2> %S" cmd res err
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
-
-type wtest = {
-  dir: (string [@default ""]); (* information on the test directory *)
-  info: (string [@default ""]); (* information *)
-  cmd: (string [@default "echo unknown command"]);
-  ret_code: (int [@default 0]);
-  out: (string [@default "" (* bin target built by the command *) ]); (* sdtout target *)
-  err: (string [@default "" (* bin target built by the command *) ]); (* stderr target *)
-  tmpout: (string [@default ""]); (* temporary file to filter stdout result *)
-  tmperr: (string [@default ""]); (* temporary file to filter stderr result *)
-  sedout: (string [@default ""]); (* filter command for the stdout result *)
-  sederr: (string [@default ""]); (* filter command for the stderr result *)
-  bin: (string list [@default []]); (* binary targets (without oracles) *)
-  log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
-  oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
-  oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
-}
-[@@deriving yojson]
 
 let update_oracle_dir ~env wtest =
   if wtest.log = [] then wtest else
