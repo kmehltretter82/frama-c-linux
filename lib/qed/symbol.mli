@@ -63,6 +63,9 @@ val apply : lfun -> ?result:tau -> tau list -> tau
 
 (** {2 Symbol Lookup} *)
 
+val tvar : int -> tvsymbol
+val tvars : int -> tvsymbol list
+
 val find_ts : env -> string -> (theory -> tysymbol -> 'a) -> 'a
 val find_ls : env -> string -> (theory -> lsymbol -> 'a) -> 'a
 val find_pr : env -> string -> (theory -> prsymbol -> 'a) -> 'a
@@ -119,19 +122,22 @@ val close : cluster -> Why3.Theory.theory
 
 (** {2 Declaration Factory} *)
 
+(** Declares a new purely abstract type *)
+val new_type :
+  cluster -> ?loc:Why3.Loc.position -> ?vars:int -> string -> data
+
+
 (** Declares a new abstract datatype in the provided cluster.
     Returns a tuple [d,cs] with the created datatype [d] and its constructors [cs]. *)
 val new_datatype :
-  cluster -> ?loc:Why3.Loc.position -> name:string ->
-  (string * Why3.Ty.ty list) list ->
+  cluster -> ?loc:Why3.Loc.position -> string -> (string * Why3.Ty.ty list) list ->
   data * lfun list
 
 (** Declares a new record type in the provided cluster.
     Returns a tuple [d,c,fs] with the created datatype [d], its constructor [c] and
     the associated fields [fs]. *)
 val new_record :
-  cluster -> ?loc:Why3.Loc.position -> name:string ->
-  (string * Why3.Ty.ty) list ->
+  cluster -> ?loc:Why3.Loc.position -> string -> (string * Why3.Ty.ty) list ->
   data * lfun * field list
 
 (** {2 Symbol Modules} *)

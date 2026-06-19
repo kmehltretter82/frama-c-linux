@@ -80,14 +80,6 @@ let gamma context = {
   locals = Lang.F.Tmap.empty ;
 }
 
-let tvar =
-  let tvar = Datatype.Int.Hashtbl.create 10 in
-  fun i ->
-    Datatype.Int.Hashtbl.memo tvar i
-      (fun i ->
-         let id = Why3.Ident.id_fresh (Printf.sprintf "a%i" i) in
-         Why3.Ty.create_tvsymbol id)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Sharing                                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -162,7 +154,7 @@ let rec cc_tau ctxt (t:Lang.F.tau) =
   | Data(adt,l) ->
     let ts = cc_adt adt in
     Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
-  | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
+  | Tvar i -> Some (Why3.Ty.ty_var (Qed.Symbol.tvar i))
   | Record _ -> failwith "Type %a not (yet) convertible" Lang.F.pp_tau t
 
 let const_int z =
@@ -493,7 +485,7 @@ class visitor ctxt c =
     method on_type lt def =
       let name = Lang.type_id lt in
       let id = Why3.Ident.id_fresh name in
-      let map i _ = tvar i in
+      let map i _ = Qed.Symbol.tvar i in
       let tvs = List.mapi map lt.lt_params in
       match def with
       | Tabs ->
@@ -694,7 +686,6 @@ class visitor ctxt c =
 module CC =
 struct
   type nonrec env = env
-  let tvar = tvar
   let find_ts env = get_ts env.context
   let find_ls env = get_ls env.context
   let cc_tau env = cc_tau env.context

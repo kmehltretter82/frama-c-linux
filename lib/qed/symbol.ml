@@ -105,18 +105,18 @@ type context =
   | Cluster of { mutable closed : Why3.Theory.theory option }
 
 type cluster = {
-  cluster : context ;
+  ct : context ;
   mutable uc : Why3.Theory.theory_uc ;
 }
 
 let cluster ?(path=["qed";"generated"]) ?loc name =
-  let cluster = Cluster { closed = None } in
+  let ct = Cluster { closed = None } in
   let uc = Why3.Theory.create_theory ~path @@ Why3.Ident.id_fresh ?loc name in
-  { cluster ; uc }
+  { ct ; uc }
 
 let close = function
-  | { cluster = Theory _ } -> assert false
-  | { uc ; cluster = Cluster c } ->
+  | { ct = Theory _ } -> assert false
+  | { uc ; ct = Cluster c } ->
     let th = Why3.Theory.close_theory uc in
     c.closed <- Some th ; th
 
@@ -185,7 +185,7 @@ let constructors (Data a) =
     a.cs <- Some cs ; cs
 
 let use_data cluster (Data d) = iter (use cluster) d.ct
-let new_data { cluster = ct } ts = Data { ct ; ts ; cs = None ; fs = None }
+let new_data { ct = ct } ts = Data { ct ; ts ; cs = None ; fs = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Records                                                            --- *)
@@ -244,7 +244,7 @@ let find_lfun env name =
     Hashtbl.add hs name lfun ; lfun
 
 let use_lfun context (Fun f) = iter (use context) f.ct
-let new_lfun { cluster = ct } ls = Fun { ct ; ls ; def = None }
+let new_lfun { ct = ct } ls = Fun { ct ; ls ; def = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generic Symbols                                                    --- *)
@@ -434,7 +434,22 @@ let definition (Fun f) =
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_datatype cluster ?loc ~name ctors =
+let tvar = Why3.Wstdlib.Hint.memo 0 @@
+  fun i ->
+  Why3.Ty.create_tvsymbol @@ Why3.Ident.id_fresh @@
+  String.make 1 @@ char_of_int @@ int_of_char 'a' + i mod 26
+
+let tvars =
+  Why3.Wstdlib.Hint.memo 0 @@
+  fun n -> let rec vs k = if k < n then tvar k :: vs (succ k) else [] in vs 0
+
+let new_type cluster ?loc ?(vars=0) name =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let vs = if vars = 0 then [] else tvars vars in
+  let ts = Why3.Ty.create_tysymbol id  vs NoDef in
+  let { ct } = cluster in Data { ct ; ts ; cs = None ; fs = None }
+
+let new_datatype cluster ?loc name ctors =
   let id = Why3.Ident.id_fresh ?loc name in
   let tvs =
     Why3.Ty.Stv.elements @@
@@ -451,11 +466,11 @@ let new_datatype cluster ?loc ~name ctors =
          Why3.Term.create_fsymbol ~constr id tys tr,
          List.map (fun _ -> None) tys
       ) ctors in
-  let { cluster = ct } = cluster in
+  let { ct } = cluster in
   Data { ct ; ts ; cs = Some ctors ; fs = None },
   List.map (fun (ls,_) -> Fun { ct ; ls ; def = None }) ctors
 
-let new_record cluster ?loc ~name fds =
+let new_record cluster ?loc name fds =
   let id = Why3.Ident.id_fresh ?loc name in
   let mk = Why3.Ident.id_fresh ?loc (name ^ "'mk") in
   let tvs =
@@ -473,7 +488,7 @@ let new_record cluster ?loc ~name fds =
          let fs = Why3.Term.create_fsymbol ~proj:true id [tr] ty in
          Some fs
       ) fds in
-  let { cluster = ct } = cluster in
+  let { ct } = cluster in
   let data = Data { ct ; ts ; cs = None ; fs = None } in
   let fields = List.mapi
       (fun rank prj ->

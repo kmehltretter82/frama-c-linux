@@ -19,7 +19,6 @@ val cc_task :
 module CC :
 sig
   type env
-  val tvar : int -> Why3.Ty.tvsymbol
   val find_ts : env -> string -> Why3.Ty.tysymbol
   val find_ls : env -> string -> Why3.Term.lsymbol
   val cc_tau : env -> Lang.F.tau -> Why3.Ty.ty option
