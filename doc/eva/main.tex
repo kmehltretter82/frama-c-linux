@@ -3802,8 +3802,8 @@ especially for nested loops. This may cause the analyzer to use more time and
 memory.
 
 It is possible to control syntactic unrolling for each loop in the analyzed code
-with the annotation \lstinline|//@loop unfold n;|, placed before the loop.
-You may also specify \lstinline|//@loop unfold "completely", n;| for a loop
+with the annotation \lstinline|//@ loop unfold n;|, placed before the loop.
+You may also specify \lstinline|//@ loop unfold "completely", n;| for a loop
 that shall be completely unrolled after $n$ steps. Although, consider that
 a loop that executes $n$ times before exiting will need $n+1$ unrolling steps,
 since the $n+1$ iteration need to be executed for terminating the loop.
@@ -3833,7 +3833,7 @@ be reached, for a given variable modified inside a loop.
 \subsubsection{Widening hints}
 \label{subsub:widen-hints}
 
-The user may place an annotation \lstinline|//@ widen_hints $v$, $e_1,\ldots,e_m$ ;|
+The user may place an annotation \lstinline|//@  widen_hints $v$, $e_1,\ldots,e_m$ ;|
 to indicate the analyzer should use preferably the values $e_1,\ldots,e_m$
 when widening the sets of values attached to variable $v$.
 
@@ -3851,11 +3851,11 @@ Note that several hints can be added to a single statement, as follows:
 \end{listing-nonumber}
 
 The user may also annotate a loop with
-\lstinline|//@ loop widen_hints $v$, $e_1,\ldots,e_m$ ;|,
+\lstinline|//@  loop widen_hints $v$, $e_1,\ldots,e_m$ ;|,
 in which case $v$ may reference loop iteration variables.
 
 Adding a \lstinline|global| label before the variable name, as in
-\lstinline|//@ loop widen_hints global:n, $e_1,\ldots,e_m$ ;|,
+\lstinline|//@  loop widen_hints global:n, $e_1,\ldots,e_m$ ;|,
 makes the annotation affect all loops in all functions, including
 those from other compilation units. It is useful for referencing variables
 in inner loops whose outer loop is defined in another file.
@@ -3988,13 +3988,13 @@ the trade off might often be worth trying.
 In practice, \lstinline|-eva-partition-history 1| seems to be sufficient in
 most cases, and a greater value is rarely needed.
 
-Locally, annotation \lstinline|split \cases;| can be used to separate the
+Locally, annotation \lstinline|//@  split \cases;| can be used to separate the
 analysis for each branch of the next \lstinline|if-then-else| or
 \lstinline|switch| statement, even after their blocks are closed.
 By default, such case-base reasoning are maintained until the end of the current
 function, or indefinitely with \lstinline|-eva-interprocedural-splits|.
 To avoid slowing down the analysis, one may also cancel any active
-\lstinline|split \cases;| with the symmetric annotation \lstinline|merge \cases;|.
+\lstinline|split \cases| with the symmetric annotation \lstinline|merge \cases|.
 
 \subsection{Value partitioning}
 \label{value-partitioning}
@@ -4042,11 +4042,11 @@ user to mitigate the cost of \lstinline|split| annotations.
 
 Two kinds of value partitioning are available:
 \begin{description}
-\item[Static split] with annotation \lstinline|//@ split e;| \\
+\item[Static split] with annotation \lstinline|//@  split e;| \\
   The partitioning is done once at the annotation point: Eva enumerates all
   possible values of the given expression, and continues the analysis separately
   for each of these values, until a merge annotation is encountered.
-\item[Dynamic split] with annotation \lstinline|//@ dynamic_split e;| \\
+\item[Dynamic split] with annotation \lstinline|//@  dynamic_split e;| \\
   The partitioning is maintained at each program point according to the current
   value of the given expression \lstinline|e|. At each assignment of a variable
   on which \lstinline|e| depends, the partitioning is updated to ensure that the
@@ -4695,7 +4695,7 @@ sensitive sources---such as external inputs or secrets---propagate through the
 program and potentially influence its execution.
 
 The initial taint must be specified by the user with \acsl{} annotations
-\lstinline|//@ taint <lvalues>;| on a statement, or a clause
+\lstinline|//@  taint <lvalues>;| on a statement, or a clause
 \lstinline|taints <lvalues>;| in a function contract.
 
 These directives are hypotheses of the taint analysis, and thus have no logical
