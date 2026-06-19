@@ -36,8 +36,8 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 30).
 }
-Prove: (land(lor(x_1, to_uint32(lsl(x, 1))), lsl(1, 1 + i)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((x_1 lor to_uint32(lsl(x, 1))) land lsl(1, 1 + i)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 
@@ -66,8 +66,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
-Prove: (land(lor(to_uint32(lsl(x, n)), x_2), lsl(1, i)) != 0) <->
-    (land(x, lsl(1, 32 + i - n)) != 0).
+Prove: (((to_uint32(lsl(x, n)) lor x_2) land lsl(1, i)) != 0) <->
+    ((x land lsl(1, 32 + i - n)) != 0).
 
 ------------------------------------------------------------
 
@@ -81,8 +81,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
-Prove: (land(lor(to_uint32(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((to_uint32(lsl(x, n)) lor x_2) land lsl(1, x_1)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 
@@ -111,8 +111,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
-Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, i)) != 0) <->
-    (land(x, lsl(1, 64 + i - n)) != 0).
+Prove: (((to_uint64(lsl(x, n)) lor x_2) land lsl(1, i)) != 0) <->
+    ((x land lsl(1, 64 + i - n)) != 0).
 
 ------------------------------------------------------------
 
@@ -126,8 +126,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
-Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((to_uint64(lsl(x, n)) lor x_2) land lsl(1, x_1)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 
@@ -158,8 +158,8 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 30).
 }
-Prove: (land(lor(x_1, to_uint32(lsl(x, 31))), lsl(1, i)) != 0) <->
-    (land(x, lsl(1, 1 + i)) != 0).
+Prove: (((x_1 lor to_uint32(lsl(x, 31))) land lsl(1, i)) != 0) <->
+    ((x land lsl(1, 1 + i)) != 0).
 
 ------------------------------------------------------------
 
@@ -188,8 +188,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
-Prove: (land(lor(x_1, to_uint32(lsl(x, 32 - n))), lsl(1, 32 + i - n)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((x_1 lor to_uint32(lsl(x, 32 - n))) land lsl(1, 32 + i - n)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 
@@ -203,8 +203,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
-Prove: (land(lor(x_2, to_uint32(lsl(x, 32 - n))), lsl(1, i)) != 0) <->
-    (land(x, lsl(1, x_1)) != 0).
+Prove: (((x_2 lor to_uint32(lsl(x, 32 - n))) land lsl(1, i)) != 0) <->
+    ((x land lsl(1, x_1)) != 0).
 
 ------------------------------------------------------------
 
@@ -233,8 +233,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
-Prove: (land(lor(x_1, to_uint64(lsl(x, 64 - n))), lsl(1, 64 + i - n)) != 0) <->
-    (land(x, lsl(1, i)) != 0).
+Prove: (((x_1 lor to_uint64(lsl(x, 64 - n))) land lsl(1, 64 + i - n)) != 0) <->
+    ((x land lsl(1, i)) != 0).
 
 ------------------------------------------------------------
 
@@ -248,8 +248,8 @@ Assume {
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
-Prove: (land(lor(x_2, to_uint64(lsl(x, 64 - n))), lsl(1, i)) != 0) <->
-    (land(x, lsl(1, x_1)) != 0).
+Prove: (((x_2 lor to_uint64(lsl(x, 64 - n))) land lsl(1, i)) != 0) <->
+    ((x land lsl(1, x_1)) != 0).
 
 ------------------------------------------------------------
 

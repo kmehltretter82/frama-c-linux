@@ -9,18 +9,6 @@ theory A_A
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   type A_InAxiomatic =
     | C_IAu int
     | C_IAc int
@@ -43,41 +31,17 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use A_A *)
-    
-    goal wp_goal : forall i:A_InAxiomatic. is_InAxiomatic i -> P_P i
+    (* use wp.generated.A_A *)
     
   end
+  
+  goal wp : forall i:A_InAxiomatic. is_InAxiomatic i -> P_P i
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic1' 
 ---------------------------------------------
 theory Axiomatic1
   
   (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
   
   type A_AtTopLevel =
     | C_TLu int
@@ -93,7 +57,7 @@ theory Axiomatic1
         forall p:int. is_sint8 p -> is_AtTopLevel (C_TLc p)
     | Q_is_AtTopLevel_TLi : forall p:int. is_AtTopLevel (C_TLi p)
   
-  (* use A_A *)
+  (* use wp.generated.A_A *)
   
   lemma Q_LA : forall a:A_InAxiomatic. is_InAxiomatic a -> P_P a
   
@@ -105,19 +69,7 @@ theory A_X
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
-  (* use Axiomatic1 *)
+  (* use wp.generated.Axiomatic1 *)
   
   predicate P_Q A_AtTopLevel
   
@@ -127,43 +79,19 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
+    (* use wp.generated.Axiomatic1 *)
     
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use Axiomatic1 *)
-    
-    (* use A_X *)
-    
-    goal wp_goal : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
+    (* use wp.generated.A_X *)
     
   end
+  
+  goal wp : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic2' 
 ---------------------------------------------
 theory Axiomatic2
   
   (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
   
   type A_Rec =
     | C_Nil
@@ -176,9 +104,9 @@ theory Axiomatic2
     | Q_is_Rec_C :
         forall p:int, p1:A_Rec. is_Rec p1 -> is_sint32 p -> is_Rec (C_C p p1)
   
-  (* use Axiomatic1 *)
+  (* use wp.generated.Axiomatic1 *)
   
-  (* use A_X *)
+  (* use wp.generated.A_X *)
   
   lemma Q_LB : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
   
@@ -190,19 +118,7 @@ theory A_Y
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
-  (* use Axiomatic2 *)
+  (* use wp.generated.Axiomatic2 *)
   
   predicate P_R A_Rec
   
@@ -212,25 +128,13 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
+    (* use wp.generated.Axiomatic2 *)
     
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use Axiomatic2 *)
-    
-    (* use A_Y *)
-    
-    goal wp_goal : forall r:A_Rec. is_Rec r -> P_R r
+    (* use wp.generated.A_Y *)
     
   end
+  
+  goal wp : forall r:A_Rec. is_Rec r -> P_R r
 [wp] 3 goals generated
 ------------------------------------------------------------
   Global

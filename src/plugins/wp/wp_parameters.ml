@@ -1196,23 +1196,7 @@ end
 (* --- Print Generated                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let cat_print_generated = register_category "print-generated"
-
-let has_print_generated () = has_dkey cat_print_generated
-
-let print_generated ?header file =
-  let header = match header with
-    | None -> Fclib.Filepath.to_string file
-    | Some head -> head in
-  debug ~dkey:cat_print_generated "%S@\n%t@." header
-    begin fun fmt ->
-      if not (Filesystem.exists file) then
-        Format.pp_print_string fmt "<missing file>"
-      else
-        Filesystem.iter_lines file (fun s ->
-            Format.pp_print_string fmt s;
-            Format.pp_print_newline fmt ())
-    end
+let print_generated = register_category "print-generated"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Output Messages                                                    --- *)

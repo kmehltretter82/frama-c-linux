@@ -192,10 +192,10 @@ let cleanup_cache () =
         "Cannot cleanup cache"
 
 type 'a digest =
-  Why3Provers.t -> 'a -> string
+  Why3Env.prover -> 'a -> string
 
 type 'a runner =
-  timeout:float option -> steplimit:int option -> Why3Provers.t -> 'a ->
+  timeout:float option -> steplimit:int option -> Why3Env.prover -> 'a ->
   VCS.result Task.task
 
 let get_result ~digest ~runner ~timeout ~steplimit prover goal =

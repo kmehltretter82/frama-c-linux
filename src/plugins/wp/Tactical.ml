@@ -501,10 +501,6 @@ open Lang
 
 let () = add_computer "wp:true" (fun _ -> e_true)
 let () = add_computer "wp:false" (fun _ -> e_false)
-let () = add_computer "wp:list" Vlist.list
-let () = add_computer "wp:concat" Vlist.concat
-let () = add_computer "wp:repeat"
-    (function [a;n] -> Vlist.repeat a n | _ -> raise Not_found)
 
 let () =
   for i = 0 to 9 do

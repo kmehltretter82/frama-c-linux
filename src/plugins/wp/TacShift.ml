@@ -24,8 +24,8 @@ let select_op f =
     (fun seq -> ("positive" , (fst seq , F.p_leq F.e_zero a)) ::
                 rewrite "shift" e b seq)
   in
-  if f == Cint.f_lsl then rewrite_lsl else
-  if f == Cint.f_lsr then rewrite_lsr else
+  if E.(Cint.f_lsl @= f) then rewrite_lsl else
+  if E.(Cint.f_lsr @= f) then rewrite_lsr else
     raise Not_found
 
 let select_int n =

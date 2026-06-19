@@ -22,10 +22,10 @@ val is_updating : mode -> bool
 
 val cleanup_cache : unit -> unit
 
-type 'a digest = Why3Provers.t -> 'a -> string
+type 'a digest = Why3Env.prover -> 'a -> string
 
 type 'a runner =
-  timeout:float option -> steplimit:int option -> Why3Provers.t -> 'a ->
+  timeout:float option -> steplimit:int option -> Why3Env.prover -> 'a ->
   VCS.result Task.task
 
 val promote: ?timeout:float -> ?steplimit:int -> VCS.result -> VCS.result
@@ -34,6 +34,6 @@ val promote: ?timeout:float -> ?steplimit:int -> VCS.result -> VCS.result
     the function returns [VCS.no_result]. *)
 
 val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
-val clear_result: digest:('a digest) -> Why3Provers.t -> 'a -> unit
+val clear_result: digest:('a digest) -> Why3Env.prover -> 'a -> unit
 
 (**************************************************************************)

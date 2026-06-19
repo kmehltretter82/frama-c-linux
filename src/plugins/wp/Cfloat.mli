@@ -14,14 +14,14 @@ open Ctypes
 open Lang
 open Lang.F
 
-val f32 : adt
-val f64 : adt
+val ft32 : adt extern
+val ft64 : adt extern
 
-val t32 : tau
-val t64 : tau
+val f32 : tau extern
+val f64 : tau extern
 
-val fq32 : lfun
-val fq64 : lfun
+val fq32 : lfun extern
+val fq64 : lfun extern
 
 type model = Real | Float
 val configure : model -> WpContext.rollback
@@ -69,14 +69,14 @@ val fle : c_float -> cmp
 val feq : c_float -> cmp
 val fneq : c_float -> cmp
 
-val f_model : c_float -> lfun
-val f_delta : c_float -> lfun
-val f_epsilon : c_float -> lfun
+val f_model : c_float -> lfun extern
+val f_delta : c_float -> lfun extern
+val f_epsilon : c_float -> lfun extern
 
-val flt_of_real : c_float -> lfun
-val real_of_flt : c_float -> lfun
+val flt_of_real : c_float -> lfun extern
+val real_of_flt : c_float -> lfun extern
 
-val flt_add : c_float -> lfun
-val flt_mul : c_float -> lfun
-val flt_div : c_float -> lfun
-val flt_neg : c_float -> lfun
+val flt_add : c_float -> lfun extern
+val flt_mul : c_float -> lfun extern
+val flt_div : c_float -> lfun extern
+val flt_neg : c_float -> lfun extern

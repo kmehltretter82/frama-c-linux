@@ -156,7 +156,7 @@ module Filtering = Filtering
 
 (** {2 Prover Interface} *)
 
-module Why3Provers = Why3Provers
+module Why3Env = Why3Env
 module Prover = Prover
 module ProverTask = ProverTask
 module ProverWhy3 = ProverWhy3

@@ -13,10 +13,6 @@ open Qed.Logic
 
 (** Logic Language based on Qed *)
 
-(** {2 Library} *)
-
-type library = string
-
 (** {2 Naming - Unique identifiers} *)
 
 val comp_id  : compinfo -> string
@@ -34,71 +30,43 @@ type datakind = KValue | KInit
 
 (** A type is never registered in a Definition.t *)
 type adt = private
-  | Mtype of mdt (** External type *)
-  | Mrecord of mdt * fields (** External record-type *)
-  | Atype of logic_type_info (** Logic Type *)
-  | Comp of compinfo * datakind (** C-code struct or union *)
-  | Wtype of string list * string * string list (** Why3 imported type *)
+  | Qdata of Qed.Symbol.data (** Qed/Why3 Type *)
+  | Atype of logic_type_info (** ACSL Logic Type *)
+  | Comp of compinfo * datakind (** C-code Struct or Union *)
 
-(** name to print to the provers *)
-and mdt = string extern
-
-and 'a extern = {
-  ext_id     : int;
-  ext_link   : 'a ;
-  ext_library : library; (** a library which it depends on *)
-  ext_debug  : string; (** just for printing during debugging *)
-}
 and fields = { mutable fields : field list }
-and field = private
-  | Mfield of mdt * fields * string * tau
-  | Cfield of fieldinfo * datakind
+and field = private Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
-type t_builtin =
-  | E_mdt of mdt
-  | E_why3 of string list * string * string list
-  | E_poly of (tau list -> tau)
-
 type lfun = private
-  | ACSL of Cil_types.logic_info (** Registered in Definition.t,
-                                     only  *)
-  | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t
-                                          directly converted/printed *)
-  | FUN of lsymbol (** External or Generated logic symbol *)
+  | ACSL of Cil_types.logic_info (** Registered in Definition.t only  *)
+  | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t directly converted/printed *)
+  | LFUN of lsymbol (** Generated logic symbol *)
+  | QFUN of esymbol  (** External logic symbol *)
 
 and lsymbol = {
+  m_name : string ;
+  m_context : WpContext.context option ;
   m_category : lfun category ;
-  m_params : sort list ;
-  m_result : sort ;
-  m_typeof : tau option list -> tau ;
-  m_source : source ;
   m_coloring : bool ;
+  m_result : tau ;
+  m_params : tau list ;
 }
 
-and source =
-  | Generated of WpContext.context option * string
-  | Extern of Engine.link extern
-  | Wsymbol of string list * string * string list (** Why3 imported logic symbol *)
+and esymbol = {
+  e_category : lfun category ;
+  e_coloring : bool ;
+  e_symbol : Qed.Symbol.lfun ;
+}
 
-val mem_builtin_type : name:string -> bool
-val is_builtin : logic_type_info -> bool
-val is_builtin_type : name:string -> tau -> bool
-val get_builtin_type : name:string -> adt
-val datatype : library:string -> string -> adt
-val record :
-  link:string -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
 val cfield : ?kind:datakind -> fieldinfo -> field
-val field : adt -> string -> field
+(* val field : adt -> string -> field *)
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
 val fields_of_field : field -> field list
 val atype : logic_type_info -> tau list -> tau
-val adt : logic_type_info -> adt (** Must not be a builtin *)
-
-type balance = Nary | Left | Right
 
 val on_lfun : (lfun -> unit) -> unit
 val on_field : (field -> unit) -> unit
@@ -106,60 +74,33 @@ val on_field : (field -> unit) -> unit
 val acsl : logic_info -> lfun
 val ctor : logic_ctor_info -> lfun
 
-val extern_s :
-  library:library ->
-  ?link:Engine.link ->
-  ?category:lfun category ->
-  ?params:sort list ->
-  ?sort:sort ->
-  ?result:tau ->
-  ?coloring:bool ->
-  ?typecheck:(tau option list -> tau) ->
-  string -> lfun
+(** Builders *)
+
+type 'a extern
+
+val extern_t : string -> adt extern
+val import_t : context:Why3.Theory.theory -> Why3.Ty.tysymbol -> adt
+val import_f : context:Why3.Theory.theory -> Why3.Term.lsymbol -> lfun
 
 val extern_f :
-  library:library ->
-  ?link:Engine.link ->
-  ?balance:balance ->
+  ?category:lfun extern category ->
+  ?coloring:bool ->
+  string -> lfun extern
+
+val generated_f :
+  ?context:bool ->
   ?category:lfun category ->
-  ?params:sort list ->
-  ?sort:sort ->
-  ?result:tau ->
   ?coloring:bool ->
-  ?typecheck:(tau option list -> tau) ->
-  ('a,Format.formatter,unit,lfun) format4 -> 'a
-(** balance just give a default when link is not specified *)
+  result:tau ->
+  params:tau list ->
+  ('a, Format.formatter, unit, lfun) format4 -> 'a
 
-val extern_p :
-  library:library ->
-  ?bool:string ->
-  ?prop:string ->
-  ?link:Engine.link ->
-  ?params:sort list ->
+val generated_p :
+  ?context:bool ->
+  ?category:lfun category ->
   ?coloring:bool ->
-  unit -> lfun
-
-val extern_fp : library:library -> ?params:sort list ->
-  ?link:string -> ?coloring:bool -> string -> lfun
-
-val generated_f : ?context:bool -> ?category:lfun category ->
-  ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
-  ('a,Format.formatter,unit,lfun) format4 -> 'a
-
-val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
-
-val extern_t:
-  string -> link:string -> library:library -> mdt
-
-val imported_t:
-  package:string list -> theory:string -> name:string list -> adt
-
-val imported_f:
-  package:string list -> theory:string -> name:string list ->
-  ?params:sort list ->
-  ?result:sort ->
-  ?typecheck:(tau option list -> tau) ->
-  unit -> lfun
+  params:tau list ->
+  ('a, Format.formatter, unit, lfun) format4 -> 'a
 
 (** {2 Sorting and Typing} *)
 
@@ -168,6 +109,7 @@ val tau_of_ctype : typ -> tau
 val tau_of_ltype : logic_type -> tau
 val tau_of_return : logic_type option -> tau
 val tau_of_lfun : lfun -> tau option list -> tau
+val adt_of_field : field -> adt
 val tau_of_field : field -> tau
 val tau_of_record : field -> tau
 
@@ -184,7 +126,7 @@ val t_init : compinfo -> tau
 val t_float : c_float -> tau
 val t_array : tau -> tau
 val t_farray : tau -> tau -> tau
-val t_datatype : adt -> tau list -> tau
+val t_data : adt -> tau list -> tau
 val t_matrix : tau -> int -> tau
 
 val pointer : tau Context.value
@@ -196,14 +138,9 @@ val floats : (c_float -> tau) Context.value
 val poly : string list Context.value
 (** polymorphism *)
 
-val builtin_types: (string -> t_builtin) Context.value
-(* builtin types *)
-
 val parameters : (lfun -> sort list) -> unit
 (** definitions *)
 
-val name_of_lfun : lfun -> string
-val name_of_field : field -> string
 val context_of_lfun : lfun -> WpContext.context option
 (** LFuns are unique by name and context *)
 
@@ -683,6 +620,21 @@ val e_subst : (term -> term) -> term -> term
 val p_subst : (term -> term) -> pred -> pred
 (** uses current pool *)
 
+module E :
+sig
+  val (!@) : 'a extern -> 'a
+  val (@=) : 'a extern -> 'a -> bool
+end
+
+val extern : 'a extern -> 'a
+val extern_mk : (Why3.Env.env -> 'a) -> 'a extern
+val extern_tau : string -> tau extern
+val extern_val : string -> term extern
+val extern_map : ('a -> 'b) -> 'a extern -> 'b extern
+val extern_const : 'a -> 'a extern
+val extern_data : adt extern -> tau list -> tau
+val extern_lfun : lfun extern -> term list -> term
+val extern_pred : lfun extern -> term list -> pred
 
 (** {2 Simplifiers} *)
 
@@ -730,22 +682,6 @@ class type simplifier =
 
 (* -------------------------------------------------------------------------- *)
 
-(** For why3_api but circular dependency *)
-module For_export : sig
-
-  type specific_equality = {
-    for_tau:(tau -> bool);
-    mk_new_eq:F.binop;
-  }
-
-  val rebuild : ?cache:term Tmap.t -> term -> term * term Tmap.t
-
-  val set_builtin : Fun.t -> (term list -> term) -> unit
-  val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
-
-  val set_builtin_eq : Fun.t -> (term -> term -> term) -> unit
-  val set_builtin_leq : Fun.t -> (term -> term -> term) -> unit
-
-  val in_state: ('a -> 'b) -> 'a -> 'b
-
-end
+(**/**)
+val hacked_types : (string -> tau list -> tau) Context.value
+(**/**)

@@ -27,10 +27,6 @@ let dkey =
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let why3_env loadpath =
-  let main = WConf.get_main @@ WConf.read_config None in
-  W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
-
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
   match List.rev segments with
@@ -64,6 +60,7 @@ let pp_id fmt (id: W.Ident.ident) = Format.pp_print_string fmt id.id_string
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
+  theory: Why3.Theory.theory ;
   types : (C.logic_type_info * Fileloc.t) list;
   logics : (C.logic_info * Fileloc.t) list;
 }
@@ -254,42 +251,29 @@ let kind_of_lt (lt : C.logic_type) : LB.kind =
   | C.Lboolean -> LB.B
   | _ -> LB.A
 
-let sort_of_lt (lt : C.logic_type) : Qed.Logic.sort =
-  match lt with
-  | C.Linteger -> Qed.Logic.Sint
-  | C.Lreal -> Qed.Logic.Sreal
-  | _ -> Qed.Logic.Sdata
-
-let sort_of_result = function
-  | Some lt -> sort_of_lt lt
-  | None -> Qed.Logic.Sprop
-
 let register_builtin env m =
   begin
-    let add_builtin (ls: W.Term.lsymbol) acsl_name profile result =
-      let (package, theory, name) = T.restore_path ls.ls_name in
+    let add_builtin (ls: W.Term.lsymbol) acsl_name profile =
       let kinds = List.map kind_of_lt profile in
-      let params = List.map sort_of_lt profile in
       LB.add_builtin acsl_name kinds @@
-      Lang.imported_f ~package ~theory ~name ~params ~result  ()
+      Lang.extern_const @@
+      Lang.import_f ~context:m.theory ls
     in
     let add_builtin_li li =
       let ls = Logic_info.Hashtbl.find env.lils li in
       let profile = List.map (fun lv -> lv.C.lv_type) li.l_profile in
-      let result = sort_of_result li.l_type in
-      add_builtin ls li.l_var_info.lv_name profile result
+      add_builtin ls li.l_var_info.lv_name profile
     in
     let add_builtin_ctor ctor =
       let ls = Logic_ctor_info.Hashtbl.find env.lcts ctor in
       let profile = ctor.Cil_types.ctor_params in
-      let result = Qed.Logic.Sdata in
-      add_builtin ls ctor.ctor_name profile result
+      add_builtin ls ctor.ctor_name profile
     in
     let add_builtin_t lti =
       let ty = Logic_type_info.Hashtbl.find env.ltts lti in
-      let (package,theory,name) = T.restore_path ty.ts_name in
       LB.add_builtin_type lti.lt_name @@
-      Lang.imported_t ~package ~theory ~name ;
+      Lang.extern_const @@
+      Lang.import_t ~context:m.theory ty ;
       begin match lti.lt_def with
         | Some C.LTsum ctors -> List.iter add_builtin_ctor ctors
         | _ -> ()
@@ -308,7 +292,7 @@ let import_theory env thname =
     let menv : menv = {li = []; lti = []} in
     let theory = get_theory env theory_name theory_path in
     parse_theory env theory menv;
-    let m = { types = List.rev menv.lti; logics =  List.rev menv.li } in
+    let m = { theory ; types = List.rev menv.lti; logics =  List.rev menv.li } in
     Datatype.String.Hashtbl.add env.menv thname m;
     register_builtin env m; m
 
@@ -323,7 +307,7 @@ module Env = WpContext.StaticGenerator
       type data = env
       let name = "Wp.Why3Import.Env"
       let compile () =
-        let env = create @@ why3_env @@ L.Library.get () in
+        let env = create @@ Why3Env.env () in
         add_builtins env ; env
     end)
 

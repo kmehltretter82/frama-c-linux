@@ -16,7 +16,7 @@ Prover CFG returns Valid
 
 Goal Post-condition 'GOAL' in 'job':
 Assume { Type: is_bool(A) /\ is_bool(B). }
-Prove: land(-64, lor(to_uint32(lsl(A, 6)), to_uint32(lsl(B, 7)))) = 192.
+Prove: ((-64) land (to_uint32(lsl(A, 6)) lor to_uint32(lsl(B, 7)))) = 192.
 
 ------------------------------------------------------------
 

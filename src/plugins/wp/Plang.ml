@@ -10,6 +10,7 @@ open Format
 open Qed.Logic
 open Qed.Engine
 open Lang
+open Lang.E
 open Lang.F
 
 (* -------------------------------------------------------------------------- *)
@@ -123,7 +124,7 @@ class engine =
           if Z.is_one den then
             Format.fprintf fmt "%s.0" (Z.to_string num)
           else
-            Format.fprintf fmt "(%s.0/%s)"
+            Format.fprintf fmt "(%s/%s)"
               (Z.to_string num)
               (Z.to_string den)
         | `Float ->
@@ -134,13 +135,6 @@ class engine =
     (* --- Atomicity --- *)
 
     method callstyle = CallVar
-    method is_atomic e =
-      match F.repr e with
-      | Kint z -> Z.leq Z.zero z
-      | Kreal _ -> true
-      | Apply _ -> true
-      | Aset _ | Aget _ | Fun _ -> true
-      | _ -> F.is_simple e
 
     (* --- Operators --- *)
 
@@ -217,10 +211,15 @@ class engine =
 
     (* --- Lists --- *)
 
+    method! is_atomic e =
+      match F.repr e with
+      | Fun(fct,_) when Vlist.f_concat @= fct -> true
+      | _ -> super#is_atomic e
+
     method! pp_fun cmode fct ts =
-      if fct == Vlist.f_concat then Vlist.pretty self ts else
-      if fct == Vlist.f_elt then Vlist.elements self ts else
-      if fct == Vlist.f_repeat then Vlist.pprepeat self ts else
+      if Vlist.f_elt    @= fct then Vlist.elements self ts else
+      if Vlist.f_repeat @= fct then Vlist.pprepeat self ts else
+      if Vlist.f_concat @= fct then Vlist.pretty self ts else
         super#pp_fun cmode fct ts
 
     (* --- Higher Order --- *)

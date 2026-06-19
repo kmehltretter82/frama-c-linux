@@ -387,13 +387,13 @@ let rec pmatch env (p : pattern) e =
   | Assoc(`And,ps) , And es -> pac env Lang.F.e_and [] ps es
   | Assoc(`Add,ps) , Add es -> pac env Lang.F.e_sum [] ps es
   | Assoc(`Mul,ps) , Mul es -> pac env Lang.F.e_prod [] ps es
-  | Assoc(`Bor,ps) , Fun(lf,es) when lf == Cint.f_lor ->
+  | Assoc(`Bor,ps) , Fun(lf,es) when Lang.E.(Cint.f_lor @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Band,ps) , Fun(lf,es) when lf == Cint.f_land ->
+  | Assoc(`Band,ps) , Fun(lf,es) when Lang.E.(Cint.f_land @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Bxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
+  | Assoc(`Bxor,ps) , Fun(lf,es) when Lang.E.(Cint.f_lxor @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Concat,ts) , Fun(lf, es) when lf == Vlist.f_concat ->
+  | Assoc(`Concat,ts) , Fun(lf, es) when Lang.E.(Vlist.f_concat @= lf) ->
     pac env (Lang.F.e_fun lf) [] ts es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Mod,q) , Mod(a,b) -> pbinop env p q a b
@@ -401,8 +401,8 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Ne,q) , Neq(a,b) -> pbinop env p q a b
   | Binop(p,`Lt,q) , Lt(a,b) -> pbinop env p q a b
   | Binop(p,`Le,q) , Leq(a,b) -> pbinop env p q a b
-  | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
-  | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
+  | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when Lang.E.(Cint.f_lsl @= lf) -> pbinop env p q a b
+  | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when Lang.E.(Cint.f_lsr @= lf) -> pbinop env p q a b
   | Implies(hps, cp), Imply(hs, c) ->
     pac env Lang.F.e_and [] hps hs ;
     pmatch env cp c
@@ -416,9 +416,9 @@ let rec pmatch env (p : pattern) e =
     pmatch env pa a ; pmatch env pk k
   | Set(pa,pk,pv) , Aset(a,k,v) ->
     pmatch env pa a ; pmatch env pk k ; pmatch env pv v
-  | Field(pv,fid) , Rget(v,fd) when Lang.name_of_field fd = fid ->
+  | Field(pv,fid) , Rget(v,fd) when Lang.Field.name fd = fid ->
     pmatch env pv v
-  | Call(fid,ps,trail) , Fun(lf,es) when Lang.name_of_lfun lf = fid ->
+  | Call(fid,ps,trail) , Fun(lf,es) when Lang.Fun.name lf = fid ->
     begin
       match Lang.Fun.category lf with
       | Operator op ->
@@ -432,7 +432,7 @@ let rec pmatch env (p : pattern) e =
           pargs env ps trail es
       | _ -> pargs env ps trail es
     end
-  | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when lf == Vlist.f_repeat ->
+  | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when Lang.E.(Vlist.f_repeat @= lf) ->
     pmatch env pl l ; pmatch env pn n
   | List _vs , _ -> ()
   | Pany ps , _ ->
@@ -641,13 +641,13 @@ let psequent ctxt sigma (seq : Conditions.sequent) =
 
 let () = Lang.on_lfun
     begin fun lf ->
-      let id = "lf:" ^ Lang.name_of_lfun lf in
+      let id = "lf:" ^ Lang.Fun.name lf in
       Tactical.add_computer id (Lang.F.e_fun lf)
     end
 
 let () = Lang.on_field
     begin fun fd ->
-      let id = "fd:" ^ Lang.name_of_field fd in
+      let id = "fd:" ^ Lang.Field.name fd in
       Tactical.add_computer id (fun es -> Lang.F.e_getfield (List.hd es) fd)
     end
 
@@ -891,7 +891,7 @@ let rec typecheck env expected (a : ast) =
         begin
           try
             let (_,ft) =
-              List.find (fun (fd,_) -> Lang.name_of_field fd = fid) fds in
+              List.find (fun (fd,_) -> Lang.Field.name fd = fid) fds in
             tc_merge env ~loc ~expected (Type ft)
           with Not_found -> expected
         end

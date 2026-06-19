@@ -6,5 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Depends on Machdep endianness *)
 include Memory.Model
 module LOADER : MemLoader.Model with type loc = loc

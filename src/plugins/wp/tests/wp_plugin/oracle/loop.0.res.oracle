@@ -17,7 +17,7 @@ Prover CFG returns Valid
 Goal Post-condition 'qed_ok' in 'init':
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
 Let x_1 = 1 + b.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
@@ -35,11 +35,11 @@ Assume {
   Have: (a <= i) /\ (i <= x_1).
   (* Invariant 'qed_ok' *)
   Have: forall i_2 : Z. ((a <= i_2) -> ((i_2 < i) ->
-      (a_2[shift_sint32(t, i_2)] = e))).
+      (m[shift_sint32(t, i_2)] = e))).
   (* Else *)
   Have: b < i.
 }
-Prove: a_2[shift_sint32(t, i_1)] = e.
+Prove: m[shift_sint32(t, i_1)] = e.
 
 ------------------------------------------------------------
 
@@ -100,7 +100,7 @@ Goal Preservation of Invariant 'qed_ok' ("loop.i", line 13, characters 30-70):
 Let x = 1 + i.
 Let a_1 = shift_sint32(t, a).
 Let x_1 = -a.
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
 Let x_2 = 1 + b.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i) /\ is_sint32(x).
@@ -118,13 +118,13 @@ Assume {
   Have: (a <= i) /\ (i <= x_2).
   (* Invariant 'qed_ok' *)
   Have: forall i_2 : Z. ((a <= i_2) -> ((i_2 < i) ->
-      (a_2[shift_sint32(t, i_2)] = e))).
+      (m[shift_sint32(t, i_2)] = e))).
   (* Then *)
   Have: i <= b.
   (* Invariant 'qed_ok' *)
   Have: a <= x.
 }
-Prove: a_2[shift_sint32(t, i) <- e][shift_sint32(t, i_1)] = e.
+Prove: m[shift_sint32(t, i) <- e][shift_sint32(t, i_1)] = e.
 
 ------------------------------------------------------------
 
@@ -143,8 +143,8 @@ Goal Loop assigns 'qed_ok' (3/3):
 Effect at line 18
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
-Let a_3 = shift_sint32(t, i).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, i - a).
+Let a_2 = shift_sint32(t, i).
 Let x_1 = 1 + i.
 Let x_2 = 1 + b.
 Assume {
@@ -152,7 +152,7 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: !invalid(Malloc_0, a_3, 1).
+  When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Pre-condition *)
@@ -163,16 +163,16 @@ Assume {
   Have: (a <= i) /\ (i <= x_2).
   (* Invariant 'qed_ok' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
-      (a_2[shift_sint32(t, i_1)] = e))).
+      (m[shift_sint32(t, i_1)] = e))).
   (* Then *)
   Have: i <= b.
   (* Invariant 'qed_ok' *)
   Have: a <= x_1.
   (* Invariant 'qed_ok' *)
   Have: forall i_1 : Z. ((i_1 <= i) -> ((a <= i_1) ->
-      (a_2[a_3 <- e][shift_sint32(t, i_1)] = e))).
+      (m[a_2 <- e][shift_sint32(t, i_1)] = e))).
 }
-Prove: included(a_3, 1, a_1, 1 + i - a).
+Prove: included(a_2, 1, a_1, 1 + i - a).
 
 ------------------------------------------------------------
 

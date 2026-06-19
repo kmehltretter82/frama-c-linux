@@ -85,9 +85,9 @@ Assume {
   (* Initializer *)
   Init: Mint_0[shiftfield_F2_St_b(a)] = 2.
   (* Initializer *)
-  Init: (w.F2_St_a) = 1.
+  Init: w.F2_St_a = 1.
   (* Initializer *)
-  Init: (w.F2_St_b) = 2.
+  Init: w.F2_St_b = 2.
 }
 Prove: EqS2_St(a_1, w).
 
@@ -105,9 +105,9 @@ Assume {
   (* Initializer *)
   Init: Mint_0[shiftfield_F2_St_b(a)] = 2.
   (* Initializer *)
-  Init: (w.F2_St_a) = 1.
+  Init: w.F2_St_a = 1.
   (* Initializer *)
-  Init: (w.F2_St_b) = 2.
+  Init: w.F2_St_b = 2.
 }
 Prove: EqS2_St(a_1, w).
 

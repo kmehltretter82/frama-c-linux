@@ -14,7 +14,7 @@ open Why3
 
 let why3_version = Why3.Config.version
 
-let file () =
+let config_file () =
   let param = Wp_parameters.Why3Config.get () in
   if Filepath.is_empty param
   then None
@@ -38,16 +38,24 @@ let extend_config config =
   !Whyconf.provers_from_detected_provers config (to_rc provers)
 
 let the_config = ref None
+let the_env = ref None
 
 let () =
-  let must_reload_config _ _ = the_config := None in
-  Wp_parameters.Why3Config.add_update_hook must_reload_config ;
-  Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config
+  begin
+    let must_reload_config _ _ =
+      begin
+        the_config := None ;
+        the_env := None ;
+      end in
+    Wp_parameters.Why3Config.add_update_hook must_reload_config ;
+    Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config ;
+    Wp_parameters.Library.add_update_hook must_reload_config ;
+  end
 
 let config () =
   if Option.is_none !the_config then
     begin try
-        let file = file () in
+        let file = config_file () in
         let extra_config = Wp_parameters.Why3ExtraConfig.get () in
         let config = Why3.Whyconf.init_config ~extra_config file in
         let auto_detect = Wp_parameters.Why3Autodetect.get () in
@@ -58,11 +66,29 @@ let config () =
     end ;
   Option.get !the_config
 
+let env () =
+  if Option.is_none !the_env then
+    begin try
+        let config = config () in
+        let main = Why3.Whyconf.get_main config in
+        let wp = Filepath.to_string_abs (Wp_parameters.Share.get_dir "why3") in
+        let user = Filepath.to_string_list (Wp_parameters.Library.get ()) in
+        let why3 = Why3.Whyconf.loadpath main in
+        let loadpath = wp :: (user @ why3) in
+        let env = Why3.Env.create_env loadpath in
+        the_env := Some env ;
+      with exn ->
+        Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
+    end ;
+  Option.get !the_env
+
 let flags_changed = ref true
 
 let () =
-  let must_reconfigure _ _ = flags_changed := true in
-  Wp_parameters.Why3Flags.add_update_hook must_reconfigure
+  begin
+    let must_reconfigure _ _ = flags_changed := true in
+    Wp_parameters.Why3Flags.add_update_hook must_reconfigure ;
+  end
 
 let configure =
   begin fun () ->
@@ -92,7 +118,7 @@ let set_procs = Why3.Controller_itp.set_session_max_tasks
 (* --- Why3 Provers                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-type t = Why3.Whyconf.prover
+type prover = Why3.Whyconf.prover
 
 let ident_why3 = Why3.Whyconf.prover_parseable_format
 let ident_wp s =
@@ -110,7 +136,7 @@ let name p = p.Why3.Whyconf.prover_name
 
 let version p = p.Why3.Whyconf.prover_version
 let is_mainstream p = p.Why3.Whyconf.prover_version <> "" && p.Why3.Whyconf.prover_altern = ""
-let is_auto (p : t) =
+let is_auto (p : prover) =
   match p.prover_name with
   | "Coq" | "Isabelle" -> false
   | "Alt-Ergo" | "Z3" | "CVC4" | "CVC5" | "Colibri2" -> true
@@ -135,7 +161,7 @@ let with_counter_examples p =
     let name = p.prover_name in
     let version = p.prover_version in
     List.find_opt
-      (fun (q : t) ->
+      (fun (q : prover) ->
          q.prover_name = name &&
          q.prover_version = version &&
          has_counter_examples q)
@@ -158,9 +184,9 @@ let cmp x y =
 let scmp u v = cmp (sem u) (sem v)
 let vcmp u v =
   List.compare scmp (String.split_on_char '.' u) (String.split_on_char '.' v)
-let by_version (p:t) (q:t) = vcmp p.prover_version q.prover_version
+let by_version (p:prover) (q:prover) = vcmp p.prover_version q.prover_version
 
-let filter ~name ?version (p:t) =
+let filter ~name ?version (p:prover) =
   p.prover_altern = "" &&
   String.lowercase_ascii p.prover_name = name &&
   match version with None -> true | Some v -> p.prover_version = v

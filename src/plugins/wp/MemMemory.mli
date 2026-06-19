@@ -17,12 +17,12 @@ open Lang.F
 
 val t_malloc : tau (** allocation tables *)
 
-val t_init : tau (** initialization tables *)
-
+val t_init : tau extern (** initialization tables *)
+val t_mptr : tau extern (** t_addr indexed array of t_attr *)
 val t_mem : tau -> tau (** t_addr indexed array *)
 
-val f_eqmem : lfun
-val f_memcpy : lfun
+val f_eqmem : lfun extern
+val f_memcpy : lfun extern
 
 val sconst : term -> pred
 val scinit : term -> pred

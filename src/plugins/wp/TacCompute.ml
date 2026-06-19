@@ -47,7 +47,7 @@ let process (fd : Tactical.feedback) ?at e =
     Applicable (Tactical.rewrite ?at ["If-Then",p,e,a;"If-Else",q,e,b])
   | Unfold(e,f,d) ->
     fd#set_title "Compute (def)" ;
-    fd#set_descr "Unfold definition of '%s'." (Lang.name_of_lfun f) ;
+    fd#set_descr "Unfold definition of '%s'." (Lang.Fun.fullname f) ;
     Applicable (Tactical.rewrite ?at ["Definition",F.p_true,e,d])
 
 class compute : Tactical.tactical =

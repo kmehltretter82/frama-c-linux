@@ -15,16 +15,16 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition ("euclid2.c", line 9) in 'euclid_gcd':
-Let x = number.Gcd.gcd(a, b).
+Let x = gcd(a, b).
 Assume {
   Type: is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(a_2) /\ is_sint32(b) /\
       is_sint32(euclid_gcd_0).
   (* Pre-condition *)
-  Have: IAbs.abs(a) <= 2147483647.
+  Have: abs(a) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_2, 0) = x.
+  Have: gcd(a_2, 0) = x.
   If a_2 < 0
   Then { Have: a_2 = a_1. Have: (a_1 + euclid_gcd_0) = 0. }
   Else { Have: euclid_gcd_0 = a_2. }
@@ -45,21 +45,21 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant ("euclid2.c", line 17):
-Let x = number.Gcd.gcd(a_2, b).
+Let x = gcd(a_2, b).
 Let x_1 = a_1 % a.
 Assume {
   Type: is_sint32(a_2) /\ is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(b) /\
       is_sint32(x_1).
   (* Pre-condition *)
-  Have: IAbs.abs(a_2) <= 2147483647.
+  Have: abs(a_2) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_1, a) = x.
+  Have: gcd(a_1, a) = x.
   (* Then *)
   Have: a != 0.
 }
-Prove: number.Gcd.gcd(a, x_1) = x.
+Prove: gcd(a, x_1) = x.
 
 ------------------------------------------------------------
 
@@ -93,21 +93,21 @@ Prove: true.
 
 Goal Decreasing of Loop variant at loop ("euclid2.c", lines 20-24):
 Let x = a % a_1.
-Let x_1 = number.Gcd.gcd(a_2, b).
+Let x_1 = gcd(a_2, b).
 Assume {
   Type: is_sint32(a_2) /\ is_sint32(a_1) /\ is_sint32(a) /\ is_sint32(b) /\
       is_sint32(x).
   (* Pre-condition *)
-  Have: IAbs.abs(a_2) <= 2147483647.
+  Have: abs(a_2) <= 2147483647.
   (* Pre-condition *)
-  Have: IAbs.abs(b) <= 2147483647.
+  Have: abs(b) <= 2147483647.
   (* Invariant *)
-  Have: number.Gcd.gcd(a, a_1) = x_1.
+  Have: gcd(a, a_1) = x_1.
   (* Then *)
   Have: a_1 != 0.
   (* Invariant *)
-  Have: number.Gcd.gcd(a_1, x) = x_1.
+  Have: gcd(a_1, x) = x_1.
 }
-Prove: IAbs.abs(x) < IAbs.abs(a_1).
+Prove: abs(x) < abs(a_1).
 
 ------------------------------------------------------------

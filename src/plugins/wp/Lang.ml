@@ -90,42 +90,20 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 
 (* -------------------------------------------------------------------------- *)
 
-type library = string
-
 type datakind = KValue | KInit
 
 type adt =
-  | Mtype of mdt (* Model type *)
-  | Mrecord of mdt * fields (* Model record-type *)
-  | Atype of logic_type_info (* Logic Type *)
+  | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
+  | Atype of logic_type_info (* ACSL Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
-  | Wtype of string list * string * string list (** Why3 imported type *)
 
 (** name to print to the provers *)
-and mdt = string extern
-and 'a extern = {
-  ext_id      : int;
-  ext_link : 'a ;
-  ext_library : library; (** a library which it depends on *)
-  ext_debug   : string; (** just for printing during debugging *)
-}
 and fields = { mutable fields : field list }
-and field =
-  | Mfield of mdt * fields * string * tau
-  | Cfield of fieldinfo * datakind
+and field = Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
 let floats = Context.create "Lang.floats"
-
-let new_extern_id = ref (-1)
-let new_extern ~debug ~library ~link =
-  incr new_extern_id;
-  {ext_id     = !new_extern_id;
-   ext_library = library;
-   ext_debug  = debug;
-   ext_link   = link}
-let ext_compare a b = Datatype.Int.compare a.ext_id b.ext_id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sorting & Typing                                                   --- *)
@@ -159,7 +137,7 @@ let t_comp c = Logic.Data(Comp (c, KValue),[])
 let t_init c = Logic.Data(Comp (c, KInit), [])
 let t_array a = Logic.Array(Logic.Int,a)
 let t_farray a b = Logic.Array(a,b)
-let t_datatype adt ts = Logic.Data(adt,ts)
+let t_data adt ts = Logic.Data(adt,ts)
 let rec t_matrix a n = if n > 0 then t_matrix (t_array a) (pred n) else a
 
 let rec tau_of_object = function
@@ -184,27 +162,10 @@ let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
-type t_builtin =
-  | E_mdt of mdt
-  | E_why3 of string list * string * string list
-  | E_poly of (tau list -> tau)
-let builtin_types = Context.create "Wp.Lang.builtin_types"
-
-let find_builtin name = Context.get builtin_types name
-
-let adt lt =
-  try match find_builtin lt.lt_name with
-    | E_mdt m -> Mtype m
-    | E_why3(p,m,s) -> Wtype(p,m,s)
-    | E_poly _ -> assert false
-  with Not_found -> Atype lt
-
-let atype lt ts =
-  try match find_builtin lt.lt_name with
-    | E_mdt m -> Logic.Data(Mtype m,ts)
-    | E_why3(p,m,s) -> Logic.Data(Wtype(p,m,s),ts)
-    | E_poly ftau -> ftau ts
-  with Not_found -> Logic.Data(Atype lt,ts)
+let hacked_types = Context.create "Wp.Lang.hacked_types"
+let atype lt (ts : tau list) : tau =
+  try Context.get hacked_types lt.lt_name ts
+  with Not_found -> Qed.Logic.Data(Atype lt,ts)
 
 let rec tau_of_ltype t =
   match Ast_types.Acsl.unroll ~unroll_typedef:false t with
@@ -225,44 +186,66 @@ let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+type 'a extern = {
+  mutable value : 'a option ;
+  mutable env : Why3.Env.env option ;
+  compute : Why3.Env.env -> 'a ;
+}
+
+let extern = function
+  | { value = Some v ; env = Some e } when e == Why3Env.env () -> v
+  | r ->
+    let env = Why3Env.env () in
+    let value = r.compute env in
+    r.env <- Some env ; r.value <- Some value ; value
+
+module E =
+struct
+  let (!@) = extern
+  let (@=) a b = !@a == b
+end
+
+let extern_mk compute = { value = None ; env = None ; compute }
+
+let import_t ~context ts = Qdata (Qed.Symbol.of_ts context ts)
+let extern_c name env = Qdata (Qed.Symbol.find_data env name)
+let extern_t name = extern_mk (extern_c name)
+
 module ADT =
 struct
 
   type t = adt
 
-  let basename = function
-    | Mtype a -> basename "M" a.ext_link
-    | Mrecord(r,_) -> basename "R" r.ext_link
-    | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
-    | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
-    | Atype lt -> basename "A" lt.lt_name
-    | Wtype(_,_,s) ->
-      let rec base def = function [] -> def | w::ws -> base w ws in base "w" s
-
-  let debug = function
-    | Mtype a -> a.ext_debug
-    | Mrecord(a,_) -> a.ext_debug
+  let name = function
+    | Qdata a -> Qed.Symbol.Data.name a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
-    | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
+
+  let basename = function
+    | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
+    | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
+    | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
+    | Atype lt -> basename "A" lt.lt_name
+
+  let fullname = function
+    | Qdata a -> Qed.Symbol.Data.fullname a
+    | Comp (c, KValue) -> comp_id c
+    | Comp (c, KInit) -> comp_init_id c
+    | Atype lt -> type_id lt
 
   let hash = function
-    | Mtype a | Mrecord(a,_) -> Hashtbl.hash a
+    | Qdata a -> Qed.Symbol.Data.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
-    | Wtype(p,m,s) -> Hashtbl.hash @@ (p @ m :: s)
 
   let compare a b =
     if a==b then 0 else
       match a,b with
-      | Mtype a , Mtype b -> ext_compare a b
-      | Mtype _ , _ -> (-1)
-      | _ , Mtype _ -> (+1)
-      | Mrecord(a,_) , Mrecord(b,_) -> ext_compare a b
-      | Mrecord _ , _ -> (-1)
-      | _ , Mrecord _ -> (+1)
+      | Qdata a , Qdata b -> Qed.Symbol.Data.compare a b
+      | Qdata _ , _ -> (-1)
+      | _ , Qdata _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
@@ -270,13 +253,10 @@ struct
       | Comp _ , _ -> (-1)
       | _ , Comp _ -> (+1)
       | Atype a , Atype b -> Logic_type_info.compare a b
-      | Atype _ , _ -> (-1)
-      | _ , Atype _ -> (+1)
-      | Wtype(p,m,s), Wtype(p',m',s') -> Stdlib.compare (p,m,s) (p',m',s')
 
   let equal a b = (compare a b = 0)
 
-  let pretty fmt a = Format.pp_print_string fmt (debug a)
+  let pretty fmt a = Format.pp_print_string fmt @@ name a
 
 end
 
@@ -284,66 +264,15 @@ end
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_builtin_type ~name =
-  match find_builtin name with
-  | E_mdt m -> Mtype m
-  | E_why3(p,m,s) -> Wtype(p,m,s)
-  | E_poly _ -> assert false
-
-let mem_builtin_type ~name =
-  try ignore (find_builtin name) ; true
-  with Not_found -> false
-
-let is_builtin lt = mem_builtin_type ~name:lt.lt_name
-
-let is_builtin_type ~name = function
-  | Data(Mtype m,_) ->
-    begin
-      try match find_builtin name with
-        | E_mdt m0 -> m == m0
-        | _ -> false
-      with Not_found -> false
-    end
-  | Data(Wtype(p,m,s),_) ->
-    begin
-      try match find_builtin name with
-        | E_why3(p0,m0,s0) -> (p,m,s) = (p0,m0,s0)
-        | _ -> false
-      with Not_found -> false
-    end
-  | _ -> false
-
-let datatype ~library name =
-  let m = new_extern ~link:name ~library ~debug:name in
-  Mtype m
-
-
 let field_observers = ref []
 let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
 let on_field f = field_observers := f :: !field_observers
 
 let cfield ?(kind=KValue) fd = field_observe @@ Cfield(fd,kind)
-
-let record ~link ~library fts =
-  let m = new_extern ~link ~library ~debug:link in
-  let r = { fields = [] } in
-  let fs = List.map (fun (f,t) -> field_observe @@ Mfield(m,r,f,t)) fts in
-  r.fields <- fs ; Mrecord(m,r)
-
-let field t f =
-  match t with
-  | Mrecord(_,r) ->
-    begin
-      try List.find (function Mfield(_,_,g,_) -> f = g | _ -> false) r.fields
-      with Not_found -> Wp_parameters.fatal "No field <%s> in record" f
-    end
-  | _ -> Wp_parameters.fatal "No field <%s> in type '%a'" f ADT.pretty t
-
 let comp c = Comp (c, KValue)
 let comp_init c = Comp (c, KInit)
 
 let fields_of_adt = function
-  | Mrecord(_,r) -> r.fields
   | Comp (c, k) ->
     List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
   | _ -> []
@@ -354,17 +283,16 @@ let fields_of_tau = function
   | _ -> []
 
 let fields_of_field = function
-  | Mfield(_,r,_,_) -> r.fields
   | Cfield(f, k) ->
     List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
 
 let tau_of_field = function
-  | Mfield(_,_,_,t) -> t
   | Cfield(f, KValue) -> tau_of_ctype f.ftype
   | Cfield(f, KInit) -> init_of_ctype f.ftype
 
+let adt_of_field = function Cfield(f,kd) -> Comp(f.fcomp,kd)
+
 let tau_of_record = function
-  | Mfield(mdt,fs,_,_) -> Logic.Data(Mrecord(mdt,fs),[])
   | Cfield(f, KValue) -> t_comp f.fcomp
   | Cfield(f, KInit) -> t_init f.fcomp
 
@@ -373,22 +301,19 @@ struct
 
   type t = field
 
-  let debug = function
-    | Mfield(_,_,f,_) -> f
+  let name = function
     | Cfield(f, KValue) -> field_id f
     | Cfield(f, KInit) -> field_init_id f
 
+  let fullname = name
+
   let hash = function
-    | Mfield(_,_,f,_) -> Hashtbl.hash f
     | Cfield(f, KValue) -> Fieldinfo.hash f
     | Cfield(f, KInit) -> 13 * Fieldinfo.hash f
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | Mfield(_,_,f,_) , Mfield(_,_,g,_) -> String.compare f g
-      | Mfield _ , Cfield _ -> (-1)
-      | Cfield _ , Mfield _ -> (+1)
       | Cfield(f, KValue) , Cfield(g, KValue)
       | Cfield(f, KInit) , Cfield(g, KInit) ->
         Fieldinfo.compare f g
@@ -397,10 +322,9 @@ struct
 
   let equal f g = (compare f g = 0)
 
-  let pretty fmt f = Format.pp_print_string fmt (debug f)
+  let pretty fmt f = Format.pp_print_string fmt @@ name f
 
   let sort = function
-    | Mfield(_,_,_,s) -> Qed.Kind.of_tau s
     | Cfield(f, KValue) -> sort_of_object (Ctypes.object_of f.ftype)
     | Cfield(f, KInit) -> init_sort_of_object (Ctypes.object_of f.ftype)
 
@@ -412,25 +336,28 @@ end
 
 type lfun =
   | ACSL of Cil_types.logic_info
-  (** Registered in Definition.t, only  *)
+  (* Registered in Definition.t, only  *)
   | CTOR of Cil_types.logic_ctor_info
-  (** Not registered in Definition.t, directly converted/printed *)
-  | FUN of lsymbol
-  (** Generated or External function *)
+  (* Not registered in Definition.t, directly converted/printed *)
+  | LFUN of lsymbol
+  (* Generated function *)
+  | QFUN of esymbol
+  (* External function *)
 
 and lsymbol = {
+  m_name : string ;
+  m_context : WpContext.context option ;
   m_category : lfun category ;
-  m_params : sort list ;
-  m_result : sort ;
-  m_typeof : tau option list -> tau ;
-  m_source : source ;
   m_coloring : bool ;
+  m_result : tau ;
+  m_params : tau list ;
 }
 
-and source =
-  | Generated of WpContext.context option * string
-  | Extern of Engine.link extern
-  | Wsymbol of string list * string * string list (* package, module, name *)
+and esymbol = {
+  e_category : lfun category ;
+  e_coloring : bool ;
+  e_symbol : Qed.Symbol.lfun ;
+}
 
 let lfun_observers = ref []
 let lfun_observe lf = List.iter (fun k -> k lf) !lfun_observers ; lf
@@ -438,152 +365,149 @@ let on_lfun f = lfun_observers := f :: !lfun_observers
 
 let acsl lf = lfun_observe (ACSL lf)
 let ctor cf = lfun_observe (CTOR cf)
-let lsymbol m = lfun_observe (FUN m)
+let lsymbol m = lfun_observe (LFUN m)
+
+let of_qtau = Kind.map_tau (fun _ -> raise Not_found) (fun d -> Qdata d)
+
+let unroll = function
+  | Qed.Logic.Data(Qdata d, ts) ->
+    let ty = Qed.Symbol.Data.symbol d in
+    let thy = Qed.Symbol.Data.theory d in
+    begin
+      match ty.ts_def with
+      | Alias tr ->
+        let sigma : tau Why3.Ty.Mtv.t =
+          List.fold_left2
+            (fun s v t -> Why3.Ty.Mtv.add v t s)
+            Why3.Ty.Mtv.empty ty.ts_args ts in
+        let rec instance sigma (ty : Why3.Ty.ty)  =
+          match ty.ty_node with
+          | Tyvar v -> Why3.Ty.Mtv.find v sigma
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_int) ts -> Int
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_real) ts -> Real
+          | Tyapp(ts,[]) when Why3.Ty.(ts_equal ts_bool) ts -> Bool
+          | Tyapp(ts,[k;v]) when Why3.Ty.(ts_equal ts_func) ts ->
+            Array(instance sigma k, instance sigma v)
+          | Tyapp(ts, ps) ->
+            let adt = Qdata (Qed.Symbol.of_ts thy ts) in
+            let ts = List.map (instance sigma) ps in
+            Qed.Logic.Data(adt,ts)
+        in (try Some (instance sigma tr) with Not_found -> None)
+      | _ -> None
+    end
+  | _ -> None
+
+
+let compare_tau = Qed.Kind.compare_tau Field.compare ADT.compare
+
+let typecheck category (tr: tau) (ps : tau list) (ts : tau list) =
+  let s = ref Qed.Intmap.empty in
+  let rec unify_all ps ts =
+    match ps,ts with
+    | [],[] -> ()
+    | p::ps,t::ts -> unify p t ; unify_all ps ts
+    | _ -> raise Not_found
+  and unify p t =
+    match p , t with
+    | _ , Tvar (-1) -> ()
+    | Tvar k , _ -> merge k t
+    | Int , Int -> ()
+    | Real, Real -> ()
+    | Bool, Bool -> ()
+    | Prop, Prop -> ()
+    | Array(a,b), Array(a',b') -> unify a a' ; unify b b'
+    | Data(d,ps) , Data(d',ts) when ADT.equal d d' -> unify_all ps ts
+    | _ ->
+      match unroll p , unroll t with
+      | Some p , Some t -> unify p t
+      | Some p , None -> unify p t
+      | None , Some t -> unify p t
+      | _ -> raise Not_found
+  and merge k t =
+    match Qed.Intmap.find k !s with
+    | exception Not_found -> s := Qed.Intmap.add k t !s
+    | t0 -> if not (compare_tau t0 t = 0) then raise Not_found
+  in
+  begin
+    match category with
+    | Operator _ -> List.iter (unify tr) ts
+    | _ -> unify_all ps ts
+  end ;
+  let rec resolve = function
+    | Int -> Int
+    | Real -> Real
+    | Bool -> Bool
+    | Prop -> Prop
+    | Tvar x -> (try Qed.Intmap.find x !s with Not_found -> Tvar (-1))
+    | Array(a,b) -> Array(resolve a, resolve b)
+    | Record fts -> Record (List.map (fun (f,t) -> f,resolve t) fts)
+    | Data(d,ts) -> Data(d,List.map resolve ts)
+  in resolve tr
 
 let tau_of_lfun phi ts =
   match phi with
   | ACSL f -> tau_of_return f.l_type
   | CTOR c ->
-    if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
+    if c.ctor_type.lt_params = []
+    then Logic.Data(Atype c.ctor_type,[])
     else raise Not_found
-  | FUN m -> match m.m_result with
-    | Sint -> Int
-    | Sreal -> Real
-    | Sbool -> Bool
-    | _ -> m.m_typeof ts
+  | LFUN m ->
+    begin
+      try
+        typecheck m.m_category m.m_result m.m_params
+          (List.map (Option.get ~exn:Not_found) ts)
+      with _ -> raise Not_found
+    end
+  | QFUN f ->
+    try
+      let _,r,ps = Qed.Symbol.signature f.e_symbol in
+      typecheck f.e_category
+        (of_qtau r)
+        (List.map of_qtau ps)
+        (List.map (Option.get ~exn:Not_found) ts)
+    with _ -> raise Not_found
 
 let is_coloring_lfun = function
   | ACSL _ | CTOR _ -> false
-  | FUN { m_coloring } -> m_coloring
+  | LFUN { m_coloring } -> m_coloring
+  | QFUN { e_coloring } -> e_coloring
 
-type balance = Nary | Left | Right
-
-let not_found _ = raise Not_found
-
-let generated ?(context=false) name =
-  let ctxt = if context
-    then Some (WpContext.get_context ())
-    else None in
-  Generated(ctxt,name)
-
-let symbolf
-    ?library
-    ?context
-    ?link
-    ?(balance=Nary) (* specify a default for link *)
+let generated_f
+    ?(context=false)
     ?(category=Logic.Function)
-    ?(params=[])
-    ?(sort=Logic.Sdata)
-    ?(result:tau option)
     ?(coloring=false)
-    ?(typecheck:(tau option list -> tau) option)
-    name =
-  let buffer = Buffer.create 80 in
-  Format.kfprintf
-    (fun fmt ->
-       Format.pp_print_flush fmt () ;
-       let name = Buffer.contents buffer in
-       let source = match library with
-         | None ->
-           assert (link = None);
-           generated ?context name
-         | Some th ->
-           let conv n = function
-             | Nary  -> Engine.F_call n
-             | Left  -> Engine.F_left n
-             | Right -> Engine.F_right n
-           in
-           let link = match link with
-             | None -> conv name balance
-             | Some info -> info
-           in
-           Extern (new_extern ~library:th ~link ~debug:name) in
-       let typeof =
-         match typecheck with Some phi -> phi | None ->
-         match result with Some t -> fun _ -> t | None -> not_found in
-       let result =
-         match result with Some t -> Kind.of_tau t | None -> sort in
-       lsymbol {
-         m_category = category ;
-         m_params = params ;
-         m_result = result ;
-         m_typeof = typeof ;
-         m_source = source ;
-         m_coloring = coloring ;
-       }
-    ) (Format.formatter_of_buffer buffer) name
+    ~result ~params descr =
+  Format.kasprintf
+    begin fun name ->
+      let context =
+        if context
+        then Some (WpContext.get_context ())
+        else None
+      in lsymbol {
+        m_name = name ;
+        m_category = category ;
+        m_params = params ;
+        m_result = result ;
+        m_context = context ;
+        m_coloring = coloring ;
+      }
+    end descr
 
-let extern_s
-    ~library ?link ?category ?params ?sort ?result ?coloring ?typecheck name =
-  symbolf
-    ~library ?category ?params ?sort ?result ?coloring ?typecheck ?link "%s" name
+let generated_p = generated_f ~result:Prop
 
-let extern_f
-    ~library ?link ?balance ?category ?params ?sort ?result ?coloring ?typecheck name =
-  symbolf
-    ~library ?category ?params ?link ?balance ?sort ?result ?coloring ?typecheck name
-
-let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
-  let link =
-    match bool,prop,link with
-    | Some b , Some p , None -> Engine.F_bool_prop(b,p)
-    | _ , _ , Some info -> info
-    | _ , _ , _ -> assert false
-  in
-  let debug = Export.debug link in
-  lsymbol {
-    m_category = Logic.Function;
-    m_params = params ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = Extern (new_extern ~library ~link ~debug) ;
-    m_coloring = coloring ;
+let extern_l ?(category=Function) ?(coloring=false) name env =
+  QFUN {
+    e_symbol = Qed.Symbol.find_lfun env name ;
+    e_coloring = coloring ;
+    e_category = Qed.Kind.map_category extern category ;
   }
 
-let extern_fp ~library ?(params=[]) ?link ?(coloring=false) phi =
-  let link = match link with
-    | None -> Engine.F_call phi
-    | Some link -> Engine.F_call link in
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = params ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = Extern (new_extern
-                         ~library
-                         ~link
-                         ~debug:phi) ;
-    m_coloring = coloring ;
-  }
+let extern_f ?category ?coloring name = extern_mk (extern_l ?category ?coloring name)
 
-let generated_f ?context ?category ?params ?sort ?result ?coloring name =
-  symbolf ?context ?category ?params ?sort ?result ?coloring name
-
-let generated_p ?context ?(coloring=false) name =
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = [] ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = generated ?context name ;
-    m_coloring = coloring ;
-  }
-
-let extern_t name ~link ~library =
-  new_extern ~link ~library ~debug:name
-
-let imported_t ~package ~theory ~name =
-  Wtype(package,theory,name)
-
-let imported_f ~package ~theory ~name
-    ?(params=[]) ?(result=Logic.Sprop) ?(typecheck=not_found) () =
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = params ;
-    m_result = result ;
-    m_typeof = typecheck ;
-    m_source = Wsymbol(package,theory,name) ;
-    m_coloring = false ;
+let import_f ~context ls = QFUN {
+    e_symbol = Qed.Symbol.of_ls context ls ;
+    e_category = Function ;
+    e_coloring = false ;
   }
 
 module Fun =
@@ -591,48 +515,36 @@ struct
 
   type t = lfun
 
-  let debug = function
+  let name = function
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
-    | FUN({m_source=Generated(_,n)}) -> n
-    | FUN({m_source=Extern e}) -> e.ext_debug
-    | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
+    | LFUN l -> l.m_name
+    | QFUN f -> Qed.Symbol.Fun.name f.e_symbol
+
+  let fullname = function
+    | ACSL f -> logic_id f
+    | CTOR c -> ctor_id c
+    | LFUN l -> l.m_name
+    | QFUN f -> Qed.Symbol.Fun.fullname f.e_symbol
 
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
-    | FUN({m_source=Generated(_,n)}) -> Datatype.String.hash n
-    | FUN({m_source=Extern e}) -> e.ext_id
-    | FUN({m_source=Wsymbol(p,m,s)}) ->
-      Datatype.String.hash @@ String.concat "." (p @ m :: s)
-
-  let compare_context c1 c2 =
-    match c1 , c2 with
-    | None , None -> 0
-    | None , _ -> (-1)
-    | _ , None -> (+1)
-    | Some c1 , Some c2 -> WpContext.S.compare c1 c2
-
-  let compare_source s1 s2 =
-    match s1 , s2 with
-    | Generated(m1,f1), Generated(m2,f2) ->
-      let cmp = String.compare f1 f2 in
-      if cmp<>0 then cmp else compare_context m1 m2
-    | Generated _, _ -> (-1)
-    | _, Generated _ -> (+1)
-    | Extern f , Extern g ->
-      ext_compare f g
-    | Extern _ , _ -> (-1)
-    | _ , Extern _ -> (+1)
-    | Wsymbol(p,m,s) , Wsymbol(p',m',s') ->
-      Stdlib.compare (p,m,s) (p',m',s')
+    | LFUN l -> 7 * String.hash l.m_name
+    | QFUN f -> 13 * Qed.Symbol.Fun.hash f.e_symbol
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | FUN {m_source=mf} , FUN {m_source=mg} -> compare_source mf mg
-      | FUN _ , _ -> (-1)
-      | _ , FUN _ -> (+1)
+      | LFUN f , LFUN g ->
+        let cmp = String.compare f.m_name g.m_name in
+        if cmp <> 0 then cmp else
+          Option.compare WpContext.S.compare f.m_context g.m_context
+      | LFUN _ , _ -> (-1)
+      | _ , LFUN _ -> (+1)
+      | QFUN f , QFUN g -> Qed.Symbol.Fun.compare f.e_symbol g.e_symbol
+      | QFUN _ , _ -> (-1)
+      | _ , QFUN _ -> (+1)
       | ACSL f , ACSL g -> Logic_info.compare f g
       | ACSL _ , _ -> (-1)
       | _ , ACSL _ -> (+1)
@@ -640,29 +552,47 @@ struct
 
   let equal f g = (compare f g = 0)
 
-  let pretty fmt f = Format.pp_print_string fmt (debug f)
+  let pretty fmt f = Format.pp_print_string fmt @@ name f
 
   let category = function
-    | FUN m -> m.m_category
+    | LFUN m -> m.m_category
+    | QFUN e -> e.e_category
     | ACSL _ -> Logic.Function
     | CTOR _ -> Logic.Constructor
 
+  let rec sort_of_tau = function
+    | Int -> Sint
+    | Real -> Sreal
+    | Bool -> Sbool
+    | Prop -> Sprop
+    | Array(_,s) -> Sarray (sort_of_tau s)
+    | _ -> Sdata
+
   let sort = function
-    | FUN m -> m.m_result
     | ACSL { l_type=None } -> Logic.Sprop
     | ACSL { l_type=Some t } -> sort_of_ltype t
     | CTOR _ -> Logic.Sdata
+    | LFUN m -> sort_of_tau m.m_result
+    | QFUN f ->
+      let _, t, _ = Qed.Symbol.signature f.e_symbol in
+      sort_of_tau t
 
   let parameters = ref (fun _ -> [])
 
   let params = function
-    | FUN m -> m.m_params
+    | LFUN m -> List.map sort_of_tau m.m_params
+    | QFUN f ->
+      let _, _, ts = Qed.Symbol.signature f.e_symbol in
+      List.map sort_of_tau ts
     | CTOR ct -> List.map sort_of_ltype ct.ctor_params
     | (ACSL _) as f -> !parameters f
 
 end
 
 let parameters phi = Fun.parameters := phi
+let associative = function
+  | Operator op -> op.associative
+  | _ -> false
 
 class virtual idprinting =
   object(self)
@@ -673,43 +603,38 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | Mtype a -> a.ext_link
-      | Mrecord(a,_) -> a.ext_link
+      | Qdata a -> Qed.Symbol.Data.name a
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
-      | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
     method field = function
-      | Mfield(_,_,f,_) -> self#sanitize_field f
       | Cfield(f, KValue) -> self#sanitize_field (field_id f)
       | Cfield(f, KInit) -> self#sanitize_field (field_init_id f)
 
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
-      | FUN({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
-      | FUN({m_source=Extern e}) -> e.ext_link
-      | FUN({m_source=Wsymbol(p,m,s)}) ->
-        Engine.F_call (String.concat "." (p @ m :: s))
+      | LFUN l ->
+        if associative l.m_category then
+          Engine.F_assoc (self#sanitize_fun l.m_name)
+        else
+          Engine.F_call (self#sanitize_fun l.m_name)
+      | QFUN l ->
+        let name = Qed.Symbol.Fun.name l.e_symbol in
+        let ls = Qed.Symbol.Fun.symbol l.e_symbol in
+        if ls.ls_proj then
+          Engine.F_proj name
+        else if associative l.e_category then
+          Engine.F_assoc name
+        else
+          Engine.F_call name
+
   end
 
-let name_of_lfun = function
-  | ACSL f -> logic_id f
-  | CTOR c -> ctor_id c
-  | FUN({m_source=Generated(_,f)}) -> f
-  | FUN({m_source=Extern e}) -> e.ext_debug
-  | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
-
 let context_of_lfun = function
-  | ACSL _ | CTOR _
-  | FUN({m_source=(Extern _|Wsymbol _)}) -> None
-  | FUN({m_source=Generated(ctxt,_)}) -> ctxt
-
-let name_of_field = function
-  | Mfield(_,_,f,_) -> f
-  | Cfield(f, KValue) -> field_id f
-  | Cfield(f, KInit) -> field_init_id f
+  | ACSL _ | CTOR _ | QFUN _ -> None
+  | LFUN l -> l.m_context
 
 (* -------------------------------------------------------------------------- *)
 (* --- Terms                                                              --- *)
@@ -908,6 +833,7 @@ struct
     end
 
   let debugp = QED.debug
+  let () = QED.printer := pp_term
 
   type env = Pretty.env
   let env xs = Pretty.known Pretty.empty xs
@@ -941,6 +867,14 @@ struct
 end
 
 open F
+
+let extern_data et ts = E.(t_data !@et ts)
+let extern_tau name = extern_mk (fun env -> t_data (extern_c name env) [])
+let extern_val name = extern_mk (fun env -> e_fun (extern_l name env) [])
+let extern_map f e = extern_mk (fun _env -> E.(f !@e))
+let extern_const c = extern_mk (fun _env -> c)
+let extern_lfun ef es = E.(e_fun !@ef es)
+let extern_pred ef es = E.(p_call !@ef es)
 
 module N = struct
 
@@ -1062,49 +996,6 @@ let filter_hypotheses xs =
   let matches p = Vars.intersect vars (varsp p) in
   let hs_with_vars , hs_without_vars = List.partition matches d.hyps in
   d.hyps <- hs_without_vars ; hs_with_vars
-
-(** For why3_api but circular dependency *)
-
-module For_export = struct
-
-  type specific_equality = {
-    for_tau:(tau -> bool);
-    mk_new_eq:F.binop;
-  }
-
-  (** delay the create at most as possible (due to constants handling in qed) *)
-  let state = ref None
-
-  let init = ref (fun () -> ())
-
-  let add_init f =
-    let old = !init in
-    init := (fun () -> old (); f ())
-
-  let get_state () =
-    match !state with
-    | None ->
-      let st = QZERO.create () in
-      QZERO.in_state st !init ();
-      state := Some st;
-      st
-    | Some st -> st
-
-  let rebuild ?cache t = QZERO.rebuild_in_state (get_state ()) ?cache t
-
-  let set_builtin f c =
-    add_init (fun () -> QZERO.set_builtin ~force:true f c)
-
-  let set_builtin' f c =
-    add_init (fun () -> QZERO.set_builtin' ~force:true f c)
-  let set_builtin_eq f c =
-    add_init (fun () -> QZERO.set_builtin_eq ~force:true f c)
-  let set_builtin_leq f c =
-    add_init (fun () -> QZERO.set_builtin_leq ~force:true f c)
-
-  let in_state f v = QZERO.in_state (get_state ()) f v
-
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier                                                         --- *)

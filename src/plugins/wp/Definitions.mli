@@ -117,8 +117,6 @@ class virtual visitor : cluster ->
     method vsymbol : lfun -> unit
     method vlemma : logic_lemma -> unit
     method vcluster : cluster -> unit
-    method vlibrary : string -> unit
-    method vtheory : string list -> string -> unit
     method vgoal : axioms option -> F.pred -> unit
 
     method vtypes : unit
@@ -138,14 +136,14 @@ class virtual visitor : cluster ->
     method virtual section : string -> unit
     (** Comment *)
 
-    method virtual on_library : string -> unit
-    (** External library to import *)
-
-    method virtual on_theory : string list -> string -> unit
-    (** External Why3 theory to import *)
-
     method virtual on_cluster : cluster -> unit
     (** Outer cluster to import *)
+
+    method virtual on_data : Qed.Symbol.data -> unit
+    (** External type symbol to import *)
+
+    method virtual on_lfun : Qed.Symbol.lfun -> unit
+    (** External logic symbol to import *)
 
     method virtual on_type : logic_type_info -> typedef -> unit
     (** This local type must be defined *)

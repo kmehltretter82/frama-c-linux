@@ -249,12 +249,12 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Assertion 'Kept' ("compound_assigns.i", line 70, characters 21-36):
-Let a = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
-Let a_2 = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
-Let a_3 = Load_R0003_S1_A(s, a, a_1).
+Let m = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
+Let a = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
+Let a_1 = Load_R0003_S1_A(s, m, m_1).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_2) /\ IsS1_A(a_3).
+  Type: is_sint32(side_0) /\ IsS1_A(a) /\ IsS1_A(a_1).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ (region(s.base) <= 0) /\
@@ -268,23 +268,23 @@ Assume {
   If side_0 != 0
   Then { Have: s = q. }
   Else { Have: s = r. }
-  Have: Load_R0003_S1_A(tmp_0, a, a_1) =
+  Have: Load_R0003_S1_A(tmp_0, m, m_1) =
       Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 }
-Prove: EqS1_A(a_3, a_2).
+Prove: EqS1_A(a_1, a).
 
 ------------------------------------------------------------
 
 Goal Assertion 'Kept' ("compound_assigns.i", line 72, characters 21-36):
-Let a = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, s, 24).
-Let a_2 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, s, 24).
-Let a_4 = Load_R0003_S1_A(s, a, a_2).
-Let a_5 = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(s, a_1, a_3).
+Let m = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, s, 24).
+Let m_2 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, s, 24).
+Let a = Load_R0003_S1_A(s, m, m_2).
+Let a_1 = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(s, m_1, m_3).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_6).
+  Type: is_sint32(side_0) /\ IsS1_A(a_1) /\ IsS1_A(a) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ (region(s.base) <= 0) /\
@@ -298,13 +298,13 @@ Assume {
   If side_0 != 0
   Then { Have: s = q. }
   Else { Have: s = r. }
-  Have: Load_R0003_S1_A(tmp_0, a, a_2) =
+  Have: Load_R0003_S1_A(tmp_0, m, m_2) =
       Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-  Have: Load_R0003_S1_A(p, a_1, a_3) = a_4.
+  Have: a = a_1.
+  Have: Load_R0003_S1_A(p, m_1, m_3) = a.
 }
-Prove: EqS1_A(a_6, a_5).
+Prove: EqS1_A(a_2, a_1).
 
 ------------------------------------------------------------
 
@@ -348,18 +348,18 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'CopyQ' in 'copy':
-Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(q, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let m = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, q, 24).
+Let m_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, q, 24).
+Let a = Load_R0003_S1_A(q, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(q, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
-      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R0003_S1_A(r, a_1, a_3)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\
+      IsS1_A(a_2) /\ IsS1_A(a) /\ IsS1_A(Load_R0003_S1_A(r, m_1, m_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -368,30 +368,30 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_6, a_5).
+Prove: EqS1_A(a_2, a_1).
 
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'KeepQ' in 'copy':
-Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(q, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let m = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, q, 24).
+Let m_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, q, 24).
+Let a = Load_R0003_S1_A(q, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(q, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
-      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R0003_S1_A(r, a_1, a_3)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\
+      IsS1_A(a_2) /\ IsS1_A(a) /\ IsS1_A(Load_R0003_S1_A(r, m_1, m_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -400,31 +400,31 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_4, a_5).
+Prove: EqS1_A(a, a_1).
 
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'SaveR' in 'copy':
-Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(q, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
-Let a_9 = Load_R0003_S1_A(r, a_1, a_3).
+Let m = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, q, 24).
+Let m_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, q, 24).
+Let a = Load_R0003_S1_A(q, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(q, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let a_5 = Load_R0003_S1_A(r, m_1, m_3).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
-      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(a_9).
+  Type: is_sint32(side_0) /\ IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\
+      IsS1_A(a_2) /\ IsS1_A(a) /\ IsS1_A(a_5).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -433,14 +433,14 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_9, a_8).
+Prove: EqS1_A(a_5, a_4).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -448,93 +448,93 @@ Prove: EqS1_A(a_9, a_8).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'CopyR' in 'copy':
-Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(r, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let m = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, r, 24).
+Let m_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, r, 24).
+Let a = Load_R0003_S1_A(r, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(r, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
-      IsS1_A(Load_R0003_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\ IsS1_A(a_2) /\
+      IsS1_A(Load_R0003_S1_A(q, m_1, m_3)) /\ IsS1_A(a).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_6, a_5).
+Prove: EqS1_A(a_2, a_1).
 
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'SaveQ' in 'copy':
-Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(r, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
-Let a_9 = Load_R0003_S1_A(q, a_1, a_3).
+Let m = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, r, 24).
+Let m_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, r, 24).
+Let a = Load_R0003_S1_A(r, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(r, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let a_5 = Load_R0003_S1_A(q, m_1, m_3).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
-      IsS1_A(a_9) /\ IsS1_A(a_4).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\ IsS1_A(a_2) /\
+      IsS1_A(a_5) /\ IsS1_A(a).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_9, a_8).
+Prove: EqS1_A(a_5, a_4).
 
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'KeepR' in 'copy':
-Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
-Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0003_S1_A(r, a, a_2).
-Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let m = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
+Let m_1 = memcpy(m, p, m, r, 24).
+Let m_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
+Let m_3 = memcpy(m_2, p, m_2, r, 24).
+Let a = Load_R0003_S1_A(r, m_1, m_3).
+Let a_1 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_2 = Load_R0003_S1_A(p, m_1, m_3).
+Let a_3 = Load_R0003_S1_A(r, m, m_2).
+Let a_4 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
-      IsS1_A(Load_R0003_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_3) /\ IsS1_A(a_2) /\
+      IsS1_A(Load_R0003_S1_A(q, m_1, m_3)) /\ IsS1_A(a).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, m, m_2) = a_4.
   (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
+  Have: a_3 = a_1.
+  Have: a_2 = a_3.
   (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
+  Have: a = a_1.
 }
-Prove: EqS1_A(a_4, a_5).
+Prove: EqS1_A(a, a_1).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -755,27 +755,27 @@ Prove: EqS1_A(a, a_1).
 ------------------------------------------------------------
 
 Goal Post-condition ("compound_assigns.i", line 80, characters 11-26) in 'init':
-Let a = memcpy(Minit_0, p, Minit_0, q, 24).
-Let a_1 = memcpy(Minit_1, p, Minit_1, q, 24).
-Let a_2 = Load_R0002_S1_A(p,
-            memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
-            memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
-Let a_3 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
+Let m = memcpy(Minit_0, p, Minit_0, q, 24).
+Let m_1 = memcpy(Minit_1, p, Minit_1, q, 24).
+Let a = Load_R0002_S1_A(p,
+          memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
+          memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
+Let a_1 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
 Assume {
-  Type: IsS1_A(a_3) /\ IsS1_A(a_2).
+  Type: IsS1_A(a_1) /\ IsS1_A(a).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: IsInit_S1_A_R0002(q, Minit_0, Minit_1).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24).
-  Have: (Load_R0002_Init_S1_A(p, a, a_1) =
-         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a_2 = a_3).
+  Have: (Load_R0002_Init_S1_A(p, m, m_1) =
+         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a = a_1).
   (* Assertion 'PF,Z3_only' *)
   Have: forall i : Z. ((0 <= i) -> ((i <= 3) ->
-      (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true))).
+      (m[shift_sint32(shiftfield_F1_A_f(p), i)]=true))).
 }
-Prove: IsInit_S1_A_R0002(p, a, a_1).
+Prove: IsInit_S1_A_R0002(p, m, m_1).
 
 ------------------------------------------------------------
 
@@ -786,13 +786,13 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Assertion 'PF,Z3_only' ("compound_assigns.i", line 87, characters 10-68):
-Let a = memcpy(Minit_0, p, Minit_0, q, 24).
-Let a_1 = Load_R0002_S1_A(p,
-            memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
-            memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
-Let a_2 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
+Let m = memcpy(Minit_0, p, Minit_0, q, 24).
+Let a = Load_R0002_S1_A(p,
+          memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
+          memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
+Let a_1 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
 Assume {
-  Type: IsS1_A(a_2) /\ IsS1_A(a_1).
+  Type: IsS1_A(a_1) /\ IsS1_A(a).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
@@ -801,10 +801,10 @@ Assume {
   Have: IsInit_S1_A_R0002(q, Minit_0, Minit_1).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24).
-  Have: (Load_R0002_Init_S1_A(p, a, memcpy(Minit_1, p, Minit_1, q, 24)) =
-         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a_1 = a_2).
+  Have: (Load_R0002_Init_S1_A(p, m, memcpy(Minit_1, p, Minit_1, q, 24)) =
+         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a = a_1).
 }
-Prove: (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true).
+Prove: (m[shift_sint32(shiftfield_F1_A_f(p), i)]=true).
 
 ------------------------------------------------------------
 
@@ -985,48 +985,48 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'P' in 'swap':
-Let a = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
-Let a_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
-Let a_2 = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
-Let a_3 = memcpy(a, q, M0003_float64_undef_0, q, 24).
-Let a_4 = memcpy(a_1, q, M0002_sint32_undef_0, q, 24).
-Let a_5 = Load_R0001_S1_A(q, a_3, a_4).
-Let a_6 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
-Let a_7 = Load_R0001_S1_A(p, a_3, a_4).
+Let m = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
+Let m_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
+Let a = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
+Let m_2 = memcpy(m, q, M0003_float64_undef_0, q, 24).
+Let m_3 = memcpy(m_1, q, M0002_sint32_undef_0, q, 24).
+Let a_1 = Load_R0001_S1_A(q, m_2, m_3).
+Let a_2 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
+Let a_3 = Load_R0001_S1_A(p, m_2, m_3).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(a_7) /\ IsS1_A(a_5).
+  Type: IsS1_A(a_2) /\ IsS1_A(a) /\ IsS1_A(a_3) /\ IsS1_A(a_1).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (q = p) \/ separated(p, 24, q, 24).
   (* Initializer *)
-  Init: a_5 = a_6.
-  Have: Load_R0001_S1_A(p, a, a_1) = a_2.
+  Init: a_1 = a_2.
+  Have: Load_R0001_S1_A(p, m, m_1) = a.
 }
-Prove: EqS1_A(a_7, a_2).
+Prove: EqS1_A(a_3, a).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'swap':
-Let a = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
-Let a_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
-Let a_2 = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
-Let a_3 = memcpy(a, q, M0003_float64_undef_0, q, 24).
-Let a_4 = memcpy(a_1, q, M0002_sint32_undef_0, q, 24).
-Let a_5 = Load_R0001_S1_A(q, a_3, a_4).
-Let a_6 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
+Let m = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
+Let m_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
+Let a = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
+Let m_2 = memcpy(m, q, M0003_float64_undef_0, q, 24).
+Let m_3 = memcpy(m_1, q, M0002_sint32_undef_0, q, 24).
+Let a_1 = Load_R0001_S1_A(q, m_2, m_3).
+Let a_2 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(Load_R0001_S1_A(p, a_3, a_4)) /\
-      IsS1_A(a_5).
+  Type: IsS1_A(a_2) /\ IsS1_A(a) /\ IsS1_A(Load_R0001_S1_A(p, m_2, m_3)) /\
+      IsS1_A(a_1).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (q = p) \/ separated(p, 24, q, 24).
   (* Initializer *)
-  Init: a_5 = a_6.
-  Have: Load_R0001_S1_A(p, a, a_1) = a_2.
+  Init: a_1 = a_2.
+  Have: Load_R0001_S1_A(p, m, m_1) = a.
 }
-Prove: EqS1_A(a_5, a_6).
+Prove: EqS1_A(a_1, a_2).
 
 ------------------------------------------------------------
 

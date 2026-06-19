@@ -7,17 +7,7 @@
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
     (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
     
     inductive P_i int =
       | Q_P_i_zero : P_i 0
@@ -27,9 +17,9 @@
       | Q_P_d_zero : P_d 0
       | Q_P_d_ind : forall n:int. P_d n -> P_d ((- 1) + n)
     
-    goal wp_goal : P_i 10 /\ P_d (- 10)
-    
   end
+  
+  goal wp : P_i 10 /\ P_d (- 10)
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic' 
 ---------------------------------------------
@@ -37,17 +27,7 @@ theory Axiomatic
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
   (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
   
   inductive P_d1 int =
     | Q_P_d_zero1 : P_d1 0
@@ -65,19 +45,7 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use Axiomatic *)
+    (* use wp.generated.Axiomatic *)
     
     inductive P_i2 int =
       | Q_P_i2_zero : P_i2 0
@@ -87,9 +55,9 @@ end
       | Q_P_d2_zero : P_d2 0
       | Q_P_d2_ind : forall n:int. P_d2 n -> P_d2 ((- 1) + n)
     
-    goal wp_goal : P_i2 10 /\ P_d2 (- 10)
-    
   end
+  
+  goal wp : P_i2 10 /\ P_d2 (- 10)
 [wp] 2 goals generated
 ------------------------------------------------------------
   Global

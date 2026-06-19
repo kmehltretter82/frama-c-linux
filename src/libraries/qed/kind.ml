@@ -58,34 +58,29 @@ let basename = function
   | Sreal -> "r"
   | Sarray _ -> "m"
 
-let rec degree_of_tau = function
-  | Tvar n -> n
-  | Int | Real | Bool | Prop -> 0
-  | Data(_,ts) -> degree_of_list ts
-  | Array(a,b) -> max (degree_of_tau a) (degree_of_tau b)
-  | Record fts ->
-    List.fold_left
-      (fun r (_,t) -> max r (degree_of_tau t)) 0 fts
-
-and degree_of_list = function
-  | [] -> 0
-  | t::ts -> max (degree_of_tau t) (degree_of_list ts)
-
-and degree_of_sig f = max (degree_of_tau f.result) (degree_of_list f.params)
-
-let rec tmap xs = function
+let rec map_tau fd adt = function
   | Int -> Int
   | Real -> Real
   | Bool -> Bool
   | Prop -> Prop
-  | Tvar k -> xs.(k-1)
-  | Array(a,b) -> Array(tmap xs a,tmap xs b)
-  | Data(a,ts) -> Data(a,List.map (tmap xs) ts)
-  | Record fts -> Record(List.map (fun (f,t) -> f,tmap xs t) fts)
+  | Tvar _ as x -> x
+  | Array(a,b) -> Array(map_tau fd adt a,map_tau fd adt b)
+  | Data(a,ts) -> Data(adt a,List.map (map_tau fd adt) ts)
+  | Record fts -> Record(List.map (fun (f,t) -> fd f,map_tau fd adt t) fts)
 
-let type_params n =
-  let rec vars k n = if k <= n then Tvar k :: vars (succ k) n else []
-  in vars 1 n
+let rec map_element f = function
+  | (E_none | E_true | E_false | E_int _) as elt -> elt
+  | E_fun (a, es) -> E_fun(f a, List.map (map_element f) es)
+
+let map_operator f op =
+  { op with
+    neutral = map_element f op.neutral ;
+    absorbent = map_element f op.absorbent ;
+  }
+
+let map_category f = function
+  | (Function | Constructor | Injection as op) -> op
+  | Operator op -> Operator (map_operator f op)
 
 let pp_data pdata ptau fmt a = function
   | [] -> pdata fmt a
@@ -103,6 +98,12 @@ let pp_record pfield ptau fmt ?(opened=false) fts =
     fts ;
   if opened then Format.fprintf fmt "@ ..." ;
   Format.fprintf fmt "@]@ }@]"
+
+let pp_tvar fmt k =
+  if 0 <= k && k < 26 then
+    Format.fprintf fmt "'%c" (char_of_int (k + int_of_char 'a'))
+  else
+    Format.fprintf fmt "'%d" k
 
 let rec pp_tau pvar pfield pdata fmt = function
   | Int -> Format.pp_print_string fmt "int"
@@ -195,12 +196,8 @@ struct
       (fun fmt k -> Format.fprintf fmt "`%d" k)
       F.pretty A.pretty
 
-  let debug f =
-    let buffer = Buffer.create 80 in
-    let fmt = Format.formatter_of_buffer buffer in
-    pretty fmt f ;
-    Format.pp_print_flush fmt () ;
-    Buffer.contents buffer
+  let name = Format.asprintf "%a" pretty
+  let fullname = name
 
   let basename = function
     | Int -> "i"

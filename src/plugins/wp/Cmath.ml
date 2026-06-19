@@ -9,31 +9,22 @@
 open Qed
 open Logic
 open Lang
+open Lang.E
 open Lang.F
 
-let f_builtin ~library ?(injective=false) ?(result=Real) ?(params=[Real]) ?ext name =
-  assert (name.[0] == '\\') ;
-  let call =
-    match ext with Some call -> call | None ->
-      String.sub name 1 (String.length name - 1) in
-  let link = Engine.F_call call in
+let f_builtin ?(injective=false) ?(params=[LogicBuiltins.R]) name ~link =
   let category =
     let open Qed.Logic in
     if injective then Injection else Function
   in
-  let signature = List.map LogicBuiltins.kind_of_tau params in
-  let params = List.map Kind.of_tau params in
-  let lfun = extern_s ~library ~category ~result ~params ~link name in
-  LogicBuiltins.(add_builtin name signature lfun) ; lfun
+  let lfun = Lang.extern_f ~category link in
+  LogicBuiltins.add_builtin name params lfun ; lfun
 
 (* -------------------------------------------------------------------------- *)
 (* --- Real Of Int                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_real_of_int =
-  extern_f ~library:"qed"
-    ~category:Qed.Logic.Injection
-    ~result:Logic.Real ~params:[Logic.Sint] "real_of_int"
+let f_real_of_int = Lang.extern_f "real.FromInt.from_int"
 
 let builtin_real_of_int e =
   match F.repr e with
@@ -44,9 +35,9 @@ let builtin_real_of_int e =
 (* --- Truncate                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_truncate = f_builtin ~library:"truncate" ~result:Int "\\truncate"
-let f_ceil = f_builtin ~library:"truncate" ~result:Int "\\ceil"
-let f_floor = f_builtin ~library:"truncate" ~result:Int "\\floor"
+let f_truncate = f_builtin "\\truncate" ~link:"real.Truncate.truncate"
+let f_ceil = f_builtin "\\ceil" ~link:"real.Truncate.ceil"
+let f_floor = f_builtin "\\floor" ~link:"real.Truncate.floor"
 
 let builtin_truncate f e =
   let open Qed.Logic in
@@ -66,15 +57,15 @@ let builtin_truncate f e =
           base
       with _ -> raise Not_found
     end
-  | Fun( f , [e] ) when f == f_real_of_int -> e
+  | Fun( f , [e] ) when f_real_of_int @= f -> e
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversions                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let int_of_real x = e_fun f_truncate [x]
-let real_of_int x = e_fun f_real_of_int [x]
+let int_of_real x = e_fun !@f_truncate [x]
+let real_of_int x = e_fun !@f_real_of_int [x]
 
 let int_of_bool a = e_neq a F.e_zero (* if a != 0 then true else false *)
 let bool_of_int a = e_if a F.e_one F.e_zero (* if a then 1 else 0 *)
@@ -86,6 +77,7 @@ let bool_of_int a = e_if a F.e_one F.e_zero (* if a then 1 else 0 *)
 (* rewrite a=b when a or b is f(x)
    for functions f such as 0 <= f(x) && ( f(x) = 0 <-> x = 0 ) *)
 let builtin_positive_eq lfun ~domain ~zero ~injective a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -107,6 +99,7 @@ let builtin_positive_eq lfun ~domain ~zero ~injective a b =
 (* rewrite a<=b when a or b is f(x)
    for functions f such as 0 <= f(x) && f(x) = 0 <-> x = 0 *)
 let builtin_positive_leq lfun ~domain ~zero ~monotonic a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -131,6 +124,7 @@ let builtin_positive_leq lfun ~domain ~zero ~monotonic a b =
 (* rewrite a=b when a or b is f(x)
    for functions f such as 0 < f(x) *)
 let builtin_strict_eq lfun ~domain ~zero ~injective a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -146,6 +140,7 @@ let builtin_strict_eq lfun ~domain ~zero ~injective a b =
 (* rewrite a<=b when a or b is f(x)
    for functions f such as 0 < f(x) *)
 let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -165,13 +160,8 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
 (* --- Absolute                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_iabs =
-  extern_f ~library:"cmath" ~link:(Qed.Engine.F_call "IAbs.abs") "\\iabs"
-
-let f_rabs =
-  extern_f ~library:"cmath"
-    ~result:Real ~params:[Sreal]
-    ~link:(Qed.Engine.F_call "RAbs.abs") "\\rabs"
+let f_iabs = Lang.extern_f "int.Abs.abs"
+let f_rabs = Lang.extern_f "real.Abs.abs"
 
 let () =
   begin
@@ -209,7 +199,7 @@ let builtin_rabs_leq = builtin_positive_leq f_rabs
 (* --- Square Root                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_sqrt = f_builtin ~library:"sqrt" "\\sqrt"
+let f_sqrt = f_builtin "\\sqrt" ~link:"real.Square.sqrt"
 
 let domain_sqrt x = QED.eval_leq e_zero_real x
 
@@ -219,7 +209,7 @@ let builtin_sqrt e =
   | Kreal r when r == Q.zero -> F.e_zero_real (* srqt(0)==0 *)
   | Kreal r when r == Q.one -> F.e_one_real (* srqt(1)==1 *)
   | Mul[a;b] when eval_eq a b -> (* a==b ==> sqrt(a*b)==|a| *)
-    e_fun f_rabs [a] (* a is smaller *)
+    e_fun !@f_rabs [a] (* a is smaller *)
   | _ -> raise Not_found
 
 let builtin_sqrt_eq = builtin_positive_eq f_sqrt
@@ -232,12 +222,14 @@ let builtin_sqrt_leq = builtin_positive_leq f_sqrt
 (* --- Exponential                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_exp = f_builtin ~library:"exponential" ~injective:true "\\exp"
-let f_log = f_builtin ~library:"exponential" "\\log"
-let f_log10 = f_builtin ~library:"exponential" "\\log10"
-let f_pow = f_builtin ~library:"power" ~params:[Real;Real] "\\pow"
+let f_exp = f_builtin ~injective:true "\\exp" ~link:"frama_c_wp.cmath.ExpLog.exp"
+let f_log = f_builtin "\\log" ~link:"frama_c_wp.cmath.ExpLog.log"
+let f_log10 = f_builtin "\\log10" ~link:"frama_c_wp.cmath.ExpLog.log10"
+let f_pow = f_builtin ~params:[R;R] "\\pow" ~link:"frama_c_wp.cmath.ExpLog.pow"
+let f_power_int = f_builtin ~params:[R;Z] "\\pow" ~link:"real.PowerInt.power"
 
 let () = ignore f_log10
+let () = ignore f_power_int
 
 let domain_exp _x = true
 let domain_log x = QED.eval_lt e_zero_real x
@@ -247,8 +239,8 @@ let builtin_exp e =
   match F.repr e with
   | Kreal r when r == Q.zero -> F.e_one_real (* exp(0)==1 *)
   | Times(n,r) when n == Z.minus_one -> (* exp(-r) = 1/exp(r) *)
-    F.e_div F.e_one_real (F.e_fun f_exp [r])
-  | Fun( f , [x] ) when f == f_log && domain_log x ->
+    F.e_div F.e_one_real (F.e_fun !@f_exp [r])
+  | Fun( f , [x] ) when f_log @= f && domain_log x ->
     (* 0<x ==> exp(log(x)) = x *) x
   | _ -> raise Not_found
 
@@ -256,10 +248,10 @@ let builtin_log e =
   let open Qed.Logic in
   match F.repr e with
   | Kreal r when r == Q.one -> F.e_zero_real (* log(1) == 0 *)
-  | Fun( f , [x] ) when f == f_exp -> x (* log(exp(x)) == x *)
-  | Fun( f , [x;n] ) when f == f_pow && domain_log x ->
+  | Fun( f , [x] ) when f_exp @= f -> x (* log(exp(x)) == x *)
+  | Fun( f , [x;n] ) when f_pow @= f && domain_log x ->
     (* 0<x ==> log(x^n) == n*log(x) *)
-    F.e_mul n (F.e_fun f_log [x])
+    F.e_mul n (F.e_fun !@f_log [x])
   | _ -> raise Not_found
 
 (* a^n = e^(n.log a) *)
@@ -280,13 +272,13 @@ let builtin_exp_leq = builtin_strict_leq f_exp
 (* --- Trigonometry                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_sin = f_builtin ~library:"trigonometry" "\\sin"
-let f_cos = f_builtin ~library:"trigonometry" "\\cos"
-let f_tan = f_builtin ~library:"trigonometry" "\\tan"
+let f_sin = f_builtin "\\sin" ~link:"real.Trigonometry.sin"
+let f_cos = f_builtin "\\cos" ~link:"real.Trigonometry.cos"
+let f_tan = f_builtin "\\tan" ~link:"real.Trigonometry.tan"
 
-let f_asin = f_builtin ~library:"arctrigo" "\\asin"
-let f_acos = f_builtin ~library:"arctrigo" "\\acos"
-let f_atan = f_builtin ~library:"arctrigo" ~injective:true "\\atan"
+let f_asin = f_builtin "\\asin" ~link:"frama_c_wp.cmath.ArcTrigo.asin"
+let f_acos = f_builtin "\\acos" ~link:"frama_c_wp.cmath.ArcTrigo.acos"
+let f_atan = f_builtin "\\atan" ~link:"frama_c_wp.cmath.ArcTrigo.atan"
 
 let domain_asin_acos x =
   QED.eval_leq x e_one_real &&
@@ -305,9 +297,9 @@ let builtin_trigo f_arc ~domain e =
 
 let () =
   begin
-    ignore (f_builtin ~library:"hyperbolic" "\\sinh") ;
-    ignore (f_builtin ~library:"hyperbolic" "\\cosh") ;
-    ignore (f_builtin ~library:"hyperbolic" "\\tanh") ;
+    ignore (f_builtin "\\sinh" ~link:"real.Hyperbolic.sinh") ;
+    ignore (f_builtin "\\cosh" ~link:"real.Hyperbolic.cosh") ;
+    ignore (f_builtin "\\tanh" ~link:"real.Hyperbolic.tanh") ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -316,8 +308,8 @@ let () =
 
 let () =
   begin
-    ignore (f_builtin ~library:"polar" ~params:[Real;Real] "\\atan2") ;
-    ignore (f_builtin ~library:"polar" ~params:[Real;Real] "\\hypot") ;
+    ignore (f_builtin ~params:[R;R] "\\atan2" ~link:"real.Polar.atan2") ;
+    ignore (f_builtin ~params:[R;R] "\\hypot" ~link:"real.Polar.hypot") ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -327,32 +319,32 @@ let () =
 let () = Context.register
     begin fun () ->
 
-      F.set_builtin_1 f_real_of_int builtin_real_of_int ;
-      F.set_builtin_1 f_truncate (builtin_truncate f_truncate) ;
-      F.set_builtin_1 f_ceil (builtin_truncate f_ceil) ;
-      F.set_builtin_1 f_floor (builtin_truncate f_floor) ;
+      F.set_builtin_1 !@f_real_of_int builtin_real_of_int ;
+      F.set_builtin_1 !@f_truncate (builtin_truncate f_truncate) ;
+      F.set_builtin_1 !@f_ceil (builtin_truncate f_ceil) ;
+      F.set_builtin_1 !@f_floor (builtin_truncate f_floor) ;
 
-      F.set_builtin_1   f_iabs (builtin_abs f_iabs e_zero) ;
-      F.set_builtin_1   f_rabs (builtin_abs f_rabs e_zero_real) ;
-      F.set_builtin_eq  f_iabs builtin_iabs_eq ;
-      F.set_builtin_eq  f_rabs builtin_rabs_eq ;
-      F.set_builtin_leq f_iabs builtin_iabs_leq ;
-      F.set_builtin_leq f_rabs builtin_rabs_leq ;
+      F.set_builtin_1   !@f_iabs (builtin_abs !@f_iabs e_zero) ;
+      F.set_builtin_1   !@f_rabs (builtin_abs !@f_rabs e_zero_real) ;
+      F.set_builtin_eq  !@f_iabs builtin_iabs_eq ;
+      F.set_builtin_eq  !@f_rabs builtin_rabs_eq ;
+      F.set_builtin_leq !@f_iabs builtin_iabs_leq ;
+      F.set_builtin_leq !@f_rabs builtin_rabs_leq ;
 
-      F.set_builtin_1   f_sqrt builtin_sqrt ;
-      F.set_builtin_eq  f_sqrt builtin_sqrt_eq ;
-      F.set_builtin_leq f_sqrt builtin_sqrt_leq ;
+      F.set_builtin_1   !@f_sqrt builtin_sqrt ;
+      F.set_builtin_eq  !@f_sqrt builtin_sqrt_eq ;
+      F.set_builtin_leq !@f_sqrt builtin_sqrt_leq ;
 
-      F.set_builtin_1   f_log builtin_log ;
-      F.set_builtin_1   f_exp builtin_exp ;
-      F.set_builtin_eq  f_exp builtin_exp_eq ;
-      F.set_builtin_leq f_exp builtin_exp_leq ;
+      F.set_builtin_1   !@f_log builtin_log ;
+      F.set_builtin_1   !@f_exp builtin_exp ;
+      F.set_builtin_eq  !@f_exp builtin_exp_eq ;
+      F.set_builtin_leq !@f_exp builtin_exp_leq ;
 
-      F.set_builtin_2   f_pow builtin_pow ;
+      F.set_builtin_2   !@f_pow builtin_pow ;
 
-      F.set_builtin_1 f_sin (builtin_trigo f_asin ~domain:domain_asin_acos) ;
-      F.set_builtin_1 f_cos (builtin_trigo f_acos ~domain:domain_asin_acos) ;
-      F.set_builtin_1 f_tan (builtin_trigo f_atan ~domain:domain_atan) ;
+      F.set_builtin_1 !@f_sin (builtin_trigo !@f_asin ~domain:domain_asin_acos) ;
+      F.set_builtin_1 !@f_cos (builtin_trigo !@f_acos ~domain:domain_asin_acos) ;
+      F.set_builtin_1 !@f_tan (builtin_trigo !@f_atan ~domain:domain_atan) ;
     end
 
 (* -------------------------------------------------------------------------- *)

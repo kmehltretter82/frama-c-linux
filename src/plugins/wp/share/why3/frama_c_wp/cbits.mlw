@@ -13,12 +13,9 @@
 theory Cbits
 
   use int.Int
-  use bool.Bool
+  use int.ComputerDivision
   use frama_c_wp.cint.Cint
-  use frama_c_wp.qed.Qed
 
-
-  function bit_testb int int : bool
   predicate bit_test int int
 
   (** * C-Integer Bits * **)
@@ -73,7 +70,7 @@ theory Cbits
 (** ** lsr identities *)
 
   axiom lsr_0: forall x:int. lsr x 0 = x
-  axiom lsr_1: forall x:int. 0 <= x -> lsr x 1 = CD.div x 2
+  axiom lsr_1: forall x:int. 0 <= x -> lsr x 1 = div x 2
   axiom lsr_add: forall x p q :int. 0 <= p -> 0 <= q -> lsr (lsr x p) q = lsr x (p+q)
 
 (** ** lsl+lsr combination *)
@@ -81,10 +78,6 @@ theory Cbits
   axiom lsl_lsr_add: forall x p q:int. 0 <= q <= p -> lsr (lsl x p) q = lsl x (p-q)
 
 (** * Bit extraction *)
-(** ** Definition of bit_test predicate *)
-
-  axiom bit_test_def: forall x k:int [bit_testb x k].
-    (bit_testb x k = True) <-> bit_test x k
 
 (** * Link between Bit extraction and bitwise operators *)
 (** ** Some properties of bit extraction *)

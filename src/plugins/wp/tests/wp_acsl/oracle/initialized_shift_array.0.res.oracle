@@ -60,7 +60,7 @@ Prove: true.
 Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_partial_not_full' at call 'test' ("initialized_shift_array.i", line 55, characters 2-18)
 :
 Assume { (* Goal *) When: (0 <= i) /\ (i <= 2). }
-Prove: (([false..])[1 <- true][0 <- true][i]=true).
+Prove: ([false..][1 <- true][0 <- true][i]=true).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -137,7 +137,7 @@ Prove: true.
 Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_from_1_from_1' at call 'test' ("initialized_shift_array.i", line 23, characters 2-18)
 :
 Assume { (* Goal *) When: (0 < i) /\ (i <= 2). }
-Prove: (([false..])[2 <- true][1 <- true][i]=true).
+Prove: ([false..][2 <- true][1 <- true][i]=true).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

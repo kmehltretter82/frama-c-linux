@@ -12,18 +12,6 @@ theory Compound
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
@@ -34,44 +22,32 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
     (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use frama_c_wp.cint.Cint *)
     
-    (* use Compound *)
-    
-    goal wp_goal :
-      forall t:int -> int, t1:addr -> int, i:int, a:addr, i1:int.
-       let a1 = shift_sint32 a 0 in
-       let a2 = shift_sint32 a i1 in
-       let m = set t1 a1 (get t1 a2) in
-       let m1 = set m (shift_sint32 a 1) (get m a2) in
-       let m2 = set m1 (shift_sint32 a 2) (get m1 a2) in
-       let m3 = set m2 (shift_sint32 a 3) (get m2 a2) in
-       0 <= i1 ->
-       0 <= i ->
-       region (a.base) <= 0 ->
-       i1 <= 9 ->
-       i <= 9 ->
-       linked t ->
-       is_sint32 i1 ->
-       valid_rw t a1 10 ->
-       (forall i2:int. 0 <= i2 -> i2 <= 9 -> 0 <= get t1 (shift_sint32 a i2)) ->
-       0 <= get (set m3 (shift_sint32 a 4) (get m3 a2)) (shift_sint32 a i)
+    (* use wp.generated.Compound *)
     
   end
+  
+  goal wp :
+    forall t:int -> int, t1:addr -> int, i:int, a:addr, i1:int.
+     let a1 = shift_sint32 a 0 in
+     let a2 = shift_sint32 a i1 in
+     let m = set t1 a1 (get t1 a2) in
+     let m1 = set m (shift_sint32 a 1) (get m a2) in
+     let m2 = set m1 (shift_sint32 a 2) (get m1 a2) in
+     let m3 = set m2 (shift_sint32 a 3) (get m2 a2) in
+     0 <= i ->
+     0 <= i1 ->
+     region (a.base) <= 0 ->
+     i <= 9 ->
+     i1 <= 9 ->
+     linked t ->
+     is_sint32 i1 ->
+     valid_rw t a1 10 ->
+     (forall i2:int. 0 <= i2 -> i2 <= 9 -> 0 <= get t1 (shift_sint32 a i2)) ->
+     0 <= get (set m3 (shift_sint32 a 4) (get m3 a2)) (shift_sint32 a i)
 [wp] 1 goal generated
 ------------------------------------------------------------
   Function f

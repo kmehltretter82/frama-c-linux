@@ -23,6 +23,8 @@
 [wp] Goal typed_BinaryMultiplication_assert_a3_ok : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a4_ok : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a5_ok : not tried
+[wp] Goal typed_BinaryMultiplication_assert_dm : not tried
+[wp] Goal typed_BinaryMultiplication_assert_rm : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a6_ok : not tried
 [wp] Goal typed_BinaryMultiplication_loop_assigns : trivial
 [wp] Goal typed_BinaryMultiplication_loop_variant_positive : not tried

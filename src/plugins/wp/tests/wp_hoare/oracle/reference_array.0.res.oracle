@@ -432,7 +432,7 @@ Prove: true.
 Goal Post-condition ("reference_array.i", line 36, characters 7-51) in 'reset_1_5':
 Let a = shift_A5_sint32(rp_0, 0).
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, 5).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, 5).
 Assume {
   (* Heap *)
   Type: (region(rp_0.base) <= 0) /\ linked(Malloc_0).
@@ -442,9 +442,9 @@ Assume {
   Have: valid_rw(Malloc_0, a_1, 5).
   (* Call 'reset_5' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      (a_2[shift_sint32(a, i_1)] = 0))).
+      (m[shift_sint32(a, i_1)] = 0))).
 }
-Prove: a_2[shift_sint32(a, i)] = 0.
+Prove: m[shift_sint32(a, i)] = 0.
 
 ------------------------------------------------------------
 

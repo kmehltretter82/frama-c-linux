@@ -750,8 +750,9 @@ struct
         let frame = logic_frame lt_name [] in
         in_frame frame
           begin fun () ->
-            let lfun = Lang.generated_p ~coloring:true ("is_" ^ lt_name) in
-            let tau_lt = Lang.tau_of_ltype (Ltype(lt, [])) in
+            let tau = Lang.tau_of_ltype (Ltype(lt, [])) in
+            let lfun = Lang.generated_p
+                ~coloring:true ~params:[tau] "is_%s" lt_name in
             Typedefs.update lt (Some lfun) ;
             let term_constraint ltyp =
               let v = Lang.freshvar ~basename:"p" (Lang.tau_of_ltype ltyp) in
@@ -761,7 +762,7 @@ struct
               | { ctor_name = l_name ; ctor_params = ts } as const ->
                 let vs, cs = List.split (List.map term_constraint ts) in
                 let ts = List.map Lang.F.e_var vs in
-                let const = F.e_fun ~result:tau_lt (Lang.ctor const) ts in
+                let const = F.e_fun ~result:tau (Lang.ctor const) ts in
                 let is_lt = F.p_call lfun [const] in
                 {
                   l_name ;
@@ -776,7 +777,7 @@ struct
             Definitions.define_symbol {
               d_lfun = lfun ;
               d_types = 0 ;
-              d_params = [ Lang.freshvar ~basename:"v" tau_lt ] ;
+              d_params = [ Lang.freshvar ~basename:"v" tau ] ;
               d_cluster = cluster ;
               d_definition = Inductive cases
             } ;
@@ -843,7 +844,7 @@ struct
       if not (Typedefs.mem lt) then
         begin
           Typedefs.update lt None ;
-          if not (Lang.is_builtin lt) then
+          if not (LogicBuiltins.is_builtin_type lt.lt_name) then
             let section = LogicUsage.section_of_type lt in
             let cluster = Definitions.section section in
             match section with
@@ -933,7 +934,7 @@ struct
         match LogicBuiltins.logic cst with
         | ACSLDEF -> call_fun env result cst [] []
         | HACK phi -> phi []
-        | LFUN phi -> e_fun ~result phi []
+        | LFUN phi -> E.(e_fun ~result !@phi [])
       in Cvalues.plain x.lv_type v
     with Not_found ->
       if Logic_env.is_logic_function x.lv_name then

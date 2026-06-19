@@ -67,16 +67,15 @@ let do_print_goal_status fmt (g : Wpo.t) =
       do_print_index fmt g.po_idx ;
       Wpo.pp_goal fmt g ;
       if ProofSession.exists g then
-        Format.fprintf fmt "Script %a@\n" ProofSession.pp_file
-          (ProofSession.filename ~force:false g) ;
+        Format.fprintf fmt "Script %a@\n"
+          ProofSession.pp_file (ProofSession.filename ~force:false g) ;
       begin
         match ProofEngine.get g with
         | `None | `Script -> ()
         | `Proof | `Saved ->
           let tree = ProofEngine.proof ~main:g in
           match ProofEngine.status tree with
-          | `Unproved | `Invalid | `Proved | `Passed ->
-            Wpo.pp_goal fmt g
+          | `Unproved | `Invalid | `Proved | `Passed -> ()
           | `Pending n | `StillResist n ->
             for i = 0 to n-1 do
               Format.fprintf fmt "%tSubgoal %d/%d:@\n" Wpo.pp_flow (succ i) n ;
@@ -107,12 +106,12 @@ let do_print_clusters fmt model scope =
 
 let do_wp_print_axiomatics fmt model ax =
   Wpo.pp_axiomatics fmt ax ;
-  if ax = None && Wp_parameters.has_print_generated () then
+  if ax = None && Wp_parameters.(has_dkey print_generated) then
     do_print_clusters fmt model WpContext.Global
 
 let do_wp_print_behavior fmt model fct bhv =
   Wpo.pp_function fmt fct bhv ;
-  if bhv = None && Wp_parameters.has_print_generated () then
+  if bhv = None && Wp_parameters.(has_dkey print_generated) then
     do_print_clusters fmt model (WpContext.Kf fct)
 
 let do_wp_print model =
@@ -680,23 +679,27 @@ let do_collect_session goals =
   }
 
 let do_update_session script session =
-  let stdout = script.stdout in
-  List.iter
-    begin fun (g, _, s) ->
-      (* we always mark existing scripts *)
-      ProofSession.mark g ;
-      if script.update then ProofSession.save ~stdout g s
-    end
-    session.updated ;
-  List.iter
-    begin fun (g, _, s) ->
-      (* we mark new incomplete scripts only if we save such files *)
-      if script.update then
-        (ProofSession.mark g ; ProofSession.save ~stdout g s)
-    end
-    session.incomplete ;
-  List.iter (fun (g, _) -> ProofSession.remove g) session.removed ;
-  ()
+  begin
+    let stdout = script.stdout in
+    List.iter
+      begin fun (g, _, s) ->
+        (* we always mark existing scripts *)
+        ProofSession.mark g ;
+        if script.update then ProofSession.save ~stdout g s
+      end
+      session.updated ;
+    List.iter
+      begin fun (g, _, s) ->
+        (* we mark new incomplete scripts only if we save such files *)
+        if script.update then
+          (ProofSession.mark g ; ProofSession.save ~stdout g s)
+      end
+      session.incomplete ;
+    List.iter
+      begin fun (g, _) ->
+        if script.update then ProofSession.remove g
+      end session.removed ;
+  end
 
 let do_show_session updated_session session =
   let show enabled kind dkey file =
@@ -877,7 +880,7 @@ let () = Cmdline.run_after_setting_files
 (* --- Prover Configuration & Detection                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Cmdline.run_after_configuring_stage Why3Provers.configure
+let () = Cmdline.run_after_configuring_stage Why3Env.configure
 
 let do_prover_detect () =
   if Wp_parameters.ListProvers.get () && not @@ Wp_parameters.is_interactive () then

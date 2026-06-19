@@ -18,19 +18,13 @@ val of_tau : ('f,'a) datatype -> sort
 val of_poly : (int -> sort) -> ('f,'a) datatype -> sort
 val image : sort -> sort
 
-val degree_of_tau  : ('f,'a) datatype -> int
-val degree_of_list : ('f,'a) datatype list -> int
-val degree_of_sig  : ('f,'a) funtype -> int
-
-val type_params : int -> ('f,'a) datatype list
-
 val merge : sort -> sort -> sort
 val merge_list : ('a -> sort) -> sort -> 'a list -> sort
 
-val tmap : ('a,'f) datatype array -> ('a,'f) datatype -> ('a,'f) datatype
-
 val basename : sort -> string
 val pretty : Format.formatter -> sort -> unit
+
+val pp_tvar : Format.formatter -> int -> unit
 
 val pp_tau :
   (Format.formatter -> int -> unit) ->
@@ -48,6 +42,11 @@ val pp_record:
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ?opened:bool -> ('f * 'b) list -> unit
 
+val hash_tau :
+  ('f -> int) ->
+  ('a -> int) ->
+  ('f, 'a) datatype -> int
+
 val eq_tau :
   ('f -> 'f -> bool) ->
   ('a -> 'a -> bool) ->
@@ -57,6 +56,15 @@ val compare_tau:
   ('f -> 'f -> int) ->
   ('a -> 'a -> int) ->
   ('f,'a) datatype -> ('f,'a) datatype -> int
+
+val map_tau:
+  ('f1 -> 'f2) ->
+  ('a1 -> 'a2) ->
+  ('f1,'a1) datatype -> ('f2,'a2) datatype
+
+val map_element : ('a -> 'b) -> 'a element -> 'b element
+val map_operator : ('a -> 'b) -> 'a operator -> 'b operator
+val map_category : ('a -> 'b) -> 'a category -> 'b category
 
 module MakeTau(F : Field)(A : Data) :
   Data with type t = (F.t,A.t) datatype

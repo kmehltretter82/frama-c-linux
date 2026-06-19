@@ -240,7 +240,7 @@ struct
         let upd = diff (Mstate.field lv fi) f1 f2 in
         let m = F.e_setfield v2 fd f1 in
         Bag.concat upd (diff lv v1 m)
-    | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2))
+    (* | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2)) *)
     | [] -> Bag.empty
 
   let updates (seq : Sigma.state sequence) domain =
@@ -374,7 +374,7 @@ struct
   (* ---  Basic Constructors                                                --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let null = Loc M.null
+  let null = Lang.extern_map (fun null -> Loc null) M.null
 
   let cvar x = match V.param x with
     | NotUsed | ByValue | ByShift -> Val(CVAL,x,[])
@@ -393,7 +393,8 @@ struct
 
         let compile v =
           let result = t_addr () in
-          let lfun = Lang.generated_f ~result "pointer_%s" v.vname in
+          let lfun =
+            Lang.generated_f ~result ~params:[] "pointer_%s" v.vname in
           let cluster =
             Definitions.cluster ~id:"Globals" ~title:"Context pointers" ()
           in

@@ -7,61 +7,47 @@
 (**************************************************************************)
 
 open Lang.F
+open Lang.E
 
 (* -------------------------------------------------------------------------- *)
 (* --- Symbols registration                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let library = "memaddr"
-
 (* Warning: DO NOT register map types using this constructor: it hides types
-   needed by ProverWhy3 for typing terms of the form x[i].
-*)
+   needed by ProverWhy3 for typing terms of the form x[i]. *)
 
-let t_addr = Qed.Logic.Data(Lang.datatype ~library "addr",[])
-let t_table = Qed.Logic.Data(Lang.datatype ~library "table",[])
+let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
 let t_malloc = Qed.Logic.Array(Qed.Logic.Int, Qed.Logic.Int)
+let t_memory (a : tau) : tau = Qed.Logic.Array(!@t_addr,a)
+let t_memptr = Lang.extern_map (fun a -> Qed.Logic.Array(a,a)) t_addr
 
-let f_base   = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"
+let f_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.base"
+let f_offset = Lang.extern_f "frama_c_wp.memaddr.MemAddr.offset"
+let f_shift  = Lang.extern_f "frama_c_wp.memaddr.MemAddr.shift"
+let f_global = Lang.extern_f ~category:Injection "frama_c_wp.memaddr.MemAddr.global"
+let f_null = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
 
-let f_offset = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_subst ("offset", "%1.offset")) "offset"
+let p_addr_lt = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_lt"
+let p_addr_le = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_le"
 
-let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
-let f_global = Lang.extern_f ~library ~result:t_addr ~category:Qed.Logic.Injection "global"
-let f_null   = Lang.extern_f ~library ~result:t_addr "null"
+let f_addr_of_int = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_of_int"
+let f_int_of_addr = Lang.extern_f "frama_c_wp.memaddr.MemAddr.int_of_addr"
 
-let p_addr_lt = Lang.extern_p ~library ~bool:"addr_lt_bool" ~prop:"addr_lt" ()
-let p_addr_le = Lang.extern_p ~library ~bool:"addr_le_bool" ~prop:"addr_le" ()
+let p_statically_allocated = Lang.extern_f "frama_c_wp.memaddr.MemAddr.statically_allocated"
 
-let f_addr_of_int = Lang.extern_f
-    ~library ~result:t_addr "addr_of_int"
+let f_table_of_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.table_of_base"
+let f_table_to_offset = Lang.extern_f ~category:Injection "frama_c_wp.memaddr.MemAddr.table_to_offset"
 
-let f_int_of_addr = Lang.extern_f
-    ~library ~result:Qed.Logic.Int "int_of_addr"
+let p_valid_rd = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_rd"
+let p_valid_rw = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_rw"
+let p_valid_obj = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_obj"
+let p_invalid = Lang.extern_f "frama_c_wp.memaddr.MemAddr.invalid"
+let p_separated = Lang.extern_f "frama_c_wp.memaddr.MemAddr.separated"
+let p_included = Lang.extern_f "frama_c_wp.memaddr.MemAddr.included"
 
-let p_statically_allocated = Lang.extern_fp ~library "statically_allocated"
-
-let f_table_of_base = Lang.extern_f ~library
-    ~category:Qed.Logic.Function ~result:t_table "table_of_base"
-
-let f_table_to_offset = Lang.extern_f ~library
-    ~category:Qed.Logic.Injection ~result:Qed.Logic.Int "table_to_offset"
-
-let p_valid_rd = Lang.extern_fp ~library "valid_rd"
-let p_valid_rw = Lang.extern_fp ~library "valid_rw"
-let p_valid_obj = Lang.extern_fp ~library "valid_obj"
-let p_invalid = Lang.extern_fp ~library "invalid"
-let p_separated = Lang.extern_fp ~library "separated"
-let p_included = Lang.extern_fp ~library "included"
-
-(* base -> region *)
-let f_region = Lang.extern_f ~coloring:true ~library ~result:Qed.Logic.Int "region"
-(* always initialized bases *)
-let p_binit =  Lang.extern_fp ~coloring:true ~library "binit"
-(* allocation-table -> prop *)
-let p_linked = Lang.extern_fp ~coloring:true ~library "linked"
+let f_region = Lang.extern_f ~coloring:true "frama_c_wp.memaddr.MemAddr.region"
+let p_binit =  Lang.extern_f "frama_c_wp.memaddr.MemAddr.binit"
+let p_linked = Lang.extern_f "frama_c_wp.memaddr.MemAddr.linked"
 
 (* -------------------------------------------------------------------------- *)
 (* --- API                                                                --- *)
@@ -69,37 +55,37 @@ let p_linked = Lang.extern_fp ~coloring:true ~library "linked"
 
 (* Basic constructors and getters *)
 
-let base addr = e_fun f_base [ addr ]
-let offset addr = e_fun f_offset [ addr ]
-let null = constant (e_fun f_null [])
-let global base = e_fun f_global [ base ]
-let shift addr offset = e_fun f_shift [ addr ; offset ]
+let base addr = e_fun !@f_base [ addr ]
+let offset addr = e_fun !@f_offset [ addr ]
+let null = Lang.extern_map (fun f -> e_fun f []) f_null
+let global base = e_fun !@f_global [ base ]
+let shift addr offset = e_fun !@f_shift [ addr ; offset ]
 let mk_addr base offset = shift (global base) offset
 
 (* Comparisons *)
 
-let addr_lt addr1 addr2 = p_call p_addr_lt [ addr1 ; addr2 ]
-let addr_le addr1 addr2 = p_call p_addr_le [ addr1 ; addr2 ]
+let addr_lt addr1 addr2 = p_call !@p_addr_lt [ addr1 ; addr2 ]
+let addr_le addr1 addr2 = p_call !@p_addr_le [ addr1 ; addr2 ]
 
 (* Regions *)
 
-let region base = e_fun f_region [ base ]
-let binit base = p_call p_binit [ base ]
-let linked memory = p_call p_linked [ memory ]
+let region base = e_fun !@f_region [ base ]
+let binit base = p_call !@p_binit [ base ]
+let linked memory = p_call !@p_linked [ memory ]
 
 (* Validity *)
 
-let valid_rd alloc addr size = p_call p_valid_rd [ alloc ; addr ; size ]
-let valid_rw alloc addr size = p_call p_valid_rw [ alloc ; addr ; size ]
-let valid_obj alloc addr = p_call p_valid_obj [ alloc ; addr ]
-let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
+let valid_rd alloc addr size = p_call !@p_valid_rd [ alloc ; addr ; size ]
+let valid_rw alloc addr size = p_call !@p_valid_rw [ alloc ; addr ; size ]
+let valid_obj alloc addr = p_call !@p_valid_obj [ alloc ; addr ]
+let invalid alloc addr size = p_call !@p_invalid [ alloc ; addr ; size ]
 
 (* Physical addresses *)
 
-let addr_of_int i = e_fun f_addr_of_int [ i ]
-let int_of_addr addr = e_fun f_int_of_addr [ addr ]
+let addr_of_int i = e_fun !@f_addr_of_int [ i ]
+let int_of_addr addr = e_fun !@f_int_of_addr [ addr ]
 
-let static_alloc addr = p_call p_statically_allocated [ addr ]
+let static_alloc addr = p_call !@p_statically_allocated [ addr ]
 (* This last function is not exposed, it does not have a particular meaning in
    ACSL, and is used only for int/addr conversions.
 *)
@@ -111,8 +97,8 @@ let in_uintptr_range addr =
 (* Table of offsets *)
 
 let base_offset base offset =
-  let offset_index = e_fun f_table_of_base [base] in
-  e_fun f_table_to_offset [offset_index ; offset]
+  let offset_index = e_fun !@f_table_of_base [base] in
+  e_fun !@f_table_to_offset [offset_index ; offset]
 (** Returns the offset in {i bytes} from the {i logic} offset
     (which is a memory cell index, actually) *)
 
@@ -149,23 +135,30 @@ type addr_builtin = {
 
 module ADDR_BUILTIN = WpContext.Static
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = addr_builtin
       let name = "MemMemory.ADDR_BUILTIN"
-      include Lang.Fun
     end)
 
-let phi_base l =
+type externs = {
+  f_shift : Lang.lfun ;
+  f_global : Lang.lfun ;
+  f_null : Lang.lfun ;
+  f_addr_of_int : Lang.lfun ;
+}
+
+let phi_base ext l =
   match repr l with
-  | Fun(f,[p;_]) when f==f_shift -> base p
-  | Fun(f,[b]) when f==f_global -> b
-  | Fun(f,[]) when f==f_null -> e_zero
+  | Fun(f,[p;_]) when f == ext.f_shift -> base p
+  | Fun(f,[b]) when f ==  ext.f_global -> b
+  | Fun(f,[]) when f == ext.f_null -> e_zero
   | Fun(f,args) -> (ADDR_BUILTIN.find f).base args
   | _ -> raise Not_found
 
-let phi_offset l = match repr l with
-  | Fun(f,[p;k]) when f==f_shift -> e_add (offset p) k
-  | Fun(f,_) when f==f_global || f==f_null -> e_zero
+let phi_offset ext l = match repr l with
+  | Fun(f,[p;k]) when f == ext.f_shift -> e_add (offset p) k
+  | Fun(f,_) when f == ext.f_global || f == ext.f_null -> e_zero
   | Fun(f,args) -> (ADDR_BUILTIN.find f).offset args
   | _ -> raise Not_found
 
@@ -297,20 +290,20 @@ let is_included args = is_true (r_included args)
 (* --- Simplifier for int/addr conversion                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let phi_int_of_addr p =
-  if p == null then e_zero else
-    match repr p with
-    | Fun(f,[a]) when f == f_addr_of_int -> a
-    | _ -> raise Not_found
+let phi_int_of_addr ext p =
+  match repr p with
+  | Fun(f,[]) when f == ext.f_null -> e_zero
+  | Fun(f,[a]) when f == ext.f_addr_of_int -> a
+  | _ -> raise Not_found
 
 let phi_addr_of_int p =
-  if p == e_zero then null else raise Not_found
+  if p == e_zero then !@null else raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier for (in)validity                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let null_base p = e_eq (e_fun f_base [p]) e_zero
+let null_base p = e_eq (e_fun !@f_base [p]) e_zero
 
 (* See: tests/why3/test_memory.why *)
 
@@ -333,15 +326,28 @@ let r_invalid = function
 
 let () = Context.register
     begin fun () ->
-      set_builtin_1   f_base   phi_base ;
-      set_builtin_1   f_offset phi_offset ;
+      let f_null = !@f_null in
+      let f_base = !@f_base in
+      let f_offset = !@f_offset in
+      let f_shift = !@f_shift in
+      let f_global = !@f_global in
+      let f_addr_of_int = !@f_addr_of_int in
+      let f_int_of_addr = !@f_int_of_addr in
+      let p_separated = !@p_separated in
+      let p_included = !@p_included in
+      let p_invalid = !@p_invalid in
+      let p_valid_rd = !@p_valid_rd in
+      let p_valid_rw = !@p_valid_rw in
+      let ext = { f_null ; f_shift ; f_global ; f_addr_of_int } in
+      set_builtin_1   f_base   (phi_base ext) ;
+      set_builtin_1   f_offset (phi_offset ext) ;
       set_builtin_2   f_shift  (phi_shift f_shift) ;
       set_builtin_eqp f_shift  eq_shift ;
       set_builtin_eqp f_global eq_shift ;
       set_builtin p_separated r_separated ;
       set_builtin p_included  r_included ;
       set_builtin_1 f_addr_of_int phi_addr_of_int ;
-      set_builtin_1 f_int_of_addr phi_int_of_addr ;
+      set_builtin_1 f_int_of_addr (phi_int_of_addr ext) ;
       set_builtin p_invalid r_invalid ;
       set_builtin p_valid_rd r_valid_unref ;
       set_builtin p_valid_rw r_valid_unref ;
@@ -351,12 +357,12 @@ let () = Context.register
 (* --- Identify lfun                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_p_valid_rd lf = lf == p_valid_rd
-let is_p_valid_rw lf = lf == p_valid_rw
-let is_p_valid_obj lf = lf == p_valid_obj
-let is_p_invalid lf = lf == p_invalid
-
-let is_f_global lf = lf == f_global
+let is_p_valid_rd lf = lf == !@p_valid_rd
+let is_p_valid_rw lf = lf == !@p_valid_rw
+let is_p_valid_obj lf = lf == !@p_valid_obj
+let is_p_invalid lf = lf == !@p_invalid
+let is_p_included lf = lf == !@p_included
+let is_f_global lf = lf == !@f_global
 
 (* -------------------------------------------------------------------------- *)
 (* --- Range Comparison                                                   --- *)
@@ -393,7 +399,7 @@ let range_set = function
 let r_included r1 r2 =
   match r1 , r2 with
   | LOC(l1,n1) , LOC(l2,n2) ->
-    p_call p_included [l1;n1;l2;n2]
+    p_call !@p_included [l1;n1;l2;n2]
   | _ ->
     let base1,set1 = range_set r1 in
     let base2,set2 = range_set r2 in
@@ -404,7 +410,7 @@ let r_included r1 r2 =
 let r_disjoint r1 r2 =
   match r1 , r2 with
   | LOC(l1,n1) , LOC(l2,n2) ->
-    p_call p_separated [l1;n1;l2;n2]
+    p_call !@p_separated [l1;n1;l2;n2]
   | _ ->
     let base1,set1 = range_set r1 in
     let base2,set2 = range_set r2 in

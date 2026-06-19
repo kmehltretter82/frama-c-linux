@@ -150,10 +150,9 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_1_5' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      ((v[i_1].F1_T_a) = 0))).
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (v[i_1].F1_T_a = 0))).
 }
-Prove: (v[i].F1_T_a) = 0.
+Prove: v[i].F1_T_a = 0.
 
 ------------------------------------------------------------
 
@@ -194,12 +193,12 @@ Assume {
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      ((ts_0[i_1].F1_T_a) = 0))).
+      (ts_0[i_1].F1_T_a = 0))).
   (* Call Effects *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) ->
       (((i_1 < 0) \/ (5 <= i_1)) -> (ts_1[i_1] = ts_0[i_1])))).
 }
-Prove: (ts_0[i].F1_T_a) = 0.
+Prove: ts_0[i].F1_T_a = 0.
 
 ------------------------------------------------------------
 
@@ -240,12 +239,11 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      ((m[i_1].F1_T_a) = 0))).
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (m[i_1].F1_T_a = 0))).
   (* Call Effects *)
   Have: forall i_1 : Z. ((i_1 != 1) -> (smatrix_1[i_1] = smatrix_0[i_1])).
 }
-Prove: (m[i].F1_T_a) = 0.
+Prove: m[i].F1_T_a = 0.
 
 ------------------------------------------------------------
 
@@ -281,7 +279,7 @@ Prove: true.
 Goal Post-condition 'Preset_5_tps' in 'call_reset_5_tps':
 Let a = tps_0[9].
 Let a_1 = shift_S1_T(a, 0).
-Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, 10).
+Let m = memcpy(Mint_0, a_1, Mint_undef_0, a_1, 10).
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ (forall i_1 : Z. region(tps_0[i_1].base) <= 0).
@@ -291,9 +289,9 @@ Assume {
   Have: valid_rw(Malloc_0, a_1, 10).
   (* Call 'reset_5' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      (a_2[shiftfield_F1_T_a(shift_S1_T(a, i_1))] = 0))).
+      (m[shiftfield_F1_T_a(shift_S1_T(a, i_1))] = 0))).
 }
-Prove: a_2[shiftfield_F1_T_a(shift_S1_T(a, i))] = 0.
+Prove: m[shiftfield_F1_T_a(shift_S1_T(a, i))] = 0.
 
 ------------------------------------------------------------
 

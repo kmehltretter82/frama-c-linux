@@ -13,30 +13,31 @@
 (** {2 Why3 configuration } *)
 
 val why3_version : string
+val env : unit -> Why3.Env.env
 val config : unit -> Why3.Whyconf.config
 val configure : unit -> unit
 val set_procs : int -> unit
 
 (** {2 Prover information } *)
 
-type t = Why3.Whyconf.prover
+type prover = Why3.Whyconf.prover
 
-val ident_why3 : t -> string
-val ident_wp : t -> string
-val title : ?version:bool -> t -> string
-val name : t -> string
-val version : t -> string
-val compare : t -> t -> int
-val equal : t -> t -> bool
-val hash : t -> int
+val ident_why3 : prover -> string
+val ident_wp : prover -> string
+val title : ?version:bool -> prover -> string
+val name : prover -> string
+val version : prover -> string
+val compare : prover -> prover -> int
+val equal : prover -> prover -> bool
+val hash : prover -> int
 
-val lookup : ?fallback:bool -> string -> t option
-val provers : unit -> t list
-val is_auto : t -> bool
-val is_available : t -> bool
-val is_mainstream : t -> bool
-val has_counter_examples : t -> bool
-val with_counter_examples : t -> t option
+val lookup : ?fallback:bool -> string -> prover option
+val provers : unit -> prover list
+val is_auto : prover -> bool
+val is_available : prover -> bool
+val is_mainstream : prover -> bool
+val has_counter_examples : prover -> bool
+val with_counter_examples : prover -> prover option
 
 type model = Why3.Model_parser.concrete_syntax_term
 val pp_model : model Pretty_utils.formatter

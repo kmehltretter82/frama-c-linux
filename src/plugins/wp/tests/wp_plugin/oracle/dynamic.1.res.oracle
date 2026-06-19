@@ -22,7 +22,7 @@ Let a_2 = global(G_g_49).
 Assume {
   Type: is_sint32(X).
   (* Heap *)
-  Type: (region(p_1.base) <= 0) /\ framed(Mptr_1) /\ is_sint32(X).
+  Type: (region(p_1.base) <= 0) /\ is_sint32(X) /\ framed(Mptr_1).
   Have: p = p_1.
   (* Pre-condition *)
   Have: (a_1 = a_2) \/ (a_1 = null).
@@ -47,7 +47,7 @@ Let a_1 = global(G_g_49).
 Assume {
   Type: is_sint32(X_1) /\ is_sint32(X).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ is_sint32(X_1).
+  Type: (region(p.base) <= 0) /\ is_sint32(X_1) /\ framed(Mptr_0).
   (* Goal *)
   When: Mptr_1[shiftfield_F1_S_f(p)] = a_1.
   Have: (X_2 = X_1) /\ (p_1 = p).
@@ -75,7 +75,7 @@ Let a_2 = Mptr_0[a].
 Assume {
   Type: is_sint32(X_1) /\ is_sint32(X).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ is_sint32(X_1).
+  Type: (region(p.base) <= 0) /\ is_sint32(X_1) /\ framed(Mptr_0).
   (* Goal *)
   When: Mptr_1[shiftfield_F1_S_f(p)] = a_1.
   Have: p_1 = p.
@@ -108,7 +108,7 @@ Let a_1 = global(G_g_49).
 Assume {
   Type: is_sint32(X_1) /\ is_sint32(X).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ is_sint32(X_1).
+  Type: (region(p.base) <= 0) /\ is_sint32(X_1) /\ framed(Mptr_0).
   (* Goal *)
   When: Mptr_1[shiftfield_F1_S_f(p)] = null.
   Have: (X_2 = X_1) /\ (p_1 = p).
@@ -136,7 +136,7 @@ Let a_2 = Mptr_0[a].
 Assume {
   Type: is_sint32(X_1) /\ is_sint32(X).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ is_sint32(X_1).
+  Type: (region(p.base) <= 0) /\ is_sint32(X_1) /\ framed(Mptr_0).
   (* Goal *)
   When: Mptr_1[shiftfield_F1_S_f(p)] = null.
   Have: p_1 = p.

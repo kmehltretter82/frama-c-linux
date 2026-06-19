@@ -1,4 +1,1 @@
-library "abs":
-logic integer ABS (integer) = "my_abs" ;
-
-why3.file := "abs.why";
+logic integer ABS (integer) = "abs.Abs.my_abs" ;

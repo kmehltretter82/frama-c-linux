@@ -45,13 +45,7 @@ let ctau = function
   | Prop -> Cprop
   | _ -> Cterm
 
-let link_name = function
-  | F_call f -> f
-  | _ -> assert false (** Only normal function call F_call can be declared *)
-
-let debug = function
-  | F_call f | F_left f | F_right f | F_bool_prop(_,f)
-  | F_list(f,_) | F_subst (f, _) | F_assoc f -> f
+let link_name = function F_call f | F_proj f | F_assoc f -> f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Identifiers                                                        --- *)
@@ -236,12 +230,7 @@ struct
     | Eq _ | Neq _ | Leq _ | Lt _ | Imply _ | And _ | Or _ | If _
     | Bind((Forall|Exists),_,_) | True | False -> true
     | Not a -> has_prop_form link a
-    | Fun(f,_) ->
-      begin
-        match link f with
-        | F_bool_prop _ -> true
-        | _ -> T.Fun.sort f = Sprop
-      end
+    | Fun _ -> true
     | _ -> false
 
   (* -------------------------------------------------------------------------- *)
@@ -341,7 +330,6 @@ struct
       method virtual e_false : cmode -> string
       method virtual pp_int : amode -> Z.t printer
       method virtual pp_real : Q.t printer
-      method virtual is_atomic : term -> bool
 
       (* -------------------------------------------------------------------------- *)
       (* --- Calls                                                              --- *)
@@ -372,7 +360,7 @@ struct
       method private pp_unop ~op fmt x =
         match op with
         | Assoc op | Op op ->
-          if self#op_spaced op (*&& self#is_atomic x*) then
+          if self#op_spaced op then
             fprintf fmt "%s %a" op self#pp_flow x
           else
             fprintf fmt "%s%a" op self#pp_atom x
@@ -400,48 +388,15 @@ struct
 
       method pp_fun cmode fct fmt xs =
         match self#link fct, cmode with
-        | F_call f, _
-        | F_bool_prop (f,_), Cterm
-        | F_bool_prop (_,f), Cprop ->
+        | F_proj f, _ ->
+          begin
+            match xs with
+            | [ x ] -> Format.fprintf fmt "%a.%s" self#pp_atom x f
+            | _ -> self#pp_callsorts ~f fmt (Fun.params fct) xs
+          end
+        | F_call f, _ ->
           self#pp_callsorts ~f fmt (Fun.params fct) xs
         | F_assoc op, _ -> Plib.pp_assoc ~e:"?" ~op self#pp_atom fmt xs
-        | F_left f, _ ->
-          begin
-            match self#callstyle with
-            | CallVar | CallVoid ->
-              Plib.pp_fold_call ~f self#pp_flow fmt xs
-            | CallApply ->
-              Plib.pp_fold_apply ~f self#pp_atom fmt xs
-          end
-        | F_right f, _ ->
-          begin
-            let xs = List.rev xs in
-            match self#callstyle with
-            | CallVar | CallVoid ->
-              Plib.pp_fold_call_rev ~f self#pp_flow fmt xs
-            | CallApply ->
-              Plib.pp_fold_apply_rev ~f self#pp_atom fmt xs
-          end
-        | F_list(fc,fn), _ ->
-          begin
-            let rec plist w fmt xs =
-              let style,fc,fn = w in
-              match style , xs with
-              | (CallVar|CallApply) , [] -> pp_print_string fmt fn
-              | CallVoid , [] -> fprintf fmt "%s()" fn
-              | (CallVar|CallVoid) , x::xs ->
-                fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
-                  fc self#pp_flow x (plist w) xs
-              | CallApply , x::xs ->
-                fprintf fmt "@[<hov 2>(%s@ %a @ %a)@]"
-                  fc self#pp_atom x (plist w) xs
-            in plist (self#callstyle,fc,fn) fmt xs
-          end
-        | F_subst (_, s), _ ->
-          let print = match self#callstyle with
-            | CallVar | CallVoid -> self#pp_flow
-            | CallApply -> self#pp_atom in
-          Plib.substitute_list print s fmt xs
 
       method virtual pp_apply : cmode -> term -> term list printer
 
@@ -778,6 +733,22 @@ struct
           | Not a -> fprintf fmt "(%a=%s)" self#pp_do_atom a (self#e_false Cterm)
           | _ -> fprintf fmt "(%a=%s)" self#pp_do_atom e (self#e_true Cterm)
         else pp fmt e
+
+      method is_atomic e =
+        match T.repr e with
+        | True | False | Fvar _ | Bvar _ | Fun(_,[]) -> true
+        | Fun(f, _) ->
+          begin
+            match self#link f with
+            | F_proj _ -> true
+            | F_assoc _ -> false
+            | F_call _ -> self#callstyle <> CallApply
+          end
+        | Acst _ | Rdef _ -> true
+        | Aget(a,_) | Aset(a,_,_) | Rget(a,_) -> self#is_atomic a
+        | Kint z -> Z.leq Z.zero z
+        | Kreal q -> Q.leq Q.zero q
+        | _ -> Tmap.mem e index.share
 
       method private pp_do_atom fmt e =
         try self#pp_var fmt (Tmap.find e index.share)

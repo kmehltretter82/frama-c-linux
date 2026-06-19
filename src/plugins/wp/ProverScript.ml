@@ -481,8 +481,7 @@ let rec crawl env on_child node = function
       with exn when Wp_parameters.protect exn ->
         Wp_parameters.warning
           "Script Error: on goal %a@\n\
-           can not apply '%s'@\n\
-           exception %S@\n\
+           can not apply '%s' (%s)@\n\
            @[<hov 2>Params: %a@]@\n\
            @[<hov 2>Select: %a@]@."
           WpPropId.pretty (Env.goal env node).po_pid

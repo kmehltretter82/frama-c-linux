@@ -15,7 +15,7 @@
 (* -------------------------------------------------------------------------- *)
 
 type t =
-  | Why3 of Why3Provers.t (** Prover via Why3 *)
+  | Why3 of Why3Env.prover (** Prover via Why3 *)
   | Qed                   (** Qed Solver *)
   | Tactical              (** Interactive Prover *)
   | CFG                   (** Used for properties proved only using CFG.

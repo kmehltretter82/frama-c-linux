@@ -7,11 +7,12 @@
 (**************************************************************************)
 
 open Lang
+open Lang.E
 
 let negative n = F.p_leq n F.e_zero
 let positive n = F.p_leq F.e_zero n
-let concat ~result es = F.e_fun ~result Vlist.f_concat es
-let repeat ~result a n = F.e_fun ~result Vlist.f_repeat [a;n]
+let concat ~result es = F.e_fun ~result !@Vlist.f_concat es
+let repeat ~result a n = F.e_fun ~result !@Vlist.f_repeat [a;n]
 let sum n = match F.repr n with
   | Add ns -> ns
   | _ -> [n]
@@ -42,7 +43,7 @@ class sequence =
     method select feedback (s : Tactical.selection) =
       let value = Tactical.selected s in
       match F.repr value with
-      | Fun(f,[a;n]) when f == Vlist.f_repeat ->
+      | Fun(f,[a;n]) when Vlist.f_repeat @= f ->
         let result = F.typeof value in
         let at = Tactical.at s in
         begin

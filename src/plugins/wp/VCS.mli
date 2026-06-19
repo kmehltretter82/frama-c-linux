@@ -48,7 +48,7 @@ type verdict =
   | Invalid (* model *)
   | Failed
 
-type model = Why3Provers.model Probe.Map.t
+type model = Why3Env.model Probe.Map.t
 
 type result = {
   verdict : verdict ;

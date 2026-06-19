@@ -20,12 +20,12 @@ let server ?procs () =
   | Some s ->
     let np = getprocs procs in
     Task.set_procs s np ;
-    Why3Provers.set_procs np ;
+    Why3Env.set_procs np ;
     s
   | None ->
     let np = getprocs procs in
     let s = Task.server ~procs:np () in
-    Why3Provers.set_procs np ;
+    Why3Env.set_procs np ;
     server := Some s ; s
 
 (* -------------------------------------------------------------------------- *)

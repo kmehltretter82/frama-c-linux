@@ -12,15 +12,19 @@
 
 open Cil_types
 open Ctypes
-open Qed
 open Lang
+open Lang.E
 
-type category = Lang.lfun Qed.Logic.category
+type category = Lang.lfun Lang.extern Qed.Logic.category
 
 type builtin =
   | ACSLDEF
-  | LFUN of lfun
+  | LFUN of lfun extern
   | HACK of (F.term list -> F.term)
+
+type t_builtin =
+  | ADT of adt extern
+  | HACKT of (F.tau list -> F.tau)
 
 type kind =
   | B (* boolean *)
@@ -38,12 +42,6 @@ let okind = function
   | _ -> A
 
 let ckind typ = okind (object_of typ)
-
-let skind = function
-  | B -> Logic.Sbool
-  | I _ | Z -> Logic.Sint
-  | F _ | R -> Logic.Sreal
-  | A -> Logic.Sdata
 
 let rec lkind t =
   match Ast_types.Acsl.unroll ~unroll_typedef:false t with
@@ -75,16 +73,10 @@ let pp_kinds fmt = function
     List.iter (fun t -> Format.fprintf fmt ",%a" pp_kind t) ts ;
     Format.fprintf fmt ")"
 
-let pp_libs fmt = function
-  | [] -> ()
-  | t::ts ->
-    Format.fprintf fmt ": %s" t ;
-    List.iter (fun t -> Format.fprintf fmt ",%s" t) ts
-
 let pp_link fmt = function
   | ACSLDEF -> Format.pp_print_string fmt "(ACSL)"
   | HACK _ -> Format.pp_print_string fmt "(HACK)"
-  | LFUN f -> Fun.pretty fmt f
+  | LFUN f -> Fun.pretty fmt !@f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Driver & Lookup & Registry                                         --- *)
@@ -95,13 +87,8 @@ type sigfun = kind list * builtin
 type driver = {
   driverid : string;
   description : string;
-  includes : Filepath.t list;
   hlogic : (string , sigfun list) Hashtbl.t;
   htypes : (string , t_builtin) Hashtbl.t;
-  hdeps : (string, string list) Hashtbl.t;
-  hoptions :
-    (string (* library *) * string (* group *) * string (* name *), string list)
-      Hashtbl.t;
   mutable locked: bool
 }
 
@@ -149,7 +136,7 @@ let lookup name kinds =
       try hack es with Not_found ->
       match lookup_driver name kinds with
       | ACSLDEF | HACK _ -> Warning.error "No fallback for hacked '%s'" name
-      | LFUN p -> F.e_fun p es
+      | LFUN p -> F.e_fun !@p es
     in HACK compute
   with Not_found -> lookup_driver name kinds
 
@@ -175,20 +162,10 @@ let iter_table f =
     (cdriver_ro ()).hlogic ;
   List.iter f (List.sort Stdlib.compare !items)
 
-let iter_libs f =
-  let items = ref [] in
-  Hashtbl.iter
-    (fun a libs -> items := (a,libs) :: !items)
-    (cdriver_ro ()).hdeps ;
-  List.iter f (List.sort Stdlib.compare !items)
-
 let dump () =
   Log.print_on_output
     begin fun fmt ->
       Format.fprintf fmt "Builtins:@\n" ;
-      iter_libs
-        (fun (name,libs) -> Format.fprintf fmt " * Library %s%a@\n"
-            name pp_libs libs) ;
       iter_table
         (fun (name,k,lnk) -> Format.fprintf fmt " * Logic %s%a = %a@\n"
             name pp_kinds k pp_link lnk) ;
@@ -205,90 +182,32 @@ let logic phi =
 let ctor phi =
   lookup phi.ctor_name (List.map lkind phi.ctor_params)
 
-let constant name =
-  lookup name []
+let constant name = lookup name []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declaration of Builtins                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let dependencies lib =
-  Hashtbl.find (cdriver_ro ()).hdeps lib
+let hack_type name fn =
+  register_type name (HACKT fn)
 
-let add_library lib deps =
-  let others = try dependencies lib with Not_found -> [] in
-  Hashtbl.add (cdriver_rw ()).hdeps lib (others @ deps)
+let add_type ?source name ~link =
+  register_type ?source name (ADT (Lang.extern_t link))
 
-let add_alias ~source name kinds ~alias () =
+let add_alias ~source name kinds ~alias =
   register ~source name kinds (lookup alias kinds)
 
-let add_logic ~source result name kinds ~library ?category ~link () =
-  let sort = skind result in
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_s ~library ?category ~sort ~params ~link name in
+let add_logic ~source ?category result name kinds ~link =
+  let lfun = Lang.extern_f ?category link in
+  ignore result ; register ~source name kinds (LFUN lfun)
+
+let add_predicate ~source name kinds ~link =
+  let lfun = Lang.extern_f link in
   register ~source name kinds (LFUN lfun)
 
-let add_predicate ~source name kinds ~library ~link () =
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_fp ~library ~params ~link link in
+let add_ctor ~source name kinds ~link =
+  let lfun = Lang.extern_f ~category:Constructor link in
   register ~source name kinds (LFUN lfun)
-
-let add_ctor ~source name kinds ~library ~link () =
-  let category = Logic.Constructor in
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_s ~library ~category ~params ~link name in
-  register ~source name kinds (LFUN lfun)
-
-let add_type ?source name ~library ?(link=name) () =
-  let mdt = Lang.extern_t name ~link ~library in
-  register_type ?source name (E_mdt mdt)
-
-let hack_type name poly =
-  register_type name (E_poly poly)
-
-type sanitizer = driver_dir:string -> string -> string
-let sanitizers : ( string * string , sanitizer ) Hashtbl.t = Hashtbl.create 10
-
-exception Unknown_option of string * string
-
-let sanitize ~driver_dir group name v =
-  try
-    (Hashtbl.find sanitizers (group,name)) ~driver_dir v
-  with Not_found -> raise (Unknown_option(group,name))
-
-type doption = string * string
-
-let create_option ~sanitizer group name =
-  let option = (group,name) in
-  Hashtbl.replace sanitizers option sanitizer ;
-  option
-
-let get_option (group,name) ~library =
-  try Hashtbl.find (cdriver_ro ()).hoptions (library,group,name)
-  with Not_found -> []
-
-let set_option ~driver_dir group name ~library value =
-  let value = sanitize ~driver_dir group name value in
-  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) [value]
-
-let add_option ~driver_dir group name ~library value =
-  let value = sanitize ~driver_dir group name value in
-  let l = get_option (group,name) ~library in
-  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) (l @ [value])
-
-
-(** Includes *)
-
-let find_lib file =
-  if Filesystem.exists file then file else
-    let rec lookup file = function
-      | [] -> Wp_parameters.abort "File '%a' not found"
-                Filepath.pretty file
-      | dir::dirs ->
-        let path = Filepath.(dir / to_string_abs file) in
-        if Filesystem.exists path then path else lookup file dirs
-    in
-    lookup file (cdriver_ro ()).includes
 
 (* -------------------------------------------------------------------------- *)
 (* --- Implemented Builtins                                               --- *)
@@ -297,11 +216,8 @@ let find_lib file =
 let builtin_driver = {
   driverid = "builtin driver";
   description = "builtin driver";
-  includes = [];
-  hlogic = Hashtbl.create 131;
-  htypes = Hashtbl.create 131;
-  hdeps  = Hashtbl.create 31;
-  hoptions = Hashtbl.create 131;
+  hlogic = Hashtbl.create 32;
+  htypes = Hashtbl.create 32;
   locked = false
 }
 
@@ -313,47 +229,40 @@ let add_builtin name kinds lfun =
     Context.bind driver builtin_driver (register name kinds) phi
 
 let add_builtin_type name adt =
-  let bt =
-    match adt with
-    | Mtype m -> E_mdt m
-    | Wtype(p,m,s) -> E_why3(p,m,s)
-    | _ -> assert false
-  in
+  let adt = ADT adt in
   if Context.defined driver then
-    register_type name bt
+    register_type name adt
   else
-    Context.bind driver builtin_driver (register_type name) bt
-
-let add_type ?source name ~library ?link () =
-  if Context.defined driver then
-    add_type ?source name ~library ?link ()
-  else
-    Context.bind driver builtin_driver
-      (add_type ?source name ~library ?link) ()
+    Context.bind driver builtin_driver (register_type name) adt
 
 let hack_type name poly =
   if Context.defined driver then hack_type name poly
   else Context.bind driver builtin_driver hack_type name poly
 
-let find_type name =
-  Hashtbl.find (cdriver_ro ()).htypes name
-let find_type name =
-  if Context.defined driver then find_type name
-  else Context.bind driver builtin_driver find_type name
+let lookup_t =
+  let lookup a = Hashtbl.find (cdriver_ro ()).htypes a in
+  fun name ->
+    if Context.defined driver then lookup name
+    else Context.bind driver builtin_driver lookup name
 
-let () = Context.set Lang.builtin_types find_type
+let resolve_t name ts =
+  match lookup_t name with
+  | ADT adt -> t_data !@adt ts
+  | HACKT fn -> fn ts
+
+let is_builtin_type name =
+  try let _ = lookup_t name in true with Not_found -> false
+
+let () = Context.set Lang.hacked_types resolve_t
 
 let new_driver ~id ?(base=builtin_driver)
-    ?(descr=id) ?(includes=[]) ?(configure=fun () -> ()) () =
+    ?(descr=id) ?(configure=fun () -> ()) () =
   lock base ;
   let new_driver = {
     driverid = id ;
     description = descr ;
-    includes = includes @ base.includes ;
     hlogic = Hashtbl.copy base.hlogic ;
     htypes = Hashtbl.copy base.htypes ;
-    hdeps  = Hashtbl.copy base.hdeps ;
-    hoptions = Hashtbl.copy base.hoptions ;
     locked = false
   } in
   let old = Context.push driver new_driver in

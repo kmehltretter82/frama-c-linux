@@ -6,12 +6,12 @@
 ------------------------------------------------------------
 
 Goal Lemma 'L2':
-Prove: list.Distinct.distinct([ 0 ]).
+Prove: distinct([ 0 ]).
 
 ------------------------------------------------------------
 
 Goal Lemma 'L3':
 Assume Lemmas: 'L2'
-Prove: list.Distinct.distinct([ 1, 2 ]).
+Prove: distinct([ 1, 2 ]).
 
 ------------------------------------------------------------

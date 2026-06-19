@@ -294,7 +294,7 @@ Let a_4 = a_3[3].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -322,7 +322,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -332,7 +332,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -340,11 +340,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: EqS3_Sc(sc2_0, sc3_0).
 
@@ -360,7 +360,7 @@ Let a_4 = a_3[3].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -388,7 +388,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -398,7 +398,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -406,11 +406,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: a_1 = 3.
 
@@ -426,7 +426,7 @@ Let a_4 = a_3[3].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -454,7 +454,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -464,7 +464,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -472,11 +472,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: x = 2.
 
@@ -493,7 +493,7 @@ Let x_1 = tab_0[5].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(x_1) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -521,7 +521,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -531,7 +531,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -539,11 +539,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: x_1 = 1.
 
@@ -559,7 +559,7 @@ Let a_4 = a_3[3].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -587,7 +587,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -597,7 +597,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -605,11 +605,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: a_4 = 3.
 
@@ -626,7 +626,7 @@ Let x_1 = t[1].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(x_1) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -654,7 +654,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -664,7 +664,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -672,11 +672,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: x_1 = 1.
 
@@ -693,7 +693,7 @@ Let x_1 = t1_0[6].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(x_1) /\ is_sint32(x) /\
-      is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(u.F4_U_b) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -721,7 +721,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -731,7 +731,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -739,11 +739,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: x_1 = 0.
 
@@ -760,7 +760,7 @@ Let x_1 = u.F4_U_b.
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
-      is_sint64(x_1) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_1) /\
+      is_sint64(x_1) /\ is_sint16(u.F4_U_t[0]) /\ is_sint32(a_1) /\
       is_sint32(a_4).
   (* Heap *)
   Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
@@ -788,7 +788,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -798,7 +798,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -806,11 +806,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: x_1 = 0.
 
@@ -823,7 +823,7 @@ Let x = sc2_0.F3_Sc_c.
 Let a_2 = sc2_0.F3_Sc_b.
 Let a_3 = st_0.F2_St_tab.
 Let a_4 = a_3[3].
-Let a_5 = (u.F4_U_t)[0].
+Let a_5 = u.F4_U_t[0].
 Assume {
   Type: IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ is_uint8(tab_0[5]) /\
       is_sint32(t[1]) /\ is_sint32(t1_0[6]) /\ is_sint32(x) /\
@@ -855,7 +855,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_3[i] = 0))).
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_2[0] = 2.
   (* Initializer *)
@@ -865,7 +865,7 @@ Assume {
   (* Initializer *)
   Init: x = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a[0] = 2.
   (* Initializer *)
@@ -873,11 +873,11 @@ Assume {
   (* Initializer *)
   Init: a_1 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_c) = 0.
+  Init: sc3_0.F3_Sc_c = 0.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
-  Init: (u.F4_U_a) = (-1).
+  Init: u.F4_U_a = (-1).
 }
 Prove: a_5 = 0.
 

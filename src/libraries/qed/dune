@@ -11,7 +11,9 @@
  (deps (universe))
  (action (progn
           (echo "Qed:" %{lib-available:qed} "\n")
-          (echo "  - Zarith:" %{lib-available:zarith} "\n"))))
+          (echo "  - Why3:" %{lib-available:why3} "\n")
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
+          )))
 
 (rule
  (alias install)
@@ -27,6 +29,6 @@
   (optional)
   (public_name qed)
   (flags (:standard -w -9))
-  (libraries str zarith)
+  (libraries str zarith why3)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx)))

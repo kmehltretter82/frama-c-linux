@@ -60,15 +60,24 @@ type sort =
 
 type maybe = Yes | No | Maybe
 
-(** Ordered, hash-able and pretty-printable symbols *)
-module type Symbol =
+module type Type =
 sig
   type t
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
-  val debug : t -> string (** for printing during debug *)
+end
+
+module type Symbol =
+sig
+  include Type
+
+  (** last name of the fullname *)
+  val name : t -> string
+
+  (** full why3 name *)
+  val fullname : t -> string
 end
 
 (** {2 Abstract Data Types} *)
@@ -167,7 +176,7 @@ sig
   type lc_term
   (** Loosely closed terms. *)
 
-  module Term : Symbol with type t = term
+  module Term : Type with type t = term
 
   (** Non-structural, machine dependent,
       but fast comparison and efficient merges *)

@@ -10,35 +10,29 @@
 (* --- Memory Model                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Lang
+open Lang.E
 open Lang.F
 
 module L = Qed.Logic
 
-let library = "memory"
-
-let ty_fst_arg = function
-  | Some l :: _ -> l
-  | _ -> raise Not_found
-
-
-let f_eqmem = Lang.extern_fp ~library "eqmem"
-let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
-let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* ptr-memory -> prop *)
-let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
-let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit" (* init-memory -> prop *)
+let f_eqmem = Lang.extern_f "frama_c_wp.memory.Memory.eqmem"
+let f_memcpy = Lang.extern_f "frama_c_wp.memory.Memory.memcpy"
+let p_framed = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.framed"
+let p_sconst = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.sconst"
+let p_scinit = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.scinit"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let t_malloc = L.Array(L.Int,L.Int)
-let t_mem t = L.Array(MemAddr.t_addr,t)
-let t_init = L.Array(MemAddr.t_addr,L.Bool)
+let t_mem a = L.Array(!@MemAddr.t_addr,a)
+let t_mptr = Lang.extern_map (fun a -> L.Array(a,a)) MemAddr.t_addr
+let t_init = Lang.extern_map (fun a -> L.Array(a,L.Bool)) MemAddr.t_addr
 
-let sconst memory = p_call p_sconst [ memory ]
-let scinit memory = p_call p_scinit [ memory ]
-let framed memory = p_call p_framed [ memory ]
+let sconst memory = p_call !@p_sconst [ memory ]
+let scinit memory = p_call !@p_scinit [ memory ]
+let framed memory = p_call !@p_framed [ memory ]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier for 'eqmem'                                             --- *)
@@ -62,18 +56,18 @@ let r_get_memcpy es ks =
   | [m;q;m0;q0;n],[p] ->
     begin
       match MemAddr.is_separated [p;e_one;q;n] with
-      | L.Yes -> F.e_get m p
+      | L.Yes -> e_get m p
       | L.No ->
         if p == q then
-          F.e_get m0 q0
+          e_get m0 q0
         else
         if q == q0 then
-          F.e_get m0 p
+          e_get m0 p
         else
           let i = MemAddr.offset p in
           let j = MemAddr.offset q in
-          let q' = MemAddr.shift q0 (F.e_sub i j) in
-          F.e_get m0 q'
+          let q' = MemAddr.shift q0 (e_sub i j) in
+          e_get m0 q'
       | _ -> raise Not_found
     end
   | _ -> raise Not_found
@@ -84,8 +78,8 @@ let r_get_memcpy es ks =
 
 let () = Context.register
     begin fun () ->
-      F.set_builtin f_eqmem r_eqmem ;
-      F.set_builtin_get f_memcpy r_get_memcpy ;
+      set_builtin (!@f_eqmem) r_eqmem ;
+      set_builtin_get (!@f_memcpy) r_get_memcpy ;
     end
 
 (* -------------------------------------------------------------------------- *)

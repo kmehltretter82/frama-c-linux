@@ -225,7 +225,7 @@ Prover CFG returns Valid
 
 Goal Post-condition ("simpl_is_type.i", line 17, characters 11-52) in 'f':
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0).
   (* Heap *)
@@ -241,10 +241,10 @@ Assume {
   Have: (0 <= i) /\ (i <= size_0).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (0 < a_1[shift_sint32(t, i_2)]))).
+      (0 < m[shift_sint32(t, i_2)]))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i <= i_2) -> ((i_2 < size_0) ->
-      (a_1[shift_sint32(t, i_2)] < 0))).
+      (m[shift_sint32(t, i_2)] < 0))).
   (* Else *)
   Have: size_0 <= i.
 }
@@ -275,12 +275,12 @@ Prove: true.
 
 Goal Preservation of Invariant ("simpl_is_type.i", line 23, characters 20-58):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
-Let a_2 = shift_sint32(t, i).
-Let a_3 = a_1[a_2].
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
+Let a_1 = shift_sint32(t, i).
+Let a_2 = m[a_1].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
-      is_sint32(a_3).
+      is_sint32(a_2).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -294,16 +294,16 @@ Assume {
   Have: (0 <= i) /\ (i <= size_0).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (0 < a_1[shift_sint32(t, i_2)]))).
+      (0 < m[shift_sint32(t, i_2)]))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i <= i_2) -> ((i_2 < size_0) ->
-      (a_1[shift_sint32(t, i_2)] < 0))).
+      (m[shift_sint32(t, i_2)] < 0))).
   (* Then *)
   Have: i < size_0.
   (* Invariant *)
   Have: (-1) <= i.
 }
-Prove: 0 < a_1[a_2 <- -a_3][shift_sint32(t, i_1)].
+Prove: 0 < m[a_1 <- -a_2][shift_sint32(t, i_1)].
 
 ------------------------------------------------------------
 
@@ -326,13 +326,13 @@ Prove: Mint_0[shift_sint32(t, i)] < 0.
 
 Goal Preservation of Invariant ("simpl_is_type.i", line 24, characters 20-61):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
-Let a_2 = shift_sint32(t, i).
-Let a_3 = a_1[a_2].
-Let a_4 = a_1[a_2 <- -a_3].
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
+Let a_1 = shift_sint32(t, i).
+Let a_2 = m[a_1].
+Let m_1 = m[a_1 <- -a_2].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
-      is_sint32(a_3).
+      is_sint32(a_2).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -346,19 +346,19 @@ Assume {
   Have: (0 <= i) /\ (i <= size_0).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (0 < a_1[shift_sint32(t, i_2)]))).
+      (0 < m[shift_sint32(t, i_2)]))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i <= i_2) -> ((i_2 < size_0) ->
-      (a_1[shift_sint32(t, i_2)] < 0))).
+      (m[shift_sint32(t, i_2)] < 0))).
   (* Then *)
   Have: i < size_0.
   (* Invariant *)
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (0 < a_4[shift_sint32(t, i_2)]))).
+      (0 < m_1[shift_sint32(t, i_2)]))).
 }
-Prove: a_4[shift_sint32(t, i_1)] < 0.
+Prove: m_1[shift_sint32(t, i_1)] < 0.
 
 ------------------------------------------------------------
 
@@ -376,17 +376,17 @@ Prove: true.
 Goal Loop assigns ("simpl_is_type.i", line 25, characters 18-30) (3/3):
 Effect at line 29
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Let x = i - 1.
-Let a_2 = shift_sint32(t, x).
-Let a_3 = a_1[a_2].
-Let a_4 = a_1[a_2 <- -a_3].
+Let a_1 = shift_sint32(t, x).
+Let a_2 = m[a_1].
+Let m_1 = m[a_1 <- -a_2].
 Assume {
-  Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(x) /\ is_sint32(a_3).
+  Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(x) /\ is_sint32(a_2).
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: !invalid(Malloc_0, a_2, 1).
+  When: !invalid(Malloc_0, a_1, 1).
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -396,20 +396,20 @@ Assume {
   Have: (0 < i) /\ (i <= (1 + size_0)).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> (((2 + i_1) <= i) ->
-      (is_sint32(i_1) -> (0 < a_1[shift_sint32(t, i_1)])))).
+      (is_sint32(i_1) -> (0 < m[shift_sint32(t, i_1)])))).
   (* Invariant *)
   Have: forall i_1 : Z. ((i_1 < size_0) -> ((i <= (1 + i_1)) ->
-      (is_sint32(i_1) -> (a_1[shift_sint32(t, i_1)] < 0)))).
+      (is_sint32(i_1) -> (m[shift_sint32(t, i_1)] < 0)))).
   (* Then *)
   Have: i <= size_0.
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (0 < a_4[shift_sint32(t, i_1)]))).
+      (0 < m_1[shift_sint32(t, i_1)]))).
   (* Invariant *)
   Have: forall i_1 : Z. ((i <= i_1) -> ((i_1 < size_0) ->
-      (a_4[shift_sint32(t, i_1)] < 0))).
+      (m_1[shift_sint32(t, i_1)] < 0))).
 }
-Prove: included(a_2, 1, a, size_0).
+Prove: included(a_1, 1, a, size_0).
 
 ------------------------------------------------------------
 

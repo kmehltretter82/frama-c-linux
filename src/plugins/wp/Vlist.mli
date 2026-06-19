@@ -24,12 +24,12 @@ class type engine =
     method pp_flow : Format.formatter -> F.term -> unit
   end
 
-val f_nil : Fun.t
-val f_elt : Fun.t
-val f_nth : Fun.t
-val f_cons : Fun.t
-val f_concat : Fun.t
-val f_repeat : Fun.t
+val f_nil : Fun.t extern
+val f_elt : Fun.t extern
+val f_nth : Fun.t extern
+val f_cons : Fun.t extern
+val f_concat : Fun.t extern
+val f_repeat : Fun.t extern
 
 val list : F.term list -> F.term
 val concat : F.term list -> F.term
@@ -40,5 +40,3 @@ val pretty : #engine -> Format.formatter -> F.term list -> unit
 val elements : #engine -> Format.formatter -> F.term list -> unit
 val pprepeat : #engine -> Format.formatter -> F.term list -> unit
 val shareable : F.term -> bool
-
-val specialize_eq_list: Lang.For_export.specific_equality

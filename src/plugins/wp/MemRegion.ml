@@ -13,9 +13,9 @@
 open Cil_types
 open Ctypes
 open Lang.F
+open Lang.E
 open Memory
 open Sigma
-open MemMemory
 
 type prim = Int of c_int | Float of c_float | Ptr
 type kind = Single of prim | Many of prim | Garbled
@@ -33,7 +33,7 @@ let pp_kind fmt = function
 let tau_of_prim = function
   | Int _ -> Qed.Logic.Int
   | Float f -> Cfloat.tau_of_float f
-  | Ptr -> MemAddr.t_addr
+  | Ptr -> !@MemAddr.t_addr
 
 (* -------------------------------------------------------------------------- *)
 (* --- Region Analysis Proxy                                              --- *)
@@ -102,8 +102,8 @@ struct
       match data with
       | Value p -> tau_of_prim p
       | ValInit -> Qed.Logic.Bool
-      | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
-      | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
+      | Array p -> Qed.Logic.Array(!@MemAddr.t_addr, tau_of_prim p )
+      | ArrInit -> Qed.Logic.Array(!@MemAddr.t_addr, Qed.Logic.Bool )
 
     let basename_of_chunk c =
       match c.data with
@@ -146,12 +146,12 @@ struct
 
     let pretty fmt (l: loc) =
       match l with
-      | Null -> M.pretty fmt M.null
+      | Null -> M.pretty fmt !@M.null
       | Raw l -> M.pretty fmt l
       | Loc (l,r) -> Format.fprintf fmt "%a@%a" M.pretty l R.pretty r
 
     let make a = function None -> Raw a | Some r -> Loc(a,r)
-    let loc = function Null -> M.null | Raw a | Loc(a,_) -> a
+    let loc = function Null -> !@M.null | Raw a | Loc(a,_) -> a
     let reg = function Null | Raw _ -> None | Loc(_,r) -> Some r
     let rfold f = function Null | Raw _ -> None | Loc(_,r) -> f r
 
@@ -194,14 +194,14 @@ struct
       | State.Mu { data = ValInit | Value _ } ->
         p_equal m0 m1
       | State.Mu { data = ArrInit | Array _ } ->
-        p_call f_eqmem [m0;m1;to_addr l;n]
+        F.p_call !@MemMemory.f_eqmem [m0;m1;to_addr l;n]
       | _ -> L.eqmem chunk m0 m1 (loc l) n
 
     let memcpy chunk m0 l0 m1 l1 n =
       match Sigma.ckind chunk with
       | State.Mu { data = ValInit | Value _ } -> m1
       | State.Mu { data = ArrInit | Array _ } ->
-        e_fun f_memcpy [m0;to_addr l0;m1;to_addr l1;n]
+        F.e_fun !@MemMemory.f_memcpy [m0;to_addr l0;m1;to_addr l1;n]
       | _ -> L.memcpy chunk m0 (loc l0) m1 (loc l1) n
 
     (* ---------------------------------------------------------------------- *)
@@ -343,7 +343,7 @@ struct
       else L.value_footprint obj l
 
     let rec footprint ~init obj loc = match loc with
-      | Null  -> lfootprint ~init obj M.null
+      | Null  -> lfootprint ~init obj !@M.null
       | Raw l -> lfootprint ~init obj l
       | Loc(l,r) ->
         match obj with
@@ -389,7 +389,7 @@ struct
 
   let vars l = M.vars @@ LOADER.loc l
   let occurs x l = M.occurs x @@ LOADER.loc l
-  let null = LOADER.Null
+  let null = Lang.extern_const LOADER.Null
 
   let cvar v = LOADER.make (M.cvar v) (R.cvar v)
   let field = LOADER.field

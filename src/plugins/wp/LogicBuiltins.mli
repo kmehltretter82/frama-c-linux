@@ -13,7 +13,7 @@
 open Cil_types
 open Lang
 
-type category = Lang.lfun Qed.Logic.category
+type category = Lang.lfun Lang.extern Qed.Logic.category
 
 type kind =
   | B                   (** boolean *)
@@ -26,12 +26,12 @@ type kind =
 val kind_of_tau : tau -> kind
 
 (** Add a new builtin. This builtin will be shared with all created drivers. *)
-val add_builtin : string -> kind list -> lfun -> unit
+val add_builtin : string -> kind list -> lfun extern -> unit
 
 (** Add a new builtin type.
     Must be an extern or imported type.
     This builtin will be shared with all created drivers. *)
-val add_builtin_type : string -> adt -> unit
+val add_builtin_type : string -> adt extern -> unit
 
 type driver
 val driver: driver Context.value
@@ -40,7 +40,6 @@ val new_driver:
   id:string ->
   ?base:driver ->
   ?descr:string ->
-  ?includes:Filepath.t list ->
   ?configure:(unit -> unit) -> unit ->
   driver
 (** Creates a configured driver from an existing one.
@@ -58,60 +57,36 @@ val descr : driver -> string
 val is_default : driver -> bool
 val compare : driver -> driver -> int
 
-val find_lib: Filepath.t -> Filepath.t
-(** find a file in the includes of the current drivers *)
+val add_type : ?source:Filepos.t ->
+  string -> link:string -> unit
 
-val dependencies : string -> string list
-(** Of external theories. Raises Not_found if undefined *)
+val add_alias : source:Filepos.t ->
+  string -> kind list -> alias:string -> unit
 
-val add_library : string -> string list -> unit
-(** Add a new library or update the dependencies of an existing one *)
+val add_ctor : source:Filepos.t ->
+  string -> kind list -> link:string -> unit
 
-val add_alias : source:Filepos.t -> string -> kind list -> alias:string -> unit -> unit
+val add_logic : source:Filepos.t ->
+  ?category:category -> kind -> string -> kind list -> link:string -> unit
 
-val add_type : ?source:Filepos.t -> string -> library:string ->
-  ?link:string -> unit -> unit
-
-val add_ctor : source:Filepos.t -> string -> kind list ->
-  library:string -> link:Qed.Engine.link -> unit -> unit
-
-val add_logic : source:Filepos.t -> kind -> string -> kind list ->
-  library:string -> ?category:category -> link:Qed.Engine.link ->
-  unit -> unit
-
-val add_predicate : source:Filepos.t -> string -> kind list ->
-  library:string -> link:string ->
-  unit -> unit
-
-val add_option :
-  driver_dir:string -> string -> string -> library:string -> string -> unit
-(** add a value to an option (group, name) *)
-
-val set_option :
-  driver_dir:string -> string -> string -> library:string -> string -> unit
-(** reset and add a value to an option (group, name) *)
-
-type doption
-
-type sanitizer = (driver_dir:string -> string -> string)
-
-val create_option: sanitizer:sanitizer -> string -> string -> doption
-(** [add_option_sanitizer ~driver_dir group name]
-    add a sanitizer for group [group] and option [name] *)
-
-val get_option : doption -> library:string -> string list
-(** return the values of option (group, name),
-    return the empty list if not set *)
+val add_predicate : source:Filepos.t ->
+  string -> kind list -> link:string -> unit
 
 type builtin =
   | ACSLDEF
-  | LFUN of lfun
+  | LFUN of lfun extern
   | HACK of (F.term list  -> F.term)
+
+type t_builtin =
+  | ADT of adt extern
+  | HACKT of (F.tau list -> F.tau)
 
 val logic : logic_info -> builtin
 val ctor : logic_ctor_info -> builtin
 val constant : string -> builtin
 val lookup : string -> kind list -> builtin
+val lookup_t : string -> t_builtin
+val resolve_t : string -> tau list -> tau
 
 (** Replace a logic definition or predicate by a built-in function.
     The LogicSemantics compilers will replace `Pcall` and `Tcall` instances
@@ -120,5 +95,7 @@ val hack : string -> (F.term list -> F.term) -> unit
 
 (** Replace a logic type definition or predicate by a built-in type. *)
 val hack_type : string -> (F.tau list -> F.tau) -> unit
+
+val is_builtin_type : string -> bool
 
 val dump : unit -> unit

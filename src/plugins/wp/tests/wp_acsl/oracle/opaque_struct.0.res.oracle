@@ -54,28 +54,28 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'fail' ("opaque_struct.i", line 60, characters 19-48):
-Let a = memcpy(Mint_0, p, Mint_undef_0, p, Length_of_S1_S).
-Let a_1 = memcpy(Mint_3, p, Mint_undef_3, p, Length_of_S1_S).
-Let a_2 = memcpy(Mint_5, p, Mint_undef_5, p, Length_of_S1_S).
-Let a_3 = memcpy(Mint_7, p, Mint_undef_7, p, Length_of_S1_S).
-Let a_4 = memcpy(Mchar_0, p, Mchar_undef_0, p, Length_of_S1_S).
-Let a_5 = memcpy(Mint_2, p, Mint_undef_2, p, Length_of_S1_S).
-Let a_6 = memcpy(Mint_4, p, Mint_undef_4, p, Length_of_S1_S).
-Let a_7 = memcpy(Mint_6, p, Mint_undef_6, p, Length_of_S1_S).
-Let a_8 = memcpy(Mint_1, p, Mint_undef_1, p, Length_of_S1_S).
+Let m = memcpy(Mint_0, p, Mint_undef_0, p, Length_of_S1_S).
+Let m_1 = memcpy(Mint_3, p, Mint_undef_3, p, Length_of_S1_S).
+Let m_2 = memcpy(Mint_5, p, Mint_undef_5, p, Length_of_S1_S).
+Let m_3 = memcpy(Mint_7, p, Mint_undef_7, p, Length_of_S1_S).
+Let m_4 = memcpy(Mchar_0, p, Mchar_undef_0, p, Length_of_S1_S).
+Let m_5 = memcpy(Mint_2, p, Mint_undef_2, p, Length_of_S1_S).
+Let m_6 = memcpy(Mint_4, p, Mint_undef_4, p, Length_of_S1_S).
+Let m_7 = memcpy(Mint_6, p, Mint_undef_6, p, Length_of_S1_S).
+Let m_8 = memcpy(Mint_1, p, Mint_undef_1, p, Length_of_S1_S).
 Assume {
   Type: is_bool_chunk(Mint_0) /\ is_sint16_chunk(Mint_3) /\
       is_sint32_chunk(Mint_5) /\ is_sint64_chunk(Mint_7) /\
       is_sint8_chunk(Mchar_0) /\ is_uint16_chunk(Mint_2) /\
       is_uint32_chunk(Mint_4) /\ is_uint64_chunk(Mint_6) /\
-      is_uint8_chunk(Mint_1) /\ is_bool_chunk(a) /\ is_sint16_chunk(a_1) /\
-      is_sint32_chunk(a_2) /\ is_sint64_chunk(a_3) /\ is_sint8_chunk(a_4) /\
-      is_uint16_chunk(a_5) /\ is_uint32_chunk(a_6) /\ is_uint64_chunk(a_7) /\
-      is_uint8_chunk(a_8).
+      is_uint8_chunk(Mint_1) /\ is_bool_chunk(m) /\ is_sint16_chunk(m_1) /\
+      is_sint32_chunk(m_2) /\ is_sint64_chunk(m_3) /\ is_sint8_chunk(m_4) /\
+      is_uint16_chunk(m_5) /\ is_uint32_chunk(m_6) /\ is_uint64_chunk(m_7) /\
+      is_uint8_chunk(m_8).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ sconst(Mchar_0).
+  Type: (region(p.base) <= 0) /\ sconst(Mchar_0) /\ framed(Mptr_0).
 }
-Prove: EqS1_S(Load_S1_S(p, a, a_8, a_4, a_5, a_1, a_6, a_2, a_7, a_3,
+Prove: EqS1_S(Load_S1_S(p, m, m_8, m_4, m_5, m_1, m_6, m_2, m_7, m_3,
                 memcpy(Mf32_0, p, Mf32_undef_0, p, Length_of_S1_S),
                 memcpy(Mf64_0, p, Mf64_undef_0, p, Length_of_S1_S),
                 memcpy(Mptr_0, p, Mptr_undef_0, p, Length_of_S1_S)),
@@ -122,18 +122,18 @@ Prove: true.
 
 Goal Check 'fail' ("opaque_struct.i", line 69, characters 19-37):
 Let x = Mint_0[p].
-Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, Length_of_S1_S).
-Let a_2 = a_1[p].
+Let m = memcpy(Mint_0, a, Mint_undef_0, a, Length_of_S1_S).
+Let a_1 = m[p].
 Assume {
-  Type: is_sint32_chunk(Mint_0) /\ is_sint32(x) /\ is_sint32_chunk(a_1) /\
-      is_sint32(a_2).
+  Type: is_sint32_chunk(Mint_0) /\ is_sint32(x) /\ is_sint32_chunk(m) /\
+      is_sint32(a_1).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
       (region(p.base) <= 0).
   (* Pre-condition *)
   Have: separated(a, Length_of_S1_S, c, 1).
 }
-Prove: a_2 = x.
+Prove: a_1 = x.
 
 ------------------------------------------------------------
 
@@ -152,17 +152,17 @@ Prove: of_f32(memcpy(Mf32_0, a, Mf32_undef_0, a, Length_of_S1_S)[q])
 
 Goal Check 'succeed' ("opaque_struct.i", line 71, characters 23-41):
 Let x = Mchar_0[c].
-Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, Length_of_S1_S).
-Let a_2 = a_1[c].
+Let m = memcpy(Mchar_0, a, Mchar_undef_0, a, Length_of_S1_S).
+Let a_1 = m[c].
 Assume {
-  Type: is_sint8_chunk(Mchar_0) /\ is_sint8(x) /\ is_sint8_chunk(a_1) /\
-      is_sint8(a_2).
+  Type: is_sint8_chunk(Mchar_0) /\ is_sint8(x) /\ is_sint8_chunk(m) /\
+      is_sint8(a_1).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\ sconst(Mchar_0).
   (* Pre-condition *)
   Have: separated(a, Length_of_S1_S, c, 1).
 }
-Prove: a_2 = x.
+Prove: a_1 = x.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

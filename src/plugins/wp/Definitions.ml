@@ -395,8 +395,6 @@ class virtual visitor main =
     val mutable dlemmas  = DS.empty
     val mutable lemmas   = DS.empty
     val mutable clusters = DC.empty
-    val mutable libraries = DS.empty
-    val mutable theories = DW.empty
     val mutable locals = DC.add main DC.empty
 
     method set_local c = locals <- DC.add c locals
@@ -414,7 +412,9 @@ class virtual visitor main =
         begin
           types <- DT.add t types ;
           let cluster = section (LogicUsage.section_of_type t) in
-          if self#do_local cluster && not (is_builtin t) then
+          if self#do_local cluster &&
+             not (LogicBuiltins.is_builtin_type t.lt_name)
+          then
             begin
               let def = match t.lt_def with
                 | None -> Qed.Engine.Tabs
@@ -467,16 +467,14 @@ class virtual visitor main =
         end
 
     method vfield = function
-      | Mfield(a,_,_,_) -> self#vlibrary a.ext_library
       | Cfield(f, KValue) -> self#vcomp f.fcomp
       | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
-      | Mtype a | Mrecord(a,_) -> self#vlibrary a.ext_library
+      | Qdata a -> self#on_data a
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
-      | Wtype(p,m,_) -> self#vtheory p m
 
     method vtau = function
       | Prop | Bool | Int | Real | Tvar _ -> ()
@@ -486,7 +484,7 @@ class virtual visitor main =
 
     method vparam x = self#vtau (tau_of_var x)
 
-    method private repr ~bool t =
+    method private repr t =
       begin
         try self#vtau (typeof t);
         with Not_found ->
@@ -500,17 +498,15 @@ class virtual visitor main =
       | Bind(_,qt,_) -> self#vtau qt
       | True | False | Kint _ | Kreal _ | Bvar _
       | Times _ | Add _ | Mul _ | Div _ | Mod _
-      | Aget _ | Aset _ | Apply _ -> ()
-      | Acst _ -> self#on_library "const"
+      | Aget _ | Aset _ | Acst _ | Apply _
       | Eq _ | Neq _ | Leq _ | Lt _
-      | And _ | Or _ | Not _ | Imply _ | If _ ->
-        if bool then self#on_library "bool"
+      | And _ | Or _ | Not _ | Imply _ | If _ -> ()
 
     method vterm t =
       if not (Tset.mem t terms) then
         begin
           terms <- Tset.add t terms ;
-          self#repr ~bool:true t ;
+          self#repr t ;
           lc_iter self#vterm t ;
         end
 
@@ -518,7 +514,7 @@ class virtual visitor main =
       let t = e_prop p in
       if not (Tset.mem t terms) then
         begin
-          self#repr ~bool:false t ;
+          self#repr t ;
           lc_iter
             (fun e ->
                if is_prop e
@@ -551,23 +547,22 @@ class virtual visitor main =
       end ;
       terms <- old_terms
 
-    method private vlfun f =
-      match Symbol.find f with
-      | exception Not_found ->
-        Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
-      | d ->
-        let c = d.d_cluster in
-        if self#do_local c then self#vdfun d
-
     method vsymbol f =
       if not (DF.mem f symbols) then
         begin
           symbols <- DF.add f symbols ;
           match f with
-          | FUN { m_source = Wsymbol(p,m,_) } -> self#vtheory p m
-          | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
-          | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
-          | CTOR c -> self#vadt (adt c.ctor_type)
+          | QFUN l -> self#on_lfun l.e_symbol
+          | CTOR c -> self#vtype c.ctor_type
+          | LFUN _ | ACSL _ ->
+            begin
+              match Symbol.find f with
+              | exception Not_found ->
+                Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
+              | d ->
+                let c = d.d_cluster in
+                if self#do_local c then self#vdfun d
+            end
         end
 
     method private vtrigger = function
@@ -616,26 +611,6 @@ class virtual visitor main =
           self#on_cluster c ;
         end
 
-    method vlibrary lib =
-      if not (DS.mem lib libraries) then
-        begin
-          libraries <- DS.add lib libraries ;
-          try
-            let deps = LogicBuiltins.dependencies lib in
-            List.iter self#vlibrary deps ;
-            self#on_library lib ;
-          with Not_found ->
-            Wp_parameters.fatal
-              ~current:false "Unknown library '%s'" lib
-        end
-
-    method vtheory p m =
-      if not (DW.mem (p,m) theories) then
-        begin
-          theories <- DW.add (p,m) theories ;
-          self#on_theory p m
-        end
-
     method vgoal (axioms : axioms option) prop =
       match axioms with
       | None ->
@@ -673,9 +648,9 @@ class virtual visitor main =
       end
 
     method virtual section : string -> unit
-    method virtual on_theory : string list -> string -> unit
-    method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
+    method virtual on_data : Qed.Symbol.data -> unit
+    method virtual on_lfun : Qed.Symbol.lfun -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
     method virtual on_comp : compinfo -> (field * tau) list option -> unit
     method virtual on_icomp : compinfo -> (field * tau) list option -> unit

@@ -18,37 +18,37 @@ Prover CFG returns Valid
 
 Goal Post-condition ("chunk_typing.i", lines 15-19) in 'function':
 Let a = shift_uint64(u64_0, 0).
-Let a_1 = memcpy(Mint_5, a, Mint_undef_5, a, 10).
-Let a_2 = shift_sint64(i64_0, 0).
-Let a_3 = memcpy(Mint_6, a_2, Mint_undef_6, a_2, 10).
-Let a_4 = shift_uint32(u32_0, 0).
-Let a_5 = memcpy(Mint_3, a_4, Mint_undef_3, a_4, 10).
-Let a_6 = shift_sint32(i32_0, 0).
-Let a_7 = memcpy(Mint_4, a_6, Mint_undef_4, a_6, 10).
-Let a_8 = shift_uint16(u16_0, 0).
-Let a_9 = memcpy(Mint_1, a_8, Mint_undef_1, a_8, 10).
-Let a_10 = shift_sint16(i16_0, 0).
-Let a_11 = memcpy(Mint_2, a_10, Mint_undef_2, a_10, 10).
-Let a_12 = shift_uint8(u8_0, 0).
-Let a_13 = memcpy(Mint_0, a_12, Mint_undef_0, a_12, 10).
-Let a_14 = shift_sint8(i8_0, 0).
-Let a_15 = memcpy(Mchar_0, a_14, Mchar_undef_0, a_14, 10).
-Let a_16 = a_15[shift_sint8(i8_0, i)].
-Let a_17 = a_13[shift_uint8(u8_0, i)].
-Let a_18 = a_9[shift_uint16(u16_0, i)].
-Let a_19 = a_11[shift_sint16(i16_0, i)].
-Let a_20 = a_5[shift_uint32(u32_0, i)].
-Let a_21 = a_7[shift_sint32(i32_0, i)].
-Let a_22 = a_3[shift_sint64(i64_0, i)].
+Let m = memcpy(Mint_5, a, Mint_undef_5, a, 10).
+Let a_1 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_6, a_1, Mint_undef_6, a_1, 10).
+Let a_2 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_3, a_2, Mint_undef_3, a_2, 10).
+Let a_3 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_4, a_3, Mint_undef_4, a_3, 10).
+Let a_4 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_1, a_4, Mint_undef_1, a_4, 10).
+Let a_5 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_2, a_5, Mint_undef_2, a_5, 10).
+Let a_6 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_0, a_6, Mint_undef_0, a_6, 10).
+Let a_7 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_7, Mchar_undef_0, a_7, 10).
+Let a_8 = m_7[shift_sint8(i8_0, i)].
+Let a_9 = m_6[shift_uint8(u8_0, i)].
+Let a_10 = m_4[shift_uint16(u16_0, i)].
+Let a_11 = m_5[shift_sint16(i16_0, i)].
+Let a_12 = m_2[shift_uint32(u32_0, i)].
+Let a_13 = m_3[shift_sint32(i32_0, i)].
+Let a_14 = m_1[shift_sint64(i64_0, i)].
 Assume {
   Type: IsArray_sint8(x) /\ is_sint16_chunk(Mint_2) /\
       is_sint32_chunk(Mint_4) /\ is_sint64_chunk(Mint_6) /\
       is_sint8_chunk(Mchar_0) /\ is_uint16_chunk(Mint_1) /\
       is_uint32_chunk(Mint_3) /\ is_uint64_chunk(Mint_5) /\
-      is_uint8_chunk(Mint_0) /\ is_sint32(i_1) /\ is_sint16_chunk(a_11) /\
-      is_sint32_chunk(a_7) /\ is_sint64_chunk(a_3) /\ is_sint8_chunk(a_15) /\
-      is_uint16_chunk(a_9) /\ is_uint32_chunk(a_5) /\ is_uint64_chunk(a_1) /\
-      is_uint8_chunk(a_13).
+      is_uint8_chunk(Mint_0) /\ is_sint32(i_1) /\ is_sint16_chunk(m_5) /\
+      is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\ is_sint8_chunk(m_7) /\
+      is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\ is_uint64_chunk(m) /\
+      is_uint8_chunk(m_6).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -60,42 +60,42 @@ Assume {
   (* Initializer *)
   Init: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (x[i_2] = 0))).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
-      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_12, 10).
+  Have: valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_3, 10) /\
+      valid_rw(Malloc_0, a_1, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_6, 10).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_15[shift_sint8(i8_0, i_2)] = 1))).
+      (m_7[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_13[shift_uint8(u8_0, i_2)] = 2))).
+      (m_6[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_11[shift_sint16(i16_0, i_2)] = 3))).
+      (m_5[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_9[shift_uint16(u16_0, i_2)] = 4))).
+      (m_4[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_7[shift_sint32(i32_0, i_2)] = 5))).
+      (m_3[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_5[shift_uint32(u32_0, i_2)] = 6))).
+      (m_2[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_3[shift_sint64(i64_0, i_2)] = 7))).
+      (m_1[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_1[shift_uint64(u64_0, i_2)] = 8))).
+      (m[shift_uint64(u64_0, i_2)] = 8))).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: (a_16 = (1 + x[i])) /\ (a_17 = (1 + a_16)) /\ (a_18 = (1 + a_19)) /\
-    (a_19 = (1 + a_17)) /\ (a_20 = (1 + a_21)) /\ (a_21 = (1 + a_18)) /\
-    (a_1[shift_uint64(u64_0, i)] = (1 + a_22)) /\ (a_22 = (1 + a_20)).
+Prove: (a_8 = (1 + x[i])) /\ (a_9 = (1 + a_8)) /\ (a_10 = (1 + a_11)) /\
+    (a_11 = (1 + a_9)) /\ (a_12 = (1 + a_13)) /\ (a_13 = (1 + a_10)) /\
+    (m[shift_uint64(u64_0, i)] = (1 + a_14)) /\ (a_14 = (1 + a_12)).
 
 ------------------------------------------------------------
 
@@ -130,35 +130,34 @@ Let a_5 = shift_sint16(i16_0, i).
 Let a_6 = shift_uint8(u8_0, i).
 Let a_7 = shift_sint8(i8_0, i).
 Let a_8 = shift_uint64(u64_0, 0).
-Let a_9 = memcpy(Mint_5, a_8, Mint_undef_5, a_8, 10).
-Let a_10 = shift_sint64(i64_0, 0).
-Let a_11 = memcpy(Mint_2, a_10, Mint_undef_2, a_10, 10).
-Let a_12 = shift_uint32(u32_0, 0).
-Let a_13 = memcpy(Mint_4, a_12, Mint_undef_4, a_12, 10).
-Let a_14 = shift_sint32(i32_0, 0).
-Let a_15 = memcpy(Mint_1, a_14, Mint_undef_1, a_14, 10).
-Let a_16 = shift_uint16(u16_0, 0).
-Let a_17 = memcpy(Mint_3, a_16, Mint_undef_3, a_16, 10).
-Let a_18 = shift_sint16(i16_0, 0).
-Let a_19 = memcpy(Mint_0, a_18, Mint_undef_0, a_18, 10).
-Let a_20 = shift_uint8(u8_0, 0).
-Let a_21 = memcpy(Mint_6, a_20, Mint_undef_6, a_20, 10).
-Let a_22 = shift_sint8(i8_0, 0).
-Let a_23 = memcpy(Mchar_0, a_22, Mchar_undef_0, a_22, 10).
-Let a_24 = a_23[a_7 <- 1].
+Let m = memcpy(Mint_5, a_8, Mint_undef_5, a_8, 10).
+Let a_9 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_9, Mint_undef_2, a_9, 10).
+Let a_10 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_10, Mint_undef_4, a_10, 10).
+Let a_11 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_11, Mint_undef_1, a_11, 10).
+Let a_12 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_12, Mint_undef_3, a_12, 10).
+Let a_13 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_13, Mint_undef_0, a_13, 10).
+Let a_14 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_14, Mint_undef_6, a_14, 10).
+Let a_15 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_15, Mchar_undef_0, a_15, 10).
+Let m_8 = m_7[a_7 <- 1].
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_19) /\ is_sint32_chunk(a_15) /\
-      is_sint64_chunk(a_11) /\ is_sint8_chunk(a_23) /\
-      is_uint16_chunk(a_17) /\ is_uint32_chunk(a_13) /\
-      is_uint64_chunk(a_9) /\ is_uint8_chunk(a_21) /\
-      is_sint16_chunk(a_19[a_5 <- 3]) /\ is_sint32_chunk(a_15[a_3 <- 5]) /\
-      is_sint64_chunk(a_11[a_1 <- 7]) /\ is_sint8_chunk(a_24) /\
-      is_uint16_chunk(a_17[a_4 <- 4]) /\ is_uint32_chunk(a_13[a_2 <- 6]) /\
-      is_uint64_chunk(a_9[a <- 8]) /\ is_uint8_chunk(a_21[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\
+      is_sint64_chunk(m_1) /\ is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\
+      is_uint32_chunk(m_2) /\ is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a_5 <- 3]) /\ is_sint32_chunk(m_3[a_3 <- 5]) /\
+      is_sint64_chunk(m_1[a_1 <- 7]) /\ is_sint8_chunk(m_8) /\
+      is_uint16_chunk(m_4[a_4 <- 4]) /\ is_uint32_chunk(m_2[a_2 <- 6]) /\
+      is_uint64_chunk(m[a <- 8]) /\ is_uint8_chunk(m_6[a_6 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -168,36 +167,36 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_18, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
-      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_22, 10) /\
-      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_20, 10).
+  Have: valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
+      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
+      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_14, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_sint8(i8_0, i_2)] = 1))).
+      (m_7[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_uint8(u8_0, i_2)] = 2))).
+      (m_6[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_sint16(i16_0, i_2)] = 3))).
+      (m_5[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_uint16(u16_0, i_2)] = 4))).
+      (m_4[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_sint32(i32_0, i_2)] = 5))).
+      (m_3[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_uint32(u32_0, i_2)] = 6))).
+      (m_2[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_sint64(i64_0, i_2)] = 7))).
+      (m_1[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_uint64(u64_0, i_2)] = 8))).
+      (m[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -221,7 +220,7 @@ Assume {
   (* Invariant *)
   Have: (-1) <= i.
 }
-Prove: a_24[shift_sint8(i8_0, i_1)] = 1.
+Prove: m_8[shift_sint8(i8_0, i_1)] = 1.
 
 ------------------------------------------------------------
 
@@ -232,44 +231,43 @@ Prove: true.
 
 Goal Preservation of Invariant ("chunk_typing.i", line 33, characters 20-65):
 Let a = shift_sint8(i8_0, 0).
-Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, 10).
-Let a_2 = shift_sint8(i8_0, i).
-Let a_3 = a_1[a_2 <- 1].
-Let a_4 = shift_uint64(u64_0, i).
-Let a_5 = shift_sint64(i64_0, i).
-Let a_6 = shift_uint32(u32_0, i).
-Let a_7 = shift_sint32(i32_0, i).
-Let a_8 = shift_uint16(u16_0, i).
-Let a_9 = shift_sint16(i16_0, i).
-Let a_10 = shift_uint8(u8_0, i).
-Let a_11 = shift_uint64(u64_0, 0).
-Let a_12 = memcpy(Mint_6, a_11, Mint_undef_6, a_11, 10).
-Let a_13 = shift_sint64(i64_0, 0).
-Let a_14 = memcpy(Mint_3, a_13, Mint_undef_3, a_13, 10).
-Let a_15 = shift_uint32(u32_0, 0).
-Let a_16 = memcpy(Mint_5, a_15, Mint_undef_5, a_15, 10).
-Let a_17 = shift_sint32(i32_0, 0).
-Let a_18 = memcpy(Mint_2, a_17, Mint_undef_2, a_17, 10).
-Let a_19 = shift_uint16(u16_0, 0).
-Let a_20 = memcpy(Mint_4, a_19, Mint_undef_4, a_19, 10).
-Let a_21 = shift_sint16(i16_0, 0).
-Let a_22 = memcpy(Mint_1, a_21, Mint_undef_1, a_21, 10).
-Let a_23 = shift_uint8(u8_0, 0).
-Let a_24 = memcpy(Mint_0, a_23, Mint_undef_0, a_23, 10).
-Let a_25 = a_24[a_10 <- 2].
+Let m = memcpy(Mchar_0, a, Mchar_undef_0, a, 10).
+Let a_1 = shift_sint8(i8_0, i).
+Let m_1 = m[a_1 <- 1].
+Let a_2 = shift_uint64(u64_0, i).
+Let a_3 = shift_sint64(i64_0, i).
+Let a_4 = shift_uint32(u32_0, i).
+Let a_5 = shift_sint32(i32_0, i).
+Let a_6 = shift_uint16(u16_0, i).
+Let a_7 = shift_sint16(i16_0, i).
+Let a_8 = shift_uint8(u8_0, i).
+Let a_9 = shift_uint64(u64_0, 0).
+Let m_2 = memcpy(Mint_6, a_9, Mint_undef_6, a_9, 10).
+Let a_10 = shift_sint64(i64_0, 0).
+Let m_3 = memcpy(Mint_3, a_10, Mint_undef_3, a_10, 10).
+Let a_11 = shift_uint32(u32_0, 0).
+Let m_4 = memcpy(Mint_5, a_11, Mint_undef_5, a_11, 10).
+Let a_12 = shift_sint32(i32_0, 0).
+Let m_5 = memcpy(Mint_2, a_12, Mint_undef_2, a_12, 10).
+Let a_13 = shift_uint16(u16_0, 0).
+Let m_6 = memcpy(Mint_4, a_13, Mint_undef_4, a_13, 10).
+Let a_14 = shift_sint16(i16_0, 0).
+Let m_7 = memcpy(Mint_1, a_14, Mint_undef_1, a_14, 10).
+Let a_15 = shift_uint8(u8_0, 0).
+Let m_8 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_9 = m_8[a_8 <- 2].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_5) /\
       is_uint64_chunk(Mint_6) /\ is_uint8_chunk(Mint_0) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_22) /\ is_sint32_chunk(a_18) /\
-      is_sint64_chunk(a_14) /\ is_sint8_chunk(a_1) /\
-      is_uint16_chunk(a_20) /\ is_uint32_chunk(a_16) /\
-      is_uint64_chunk(a_12) /\ is_uint8_chunk(a_24) /\
-      is_sint16_chunk(a_22[a_9 <- 3]) /\ is_sint32_chunk(a_18[a_7 <- 5]) /\
-      is_sint64_chunk(a_14[a_5 <- 7]) /\ is_sint8_chunk(a_3) /\
-      is_uint16_chunk(a_20[a_8 <- 4]) /\ is_uint32_chunk(a_16[a_6 <- 6]) /\
-      is_uint64_chunk(a_12[a_4 <- 8]) /\ is_uint8_chunk(a_25).
+      is_sint32(1 + i) /\ is_sint16_chunk(m_7) /\ is_sint32_chunk(m_5) /\
+      is_sint64_chunk(m_3) /\ is_sint8_chunk(m) /\ is_uint16_chunk(m_6) /\
+      is_uint32_chunk(m_4) /\ is_uint64_chunk(m_2) /\ is_uint8_chunk(m_8) /\
+      is_sint16_chunk(m_7[a_7 <- 3]) /\ is_sint32_chunk(m_5[a_5 <- 5]) /\
+      is_sint64_chunk(m_3[a_3 <- 7]) /\ is_sint8_chunk(m_1) /\
+      is_uint16_chunk(m_6[a_6 <- 4]) /\ is_uint32_chunk(m_4[a_4 <- 6]) /\
+      is_uint64_chunk(m_2[a_2 <- 8]) /\ is_uint8_chunk(m_9).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -279,42 +277,156 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_21, 10) /\ valid_rw(Malloc_0, a_17, 10) /\
-      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a, 10) /\
-      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
-      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_23, 10).
+  Have: valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
+      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_15, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_sint8(i8_0, i_2)] = 1))).
+      (m[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_24[shift_uint8(u8_0, i_2)] = 2))).
+      (m_8[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_22[shift_sint16(i16_0, i_2)] = 3))).
+      (m_7[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_20[shift_uint16(u16_0, i_2)] = 4))).
+      (m_6[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_18[shift_sint32(i32_0, i_2)] = 5))).
+      (m_5[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_16[shift_uint32(u32_0, i_2)] = 6))).
+      (m_4[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_14[shift_sint64(i64_0, i_2)] = 7))).
+      (m_3[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_12[shift_uint64(u64_0, i_2)] = 8))).
+      (m_2[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
+  Have: valid_rw(Malloc_0, a_1, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_10, 1).
+  Have: valid_rw(Malloc_0, a_8, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_7, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_6, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_5, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_4, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_2, 1).
+  (* Assertion 'rte,signed_overflow' *)
+  Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_1[shift_sint8(i8_0, i_2)] = 1))).
+}
+Prove: m_9[shift_uint8(u8_0, i_1)] = 2.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant ("chunk_typing.i", line 34, characters 20-66):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant ("chunk_typing.i", line 34, characters 20-66):
+Let a = shift_uint8(u8_0, 0).
+Let m = memcpy(Mint_6, a, Mint_undef_6, a, 10).
+Let a_1 = shift_uint8(u8_0, i).
+Let m_1 = m[a_1 <- 2].
+Let a_2 = shift_sint8(i8_0, 0).
+Let m_2 = memcpy(Mchar_0, a_2, Mchar_undef_0, a_2, 10).
+Let a_3 = shift_sint8(i8_0, i).
+Let m_3 = m_2[a_3 <- 1].
+Let a_4 = shift_uint64(u64_0, i).
+Let a_5 = shift_sint64(i64_0, i).
+Let a_6 = shift_uint32(u32_0, i).
+Let a_7 = shift_sint32(i32_0, i).
+Let a_8 = shift_uint16(u16_0, i).
+Let a_9 = shift_sint16(i16_0, i).
+Let a_10 = shift_uint64(u64_0, 0).
+Let m_4 = memcpy(Mint_5, a_10, Mint_undef_5, a_10, 10).
+Let a_11 = shift_sint64(i64_0, 0).
+Let m_5 = memcpy(Mint_2, a_11, Mint_undef_2, a_11, 10).
+Let a_12 = shift_uint32(u32_0, 0).
+Let m_6 = memcpy(Mint_4, a_12, Mint_undef_4, a_12, 10).
+Let a_13 = shift_sint32(i32_0, 0).
+Let m_7 = memcpy(Mint_1, a_13, Mint_undef_1, a_13, 10).
+Let a_14 = shift_uint16(u16_0, 0).
+Let m_8 = memcpy(Mint_3, a_14, Mint_undef_3, a_14, 10).
+Let a_15 = shift_sint16(i16_0, 0).
+Let m_9 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_10 = m_9[a_9 <- 3].
+Assume {
+  Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
+      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
+      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
+      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
+      is_sint32(1 + i) /\ is_sint16_chunk(m_9) /\ is_sint32_chunk(m_7) /\
+      is_sint64_chunk(m_5) /\ is_sint8_chunk(m_2) /\ is_uint16_chunk(m_8) /\
+      is_uint32_chunk(m_6) /\ is_uint64_chunk(m_4) /\ is_uint8_chunk(m) /\
+      is_sint16_chunk(m_10) /\ is_sint32_chunk(m_7[a_7 <- 5]) /\
+      is_sint64_chunk(m_5[a_5 <- 7]) /\ is_sint8_chunk(m_3) /\
+      is_uint16_chunk(m_8[a_8 <- 4]) /\ is_uint32_chunk(m_6[a_6 <- 6]) /\
+      is_uint64_chunk(m_4[a_4 <- 8]) /\ is_uint8_chunk(m_1).
+  (* Heap *)
+  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
+      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
+      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
+      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
+      linked(Malloc_0) /\ sconst(Mchar_0).
+  (* Goal *)
+  When: (i_1 <= i) /\ (0 <= i_1).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
+      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
+      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_2[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_9[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_8[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_7[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_6[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_5[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_4[shift_uint64(u64_0, i_2)] = 8))).
+  (* Then *)
+  Have: i <= 9.
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_1, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_9, 1).
   (* Assertion 'rte,mem_access' *)
@@ -333,58 +445,61 @@ Assume {
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_sint8(i8_0, i_2)] = 1))).
+      (m_3[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_1[shift_uint8(u8_0, i_2)] = 2))).
 }
-Prove: a_25[shift_uint8(u8_0, i_1)] = 2.
+Prove: m_10[shift_sint16(i16_0, i_1)] = 3.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant ("chunk_typing.i", line 34, characters 20-66):
+Goal Establishment of Invariant ("chunk_typing.i", line 35, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant ("chunk_typing.i", line 34, characters 20-66):
-Let a = shift_uint8(u8_0, 0).
-Let a_1 = memcpy(Mint_6, a, Mint_undef_6, a, 10).
-Let a_2 = shift_uint8(u8_0, i).
-Let a_3 = a_1[a_2 <- 2].
+Goal Preservation of Invariant ("chunk_typing.i", line 35, characters 20-66):
+Let a = shift_sint16(i16_0, 0).
+Let m = memcpy(Mint_1, a, Mint_undef_1, a, 10).
+Let a_1 = shift_sint16(i16_0, i).
+Let m_1 = m[a_1 <- 3].
+Let a_2 = shift_uint8(u8_0, 0).
+Let m_2 = memcpy(Mint_6, a_2, Mint_undef_6, a_2, 10).
+Let a_3 = shift_uint8(u8_0, i).
+Let m_3 = m_2[a_3 <- 2].
 Let a_4 = shift_sint8(i8_0, 0).
-Let a_5 = memcpy(Mchar_0, a_4, Mchar_undef_0, a_4, 10).
-Let a_6 = shift_sint8(i8_0, i).
-Let a_7 = a_5[a_6 <- 1].
-Let a_8 = shift_uint64(u64_0, i).
-Let a_9 = shift_sint64(i64_0, i).
-Let a_10 = shift_uint32(u32_0, i).
-Let a_11 = shift_sint32(i32_0, i).
-Let a_12 = shift_uint16(u16_0, i).
-Let a_13 = shift_sint16(i16_0, i).
-Let a_14 = shift_uint64(u64_0, 0).
-Let a_15 = memcpy(Mint_5, a_14, Mint_undef_5, a_14, 10).
-Let a_16 = shift_sint64(i64_0, 0).
-Let a_17 = memcpy(Mint_2, a_16, Mint_undef_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = memcpy(Mint_4, a_18, Mint_undef_4, a_18, 10).
-Let a_20 = shift_sint32(i32_0, 0).
-Let a_21 = memcpy(Mint_1, a_20, Mint_undef_1, a_20, 10).
-Let a_22 = shift_uint16(u16_0, 0).
-Let a_23 = memcpy(Mint_3, a_22, Mint_undef_3, a_22, 10).
-Let a_24 = shift_sint16(i16_0, 0).
-Let a_25 = memcpy(Mint_0, a_24, Mint_undef_0, a_24, 10).
-Let a_26 = a_25[a_13 <- 3].
+Let m_4 = memcpy(Mchar_0, a_4, Mchar_undef_0, a_4, 10).
+Let a_5 = shift_sint8(i8_0, i).
+Let m_5 = m_4[a_5 <- 1].
+Let a_6 = shift_uint64(u64_0, i).
+Let a_7 = shift_sint64(i64_0, i).
+Let a_8 = shift_uint32(u32_0, i).
+Let a_9 = shift_sint32(i32_0, i).
+Let a_10 = shift_uint16(u16_0, i).
+Let a_11 = shift_uint64(u64_0, 0).
+Let m_6 = memcpy(Mint_5, a_11, Mint_undef_5, a_11, 10).
+Let a_12 = shift_sint64(i64_0, 0).
+Let m_7 = memcpy(Mint_3, a_12, Mint_undef_3, a_12, 10).
+Let a_13 = shift_uint32(u32_0, 0).
+Let m_8 = memcpy(Mint_4, a_13, Mint_undef_4, a_13, 10).
+Let a_14 = shift_sint32(i32_0, 0).
+Let m_9 = memcpy(Mint_2, a_14, Mint_undef_2, a_14, 10).
+Let a_15 = shift_uint16(u16_0, 0).
+Let m_10 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_11 = m_10[a_10 <- 4].
 Assume {
-  Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
-      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
-      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
+  Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
+      is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
+      is_uint16_chunk(Mint_0) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_25) /\ is_sint32_chunk(a_21) /\
-      is_sint64_chunk(a_17) /\ is_sint8_chunk(a_5) /\
-      is_uint16_chunk(a_23) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_15) /\ is_uint8_chunk(a_1) /\
-      is_sint16_chunk(a_26) /\ is_sint32_chunk(a_21[a_11 <- 5]) /\
-      is_sint64_chunk(a_17[a_9 <- 7]) /\ is_sint8_chunk(a_7) /\
-      is_uint16_chunk(a_23[a_12 <- 4]) /\ is_uint32_chunk(a_19[a_10 <- 6]) /\
-      is_uint64_chunk(a_15[a_8 <- 8]) /\ is_uint8_chunk(a_3).
+      is_sint32(1 + i) /\ is_sint16_chunk(m) /\ is_sint32_chunk(m_9) /\
+      is_sint64_chunk(m_7) /\ is_sint8_chunk(m_4) /\ is_uint16_chunk(m_10) /\
+      is_uint32_chunk(m_8) /\ is_uint64_chunk(m_6) /\ is_uint8_chunk(m_2) /\
+      is_sint16_chunk(m_1) /\ is_sint32_chunk(m_9[a_9 <- 5]) /\
+      is_sint64_chunk(m_7[a_7 <- 7]) /\ is_sint8_chunk(m_5) /\
+      is_uint16_chunk(m_11) /\ is_uint32_chunk(m_8[a_8 <- 6]) /\
+      is_uint64_chunk(m_6[a_6 <- 8]) /\ is_uint8_chunk(m_3).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -394,46 +509,168 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_24, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
-      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a, 10).
+  Have: valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
+      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_2, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_sint8(i8_0, i_2)] = 1))).
+      (m_4[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_uint8(u8_0, i_2)] = 2))).
+      (m_2[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_25[shift_sint16(i16_0, i_2)] = 3))).
+      (m[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint16(u16_0, i_2)] = 4))).
+      (m_10[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint32(i32_0, i_2)] = 5))).
+      (m_9[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
+      (m_8[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint64(i64_0, i_2)] = 7))).
+      (m_7[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint64(u64_0, i_2)] = 8))).
+      (m_6[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_5, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_1, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_9, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_8, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_7, 1).
+  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
+  (* Assertion 'rte,signed_overflow' *)
+  Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_5[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_3[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_1[shift_sint16(i16_0, i_2)] = 3))).
+}
+Prove: m_11[shift_uint16(u16_0, i_1)] = 4.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant ("chunk_typing.i", line 36, characters 20-66):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant ("chunk_typing.i", line 36, characters 20-66):
+Let a = shift_uint16(u16_0, 0).
+Let m = memcpy(Mint_3, a, Mint_undef_3, a, 10).
+Let a_1 = shift_uint16(u16_0, i).
+Let m_1 = m[a_1 <- 4].
+Let a_2 = shift_sint16(i16_0, 0).
+Let m_2 = memcpy(Mint_1, a_2, Mint_undef_1, a_2, 10).
+Let a_3 = shift_sint16(i16_0, i).
+Let m_3 = m_2[a_3 <- 3].
+Let a_4 = shift_uint8(u8_0, 0).
+Let m_4 = memcpy(Mint_6, a_4, Mint_undef_6, a_4, 10).
+Let a_5 = shift_uint8(u8_0, i).
+Let m_5 = m_4[a_5 <- 2].
+Let a_6 = shift_sint8(i8_0, 0).
+Let m_6 = memcpy(Mchar_0, a_6, Mchar_undef_0, a_6, 10).
+Let a_7 = shift_sint8(i8_0, i).
+Let m_7 = m_6[a_7 <- 1].
+Let a_8 = shift_uint64(u64_0, i).
+Let a_9 = shift_sint64(i64_0, i).
+Let a_10 = shift_uint32(u32_0, i).
+Let a_11 = shift_sint32(i32_0, i).
+Let a_12 = shift_uint64(u64_0, 0).
+Let m_8 = memcpy(Mint_5, a_12, Mint_undef_5, a_12, 10).
+Let a_13 = shift_sint64(i64_0, 0).
+Let m_9 = memcpy(Mint_2, a_13, Mint_undef_2, a_13, 10).
+Let a_14 = shift_uint32(u32_0, 0).
+Let m_10 = memcpy(Mint_4, a_14, Mint_undef_4, a_14, 10).
+Let a_15 = shift_sint32(i32_0, 0).
+Let m_11 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_12 = m_11[a_11 <- 5].
+Assume {
+  Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_0) /\
+      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
+      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
+      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
+      is_sint32(1 + i) /\ is_sint16_chunk(m_2) /\ is_sint32_chunk(m_11) /\
+      is_sint64_chunk(m_9) /\ is_sint8_chunk(m_6) /\ is_uint16_chunk(m) /\
+      is_uint32_chunk(m_10) /\ is_uint64_chunk(m_8) /\ is_uint8_chunk(m_4) /\
+      is_sint16_chunk(m_3) /\ is_sint32_chunk(m_12) /\
+      is_sint64_chunk(m_9[a_9 <- 7]) /\ is_sint8_chunk(m_7) /\
+      is_uint16_chunk(m_1) /\ is_uint32_chunk(m_10[a_10 <- 6]) /\
+      is_uint64_chunk(m_8[a_8 <- 8]) /\ is_uint8_chunk(m_5).
+  (* Heap *)
+  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
+      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
+      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
+      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
+      linked(Malloc_0) /\ sconst(Mchar_0).
+  (* Goal *)
+  When: (i_1 <= i) /\ (0 <= i_1).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
+      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_6[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_4[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_2[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_11[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_10[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_9[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (m_8[shift_uint64(u64_0, i_2)] = 8))).
+  (* Then *)
+  Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
+  Have: valid_rw(Malloc_0, a_7, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_13, 1).
+  Have: valid_rw(Malloc_0, a_5, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_12, 1).
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_1, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_11, 1).
   (* Assertion 'rte,mem_access' *)
@@ -448,260 +685,18 @@ Assume {
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_sint8(i8_0, i_2)] = 1))).
+      (m_7[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_uint8(u8_0, i_2)] = 2))).
+      (m_5[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_3[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (m_1[shift_uint16(u16_0, i_2)] = 4))).
 }
-Prove: a_26[shift_sint16(i16_0, i_1)] = 3.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant ("chunk_typing.i", line 35, characters 20-66):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Preservation of Invariant ("chunk_typing.i", line 35, characters 20-66):
-Let a = shift_sint16(i16_0, 0).
-Let a_1 = memcpy(Mint_1, a, Mint_undef_1, a, 10).
-Let a_2 = shift_sint16(i16_0, i).
-Let a_3 = a_1[a_2 <- 3].
-Let a_4 = shift_uint8(u8_0, 0).
-Let a_5 = memcpy(Mint_6, a_4, Mint_undef_6, a_4, 10).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = a_5[a_6 <- 2].
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = memcpy(Mchar_0, a_8, Mchar_undef_0, a_8, 10).
-Let a_10 = shift_sint8(i8_0, i).
-Let a_11 = a_9[a_10 <- 1].
-Let a_12 = shift_uint64(u64_0, i).
-Let a_13 = shift_sint64(i64_0, i).
-Let a_14 = shift_uint32(u32_0, i).
-Let a_15 = shift_sint32(i32_0, i).
-Let a_16 = shift_uint16(u16_0, i).
-Let a_17 = shift_uint64(u64_0, 0).
-Let a_18 = memcpy(Mint_5, a_17, Mint_undef_5, a_17, 10).
-Let a_19 = shift_sint64(i64_0, 0).
-Let a_20 = memcpy(Mint_3, a_19, Mint_undef_3, a_19, 10).
-Let a_21 = shift_uint32(u32_0, 0).
-Let a_22 = memcpy(Mint_4, a_21, Mint_undef_4, a_21, 10).
-Let a_23 = shift_sint32(i32_0, 0).
-Let a_24 = memcpy(Mint_2, a_23, Mint_undef_2, a_23, 10).
-Let a_25 = shift_uint16(u16_0, 0).
-Let a_26 = memcpy(Mint_0, a_25, Mint_undef_0, a_25, 10).
-Let a_27 = a_26[a_16 <- 4].
-Assume {
-  Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
-      is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
-      is_uint16_chunk(Mint_0) /\ is_uint32_chunk(Mint_4) /\
-      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_1) /\ is_sint32_chunk(a_24) /\
-      is_sint64_chunk(a_20) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_26) /\ is_uint32_chunk(a_22) /\
-      is_uint64_chunk(a_18) /\ is_uint8_chunk(a_5) /\ is_sint16_chunk(a_3) /\
-      is_sint32_chunk(a_24[a_15 <- 5]) /\ is_sint64_chunk(a_20[a_13 <- 7]) /\
-      is_sint8_chunk(a_11) /\ is_uint16_chunk(a_27) /\
-      is_uint32_chunk(a_22[a_14 <- 6]) /\ is_uint64_chunk(a_18[a_12 <- 8]) /\
-      is_uint8_chunk(a_7).
-  (* Heap *)
-  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
-      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
-      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
-      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Goal *)
-  When: (i_1 <= i) /\ (0 <= i_1).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_23, 10) /\
-      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_25, 10) /\ valid_rw(Malloc_0, a_21, 10) /\
-      valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_4, 10).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_26[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_24[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_22[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_20[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_18[shift_uint64(u64_0, i_2)] = 8))).
-  (* Then *)
-  Have: i <= 9.
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_10, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_16, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_15, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_14, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_13, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_12, 1).
-  (* Assertion 'rte,signed_overflow' *)
-  Have: i <= 2147483646.
-  (* Invariant *)
-  Have: (-1) <= i.
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_11[shift_sint8(i8_0, i_2)] = 1))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_sint16(i16_0, i_2)] = 3))).
-}
-Prove: a_27[shift_uint16(u16_0, i_1)] = 4.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant ("chunk_typing.i", line 36, characters 20-66):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Preservation of Invariant ("chunk_typing.i", line 36, characters 20-66):
-Let a = shift_uint16(u16_0, 0).
-Let a_1 = memcpy(Mint_3, a, Mint_undef_3, a, 10).
-Let a_2 = shift_uint16(u16_0, i).
-Let a_3 = a_1[a_2 <- 4].
-Let a_4 = shift_sint16(i16_0, 0).
-Let a_5 = memcpy(Mint_1, a_4, Mint_undef_1, a_4, 10).
-Let a_6 = shift_sint16(i16_0, i).
-Let a_7 = a_5[a_6 <- 3].
-Let a_8 = shift_uint8(u8_0, 0).
-Let a_9 = memcpy(Mint_6, a_8, Mint_undef_6, a_8, 10).
-Let a_10 = shift_uint8(u8_0, i).
-Let a_11 = a_9[a_10 <- 2].
-Let a_12 = shift_sint8(i8_0, 0).
-Let a_13 = memcpy(Mchar_0, a_12, Mchar_undef_0, a_12, 10).
-Let a_14 = shift_sint8(i8_0, i).
-Let a_15 = a_13[a_14 <- 1].
-Let a_16 = shift_uint64(u64_0, i).
-Let a_17 = shift_sint64(i64_0, i).
-Let a_18 = shift_uint32(u32_0, i).
-Let a_19 = shift_sint32(i32_0, i).
-Let a_20 = shift_uint64(u64_0, 0).
-Let a_21 = memcpy(Mint_5, a_20, Mint_undef_5, a_20, 10).
-Let a_22 = shift_sint64(i64_0, 0).
-Let a_23 = memcpy(Mint_2, a_22, Mint_undef_2, a_22, 10).
-Let a_24 = shift_uint32(u32_0, 0).
-Let a_25 = memcpy(Mint_4, a_24, Mint_undef_4, a_24, 10).
-Let a_26 = shift_sint32(i32_0, 0).
-Let a_27 = memcpy(Mint_0, a_26, Mint_undef_0, a_26, 10).
-Let a_28 = a_27[a_19 <- 5].
-Assume {
-  Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_0) /\
-      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
-      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
-      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_5) /\ is_sint32_chunk(a_27) /\
-      is_sint64_chunk(a_23) /\ is_sint8_chunk(a_13) /\
-      is_uint16_chunk(a_1) /\ is_uint32_chunk(a_25) /\
-      is_uint64_chunk(a_21) /\ is_uint8_chunk(a_9) /\ is_sint16_chunk(a_7) /\
-      is_sint32_chunk(a_28) /\ is_sint64_chunk(a_23[a_17 <- 7]) /\
-      is_sint8_chunk(a_15) /\ is_uint16_chunk(a_3) /\
-      is_uint32_chunk(a_25[a_18 <- 6]) /\ is_uint64_chunk(a_21[a_16 <- 8]) /\
-      is_uint8_chunk(a_11).
-  (* Heap *)
-  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
-      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
-      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
-      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Goal *)
-  When: (i_1 <= i) /\ (0 <= i_1).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_26, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
-      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_24, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint8(i8_0, i_2)] = 1))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_27[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_25[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_uint64(u64_0, i_2)] = 8))).
-  (* Then *)
-  Have: i <= 9.
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_14, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_10, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_19, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_18, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_17, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_16, 1).
-  (* Assertion 'rte,signed_overflow' *)
-  Have: i <= 2147483646.
-  (* Invariant *)
-  Have: (-1) <= i.
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_15[shift_sint8(i8_0, i_2)] = 1))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_uint16(u16_0, i_2)] = 4))).
-}
-Prove: a_28[shift_sint32(i32_0, i_1)] = 5.
+Prove: m_12[shift_sint32(i32_0, i_1)] = 5.
 
 ------------------------------------------------------------
 
@@ -712,48 +707,47 @@ Prove: true.
 
 Goal Preservation of Invariant ("chunk_typing.i", line 37, characters 20-66):
 Let a = shift_sint32(i32_0, 0).
-Let a_1 = memcpy(Mint_2, a, Mint_undef_2, a, 10).
-Let a_2 = shift_sint32(i32_0, i).
-Let a_3 = a_1[a_2 <- 5].
-Let a_4 = shift_uint16(u16_0, 0).
-Let a_5 = memcpy(Mint_4, a_4, Mint_undef_4, a_4, 10).
-Let a_6 = shift_uint16(u16_0, i).
-Let a_7 = a_5[a_6 <- 4].
-Let a_8 = shift_sint16(i16_0, 0).
-Let a_9 = memcpy(Mint_1, a_8, Mint_undef_1, a_8, 10).
-Let a_10 = shift_sint16(i16_0, i).
-Let a_11 = a_9[a_10 <- 3].
-Let a_12 = shift_uint8(u8_0, 0).
-Let a_13 = memcpy(Mint_6, a_12, Mint_undef_6, a_12, 10).
-Let a_14 = shift_uint8(u8_0, i).
-Let a_15 = a_13[a_14 <- 2].
-Let a_16 = shift_sint8(i8_0, 0).
-Let a_17 = memcpy(Mchar_0, a_16, Mchar_undef_0, a_16, 10).
-Let a_18 = shift_sint8(i8_0, i).
-Let a_19 = a_17[a_18 <- 1].
-Let a_20 = shift_uint64(u64_0, i).
-Let a_21 = shift_sint64(i64_0, i).
-Let a_22 = shift_uint32(u32_0, i).
-Let a_23 = shift_uint64(u64_0, 0).
-Let a_24 = memcpy(Mint_5, a_23, Mint_undef_5, a_23, 10).
-Let a_25 = shift_sint64(i64_0, 0).
-Let a_26 = memcpy(Mint_3, a_25, Mint_undef_3, a_25, 10).
-Let a_27 = shift_uint32(u32_0, 0).
-Let a_28 = memcpy(Mint_0, a_27, Mint_undef_0, a_27, 10).
-Let a_29 = a_28[a_22 <- 6].
+Let m = memcpy(Mint_2, a, Mint_undef_2, a, 10).
+Let a_1 = shift_sint32(i32_0, i).
+Let m_1 = m[a_1 <- 5].
+Let a_2 = shift_uint16(u16_0, 0).
+Let m_2 = memcpy(Mint_4, a_2, Mint_undef_4, a_2, 10).
+Let a_3 = shift_uint16(u16_0, i).
+Let m_3 = m_2[a_3 <- 4].
+Let a_4 = shift_sint16(i16_0, 0).
+Let m_4 = memcpy(Mint_1, a_4, Mint_undef_1, a_4, 10).
+Let a_5 = shift_sint16(i16_0, i).
+Let m_5 = m_4[a_5 <- 3].
+Let a_6 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_6, Mint_undef_6, a_6, 10).
+Let a_7 = shift_uint8(u8_0, i).
+Let m_7 = m_6[a_7 <- 2].
+Let a_8 = shift_sint8(i8_0, 0).
+Let m_8 = memcpy(Mchar_0, a_8, Mchar_undef_0, a_8, 10).
+Let a_9 = shift_sint8(i8_0, i).
+Let m_9 = m_8[a_9 <- 1].
+Let a_10 = shift_uint64(u64_0, i).
+Let a_11 = shift_sint64(i64_0, i).
+Let a_12 = shift_uint32(u32_0, i).
+Let a_13 = shift_uint64(u64_0, 0).
+Let m_10 = memcpy(Mint_5, a_13, Mint_undef_5, a_13, 10).
+Let a_14 = shift_sint64(i64_0, 0).
+Let m_11 = memcpy(Mint_3, a_14, Mint_undef_3, a_14, 10).
+Let a_15 = shift_uint32(u32_0, 0).
+Let m_12 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_13 = m_12[a_12 <- 6].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_0) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_9) /\ is_sint32_chunk(a_1) /\
-      is_sint64_chunk(a_26) /\ is_sint8_chunk(a_17) /\
-      is_uint16_chunk(a_5) /\ is_uint32_chunk(a_28) /\
-      is_uint64_chunk(a_24) /\ is_uint8_chunk(a_13) /\
-      is_sint16_chunk(a_11) /\ is_sint32_chunk(a_3) /\
-      is_sint64_chunk(a_26[a_21 <- 7]) /\ is_sint8_chunk(a_19) /\
-      is_uint16_chunk(a_7) /\ is_uint32_chunk(a_29) /\
-      is_uint64_chunk(a_24[a_20 <- 8]) /\ is_uint8_chunk(a_15).
+      is_sint32(1 + i) /\ is_sint16_chunk(m_4) /\ is_sint32_chunk(m) /\
+      is_sint64_chunk(m_11) /\ is_sint8_chunk(m_8) /\ is_uint16_chunk(m_2) /\
+      is_uint32_chunk(m_12) /\ is_uint64_chunk(m_10) /\
+      is_uint8_chunk(m_6) /\ is_sint16_chunk(m_5) /\ is_sint32_chunk(m_1) /\
+      is_sint64_chunk(m_11[a_11 <- 7]) /\ is_sint8_chunk(m_9) /\
+      is_uint16_chunk(m_3) /\ is_uint32_chunk(m_13) /\
+      is_uint64_chunk(m_10[a_10 <- 8]) /\ is_uint8_chunk(m_7).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -763,75 +757,75 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a, 10) /\
-      valid_rw(Malloc_0, a_25, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_27, 10) /\
-      valid_rw(Malloc_0, a_23, 10) /\ valid_rw(Malloc_0, a_12, 10).
+  Have: valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
+      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_6, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint8(i8_0, i_2)] = 1))).
+      (m_8[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_uint8(u8_0, i_2)] = 2))).
+      (m_6[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint16(i16_0, i_2)] = 3))).
+      (m_4[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_uint16(u16_0, i_2)] = 4))).
+      (m_2[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_sint32(i32_0, i_2)] = 5))).
+      (m[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_28[shift_uint32(u32_0, i_2)] = 6))).
+      (m_12[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_26[shift_sint64(i64_0, i_2)] = 7))).
+      (m_11[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_24[shift_uint64(u64_0, i_2)] = 8))).
+      (m_10[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_18, 1).
+  Have: valid_rw(Malloc_0, a_9, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_14, 1).
+  Have: valid_rw(Malloc_0, a_7, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_5, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_1, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_12, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_11, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_10, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_22, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_21, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_20, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
   (* Invariant *)
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_19[shift_sint8(i8_0, i_2)] = 1))).
+      (m_9[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_15[shift_uint8(u8_0, i_2)] = 2))).
+      (m_7[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_11[shift_sint16(i16_0, i_2)] = 3))).
+      (m_5[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_uint16(u16_0, i_2)] = 4))).
+      (m_3[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_sint32(i32_0, i_2)] = 5))).
+      (m_1[shift_sint32(i32_0, i_2)] = 5))).
 }
-Prove: a_29[shift_uint32(u32_0, i_1)] = 6.
+Prove: m_13[shift_uint32(u32_0, i_1)] = 6.
 
 ------------------------------------------------------------
 
@@ -842,49 +836,48 @@ Prove: true.
 
 Goal Preservation of Invariant ("chunk_typing.i", line 38, characters 20-66):
 Let a = shift_uint32(u32_0, 0).
-Let a_1 = memcpy(Mint_4, a, Mint_undef_4, a, 10).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = a_1[a_2 <- 6].
-Let a_4 = shift_sint32(i32_0, 0).
-Let a_5 = memcpy(Mint_2, a_4, Mint_undef_2, a_4, 10).
-Let a_6 = shift_sint32(i32_0, i).
-Let a_7 = a_5[a_6 <- 5].
-Let a_8 = shift_uint16(u16_0, 0).
-Let a_9 = memcpy(Mint_3, a_8, Mint_undef_3, a_8, 10).
-Let a_10 = shift_uint16(u16_0, i).
-Let a_11 = a_9[a_10 <- 4].
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = memcpy(Mint_1, a_12, Mint_undef_1, a_12, 10).
-Let a_14 = shift_sint16(i16_0, i).
-Let a_15 = a_13[a_14 <- 3].
-Let a_16 = shift_uint8(u8_0, 0).
-Let a_17 = memcpy(Mint_6, a_16, Mint_undef_6, a_16, 10).
-Let a_18 = shift_uint8(u8_0, i).
-Let a_19 = a_17[a_18 <- 2].
-Let a_20 = shift_sint8(i8_0, 0).
-Let a_21 = memcpy(Mchar_0, a_20, Mchar_undef_0, a_20, 10).
-Let a_22 = shift_sint8(i8_0, i).
-Let a_23 = a_21[a_22 <- 1].
-Let a_24 = shift_uint64(u64_0, i).
-Let a_25 = shift_sint64(i64_0, i).
-Let a_26 = shift_uint64(u64_0, 0).
-Let a_27 = memcpy(Mint_5, a_26, Mint_undef_5, a_26, 10).
-Let a_28 = shift_sint64(i64_0, 0).
-Let a_29 = memcpy(Mint_0, a_28, Mint_undef_0, a_28, 10).
-Let a_30 = a_29[a_25 <- 7].
+Let m = memcpy(Mint_4, a, Mint_undef_4, a, 10).
+Let a_1 = shift_uint32(u32_0, i).
+Let m_1 = m[a_1 <- 6].
+Let a_2 = shift_sint32(i32_0, 0).
+Let m_2 = memcpy(Mint_2, a_2, Mint_undef_2, a_2, 10).
+Let a_3 = shift_sint32(i32_0, i).
+Let m_3 = m_2[a_3 <- 5].
+Let a_4 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_4, Mint_undef_3, a_4, 10).
+Let a_5 = shift_uint16(u16_0, i).
+Let m_5 = m_4[a_5 <- 4].
+Let a_6 = shift_sint16(i16_0, 0).
+Let m_6 = memcpy(Mint_1, a_6, Mint_undef_1, a_6, 10).
+Let a_7 = shift_sint16(i16_0, i).
+Let m_7 = m_6[a_7 <- 3].
+Let a_8 = shift_uint8(u8_0, 0).
+Let m_8 = memcpy(Mint_6, a_8, Mint_undef_6, a_8, 10).
+Let a_9 = shift_uint8(u8_0, i).
+Let m_9 = m_8[a_9 <- 2].
+Let a_10 = shift_sint8(i8_0, 0).
+Let m_10 = memcpy(Mchar_0, a_10, Mchar_undef_0, a_10, 10).
+Let a_11 = shift_sint8(i8_0, i).
+Let m_11 = m_10[a_11 <- 1].
+Let a_12 = shift_uint64(u64_0, i).
+Let a_13 = shift_sint64(i64_0, i).
+Let a_14 = shift_uint64(u64_0, 0).
+Let m_12 = memcpy(Mint_5, a_14, Mint_undef_5, a_14, 10).
+Let a_15 = shift_sint64(i64_0, 0).
+Let m_13 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_14 = m_13[a_13 <- 7].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_0) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_5) /\
-      is_sint64_chunk(a_29) /\ is_sint8_chunk(a_21) /\
-      is_uint16_chunk(a_9) /\ is_uint32_chunk(a_1) /\
-      is_uint64_chunk(a_27) /\ is_uint8_chunk(a_17) /\
-      is_sint16_chunk(a_15) /\ is_sint32_chunk(a_7) /\
-      is_sint64_chunk(a_30) /\ is_sint8_chunk(a_23) /\
-      is_uint16_chunk(a_11) /\ is_uint32_chunk(a_3) /\
-      is_uint64_chunk(a_27[a_24 <- 8]) /\ is_uint8_chunk(a_19).
+      is_sint32(1 + i) /\ is_sint16_chunk(m_6) /\ is_sint32_chunk(m_2) /\
+      is_sint64_chunk(m_13) /\ is_sint8_chunk(m_10) /\
+      is_uint16_chunk(m_4) /\ is_uint32_chunk(m) /\ is_uint64_chunk(m_12) /\
+      is_uint8_chunk(m_8) /\ is_sint16_chunk(m_7) /\ is_sint32_chunk(m_3) /\
+      is_sint64_chunk(m_14) /\ is_sint8_chunk(m_11) /\
+      is_uint16_chunk(m_5) /\ is_uint32_chunk(m_1) /\
+      is_uint64_chunk(m_12[a_12 <- 8]) /\ is_uint8_chunk(m_9).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -894,78 +887,78 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a_28, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a, 10) /\
-      valid_rw(Malloc_0, a_26, 10) /\ valid_rw(Malloc_0, a_16, 10).
+  Have: valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
+      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_8, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint8(i8_0, i_2)] = 1))).
+      (m_10[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_uint8(u8_0, i_2)] = 2))).
+      (m_8[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
+      (m_6[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_uint16(u16_0, i_2)] = 4))).
+      (m_4[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_sint32(i32_0, i_2)] = 5))).
+      (m_2[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_uint32(u32_0, i_2)] = 6))).
+      (m[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_29[shift_sint64(i64_0, i_2)] = 7))).
+      (m_13[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_27[shift_uint64(u64_0, i_2)] = 8))).
+      (m_12[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_22, 1).
+  Have: valid_rw(Malloc_0, a_11, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_18, 1).
+  Have: valid_rw(Malloc_0, a_9, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_14, 1).
+  Have: valid_rw(Malloc_0, a_7, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_10, 1).
+  Have: valid_rw(Malloc_0, a_5, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
+  Have: valid_rw(Malloc_0, a_3, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
+  Have: valid_rw(Malloc_0, a_1, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_25, 1).
+  Have: valid_rw(Malloc_0, a_13, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_24, 1).
+  Have: valid_rw(Malloc_0, a_12, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
   (* Invariant *)
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_23[shift_sint8(i8_0, i_2)] = 1))).
+      (m_11[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_19[shift_uint8(u8_0, i_2)] = 2))).
+      (m_9[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_15[shift_sint16(i16_0, i_2)] = 3))).
+      (m_7[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_11[shift_uint16(u16_0, i_2)] = 4))).
+      (m_5[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_sint32(i32_0, i_2)] = 5))).
+      (m_3[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_uint32(u32_0, i_2)] = 6))).
+      (m_1[shift_uint32(u32_0, i_2)] = 6))).
 }
-Prove: a_30[shift_sint64(i64_0, i_1)] = 7.
+Prove: m_14[shift_sint64(i64_0, i_1)] = 7.
 
 ------------------------------------------------------------
 
@@ -976,50 +969,48 @@ Prove: true.
 
 Goal Preservation of Invariant ("chunk_typing.i", line 39, characters 20-66):
 Let a = shift_sint64(i64_0, 0).
-Let a_1 = memcpy(Mint_3, a, Mint_undef_3, a, 10).
-Let a_2 = shift_sint64(i64_0, i).
-Let a_3 = a_1[a_2 <- 7].
-Let a_4 = shift_uint32(u32_0, 0).
-Let a_5 = memcpy(Mint_5, a_4, Mint_undef_5, a_4, 10).
-Let a_6 = shift_uint32(u32_0, i).
-Let a_7 = a_5[a_6 <- 6].
-Let a_8 = shift_sint32(i32_0, 0).
-Let a_9 = memcpy(Mint_2, a_8, Mint_undef_2, a_8, 10).
-Let a_10 = shift_sint32(i32_0, i).
-Let a_11 = a_9[a_10 <- 5].
-Let a_12 = shift_uint16(u16_0, 0).
-Let a_13 = memcpy(Mint_4, a_12, Mint_undef_4, a_12, 10).
-Let a_14 = shift_uint16(u16_0, i).
-Let a_15 = a_13[a_14 <- 4].
-Let a_16 = shift_sint16(i16_0, 0).
-Let a_17 = memcpy(Mint_1, a_16, Mint_undef_1, a_16, 10).
-Let a_18 = shift_sint16(i16_0, i).
-Let a_19 = a_17[a_18 <- 3].
-Let a_20 = shift_uint8(u8_0, 0).
-Let a_21 = memcpy(Mint_6, a_20, Mint_undef_6, a_20, 10).
-Let a_22 = shift_uint8(u8_0, i).
-Let a_23 = a_21[a_22 <- 2].
-Let a_24 = shift_sint8(i8_0, 0).
-Let a_25 = memcpy(Mchar_0, a_24, Mchar_undef_0, a_24, 10).
-Let a_26 = shift_sint8(i8_0, i).
-Let a_27 = a_25[a_26 <- 1].
-Let a_28 = shift_uint64(u64_0, i).
-Let a_29 = shift_uint64(u64_0, 0).
-Let a_30 = memcpy(Mint_0, a_29, Mint_undef_0, a_29, 10).
-Let a_31 = a_30[a_28 <- 8].
+Let m = memcpy(Mint_3, a, Mint_undef_3, a, 10).
+Let a_1 = shift_sint64(i64_0, i).
+Let m_1 = m[a_1 <- 7].
+Let a_2 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_5, a_2, Mint_undef_5, a_2, 10).
+Let a_3 = shift_uint32(u32_0, i).
+Let m_3 = m_2[a_3 <- 6].
+Let a_4 = shift_sint32(i32_0, 0).
+Let m_4 = memcpy(Mint_2, a_4, Mint_undef_2, a_4, 10).
+Let a_5 = shift_sint32(i32_0, i).
+Let m_5 = m_4[a_5 <- 5].
+Let a_6 = shift_uint16(u16_0, 0).
+Let m_6 = memcpy(Mint_4, a_6, Mint_undef_4, a_6, 10).
+Let a_7 = shift_uint16(u16_0, i).
+Let m_7 = m_6[a_7 <- 4].
+Let a_8 = shift_sint16(i16_0, 0).
+Let m_8 = memcpy(Mint_1, a_8, Mint_undef_1, a_8, 10).
+Let a_9 = shift_sint16(i16_0, i).
+Let m_9 = m_8[a_9 <- 3].
+Let a_10 = shift_uint8(u8_0, 0).
+Let m_10 = memcpy(Mint_6, a_10, Mint_undef_6, a_10, 10).
+Let a_11 = shift_uint8(u8_0, i).
+Let m_11 = m_10[a_11 <- 2].
+Let a_12 = shift_sint8(i8_0, 0).
+Let m_12 = memcpy(Mchar_0, a_12, Mchar_undef_0, a_12, 10).
+Let a_13 = shift_sint8(i8_0, i).
+Let m_13 = m_12[a_13 <- 1].
+Let a_14 = shift_uint64(u64_0, i).
+Let a_15 = shift_uint64(u64_0, 0).
+Let m_14 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
+Let m_15 = m_14[a_14 <- 8].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_5) /\
       is_uint64_chunk(Mint_0) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_17) /\ is_sint32_chunk(a_9) /\
-      is_sint64_chunk(a_1) /\ is_sint8_chunk(a_25) /\
-      is_uint16_chunk(a_13) /\ is_uint32_chunk(a_5) /\
-      is_uint64_chunk(a_30) /\ is_uint8_chunk(a_21) /\
-      is_sint16_chunk(a_19) /\ is_sint32_chunk(a_11) /\
-      is_sint64_chunk(a_3) /\ is_sint8_chunk(a_27) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_7) /\
-      is_uint64_chunk(a_31) /\ is_uint8_chunk(a_23).
+      is_sint32(1 + i) /\ is_sint16_chunk(m_8) /\ is_sint32_chunk(m_4) /\
+      is_sint64_chunk(m) /\ is_sint8_chunk(m_12) /\ is_uint16_chunk(m_6) /\
+      is_uint32_chunk(m_2) /\ is_uint64_chunk(m_14) /\
+      is_uint8_chunk(m_10) /\ is_sint16_chunk(m_9) /\ is_sint32_chunk(m_5) /\
+      is_sint64_chunk(m_1) /\ is_sint8_chunk(m_13) /\ is_uint16_chunk(m_7) /\
+      is_uint32_chunk(m_3) /\ is_uint64_chunk(m_15) /\ is_uint8_chunk(m_11).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1029,109 +1020,109 @@ Assume {
   (* Goal *)
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_24, 10) /\
-      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a_29, 10) /\ valid_rw(Malloc_0, a_20, 10).
+  Have: valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
+      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_10, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_25[shift_sint8(i8_0, i_2)] = 1))).
+      (m_12[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_uint8(u8_0, i_2)] = 2))).
+      (m_10[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint16(i16_0, i_2)] = 3))).
+      (m_8[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_uint16(u16_0, i_2)] = 4))).
+      (m_6[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint32(i32_0, i_2)] = 5))).
+      (m_4[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_5[shift_uint32(u32_0, i_2)] = 6))).
+      (m_2[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_sint64(i64_0, i_2)] = 7))).
+      (m[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_30[shift_uint64(u64_0, i_2)] = 8))).
+      (m_14[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_26, 1).
+  Have: valid_rw(Malloc_0, a_13, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_22, 1).
+  Have: valid_rw(Malloc_0, a_11, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_18, 1).
+  Have: valid_rw(Malloc_0, a_9, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_7, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_5, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_3, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_1, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_14, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_10, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_28, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
   (* Invariant *)
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_27[shift_sint8(i8_0, i_2)] = 1))).
+      (m_13[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_23[shift_uint8(u8_0, i_2)] = 2))).
+      (m_11[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_19[shift_sint16(i16_0, i_2)] = 3))).
+      (m_9[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
+      (m_7[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_11[shift_sint32(i32_0, i_2)] = 5))).
+      (m_5[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_7[shift_uint32(u32_0, i_2)] = 6))).
+      (m_3[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (a_3[shift_sint64(i64_0, i_2)] = 7))).
+      (m_1[shift_sint64(i64_0, i_2)] = 7))).
 }
-Prove: a_31[shift_uint64(u64_0, i_1)] = 8.
+Prove: m_15[shift_uint64(u64_0, i_1)] = 8.
 
 ------------------------------------------------------------
 
 Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 45, characters 13-14):
 Let a = shift_uint64(u64_0, 0).
-Let a_1 = memcpy(Mint_5, a, Mint_undef_5, a, 10).
-Let a_2 = shift_sint64(i64_0, 0).
-Let a_3 = memcpy(Mint_2, a_2, Mint_undef_2, a_2, 10).
-Let a_4 = shift_uint32(u32_0, 0).
-Let a_5 = memcpy(Mint_4, a_4, Mint_undef_4, a_4, 10).
-Let a_6 = shift_sint32(i32_0, 0).
-Let a_7 = memcpy(Mint_1, a_6, Mint_undef_1, a_6, 10).
-Let a_8 = shift_uint16(u16_0, 0).
-Let a_9 = memcpy(Mint_3, a_8, Mint_undef_3, a_8, 10).
-Let a_10 = shift_sint16(i16_0, 0).
-Let a_11 = memcpy(Mint_0, a_10, Mint_undef_0, a_10, 10).
-Let a_12 = shift_uint8(u8_0, 0).
-Let a_13 = memcpy(Mint_6, a_12, Mint_undef_6, a_12, 10).
-Let a_14 = shift_sint8(i8_0, 0).
-Let a_15 = memcpy(Mchar_0, a_14, Mchar_undef_0, a_14, 10).
+Let m = memcpy(Mint_5, a, Mint_undef_5, a, 10).
+Let a_1 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_1, Mint_undef_2, a_1, 10).
+Let a_2 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_2, Mint_undef_4, a_2, 10).
+Let a_3 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_3, Mint_undef_1, a_3, 10).
+Let a_4 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_4, Mint_undef_3, a_4, 10).
+Let a_5 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_5, Mint_undef_0, a_5, 10).
+Let a_6 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_6, Mint_undef_6, a_6, 10).
+Let a_7 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_7, Mchar_undef_0, a_7, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_11) /\ is_sint32_chunk(a_7) /\
-      is_sint64_chunk(a_3) /\ is_sint8_chunk(a_15) /\ is_uint16_chunk(a_9) /\
-      is_uint32_chunk(a_5) /\ is_uint64_chunk(a_1) /\ is_uint8_chunk(a_13).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1139,36 +1130,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
-      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_12, 10).
+  Have: valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_3, 10) /\
+      valid_rw(Malloc_0, a_1, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_6, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_3[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
 }
@@ -1179,31 +1170,30 @@ Prove: valid_rw(Malloc_0, shift_sint8(i8_0, i), 1).
 Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 46, characters 13-14):
 Let a = shift_sint8(i8_0, i).
 Let a_1 = shift_uint64(u64_0, 0).
-Let a_2 = memcpy(Mint_5, a_1, Mint_undef_5, a_1, 10).
-Let a_3 = shift_sint64(i64_0, 0).
-Let a_4 = memcpy(Mint_2, a_3, Mint_undef_2, a_3, 10).
-Let a_5 = shift_uint32(u32_0, 0).
-Let a_6 = memcpy(Mint_4, a_5, Mint_undef_4, a_5, 10).
-Let a_7 = shift_sint32(i32_0, 0).
-Let a_8 = memcpy(Mint_1, a_7, Mint_undef_1, a_7, 10).
-Let a_9 = shift_uint16(u16_0, 0).
-Let a_10 = memcpy(Mint_3, a_9, Mint_undef_3, a_9, 10).
-Let a_11 = shift_sint16(i16_0, 0).
-Let a_12 = memcpy(Mint_0, a_11, Mint_undef_0, a_11, 10).
-Let a_13 = shift_uint8(u8_0, 0).
-Let a_14 = memcpy(Mint_6, a_13, Mint_undef_6, a_13, 10).
-Let a_15 = shift_sint8(i8_0, 0).
-Let a_16 = memcpy(Mchar_0, a_15, Mchar_undef_0, a_15, 10).
+Let m = memcpy(Mint_5, a_1, Mint_undef_5, a_1, 10).
+Let a_2 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_2, Mint_undef_2, a_2, 10).
+Let a_3 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_3, Mint_undef_4, a_3, 10).
+Let a_4 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_4, Mint_undef_1, a_4, 10).
+Let a_5 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_5, Mint_undef_3, a_5, 10).
+Let a_6 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_6, Mint_undef_0, a_6, 10).
+Let a_7 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_7, Mint_undef_6, a_7, 10).
+Let a_8 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_8, Mchar_undef_0, a_8, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_12) /\ is_sint32_chunk(a_8) /\
-      is_sint64_chunk(a_4) /\ is_sint8_chunk(a_16) /\
-      is_uint16_chunk(a_10) /\ is_uint32_chunk(a_6) /\
-      is_uint64_chunk(a_2) /\ is_uint8_chunk(a_14) /\
-      is_sint8_chunk(a_16[a <- 1]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint8_chunk(m_7[a <- 1]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1211,36 +1201,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
-      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
-      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_5, 10) /\
-      valid_rw(Malloc_0, a_1, 10) /\ valid_rw(Malloc_0, a_13, 10).
+  Have: valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_3, 10) /\
+      valid_rw(Malloc_0, a_1, 10) /\ valid_rw(Malloc_0, a_7, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_4[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_2[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1254,31 +1244,30 @@ Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 47, characters 14-15):
 Let a = shift_uint8(u8_0, i).
 Let a_1 = shift_sint8(i8_0, i).
 Let a_2 = shift_uint64(u64_0, 0).
-Let a_3 = memcpy(Mint_5, a_2, Mint_undef_5, a_2, 10).
-Let a_4 = shift_sint64(i64_0, 0).
-Let a_5 = memcpy(Mint_2, a_4, Mint_undef_2, a_4, 10).
-Let a_6 = shift_uint32(u32_0, 0).
-Let a_7 = memcpy(Mint_4, a_6, Mint_undef_4, a_6, 10).
-Let a_8 = shift_sint32(i32_0, 0).
-Let a_9 = memcpy(Mint_1, a_8, Mint_undef_1, a_8, 10).
-Let a_10 = shift_uint16(u16_0, 0).
-Let a_11 = memcpy(Mint_3, a_10, Mint_undef_3, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = memcpy(Mint_0, a_12, Mint_undef_0, a_12, 10).
-Let a_14 = shift_uint8(u8_0, 0).
-Let a_15 = memcpy(Mint_6, a_14, Mint_undef_6, a_14, 10).
-Let a_16 = shift_sint8(i8_0, 0).
-Let a_17 = memcpy(Mchar_0, a_16, Mchar_undef_0, a_16, 10).
+Let m = memcpy(Mint_5, a_2, Mint_undef_5, a_2, 10).
+Let a_3 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_3, Mint_undef_2, a_3, 10).
+Let a_4 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_4, Mint_undef_4, a_4, 10).
+Let a_5 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_5, Mint_undef_1, a_5, 10).
+Let a_6 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_6, Mint_undef_3, a_6, 10).
+Let a_7 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_7, Mint_undef_0, a_7, 10).
+Let a_8 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_8, Mint_undef_6, a_8, 10).
+Let a_9 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_9, Mchar_undef_0, a_9, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_13) /\ is_sint32_chunk(a_9) /\
-      is_sint64_chunk(a_5) /\ is_sint8_chunk(a_17) /\
-      is_uint16_chunk(a_11) /\ is_uint32_chunk(a_7) /\
-      is_uint64_chunk(a_3) /\ is_uint8_chunk(a_15) /\
-      is_sint8_chunk(a_17[a_1 <- 1]) /\ is_uint8_chunk(a_15[a <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint8_chunk(m_7[a_1 <- 1]) /\ is_uint8_chunk(m_6[a <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1286,36 +1275,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
-      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10).
+  Have: valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_5, 10) /\
+      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_8, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_3[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1332,32 +1321,31 @@ Let a = shift_sint16(i16_0, i).
 Let a_1 = shift_uint8(u8_0, i).
 Let a_2 = shift_sint8(i8_0, i).
 Let a_3 = shift_uint64(u64_0, 0).
-Let a_4 = memcpy(Mint_5, a_3, Mint_undef_5, a_3, 10).
-Let a_5 = shift_sint64(i64_0, 0).
-Let a_6 = memcpy(Mint_2, a_5, Mint_undef_2, a_5, 10).
-Let a_7 = shift_uint32(u32_0, 0).
-Let a_8 = memcpy(Mint_4, a_7, Mint_undef_4, a_7, 10).
-Let a_9 = shift_sint32(i32_0, 0).
-Let a_10 = memcpy(Mint_1, a_9, Mint_undef_1, a_9, 10).
-Let a_11 = shift_uint16(u16_0, 0).
-Let a_12 = memcpy(Mint_3, a_11, Mint_undef_3, a_11, 10).
-Let a_13 = shift_sint16(i16_0, 0).
-Let a_14 = memcpy(Mint_0, a_13, Mint_undef_0, a_13, 10).
-Let a_15 = shift_uint8(u8_0, 0).
-Let a_16 = memcpy(Mint_6, a_15, Mint_undef_6, a_15, 10).
-Let a_17 = shift_sint8(i8_0, 0).
-Let a_18 = memcpy(Mchar_0, a_17, Mchar_undef_0, a_17, 10).
+Let m = memcpy(Mint_5, a_3, Mint_undef_5, a_3, 10).
+Let a_4 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_4, Mint_undef_2, a_4, 10).
+Let a_5 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_5, Mint_undef_4, a_5, 10).
+Let a_6 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_6, Mint_undef_1, a_6, 10).
+Let a_7 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_7, Mint_undef_3, a_7, 10).
+Let a_8 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_8, Mint_undef_0, a_8, 10).
+Let a_9 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_9, Mint_undef_6, a_9, 10).
+Let a_10 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_10, Mchar_undef_0, a_10, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_14) /\ is_sint32_chunk(a_10) /\
-      is_sint64_chunk(a_6) /\ is_sint8_chunk(a_18) /\
-      is_uint16_chunk(a_12) /\ is_uint32_chunk(a_8) /\
-      is_uint64_chunk(a_4) /\ is_uint8_chunk(a_16) /\
-      is_sint16_chunk(a_14[a <- 3]) /\ is_sint8_chunk(a_18[a_2 <- 1]) /\
-      is_uint8_chunk(a_16[a_1 <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a <- 3]) /\ is_sint8_chunk(m_7[a_2 <- 1]) /\
+      is_uint8_chunk(m_6[a_1 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1365,36 +1353,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
-      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_17, 10) /\
-      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
-      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_15, 10).
+  Have: valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_5, 10) /\
+      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_9, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_4[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1414,32 +1402,31 @@ Let a_1 = shift_sint16(i16_0, i).
 Let a_2 = shift_uint8(u8_0, i).
 Let a_3 = shift_sint8(i8_0, i).
 Let a_4 = shift_uint64(u64_0, 0).
-Let a_5 = memcpy(Mint_5, a_4, Mint_undef_5, a_4, 10).
-Let a_6 = shift_sint64(i64_0, 0).
-Let a_7 = memcpy(Mint_2, a_6, Mint_undef_2, a_6, 10).
-Let a_8 = shift_uint32(u32_0, 0).
-Let a_9 = memcpy(Mint_4, a_8, Mint_undef_4, a_8, 10).
-Let a_10 = shift_sint32(i32_0, 0).
-Let a_11 = memcpy(Mint_1, a_10, Mint_undef_1, a_10, 10).
-Let a_12 = shift_uint16(u16_0, 0).
-Let a_13 = memcpy(Mint_3, a_12, Mint_undef_3, a_12, 10).
-Let a_14 = shift_sint16(i16_0, 0).
-Let a_15 = memcpy(Mint_0, a_14, Mint_undef_0, a_14, 10).
-Let a_16 = shift_uint8(u8_0, 0).
-Let a_17 = memcpy(Mint_6, a_16, Mint_undef_6, a_16, 10).
-Let a_18 = shift_sint8(i8_0, 0).
-Let a_19 = memcpy(Mchar_0, a_18, Mchar_undef_0, a_18, 10).
+Let m = memcpy(Mint_5, a_4, Mint_undef_5, a_4, 10).
+Let a_5 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_5, Mint_undef_2, a_5, 10).
+Let a_6 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_6, Mint_undef_4, a_6, 10).
+Let a_7 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_7, Mint_undef_1, a_7, 10).
+Let a_8 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_8, Mint_undef_3, a_8, 10).
+Let a_9 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_9, Mint_undef_0, a_9, 10).
+Let a_10 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_10, Mint_undef_6, a_10, 10).
+Let a_11 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_11, Mchar_undef_0, a_11, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_15) /\ is_sint32_chunk(a_11) /\
-      is_sint64_chunk(a_7) /\ is_sint8_chunk(a_19) /\
-      is_uint16_chunk(a_13) /\ is_uint32_chunk(a_9) /\
-      is_uint64_chunk(a_5) /\ is_uint8_chunk(a_17) /\
-      is_sint16_chunk(a_15[a_1 <- 3]) /\ is_sint8_chunk(a_19[a_3 <- 1]) /\
-      is_uint16_chunk(a_13[a <- 4]) /\ is_uint8_chunk(a_17[a_2 <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a_1 <- 3]) /\ is_sint8_chunk(m_7[a_3 <- 1]) /\
+      is_uint16_chunk(m_4[a <- 4]) /\ is_uint8_chunk(m_6[a_2 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1447,36 +1434,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
-      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_16, 10).
+  Have: valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_10, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1499,33 +1486,32 @@ Let a_2 = shift_sint16(i16_0, i).
 Let a_3 = shift_uint8(u8_0, i).
 Let a_4 = shift_sint8(i8_0, i).
 Let a_5 = shift_uint64(u64_0, 0).
-Let a_6 = memcpy(Mint_5, a_5, Mint_undef_5, a_5, 10).
-Let a_7 = shift_sint64(i64_0, 0).
-Let a_8 = memcpy(Mint_2, a_7, Mint_undef_2, a_7, 10).
-Let a_9 = shift_uint32(u32_0, 0).
-Let a_10 = memcpy(Mint_4, a_9, Mint_undef_4, a_9, 10).
-Let a_11 = shift_sint32(i32_0, 0).
-Let a_12 = memcpy(Mint_1, a_11, Mint_undef_1, a_11, 10).
-Let a_13 = shift_uint16(u16_0, 0).
-Let a_14 = memcpy(Mint_3, a_13, Mint_undef_3, a_13, 10).
-Let a_15 = shift_sint16(i16_0, 0).
-Let a_16 = memcpy(Mint_0, a_15, Mint_undef_0, a_15, 10).
-Let a_17 = shift_uint8(u8_0, 0).
-Let a_18 = memcpy(Mint_6, a_17, Mint_undef_6, a_17, 10).
-Let a_19 = shift_sint8(i8_0, 0).
-Let a_20 = memcpy(Mchar_0, a_19, Mchar_undef_0, a_19, 10).
+Let m = memcpy(Mint_5, a_5, Mint_undef_5, a_5, 10).
+Let a_6 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_6, Mint_undef_2, a_6, 10).
+Let a_7 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_7, Mint_undef_4, a_7, 10).
+Let a_8 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_8, Mint_undef_1, a_8, 10).
+Let a_9 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_9, Mint_undef_3, a_9, 10).
+Let a_10 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_10, Mint_undef_0, a_10, 10).
+Let a_11 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_11, Mint_undef_6, a_11, 10).
+Let a_12 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_12, Mchar_undef_0, a_12, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_16) /\ is_sint32_chunk(a_12) /\
-      is_sint64_chunk(a_8) /\ is_sint8_chunk(a_20) /\
-      is_uint16_chunk(a_14) /\ is_uint32_chunk(a_10) /\
-      is_uint64_chunk(a_6) /\ is_uint8_chunk(a_18) /\
-      is_sint16_chunk(a_16[a_2 <- 3]) /\ is_sint32_chunk(a_12[a <- 5]) /\
-      is_sint8_chunk(a_20[a_4 <- 1]) /\ is_uint16_chunk(a_14[a_1 <- 4]) /\
-      is_uint8_chunk(a_18[a_3 <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a_2 <- 3]) /\ is_sint32_chunk(m_3[a <- 5]) /\
+      is_sint8_chunk(m_7[a_4 <- 1]) /\ is_uint16_chunk(m_4[a_1 <- 4]) /\
+      is_uint8_chunk(m_6[a_3 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1533,36 +1519,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
-      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_19, 10) /\
-      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
-      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_17, 10).
+  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_11, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_20[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1588,33 +1574,32 @@ Let a_3 = shift_sint16(i16_0, i).
 Let a_4 = shift_uint8(u8_0, i).
 Let a_5 = shift_sint8(i8_0, i).
 Let a_6 = shift_uint64(u64_0, 0).
-Let a_7 = memcpy(Mint_5, a_6, Mint_undef_5, a_6, 10).
-Let a_8 = shift_sint64(i64_0, 0).
-Let a_9 = memcpy(Mint_2, a_8, Mint_undef_2, a_8, 10).
-Let a_10 = shift_uint32(u32_0, 0).
-Let a_11 = memcpy(Mint_4, a_10, Mint_undef_4, a_10, 10).
-Let a_12 = shift_sint32(i32_0, 0).
-Let a_13 = memcpy(Mint_1, a_12, Mint_undef_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = memcpy(Mint_3, a_14, Mint_undef_3, a_14, 10).
-Let a_16 = shift_sint16(i16_0, 0).
-Let a_17 = memcpy(Mint_0, a_16, Mint_undef_0, a_16, 10).
-Let a_18 = shift_uint8(u8_0, 0).
-Let a_19 = memcpy(Mint_6, a_18, Mint_undef_6, a_18, 10).
-Let a_20 = shift_sint8(i8_0, 0).
-Let a_21 = memcpy(Mchar_0, a_20, Mchar_undef_0, a_20, 10).
+Let m = memcpy(Mint_5, a_6, Mint_undef_5, a_6, 10).
+Let a_7 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_7, Mint_undef_2, a_7, 10).
+Let a_8 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_8, Mint_undef_4, a_8, 10).
+Let a_9 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_9, Mint_undef_1, a_9, 10).
+Let a_10 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_10, Mint_undef_3, a_10, 10).
+Let a_11 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_11, Mint_undef_0, a_11, 10).
+Let a_12 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_12, Mint_undef_6, a_12, 10).
+Let a_13 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_13, Mchar_undef_0, a_13, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_17) /\ is_sint32_chunk(a_13) /\
-      is_sint64_chunk(a_9) /\ is_sint8_chunk(a_21) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_11) /\
-      is_uint64_chunk(a_7) /\ is_uint8_chunk(a_19) /\
-      is_sint16_chunk(a_17[a_3 <- 3]) /\ is_sint32_chunk(a_13[a_1 <- 5]) /\
-      is_sint8_chunk(a_21[a_5 <- 1]) /\ is_uint16_chunk(a_15[a_2 <- 4]) /\
-      is_uint32_chunk(a_11[a <- 6]) /\ is_uint8_chunk(a_19[a_4 <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a_3 <- 3]) /\ is_sint32_chunk(m_3[a_1 <- 5]) /\
+      is_sint8_chunk(m_7[a_5 <- 1]) /\ is_uint16_chunk(m_4[a_2 <- 4]) /\
+      is_uint32_chunk(m_2[a <- 6]) /\ is_uint8_chunk(m_6[a_4 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1622,36 +1607,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
-      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_18, 10).
+  Have: valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
+      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
+      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_12, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_21[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1680,34 +1665,33 @@ Let a_4 = shift_sint16(i16_0, i).
 Let a_5 = shift_uint8(u8_0, i).
 Let a_6 = shift_sint8(i8_0, i).
 Let a_7 = shift_uint64(u64_0, 0).
-Let a_8 = memcpy(Mint_5, a_7, Mint_undef_5, a_7, 10).
-Let a_9 = shift_sint64(i64_0, 0).
-Let a_10 = memcpy(Mint_2, a_9, Mint_undef_2, a_9, 10).
-Let a_11 = shift_uint32(u32_0, 0).
-Let a_12 = memcpy(Mint_4, a_11, Mint_undef_4, a_11, 10).
-Let a_13 = shift_sint32(i32_0, 0).
-Let a_14 = memcpy(Mint_1, a_13, Mint_undef_1, a_13, 10).
-Let a_15 = shift_uint16(u16_0, 0).
-Let a_16 = memcpy(Mint_3, a_15, Mint_undef_3, a_15, 10).
-Let a_17 = shift_sint16(i16_0, 0).
-Let a_18 = memcpy(Mint_0, a_17, Mint_undef_0, a_17, 10).
-Let a_19 = shift_uint8(u8_0, 0).
-Let a_20 = memcpy(Mint_6, a_19, Mint_undef_6, a_19, 10).
-Let a_21 = shift_sint8(i8_0, 0).
-Let a_22 = memcpy(Mchar_0, a_21, Mchar_undef_0, a_21, 10).
+Let m = memcpy(Mint_5, a_7, Mint_undef_5, a_7, 10).
+Let a_8 = shift_sint64(i64_0, 0).
+Let m_1 = memcpy(Mint_2, a_8, Mint_undef_2, a_8, 10).
+Let a_9 = shift_uint32(u32_0, 0).
+Let m_2 = memcpy(Mint_4, a_9, Mint_undef_4, a_9, 10).
+Let a_10 = shift_sint32(i32_0, 0).
+Let m_3 = memcpy(Mint_1, a_10, Mint_undef_1, a_10, 10).
+Let a_11 = shift_uint16(u16_0, 0).
+Let m_4 = memcpy(Mint_3, a_11, Mint_undef_3, a_11, 10).
+Let a_12 = shift_sint16(i16_0, 0).
+Let m_5 = memcpy(Mint_0, a_12, Mint_undef_0, a_12, 10).
+Let a_13 = shift_uint8(u8_0, 0).
+Let m_6 = memcpy(Mint_6, a_13, Mint_undef_6, a_13, 10).
+Let a_14 = shift_sint8(i8_0, 0).
+Let m_7 = memcpy(Mchar_0, a_14, Mchar_undef_0, a_14, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_18) /\ is_sint32_chunk(a_14) /\
-      is_sint64_chunk(a_10) /\ is_sint8_chunk(a_22) /\
-      is_uint16_chunk(a_16) /\ is_uint32_chunk(a_12) /\
-      is_uint64_chunk(a_8) /\ is_uint8_chunk(a_20) /\
-      is_sint16_chunk(a_18[a_4 <- 3]) /\ is_sint32_chunk(a_14[a_2 <- 5]) /\
-      is_sint64_chunk(a_10[a <- 7]) /\ is_sint8_chunk(a_22[a_6 <- 1]) /\
-      is_uint16_chunk(a_16[a_3 <- 4]) /\ is_uint32_chunk(a_12[a_1 <- 6]) /\
-      is_uint8_chunk(a_20[a_5 <- 2]).
+      is_sint16_chunk(m_5) /\ is_sint32_chunk(m_3) /\ is_sint64_chunk(m_1) /\
+      is_sint8_chunk(m_7) /\ is_uint16_chunk(m_4) /\ is_uint32_chunk(m_2) /\
+      is_uint64_chunk(m) /\ is_uint8_chunk(m_6) /\
+      is_sint16_chunk(m_5[a_4 <- 3]) /\ is_sint32_chunk(m_3[a_2 <- 5]) /\
+      is_sint64_chunk(m_1[a <- 7]) /\ is_sint8_chunk(m_7[a_6 <- 1]) /\
+      is_uint16_chunk(m_4[a_3 <- 4]) /\ is_uint32_chunk(m_2[a_1 <- 6]) /\
+      is_uint8_chunk(m_6[a_5 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1715,36 +1699,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
-      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_21, 10) /\
-      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
-      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_19, 10).
+  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
+      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_13, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_22[shift_sint8(i8_0, i_1)] = 1))).
+      (m_7[shift_sint8(i8_0, i_1)] = 1))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_20[shift_uint8(u8_0, i_1)] = 2))).
+      (m_6[shift_uint8(u8_0, i_1)] = 2))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_sint16(i16_0, i_1)] = 3))).
+      (m_5[shift_sint16(i16_0, i_1)] = 3))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_uint16(u16_0, i_1)] = 4))).
+      (m_4[shift_uint16(u16_0, i_1)] = 4))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_sint32(i32_0, i_1)] = 5))).
+      (m_3[shift_sint32(i32_0, i_1)] = 5))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_uint32(u32_0, i_1)] = 6))).
+      (m_2[shift_uint32(u32_0, i_1)] = 6))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_sint64(i64_0, i_1)] = 7))).
+      (m_1[shift_sint64(i64_0, i_1)] = 7))).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_uint64(u64_0, i_1)] = 8))).
+      (m[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)

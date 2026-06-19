@@ -66,7 +66,7 @@
 
 Goal Lemma 'band_sint8':
 Assume Lemmas: 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Let x_1 = land(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Let x_1 = x land y. Assume { Have: is_sint8(x). Have: is_sint8(y). }
 Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
@@ -74,7 +74,7 @@ Prove: to_sint8(x_1) = x_1.
 Goal Lemma 'band_uint8':
 Assume Lemmas: 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8'
   'bnot_sint8'
-Let x_1 = land(x, y). Assume { Have: is_uint8(x). Have: is_uint8(y). }
+Let x_1 = x land y. Assume { Have: is_uint8(x). Have: is_uint8(y). }
 Prove: to_uint8(x_1) = x_1.
 
 ------------------------------------------------------------
@@ -104,7 +104,7 @@ Prove: to_sint8(x_1) = x_1.
 
 Goal Lemma 'bor_sint8':
 Assume Lemmas: 'bxor_sint8' 'bnot_sint8'
-Let x_1 = lor(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Let x_1 = x lor y. Assume { Have: is_sint8(x). Have: is_sint8(y). }
 Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
@@ -118,7 +118,7 @@ Prove: true.
 
 Goal Lemma 'bxor_sint8':
 Assume Lemmas: 'bnot_sint8'
-Let x_1 = lxor(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Let x_1 = x lxor y. Assume { Have: is_sint8(x). Have: is_sint8(y). }
 Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
@@ -309,7 +309,7 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'band_char':
-Let x = land(a, b). Assume { Type: is_sint8(a) /\ is_sint8(b). }
+Let x = a land b. Assume { Type: is_sint8(a) /\ is_sint8(b). }
 Prove: to_sint8(x) = x.
 
 ------------------------------------------------------------
@@ -347,7 +347,7 @@ Prove: true.
 
 Goal Assertion 'ko' ("unit_bitwise.c", line 20):
 Assume { Type: is_sint32(a). }
-Prove: land(281, a) <= 172.
+Prove: (281 land a) <= 172.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -361,7 +361,7 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'band_uchar':
-Let x = land(a, b). Assume { Type: is_uint8(a) /\ is_uint8(b). }
+Let x = a land b. Assume { Type: is_uint8(a) /\ is_uint8(b). }
 Prove: to_uint8(x) = x.
 
 ------------------------------------------------------------
@@ -495,7 +495,7 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'bor_char':
-Let x = lor(a, b). Assume { Type: is_sint8(a) /\ is_sint8(b). }
+Let x = a lor b. Assume { Type: is_sint8(a) /\ is_sint8(b). }
 Prove: to_sint8(x) = x.
 
 ------------------------------------------------------------
@@ -576,7 +576,7 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'bxor_char':
-Let x = lxor(a, b). Assume { Type: is_sint8(a) /\ is_sint8(b). }
+Let x = a lxor b. Assume { Type: is_sint8(a) /\ is_sint8(b). }
 Prove: to_sint8(x) = x.
 
 ------------------------------------------------------------
@@ -622,7 +622,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'bxor_uchar':
-Let x = lxor(a, b). Assume { Type: is_uint8(a) /\ is_uint8(b). }
+Let x = a lxor b. Assume { Type: is_uint8(a) /\ is_uint8(b). }
 Prove: to_uint8(x) = x.
 
 ------------------------------------------------------------
@@ -648,7 +648,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'bxor_uint':
-Let x = lxor(a, b). Assume { Type: is_uint32(a) /\ is_uint32(b). }
+Let x = a lxor b. Assume { Type: is_uint32(a) /\ is_uint32(b). }
 Prove: to_uint32(x) = x.
 
 ------------------------------------------------------------

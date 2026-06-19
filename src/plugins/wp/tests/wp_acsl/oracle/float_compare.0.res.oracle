@@ -73,7 +73,7 @@ Prover CFG returns Valid
 
 Goal Post-condition 'DEF' in 'cmp_dd':
 Assume { (* Pre-condition *) Have: is_finite_f64(a) /\ is_finite_f64(b). }
-Prove: (if lt_f64b(a, b) then 1 else 0)
+Prove: (if lt_f64(a, b) then 1 else 0)
          = (if (of_f64(a) < of_f64(b)) then 1 else 0).
 
 ------------------------------------------------------------
@@ -116,8 +116,7 @@ Assume {
   (* Assertion *)
   Have: of_f64(a_1) = r.
 }
-Prove: (if lt_f64b(a_1, b) then 1 else 0)
-         = (if (r < of_f64(b)) then 1 else 0).
+Prove: (if lt_f64(a_1, b) then 1 else 0) = (if (r < of_f64(b)) then 1 else 0).
 
 ------------------------------------------------------------
 
@@ -187,7 +186,7 @@ Prover CFG returns Valid
 
 Goal Post-condition 'DEF' in 'cmp_ff':
 Assume { (* Pre-condition *) Have: is_finite_f32(a) /\ is_finite_f32(b). }
-Prove: (if lt_f32b(a, b) then 1 else 0)
+Prove: (if lt_f32(a, b) then 1 else 0)
          = (if (of_f32(a) < of_f32(b)) then 1 else 0).
 
 ------------------------------------------------------------

@@ -75,7 +75,7 @@ Prove: true.
 Goal Preservation of Invariant 'is_zero' ("zero.i", line 25, characters 29-72):
 Let x = to_uint32(1 + i).
 Let a = shift_float64(s, 0).
-Let a_1 = memcpy(Mf64_0, a, Mf64_undef_0, a, 10).
+Let m = memcpy(Mf64_0, a, Mf64_undef_0, a, 10).
 Assume {
   Type: is_uint32(i).
   (* Heap *)
@@ -88,13 +88,13 @@ Assume {
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant 'is_zero' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_float64(s, i_2)] = 0))).
+      (m[shift_float64(s, i_2)] = 0))).
   (* Then *)
   Have: i <= 9.
   (* Invariant *)
   Have: x <= 10.
 }
-Prove: a_1[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0.
+Prove: m[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0.
 
 ------------------------------------------------------------
 
@@ -129,7 +129,7 @@ Prove: true.
 Goal Decreasing of Loop variant at loop ("zero.i", lines 29-31):
 Let x = to_uint32(1 + i).
 Let a = shift_float64(s, 0).
-Let a_1 = memcpy(Mf64_0, a, Mf64_undef_0, a, 10).
+Let m = memcpy(Mf64_0, a, Mf64_undef_0, a, 10).
 Assume {
   Type: is_uint32(i).
   (* Heap *)
@@ -140,14 +140,14 @@ Assume {
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant 'is_zero' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_float64(s, i_1)] = 0))).
+      (m[shift_float64(s, i_1)] = 0))).
   (* Then *)
   Have: i <= 9.
   (* Invariant *)
   Have: x <= 10.
   (* Invariant 'is_zero' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
-      (a_1[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0))).
+      (m[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0))).
 }
 Prove: i < x.
 

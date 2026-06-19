@@ -223,7 +223,7 @@ class engine (lang : #Plang.engine) =
         in
         let pp_prover_model fmt (p, model) =
           Format.fprintf fmt "= %a (%s)"
-            (Pretty_utils.pp_opt ~none:"?" Why3Provers.pp_model) model
+            (Pretty_utils.pp_opt ~none:"?" Why3Env.pp_model) model
             (Prover.title ~version:false p)
         in
         Format.fprintf fmt " @{<wp:comment>(* %a *)@}"

@@ -58,20 +58,23 @@ val l_or  : binop
 val l_lsl : binop
 val l_lsr : binop
 
-val f_lnot : lfun
-val f_land : lfun
-val f_lxor : lfun
-val f_lor  : lfun
-val f_lsl  : lfun
-val f_lsr  : lfun
+val f_lnot : lfun extern
+val f_land : lfun extern
+val f_lxor : lfun extern
+val f_lor  : lfun extern
+val f_lsl  : lfun extern
+val f_lsr  : lfun extern
 
-val f_bitwised : lfun list
-(** All except f_bit_positive *)
+val p_bit_test : lfun extern
 
-val f_bits : lfun list
-(** All bit-test functions *)
+val f_bitwised : lfun extern list
+(** All bitwise operators *)
 
-val bit_test : term -> int -> term
+val is_bitwised : lfun -> bool
+
+val bitk : term -> term -> term (* nth-bit, value => bool *)
+val bit_test : term -> term -> pred (* value, nth-bit => pred *)
+val bit_testk : term -> int -> pred (* value, const nth-bit => pred *)
 
 (** Matchers *)
 

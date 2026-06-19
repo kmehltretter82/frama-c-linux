@@ -79,11 +79,11 @@ Prove: exists s : set(Z). !mem(0, s).
 ------------------------------------------------------------
 
 Goal Check Lemma 'test_inter':
-Let a_1 = inter(a, inter(b, c)).
-Let a_2 = inter(a, c).
+Let m = inter(a, inter(b, c)).
+Let m_1 = inter(a, c).
 Assume { Have: (b = a) \/ (c = b). }
-Prove: (forall i : Z. (mem(i, a_1) -> mem(i, a_2))) /\
-    (forall i : Z. (mem(i, a_2) -> mem(i, a_1))).
+Prove: (forall i : Z. (mem(i, m) -> mem(i, m_1))) /\
+    (forall i : Z. (mem(i, m_1) -> mem(i, m))).
 
 ------------------------------------------------------------
 

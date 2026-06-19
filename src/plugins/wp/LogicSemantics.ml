@@ -664,7 +664,7 @@ struct
       let r = match LogicBuiltins.logic f with
         | ACSLDEF -> C.call_fun env result f ls vs
         | HACK phi -> phi vs
-        | LFUN f -> e_fun ~result f vs
+        | LFUN f -> E.(e_fun ~result !@f vs)
       in
       begin match t.term_type with
         | Ctype t -> Lang.assume (Cvalues.has_ctype t r)
@@ -680,7 +680,7 @@ struct
       let r = match LogicBuiltins.ctor c with
         | ACSLDEF -> e_fun (Lang.ctor c) es
         | HACK phi -> phi es
-        | LFUN f -> e_fun f es ~result:(Lang.tau_of_ltype t.term_type)
+        | LFUN f -> E.(e_fun !@f es ~result:(Lang.tau_of_ltype t.term_type))
       in Vexp r
 
     | Tif( cond , a , b ) ->
@@ -706,8 +706,7 @@ struct
       let sigma = C.mem_at env (of_logic label) in
       L.map_l2t (M.block_length sigma obj) (C.logic env t)
 
-    | Tnull ->
-      Vloc M.null
+    | Tnull -> Vloc (Lang.extern M.null)
 
     | TUpdate(a,offset,b) ->
       Vexp (update_offset env (val_of_term env a) offset (val_of_term env b))
@@ -808,7 +807,7 @@ struct
       match LogicBuiltins.logic f with
       | ACSLDEF -> C.call_pred env f ls es
       | HACK phi -> empty ls ; F.p_bool (phi es)
-      | LFUN p -> empty ls ; p_call p es
+      | LFUN p -> empty ls ; E.(p_call !@p es)
 
   let predicate polarity env p =
     match p.pred_content with

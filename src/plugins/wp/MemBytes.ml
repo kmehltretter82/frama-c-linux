@@ -6,6 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Lang.E
 open Lang.F
 open Memory
 open Ctypes
@@ -16,92 +17,53 @@ module Logic = Qed.Logic
 
 module WBytes =
 struct
-  let library = "membytes"
 
   let t_vblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Int)
   let t_memory = Qed.Logic.Array (Qed.Logic.Int,t_vblock)
   let t_iblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Bool)
   let t_init = Qed.Logic.Array   (Qed.Logic.Int,t_iblock)
 
-  let ty_fst_arg = function
-    | Some l :: _ -> l
-    | _ -> raise Not_found
+  let fk_membytes ?coloring endian name =
+    Format.kasprintf
+      (Lang.extern_f ?coloring)
+      "frama_c_wp.membytes_%s.MemBytes.%s" endian name
 
-  let f_eqmem = Lang.extern_fp ~library "eqmem"
-  let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
+  let f_membytes ?coloring name =
+    let f_le = fk_membytes ?coloring "le" name in
+    let f_be = fk_membytes ?coloring "be" name in
+    Lang.extern_mk @@ fun _env ->
+    if Machine.little_endian () then !@f_le else !@f_be
 
-  let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
-  let sconst m = p_call p_sconst [m]
+  let fd_membytes ?coloring descr =
+    Format.kasprintf (f_membytes ?coloring) descr
 
-  let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit"
-  let scinit m = p_call p_scinit [m]
+  let f_eqmem = f_membytes "eqmem"
+  let f_memcpy = f_membytes "memcpy"
+  let f_sconst = f_membytes ~coloring:true "sconst"
+  let f_scinit = f_membytes ~coloring:true "scinit"
+  let f_bytes = f_membytes "bytes"
 
-  let p_bytes = Lang.extern_fp ~library "bytes"
-  let bytes m = p_call p_bytes [ m ]
+  let eqmem m0 m1 p s = p_call !@f_eqmem [m0;m1;p;s]
+  let memcpy m p m0 p0 s = e_fun !@f_memcpy [m;p;m0;p0;s]
+  let sconst m = p_call !@f_sconst [m]
+  let scinit m = p_call !@f_scinit [m]
+  let bytes m = p_call !@f_bytes [m]
 
   (* read/write *)
-  let f_read_uint8 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint8"
-  let read_uint8 m a = e_fun f_read_uint8 [ m ; a ]
-  let f_read_uint16 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint16"
-  let read_uint16 m a = e_fun f_read_uint16 [ m ; a ]
-  let f_read_uint32 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint32"
-  let read_uint32 m a = e_fun f_read_uint32 [ m ; a ]
-  let f_read_uint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint64"
-  let read_uint64 m a = e_fun f_read_uint64 [ m ; a ]
-  let f_read_uint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint128"
-  let read_uint128 m a = e_fun f_read_uint128 [ m ; a ]
-  let f_read_sint8 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint8"
-  let read_sint8 m a = e_fun f_read_sint8 [ m ; a ]
-  let f_read_sint16 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint16"
-  let read_sint16 m a = e_fun f_read_sint16 [ m ; a ]
-  let f_read_sint32 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint32"
-  let read_sint32 m a = e_fun f_read_sint32 [ m ; a ]
-  let f_read_sint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint64"
-  let read_sint64 m a = e_fun f_read_sint64 [ m ; a ]
-  let f_read_sint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint128"
-  let read_sint128 m a = e_fun f_read_sint128 [ m ; a ]
-  let f_write_uint8 = Lang.extern_f ~result:t_memory ~library "write_uint8"
-  let write_uint8 m a v = e_fun f_write_uint8 [ m ; a ; v ]
-  let f_write_uint16 = Lang.extern_f ~result:t_memory ~library "write_uint16"
-  let write_uint16 m a v = e_fun f_write_uint16 [ m ; a ; v ]
-  let f_write_uint32 = Lang.extern_f ~result:t_memory ~library "write_uint32"
-  let write_uint32 m a v = e_fun f_write_uint32 [ m ; a ; v ]
-  let f_write_uint64 = Lang.extern_f ~result:t_memory ~library "write_uint64"
-  let write_uint64 m a v = e_fun f_write_uint64 [ m ; a ; v ]
-  let f_write_uint128 = Lang.extern_f ~result:t_memory ~library "write_uint128"
-  let write_uint128 m a v = e_fun f_write_uint128 [ m ; a ; v ]
-  let f_write_sint8 = Lang.extern_f ~result:t_memory ~library "write_sint8"
-  let write_sint8 m a v = e_fun f_write_sint8 [ m ; a ; v ]
-  let f_write_sint16 = Lang.extern_f ~result:t_memory ~library "write_sint16"
-  let write_sint16 m a v = e_fun f_write_sint16 [ m ; a ; v ]
-  let f_write_sint32 = Lang.extern_f ~result:t_memory ~library "write_sint32"
-  let write_sint32 m a v = e_fun f_write_sint32 [ m ; a ; v ]
-  let f_write_sint64 = Lang.extern_f ~result:t_memory ~library "write_sint64"
-  let write_sint64 m a v = e_fun f_write_sint64 [ m ; a ; v ]
-  let f_write_sint128 = Lang.extern_f ~result:t_memory ~library "write_sint128"
-  let write_sint128 m a v = e_fun f_write_sint128 [ m ; a ; v ]
 
-  (* init *)
-  let f_read_init8 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init8"
-  let read_init8 m a = e_fun f_read_init8 [ m ; a ]
-  let f_read_init16 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init16"
-  let read_init16 m a = e_fun f_read_init16 [ m ; a ]
-  let f_read_init32 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init32"
-  let read_init32 m a = e_fun f_read_init32 [ m ; a ]
-  let f_read_init64 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init64"
-  let read_init64 m a = e_fun f_read_init64 [ m ; a ]
-  let f_read_init128 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init128"
-  let read_init128 m a = e_fun f_read_init128 [ m ; a ]
-  let f_write_init8 = Lang.extern_f ~result:t_init ~library "write_init8"
-  let write_init8 m a v = e_fun f_write_init8 [ m ; a ; v ]
-  let f_write_init16 = Lang.extern_f ~result:t_init ~library "write_init16"
-  let write_init16 m a v = e_fun f_write_init16 [ m ; a ; v ]
-  let f_write_init32 = Lang.extern_f ~result:t_init ~library "write_init32"
-  let write_init32 m a v = e_fun f_write_init32 [ m ; a ; v ]
-  let f_write_init64 = Lang.extern_f ~result:t_init ~library "write_init64"
-  let write_init64 m a v = e_fun f_write_init64 [ m ; a ; v ]
-  let f_write_init128 = Lang.extern_f ~result:t_init ~library "write_init128"
-  let write_init128 m a v = e_fun f_write_init128 [ m ; a ; v ]
+  let readi = Ctypes.i_memo (fd_membytes "read_%a" Ctypes.pp_int)
+  let writei = Ctypes.i_memo (fd_membytes "write_%a" Ctypes.pp_int)
+
+  let read m i a = e_fun !@(readi i) [ m ; a ]
+  let write m i a v = e_fun !@(writei i) [ m ; a ; v ]
+
+  (* read/write init *)
+  let read_initd = Why3.Wstdlib.Hint.memo 0 (fd_membytes "read_init%d")
+  let write_initd = Why3.Wstdlib.Hint.memo 0 (fd_membytes "write_init%d")
+
+  let read_init m s a = e_fun !@(read_initd s) [ m ; a ]
+  let write_init m s a v = e_fun !@(write_initd s) [ m ; a ; v ]
+
 end
 
 (* Model *)
@@ -111,13 +73,14 @@ let dkey_model = Wp_parameters.register_category (lc_name ^ ":model")
 
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
-    let orig_null    = Context.push Cvalues.null (p_equal MemAddr.null) in
+    let ptr = !@MemAddr.t_addr in
+    let null p = p_equal p !@MemAddr.null in
+    let orig_pointer = Context.push Lang.pointer ptr in
+    let orig_null    = Context.push Cvalues.null null in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
       Context.pop Cvalues.null orig_null ;
-    in
-    rollback
+    in rollback
   end
 let no_binder = { bind = fun _ f v -> f v }
 let configure_ia _ = no_binder
@@ -237,10 +200,10 @@ let phi_index size = function
 
 module RegisterShift = WpContext.Static
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = shift
       let name = "MemBytes.RegisterShift"
-      include Lang.Fun
     end)
 
 let field_offset ci field =
@@ -259,14 +222,16 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
       type data = Definitions.dfun
 
       let generate f =
-        let result = MemAddr.t_addr in
-        let lfun = Lang.generated_f ~result "shiftfield_%s" (Lang.field_id f) in
+        let addr = !@MemAddr.t_addr in
+        let lfun =
+          Lang.generated_f ~result:addr ~params:[addr]
+            "shiftfield_%s" (Lang.field_id f) in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let p = Lang.freshvar ~basename:"p" addr in
         let tp = e_var p in
         let position = e_int @@ field_offset f.fcomp f in
         let def = MemAddr.shift tp position in
-        let dfun = Definitions.Function( result , Def , def) in
+        let dfun = Definitions.Function( addr , Def , def) in
         RegisterShift.define lfun (RS_Field(f,position)) ;
         MemAddr.register ~base:phi_base ~offset:(phi_field position) lfun ;
         Definitions.{
@@ -275,7 +240,6 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
           d_definition = dfun ;
           d_cluster = Definitions.dummy () ;
         }
-
       let compile = Lang.local generate
     end)
 
@@ -320,16 +284,19 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
       let generate obj =
-        let result = MemAddr.t_addr in
-        let shift = Lang.generated_f ~result "shift_%s" (c_object_id obj) in
+        let addr = !@MemAddr.t_addr in
+        let shift =
+          Lang.generated_f
+            ~result:addr ~params:[addr;Int]
+            "shift_%s" (c_object_id obj) in
         let size = protected_sizeof_object obj in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let p = Lang.freshvar ~basename:"p" addr in
         let tp = e_var p in
-        let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
+        let k = Lang.freshvar ~basename:"k" Int in
         let tk = e_var k in
         let def = MemAddr.shift tp (e_mul size tk) in
-        let dfun = Definitions.Function( result , Def , def) in
+        let dfun = Definitions.Function( addr , Def , def) in
         RegisterShift.define shift (RS_Index size) ;
         MemAddr.register ~base:phi_base ~offset:(phi_index size)
           ~linear:true shift ;
@@ -429,28 +396,30 @@ module CODEC_FLOAT = WpContext.Generator(Float)
       type data = Lang.lfun * Lang.lfun
 
       let decode ft =
-        let result = Cfloat.tau_of_float ft in
-        let f = Lang.freshvar ~basename:"f" Lang.t_int in
+        let flt = Cfloat.tau_of_float ft in
         let decode =
-          Lang.generated_f ~result "int_to_%a" Float.pretty ft in
+          Lang.generated_f
+            ~result:flt ~params:[Int]
+            "int_to_%a" Float.pretty ft in
         Definitions.define_symbol {
           d_lfun = decode ;
           d_cluster = float_cluster () ; d_types = 0 ;
-          d_params = [ f ] ;
-          d_definition = Logic result ;
+          d_params = [ Lang.freshvar ~basename:"x" Int ] ;
+          d_definition = Logic flt ;
         } ;
         decode
 
       let encode ft =
-        let result = Lang.t_int in
-        let f = Lang.freshvar ~basename:"f" @@ Cfloat.tau_of_float ft in
+        let flt = Cfloat.tau_of_float ft in
         let encode =
-          Lang.generated_f ~result "%a_to_int" Float.pretty ft in
+          Lang.generated_f
+            ~result:Int ~params:[flt]
+            "%a_to_int" Float.pretty ft in
         Definitions.define_symbol {
           d_lfun = encode ;
           d_cluster = float_cluster () ; d_types = 0 ;
-          d_params = [ f ] ;
-          d_definition = Logic result ;
+          d_params = [ Lang.freshvar ~basename:"x" flt ] ;
+          d_definition = Logic Int ;
         } ;
         encode
 
@@ -513,24 +482,9 @@ let float_to_int fkind f =
 let int_to_float fkind f =
   e_fun (snd @@ CODEC_FLOAT.get fkind) [ f ]
 
-let load_int_raw memory kind addr =
-  let read = match kind with
-    | CBool -> WBytes.read_uint8
-    | UInt8 -> WBytes.read_uint8
-    | SInt8 -> WBytes.read_sint8
-    | UInt16 -> WBytes.read_uint16
-    | SInt16 -> WBytes.read_sint16
-    | UInt32 -> WBytes.read_uint32
-    | SInt32 -> WBytes.read_sint32
-    | UInt64 -> WBytes.read_uint64
-    | SInt64 -> WBytes.read_sint64
-    | UInt128 -> WBytes.read_uint128
-    | SInt128 -> WBytes.read_sint128
-  in
-  read memory addr
+let load_int_raw = WBytes.read
 
-let load_int sigma kind addr =
-  load_int_raw (Sigma.value sigma m_mem) kind addr
+let load_int sigma = WBytes.read (Sigma.value sigma m_mem)
 
 let load_float sigma kind addr =
   int_to_float kind @@ load_int sigma (Float.ikind kind) addr
@@ -541,35 +495,10 @@ let load_pointer_raw memory _ty loc =
 let load_pointer sigma _ty loc =
   MemAddr.addr_of_int @@ load_int sigma (Ctypes.c_ptr ()) loc
 
-let load_init_raw memory size loc =
-  match size with
-  | 1 -> WBytes.read_init8  memory loc
-  | 2 -> WBytes.read_init16 memory loc
-  | 4 -> WBytes.read_init32 memory loc
-  | 8 -> WBytes.read_init64 memory loc
-  | 16 -> WBytes.read_init128 memory loc
-  | _ -> assert false
-
 let load_init_atom sigma obj loc =
-  let init_memory = Sigma.value sigma m_init in
-  let size = sizeof_object obj in
-  load_init_raw init_memory size loc
+  WBytes.read_init (Sigma.value sigma m_init) (bits_sizeof_object obj) loc
 
-let store_int sigma kind addr v =
-  let write = match kind with
-    | CBool -> WBytes.write_uint8
-    | UInt8 -> WBytes.write_uint8
-    | SInt8 -> WBytes.write_sint8
-    | UInt16 -> WBytes.write_uint16
-    | SInt16 -> WBytes.write_sint16
-    | UInt32 -> WBytes.write_uint32
-    | SInt32 -> WBytes.write_sint32
-    | UInt64 -> WBytes.write_uint64
-    | SInt64 -> WBytes.write_sint64
-    | UInt128 -> WBytes.write_uint128
-    | SInt128 -> WBytes.write_sint128
-  in
-  m_mem, write (Sigma.value sigma m_mem) addr v
+let store_int sigma i p v = m_mem, WBytes.write (Sigma.value sigma m_mem) i p v
 
 let store_float sigma kind addr v =
   store_int sigma (Float.ikind kind) addr @@ float_to_int kind v
@@ -577,21 +506,8 @@ let store_float sigma kind addr v =
 let store_pointer sigma _kind addr v =
   store_int sigma (Ctypes.c_ptr ()) addr @@ MemAddr.int_of_addr v
 
-let store_init_raw m size loc v =
-  let write = match size with
-    | 1 -> WBytes.write_init8
-    | 2 -> WBytes.write_init16
-    | 4 -> WBytes.write_init32
-    | 8 -> WBytes.write_init64
-    | 16 -> WBytes.write_init128
-    | _ -> assert false
-  in
-  write m loc v
-
 let store_init_atom sigma obj loc v =
-  let init_memory = Sigma.value sigma m_init in
-  let size = sizeof_object obj in
-  m_init, store_init_raw init_memory size loc v
+  m_init, WBytes.write_init (Sigma.value sigma m_init) (bits_sizeof_object obj) loc v
 
 module LOADER =
 struct
@@ -615,13 +531,14 @@ struct
     e_sub (e_div (allocated sigma l) n) e_one
 
   let fresh _l =
-    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    let t = !@MemAddr.t_addr in
+    let x = Lang.freshvar ~basename:"p" t in
     [x] , e_var x
 
-  let separated p n p' n' = p_call MemAddr.p_separated [p;n;p';n']
+  let separated p n p' n' = p_call !@MemAddr.p_separated [p;n;p';n']
 
-  let eqmem _chunk m0 m1 l n = p_call WBytes.f_eqmem [m0;m1;l;n]
-  let memcpy _chunk m0 l0 m1 l1 n = e_fun WBytes.f_memcpy [m0;l0;m1;l1;n]
+  let eqmem _chunk = WBytes.eqmem
+  let memcpy _chunk = WBytes.memcpy
 
   let load_int = load_int
   let load_float = load_float
@@ -649,10 +566,10 @@ let formals = 2
 
 module RegisterBASE = WpContext.Index
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = Cil_types.varinfo
       let name = "MemBytes.RegisterBASE"
-      include Lang.Fun
     end)
 
 module BASE = WpContext.Generator(Cil_datatype.Varinfo)
@@ -743,17 +660,19 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
           if vi.vglob
           then if acs_rd then "K" else "G"
           else if vi.vformal then "P" else "L" in
-        let lfun = Lang.generated_f
-            ~category:Logic.Constructor ~result:Logic.Int "%s_%s_%d"
-            prefix vi.vorig_name vi.vid in
+        let d_lfun =
+          Lang.generated_f
+            ~category:Logic.Constructor
+            ~result:Int ~params:[]
+            "%s_%s_%d" prefix vi.vorig_name vi.vid in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ; d_params = [ ] ;
+          d_lfun = d_lfun ; d_types = 0 ; d_params = [] ;
           d_definition = Definitions.Function (result, Def, e_int vi.vid) ;
           d_cluster = cluster_globals () ;
         } ;
-        let prefix = Lang.Fun.debug lfun in
-        let base = e_fun lfun [] in
-        RegisterBASE.define lfun vi ;
+        let prefix = Lang.Fun.name d_lfun in
+        let base = e_fun d_lfun [] in
+        RegisterBASE.define d_lfun vi ;
         static_alloc prefix base ;
         region prefix vi base ;
         alloc prefix vi base ;
@@ -830,12 +749,12 @@ module STRING = WpContext.Generator(LITERAL)
 
       let compile (_,cst) =
         let eid = fresh () in
-        let lfun = Lang.generated_f ~result:Lang.t_int "Str_%d" eid in
+        let d_lfun = Lang.generated_f ~result:Int ~params:[] "Str_%d" eid in
         (* Since its a generated it is the unique name given *)
-        let prefix = Lang.Fun.debug lfun in
-        let base = Lang.F.e_fun lfun [] in
+        let prefix = Lang.Fun.name d_lfun in
+        let base = Lang.F.e_fun d_lfun [] in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ; d_params = [] ;
+          d_lfun ; d_types = 0 ; d_params = [] ;
           d_definition = Logic Lang.t_int ;
           d_cluster = Cstring.cluster () ;
         } ;
@@ -942,7 +861,7 @@ let int_of_loc _ loc =
 
 let domain _ _ = Sigma.Domain.of_list [ m_init ; m_mem ]
 
-let is_null = p_equal null
+let is_null p = p_equal p !@null
 let loc_eq = p_equal
 let loc_lt = MemAddr.addr_lt
 let loc_leq = MemAddr.addr_le
@@ -963,7 +882,7 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
       type data = Lang.lfun
 
       let ranges () =
-        let a = Lang.freshvar ~basename:"a" MemAddr.t_addr in
+        let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let prop = MemAddr.in_uintptr_range (e_var a) in
         Definitions.define_lemma {
           l_kind = Admit ; l_name = "pointers_int_range" ;
@@ -973,20 +892,22 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
         }
 
       let compile () =
-        let lfun = Lang.generated_p "framed" in
+        let lfun = Lang.generated_p ~params:[WBytes.t_memory] "framed" in
         let m = Lang.freshvar ~basename:"m" WBytes.t_memory in
-        let a = Lang.freshvar ~basename:"a" MemAddr.t_addr in
+        let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let p = load_pointer_raw (e_var m) (Cil_const.voidPtrType) (e_var a) in
-        let ba = MemAddr.base (e_var a) and bp = MemAddr.base p in
+        let base_a = MemAddr.base (e_var a) in
+        let base_p = MemAddr.base p in
         let body =
           p_forall [a] @@ p_imply
-            (p_leq (MemAddr.region ba) e_zero)
-            (p_leq (MemAddr.region bp) e_zero)
+            (p_leq (MemAddr.region base_a) e_zero)
+            (p_leq (MemAddr.region base_p) e_zero)
         in
         Definitions.define_symbol {
           d_lfun = lfun ;
-          d_cluster = pointer_cluster () ; d_types = 0 ;
-          d_params = [ m ] ; d_definition = Predicate (Def, body)
+          d_cluster = pointer_cluster () ;
+          d_params = [ m ] ; d_types = 0 ;
+          d_definition = Predicate (Def, body)
         };
         ranges () ;
         lfun
