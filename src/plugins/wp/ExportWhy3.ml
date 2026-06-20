@@ -686,6 +686,11 @@ class visitor ctxt c =
 module CC =
 struct
   type nonrec env = env
+
+  let export name =
+    let context = context (Why3Env.env ()) name in
+    gamma context, context.cluster
+
   let find_ts env = get_ts env.context
   let find_ls env = get_ls env.context
   let cc_tau env = cc_tau env.context

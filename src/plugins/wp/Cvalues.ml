@@ -58,6 +58,52 @@ and constant_term t =
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
 (* -------------------------------------------------------------------------- *)
+(* --- Compound Types                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+module CC_COMP(K : sig val name : string val tau : typ -> tau end) =
+struct
+  module F = WpContext.Generator(Cil_datatype.Fieldinfo)
+      (struct
+        type key = fieldinfo
+        type data = Qed.Symbol.field
+        let name = Printf.sprintf "CValues.%s.F" K.name
+        let compile _ = assert false
+      end)
+  module C = WpContext.Generator(Cil_datatype.Compinfo)
+      (struct
+        type key = compinfo
+        type data = Qed.Symbol.data
+        let name = "CValues.VCOMP"
+        let compile c =
+          let open ExportWhy3.CC in
+          let env,cluster = export c.cname in
+          match c.cfields with
+          | None -> Qed.Symbol.new_type cluster name
+          | Some fds ->
+            let data,_,fields =
+              Qed.Symbol.new_record cluster c.cname @@
+              List.map
+                (fun fd ->
+                   fd.fname,
+                   Option.get @@ cc_tau env @@ K.tau fd.ftype
+                ) fds in
+            List.iter2 F.set fds fields ; data
+      end)
+  let comp = C.get
+  let field fd = let _ = C.get fd.fcomp in F.get fd
+end
+
+module VCOMP = CC_COMP(struct let name = "VCOMP" let tau = tau_of_ctype end)
+module ICOMP = CC_COMP(struct let name = "ICOMP" let tau = init_of_ctype end)
+
+let cc_comp = VCOMP.comp
+let cc_field = VCOMP.field
+
+let cc_comp_init = ICOMP.comp
+let cc_field_init = ICOMP.field
+
+(* -------------------------------------------------------------------------- *)
 (* --- Initialization values                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
