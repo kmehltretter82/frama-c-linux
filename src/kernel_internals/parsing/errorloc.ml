@@ -138,10 +138,10 @@ let convert_pos pos =
   in
   Filepos.of_lexing_pos ?origin pos
 
-let convert_loc (pos_start, pos_end) =
-  let pos_start = convert_pos pos_start
-  and pos_end = convert_pos pos_end in
-  Fileloc.make ~pos_start ~pos_end
+let convert_loc (start_pos, end_pos) =
+  let start_pos = convert_pos start_pos
+  and end_pos = convert_pos end_pos in
+  Fileloc.make ~start_pos ~end_pos
 
 (* Precise error locations points to the output of the preprocessing phase.
    Some work needs to be done to find the matching location in the original
@@ -200,11 +200,11 @@ let matching_pos ~orig_lines ~ppc_lines pos =
   Filepos.update_column ~column orig_pos
 
 let matching_loc ~orig_lines ~ppc_lines loc =
-  let start_pos, end_pos = Fileloc.extract loc in
+  let start_pos, end_pos = Fileloc.positions loc in
   let open Option.Operators in
-  let+ start_col = matching_pos ~orig_lines ~ppc_lines start_pos
-  and+ end_col = matching_pos ~orig_lines ~ppc_lines end_pos in
-  Fileloc.make ~pos_start:start_col ~pos_end:end_col
+  let+ start_pos = matching_pos ~orig_lines ~ppc_lines start_pos
+  and+ end_pos = matching_pos ~orig_lines ~ppc_lines end_pos in
+  Fileloc.make ~start_pos ~end_pos
 
 (* Replace non-blanks characters with spaces. Keep tabulations. *)
 let replace_chars_with_blanks s =
@@ -214,7 +214,7 @@ let min_and_max x y =
   if x <= y then x, y else y, x
 
 let get_context_from_file ~ctx loc =
-  let start_pos, end_pos = Fileloc.extract loc in
+  let start_pos, end_pos = Fileloc.positions loc in
   let start_path = Filepos.input_path start_pos
   and end_path = Filepos.input_path end_pos
   and start_line = Filepos.input_line start_pos
@@ -232,7 +232,7 @@ let get_context_from_file ~ctx loc =
   List.rev !lines
 
 let pp_context fmt (loc, lines) =
-  let numbering = not (Filepos.is_preprocessed (Fileloc.loc_start loc)) in
+  let numbering = not (Filepos.is_preprocessed (Fileloc.start_pos loc)) in
   let pp_line fmt i =
     if numbering
     then Format.fprintf fmt "%-6d" i
@@ -242,7 +242,7 @@ let pp_context fmt (loc, lines) =
     then Format.fprintf fmt "%d-%d" i j
     else Format.fprintf fmt "%6s" ""
   in
-  let start_pos, end_pos = Fileloc.extract loc in
+  let start_pos, end_pos = Fileloc.positions loc in
   (* The difference between the first and last error lines can be very
       large; in this case, we print only the first and last [inner_context]
       lines, with "..." between them. *)
@@ -285,7 +285,7 @@ let pp_context fmt (loc, lines) =
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
 let pp_context_from_file ?(ctx=2) fmt ppc_loc =
-  let (ppc_start, ppc_end) = Fileloc.extract ppc_loc in
+  let (ppc_start, ppc_end) = Fileloc.positions ppc_loc in
   try
     match Filepos.origin ppc_start, Filepos.origin ppc_end with
     | Generated _, _ | _, Generated _ ->
@@ -295,7 +295,7 @@ let pp_context_from_file ?(ctx=2) fmt ppc_loc =
     | Preprocessed orig_start, Preprocessed orig_end
       when Filepath.equal (Filepos.path orig_start) (Filepos.path orig_end) ->
       (* [loc] is a location in a preprocessed file *)
-      let orig_loc = Fileloc.make ~pos_start:orig_start ~pos_end:orig_end in
+      let orig_loc = Fileloc.make ~start_pos:orig_start ~end_pos:orig_end in
       let orig_lines = get_context_from_file ~ctx orig_loc in
       if Filepos.line orig_start <> Filepos.line orig_end then
         (* The original location is on several lines, only print the original

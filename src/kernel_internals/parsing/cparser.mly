@@ -27,8 +27,8 @@ open Cabshelper
    removing Logic_ptree.location. *)
 type location = Fileloc.t
 
-let loc_range {expr_loc = loc_start} {expr_loc = loc_end} =
-  Fileloc.range ~loc_start ~loc_end
+let loc_range {expr_loc = start_loc} {expr_loc = end_loc} =
+  Fileloc.range ~start_loc ~end_loc
 
 (*
 ** Expression building
@@ -41,8 +41,8 @@ let smooth_expression lst =
     let expr_loc = loc_range hd (List.last lst) in
     { expr_loc; expr_node = COMMA (lst) }
 
-let merge_string (c1, loc_start) (l2, loc_end) =
-  let loc = Fileloc.range ~loc_start ~loc_end in
+let merge_string (c1, start_loc) (l2, end_loc) =
+  let loc = Fileloc.range ~start_loc ~end_loc in
   c1 :: l2, loc
 
 (* To be called only inside a grammar rule. *)
@@ -123,16 +123,16 @@ let doDeclaration logic_spec (loc: Fileloc.t) (specs: spec_elem list) (nl: init_
     let logic_spec =
       match logic_spec with
       | None -> None
-      | Some (pos_start, _ as ls) -> begin
+      | Some (start_pos, _ as ls) -> begin
           Option.map
-            (fun (pos_end, spec) ->
+            (fun (end_pos, spec) ->
                let name =
                  match nl with
                  | [ (n,_,_,_),_ ] -> n
                  | _ -> "unknown function"
                in
                check_funspec_abrupt_clauses name spec;
-               (spec, Fileloc.make ~pos_start ~pos_end))
+               (spec, Fileloc.make ~start_pos ~end_pos))
             (Logic_lexer.spec ls)
         end
     in
@@ -946,8 +946,8 @@ statement:
 | SPEC annotated_statement {
     let bs = $2 in
     match Logic_lexer.spec $1 with
-    | Some (pos_end,spec) ->
-      let loc = Fileloc.make ~pos_start:(fst $1) ~pos_end in
+    | Some (end_pos,spec) ->
+      let loc = Fileloc.make ~start_pos:(fst $1) ~end_pos in
       let spec = no_ghost [Cabs.CODE_SPEC (spec, loc)] in
       spec @ $2
     | None -> bs
@@ -1518,10 +1518,10 @@ function_def: /* (* ISO 6.9.1 *) */
     let spec_loc =
       Option.bind
         (fun s ->
-            let pos_start = fst s in
+            let start_pos = fst s in
             Option.map
-              (fun (pos_end, spec) ->
-                let loc = Fileloc.make ~pos_start ~pos_end in
+              (fun (end_pos, spec) ->
+                let loc = Fileloc.make ~start_pos ~end_pos in
                 spec, loc)
               (Logic_lexer.spec s))
         s

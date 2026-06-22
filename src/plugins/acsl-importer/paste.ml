@@ -1000,9 +1000,9 @@ let parse_global s =
   | Some (_, Logic_ptree.Adecl decls) ->
     (* update starting annotation location *)
     List.map (fun d ->
-        let pos_start = get_prop_loc () in
-        let pos_end = Fileloc.loc_end d.Logic_ptree.decl_loc in
-        let loc = Fileloc.make ~pos_start ~pos_end in
+        let start_pos = get_prop_loc () in
+        let end_pos = Fileloc.end_pos d.Logic_ptree.decl_loc in
+        let loc = Fileloc.make ~start_pos ~end_pos in
         Logic_ptree.{d with decl_loc = loc})
       decls
   | _ -> Options.abort "[Syntax error] Unallowed global annotation."
@@ -1011,20 +1011,20 @@ let parse_global s =
 let parse_spec s =
   match Logic_lexer.spec (get_buff_loc (), s) with
   | Some (loc2, a) -> (* update starting annotation location *)
-    a, Fileloc.make ~pos_start:(get_prop_loc ()) ~pos_end:loc2
+    a, Fileloc.make ~start_pos:(get_prop_loc ()) ~end_pos:loc2
   | None -> Options.abort "[Syntax error] Invalid function contract"
 
 (** Parse a code annotation. *)
 let parse_annots s =
-  let pos_start = get_prop_loc () in
-  let make_loc = Fileloc.make ~pos_start in
+  let start_pos = get_prop_loc () in
+  let make_loc = Fileloc.make ~start_pos in
   match Logic_lexer.annot (get_buff_loc (), s) with
   | Some (_,Logic_ptree.Acode_annot (loc,a)) ->
     (* update starting annotation location *)
-    make_loc ~pos_end:(Fileloc.loc_end loc), [a]
+    make_loc ~end_pos:(Fileloc.end_pos loc), [a]
   | Some (_,Logic_ptree.Aloop_annot (loc,a)) ->
     (* update starting annotation location *)
-    make_loc ~pos_end:(Fileloc.loc_end loc), a
+    make_loc ~end_pos:(Fileloc.end_pos loc), a
   | _ ->
     Options.abort "[Syntax error] Unallowed annotation."
 

@@ -492,7 +492,7 @@ let xform_switch_block ?(keepSwitch=false) b =
           s.skind <- If(e,b1,b2,l);
           s:: xform_switch_stmt rest break_dest cont_dest label_index 0
         | Switch(e,b,sl, l) ->
-          let loc = Fileloc.(from_position (loc_end l)) in
+          let loc = Fileloc.(from_position (end_pos l)) in
           if keepSwitch then begin
             let label_index = label_index + 1 in
             let break_stmt = Cil.mkStmt (Instr (Skip loc)) in
@@ -611,14 +611,15 @@ let xform_switch_block ?(keepSwitch=false) b =
             xform_switch_stmt rest break_dest cont_dest label_index 0
           end
         | Loop(a,b,l,_,_) ->
+          let start_pos, end_pos = Fileloc.positions l in
           let label_index = label_index + 1 in
-          let loc_break = Fileloc.(from_position (loc_end l)) in
+          let loc_break = Fileloc.from_position end_pos in
           let break_stmt = Cil.mkStmt (Instr (Skip loc_break)) in
           break_stmt.labels <-
             [Label(freshLabel
                      (Printf.sprintf
                         "while_%d_break" label_index),l,false)] ;
-          let cont_loc = Fileloc.(from_position (loc_start l)) in
+          let cont_loc = Fileloc.from_position start_pos in
           let cont_stmt = Cil.mkStmt (Instr (Skip cont_loc)) in
           b.bstmts <- cont_stmt :: b.bstmts ;
           let my_break_dest () = ref break_stmt in

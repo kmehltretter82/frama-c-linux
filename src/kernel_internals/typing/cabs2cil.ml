@@ -46,10 +46,10 @@ module FuncLocs = struct
   let add_loc ?spec loc1 loc2 funcname =
     let startpos =
       match spec with
-      | None -> Fileloc.loc_start loc1
-      | Some (_, spec_loc) -> Fileloc.loc_start spec_loc
+      | None -> Fileloc.start_pos loc1
+      | Some (_, spec_loc) -> Fileloc.start_pos spec_loc
     in
-    let endpos = Fileloc.loc_end loc2 in
+    let endpos = Fileloc.end_pos loc2 in
     add (startpos, endpos, funcname)
 end
 
@@ -229,8 +229,8 @@ let check_no_locals_in_initializer i =
 (* ---------- source error message handling ------------- *)
 let cabslu s =
   Fileloc.make
-    ~pos_start:(Filepos.generated ("Cabs2cil_start" ^ s))
-    ~pos_end:(Filepos.generated ("Cabs2cil_end" ^ s))
+    ~start_pos:(Filepos.generated ("Cabs2cil_start" ^ s))
+    ~end_pos:(Filepos.generated ("Cabs2cil_end" ^ s))
 
 
 (** Keep a list of the variable ID for the variables that were created to
@@ -528,7 +528,7 @@ let check_aligned attrs =
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
 let process_pragmas_pack_align_comp_attributes loc ci cattrs =
-  let source = Fileloc.from_position (Fileloc.loc_end loc) in
+  let source = Fileloc.from_position (Fileloc.end_pos loc) in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->
@@ -8347,7 +8347,7 @@ and doInit local_env asconst preinit so acc initl =
         in
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
-        let loc = Fileloc.range ~loc_start:idxs'.eloc ~loc_end:idxe'.eloc in
+        let loc = Fileloc.range ~start_loc:idxs'.eloc ~end_loc:idxe'.eloc in
         let<> UpdatedCurrentLoc = loc in
         if isNotEmpty doidxs || isNotEmpty doidxe then
           Errorloc.abort_context "Range designators are not constants";
@@ -9162,8 +9162,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
     begin
       let ghost = local_env.is_ghost in
       let idloc = loc1 in
-      let pos_start, pos_end = Fileloc.loc_start loc1, Fileloc.loc_end loc2 in
-      let funloc = Fileloc.make ~pos_start ~pos_end in
+      let funloc = Fileloc.range ~start_loc:loc1 ~end_loc:loc2 in
       let endloc = loc2 in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "Definition of %s at %a\n" n Fileloc.pretty idloc;

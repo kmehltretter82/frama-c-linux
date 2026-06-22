@@ -6835,5 +6835,5 @@ let typeDeepDropAllAttributes t =
 
 let mkBinOp_safe_ptr_cmp = mkBinOp_exn ~constfold:false
 
-let range_loc loc_start loc_end =
-  Fileloc.range ~loc_start ~loc_end
+let range_loc start_loc end_loc =
+  Fileloc.range ~start_loc ~end_loc

@@ -148,7 +148,7 @@ val invalidStmt: stmt
 (** Returns a location that ranges over the two locations in arguments. *)
 val range_loc: Fileloc.t -> Fileloc.t -> Fileloc.t
 [@@deprecated "Use Fileloc.range instead."]
-[@@migrate { repl = fun loc_start loc_end -> Fileloc.range ~loc_start ~loc_end }]
+[@@migrate { repl = fun start_loc end_loc -> Fileloc.range ~start_loc ~end_loc }]
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating initializers} *)

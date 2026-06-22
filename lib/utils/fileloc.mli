@@ -73,11 +73,11 @@ val to_lexing_loc : t -> Lexing.position * Lexing.position
 
 (** Get the starting position of a location
     @since Frama-C+dev. *)
-val loc_start : t -> Filepos.t
+val start_pos : t -> Filepos.t
 
 (** Get the ending position of a location
     @since Frama-C+dev. *)
-val loc_end : t -> Filepos.t
+val end_pos : t -> Filepos.t
 
 (** Get the first line of the location. *)
 val line : t -> int
@@ -97,11 +97,11 @@ val is_empty : t -> bool
 
 (** Create a location between a starting and ending position.
     @since Frama-C+dev *)
-val make : pos_start:Filepos.t -> pos_end:Filepos.t -> t
+val make : start_pos:Filepos.t -> end_pos:Filepos.t -> t
 
 (** Convert a location to a pair of positions.
     @since Frama-C+dev *)
-val extract :  t -> Filepos.t * Filepos.t
+val positions :  t -> Filepos.t * Filepos.t
 
 (** Create a location from the given position.
     @since Frama-C+dev *)
@@ -110,7 +110,7 @@ val from_position : Filepos.t -> t
 (** Create a location which ranges from the start of the first location to the
     end of the second one.
     @since Frama-C+dev *)
-val range : loc_start:t -> loc_end:t -> t
+val range : start_loc:t -> end_loc:t -> t
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

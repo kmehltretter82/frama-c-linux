@@ -305,8 +305,8 @@ let set_current_source fpos = current_loc := fpos
 let get_current_source () = !current_loc ()
 
 let get_source current = function
-  | None -> if current then Some (Fileloc.loc_start (!current_loc ())) else None
-  | Some loc -> Some (Fileloc.loc_start loc)
+  | None -> if current then Some (Fileloc.start_pos (!current_loc ())) else None
+  | Some loc -> Some (Fileloc.start_pos loc)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Channels                                                           --- *)

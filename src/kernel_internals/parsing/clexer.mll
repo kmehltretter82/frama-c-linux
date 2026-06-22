@@ -392,7 +392,7 @@ let annot_lex initial rule lexbuf =
     initial lexbuf
 
 let make_annot ~one_line default lexbuf s =
-  let start = Fileloc.loc_end !annot_start_pos in
+  let start = Fileloc.end_pos !annot_start_pos in
   match Logic_lexer.annot (start, s) with
   (* error occurred and annotation is discarded. Find a normal token. *)
   | None -> default lexbuf
@@ -839,9 +839,9 @@ and annot_token = parse
     {
     if is_ghost_annot ()
     then begin
-      let loc_start = get_ghost_annot_start ()
-      and loc_end = currentLoc () in
-      let loc = Fileloc.range ~loc_start ~loc_end in
+      let start_loc = get_ghost_annot_start ()
+      and end_loc = currentLoc () in
+      let loc = Fileloc.range ~start_loc ~end_loc in
       parse_error ~loc "Ghost multi-line annotation not terminated"
     end;
     let s = Buffer.contents buf in

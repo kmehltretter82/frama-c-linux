@@ -403,7 +403,7 @@ struct
       ~name:"source"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun (decl,_) -> Fileloc.loc_start @@ loc_of_declaration decl)
+      ~get:(fun (decl,_) -> Fileloc.start_pos @@ loc_of_declaration decl)
       model
 
   let array = States.register_array
@@ -613,7 +613,7 @@ struct
 
   let () =
     let get (tag, _) =
-      let pos = Fileloc.loc_start (Printer_tag.loc_of_localizable tag) in
+      let pos = Fileloc.start_pos (Printer_tag.loc_of_localizable tag) in
       if Filepos.is_empty pos then None else Some pos
     in
     States.option
@@ -891,7 +891,7 @@ struct
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
         ~data:(module Position)
-        ~get:(fun kf -> Fileloc.loc_start (Kernel_function.get_location kf));
+        ~get:(fun kf -> Fileloc.start_pos (Kernel_function.get_location kf));
       States.column model
         ~name:"filters"
         ~descr:(Md.plain "List of filter values")
@@ -941,7 +941,7 @@ module GlobalVars = struct
       ~name:"sloc"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun vi -> Fileloc.loc_start vi.vdecl);
+      ~get:(fun vi -> Fileloc.start_pos vi.vdecl);
     States.column model
       ~name:"filters"
       ~descr:(Md.plain "List of filter values")
@@ -1066,7 +1066,7 @@ let () = Information.register
     ~label:"Location"
     ~title:"Source file location"
     begin fun fmt loc ->
-      let pos = Fileloc.loc_start @@ Printer_tag.loc_of_localizable loc in
+      let pos = Fileloc.start_pos @@ Printer_tag.loc_of_localizable loc in
       if Filepath.is_empty (Filepos.path pos) then
         raise Not_found ;
       Filepos.pretty fmt pos

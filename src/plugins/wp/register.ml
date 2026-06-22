@@ -290,7 +290,7 @@ let pstats_to_json (p,r) : Json.t = `Assoc [
 let stats_to_json g (s : Stats.stats) : Json.t =
   let smoke = Wpo.is_smoke_test g in
   let target = Wpo.get_target g in
-  let source = Fileloc.loc_start (Property.location target) in
+  let source = Fileloc.start_pos (Property.location target) in
   let script = match ProofSession.get g with
     | NoScript -> []
     | Script file | Deprecated file ->

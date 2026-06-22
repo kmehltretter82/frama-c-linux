@@ -11,9 +11,9 @@
 open Lexing
 
 let abort_current lex fmt =
-  let pos_start = Filepos.of_lexing_pos (lexeme_start_p lex) in
-  let pos_end = Filepos.of_lexing_pos (lexeme_end_p lex) in
-  let loc = Fileloc.make ~pos_start ~pos_end in
+  let start_pos = Filepos.of_lexing_pos (lexeme_start_p lex) in
+  let end_pos = Filepos.of_lexing_pos (lexeme_end_p lex) in
+  let loc = Fileloc.make ~start_pos ~end_pos in
   let fmt = "before or at token %s@\n%a@\n" ^^ fmt in
   Aorai_option.abort fmt
     (Lexing.lexeme lex)

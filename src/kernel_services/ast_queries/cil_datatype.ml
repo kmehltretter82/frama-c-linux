@@ -177,7 +177,7 @@ end
 module Position =  struct
   include Filepos
   let unknown = unknown [@@alert "-deprecated"]
-  let dummy = Fileloc.loc_start dummy_loc
+  let dummy = Fileloc.start_pos dummy_loc
   let pp_with_col = Filepos.pretty_long
   let of_lexing_pos pos = of_lexing_pos pos (* Erase the optional parameter *)
 end
@@ -189,7 +189,7 @@ module Location = struct
   let is_unknown loc = is_empty loc
   let compare_start_semantic = compare
   let equal_start_semantic = equal
-  let pretty_line fmt loc = Filepos.pretty_long fmt (loc_start loc)
+  let pretty_line fmt loc = Filepos.pretty_long fmt (start_pos loc)
 end
 
 module File = struct

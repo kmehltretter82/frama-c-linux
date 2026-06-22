@@ -290,7 +290,7 @@ let string_of_pos_opt =
   | None -> "Global"
   | Some pos -> string_of_pos pos
 
-let string_of_loc loc = Fileloc.loc_start loc |> string_of_pos
+let string_of_loc loc = Fileloc.start_pos loc |> string_of_pos
 
 let make_events_table print_kind caption events =
   let open Log in

@@ -46,7 +46,7 @@ struct
 
   (* What matters is the beginning of the comment. *)
   let add loc comment =
-    let first, last = Fileloc.extract loc in
+    let first, last = Fileloc.positions loc in
     let state = MyState.get () in
     Kernel.debug ~dkey:Kernel.dkey_comments
       "Adding a comment starting at %a@." Filepos.pretty_debug first;
@@ -54,7 +54,7 @@ struct
     MyState.set ((MyTable.add first ((last,comment)::acc)) state)
 
   let get loc =
-    let first, last = Fileloc.extract loc in
+    let first, last = Fileloc.positions loc in
     Kernel.debug ~dkey:Kernel.dkey_comments
       "@[<hv>Searching for comments between positions@ %a@ and@ %a@.@]"
       Filepos.pretty_debug first Filepos.pretty_debug last;
@@ -82,18 +82,18 @@ struct
 
   let iter f =
     MyTable.iter
-      (fun pos_start comments ->
-         List.iter (fun (pos_end,comment) ->
-             let loc = Fileloc.make ~pos_start ~pos_end in
+      (fun start_pos comments ->
+         List.iter (fun (end_pos,comment) ->
+             let loc = Fileloc.make ~start_pos ~end_pos in
              f loc comment) comments)
       (MyState.get())
 
   let fold f acc =
     MyTable.fold
-      (fun pos_start comments acc ->
+      (fun start_pos comments acc ->
          List.fold_left
-           (fun acc (pos_end,comment) ->
-              let loc = Fileloc.make ~pos_start ~pos_end in
+           (fun acc (end_pos,comment) ->
+              let loc = Fileloc.make ~start_pos ~end_pos in
               f loc comment acc) acc comments)
       (MyState.get()) acc
 
@@ -184,7 +184,7 @@ let valueOfDigit chr =
 
 
 let d_cabsloc fmt cl =
-  Format.fprintf fmt "%a" Filepos.pretty (Fileloc.loc_start cl)
+  Format.fprintf fmt "%a" Filepos.pretty (Fileloc.start_pos cl)
 
 type attr_test = Normal | Test
 let state_stack = Stack.create ()

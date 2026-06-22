@@ -112,7 +112,7 @@ let kprintf phi ?(log=true) ?(severe=false) ?source ~fallback message =
        if log then
          Wp_parameters.warning ~source:loc "%s" text ~once:true ;
        phi {
-         loc = Fileloc.loc_start loc ;
+         loc = Fileloc.start_pos loc ;
          severe = severe ;
          source = source ;
          fallback = fallback ;

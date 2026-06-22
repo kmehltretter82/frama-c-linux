@@ -1,6 +1,7 @@
 open Cil_types
 
-let print_loc fmt (b,e : Filepos.t * Filepos.t) =
+let print_loc fmt loc =
+  let b, e  = Fileloc.positions loc in
   Format.fprintf fmt "Start line %d, char %d; End line %d, char %d"
     (Filepos.line b) (Filepos.input_column b)
     (Filepos.line e) (Filepos.input_column e)

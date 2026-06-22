@@ -27,8 +27,8 @@
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
 
-  let loc_range {lexpr_loc = loc_start} {lexpr_loc = loc_end} =
-    Fileloc.range ~loc_start ~loc_end
+  let loc_range {lexpr_loc = start_loc} {lexpr_loc = end_loc} =
+    Fileloc.range ~start_loc ~end_loc
 
 
   let info start_end x = loc_info (loc start_end) x

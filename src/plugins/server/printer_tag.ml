@@ -199,7 +199,7 @@ let pp_ki_loc fmt ki =
   match ki with
   | Kglobal -> (* no location, print 'global' *)
     Format.fprintf fmt "global"
-  | Kstmt st -> Filepos.pretty fmt (Fileloc.loc_start @@ Stmt.loc st)
+  | Kstmt st -> Filepos.pretty fmt (Fileloc.start_pos @@ Stmt.loc st)
 
 let pp_debug fmt = function
   | PStmtStart (_, s) ->
@@ -545,7 +545,7 @@ class pos_to_localizable =
 
     method add_range loc (localizable : localizable) =
       if not (Fileloc.is_empty loc) then (
-        let p1, p2 = Fileloc.extract loc in
+        let p1, p2 = Fileloc.positions loc in
         if not (Filepath.equal (Filepos.path p1) (Filepos.path p2)) then
           Kernel.debug ~once:true ~dkey
             "Localizable over two files: %a and %a; %a"
@@ -631,7 +631,7 @@ class pos_to_localizable =
 
 (* Returns [true] if the column [col] is within location [loc]. *)
 let location_contains_col (loc : Fileloc.t) col =
-  let pos_start, pos_end = Fileloc.extract loc in
+  let pos_start, pos_end = Fileloc.positions loc in
   Filepos.input_column pos_start <= col && col <= Filepos.input_column pos_end
 
 (* Applies several heuristics to try and match the best localizable to a
@@ -654,7 +654,7 @@ let apply_location_heuristics precise_col possible_locs pos =
   let filter_locs l =
     List.filter (fun (loc', _) ->
         if precise_col then location_contains_col loc' col
-        else pos = Fileloc.loc_start loc'
+        else pos = Fileloc.start_pos loc'
       ) l
   in
   (* Heuristic 2: prioritize expressions if they are present.

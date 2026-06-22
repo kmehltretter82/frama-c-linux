@@ -58,7 +58,7 @@ let get_backtrace () =
     let src_text =
       try
         let src = Log.get_current_source () in
-        Format.asprintf "%a" Filepos.pretty (Fileloc.loc_start src)
+        Format.asprintf "%a" Filepos.pretty (Fileloc.start_pos src)
       with Not_found -> "<unset>"
     in
     Format.asprintf "Current source was: %s@." src_text

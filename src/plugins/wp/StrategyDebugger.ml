@@ -68,8 +68,8 @@ struct
     Jrecord [ "offset", Jnumber ; "length", Jnumber ]
 
   let to_json (loc : t) =
-    let offset = Filepos.input_offset (Fileloc.loc_start loc) in
-    let length = Filepos.input_offset (Fileloc.loc_end loc) - offset in
+    let offset = Filepos.input_offset (Fileloc.start_pos loc) in
+    let length = Filepos.input_offset (Fileloc.end_pos loc) - offset in
     `Assoc [ "offset", `Int offset ; "length", `Int length ]
 
   let of_json _ =
@@ -215,7 +215,7 @@ let parse_string s =
     String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
   let pbeg = Filepos.make ~path ~line:0 ~column:0 ~offset:0 () in
   let pend = Filepos.make ~path ~line ~column ~offset:0 () in
-  let loc = Fileloc.make ~pos_start:pbeg ~pos_end:pend in
+  let loc = Fileloc.make ~start_pos:pbeg ~end_pos:pend in
   let lb = Lexing.from_string s in
   let get_loc () =
     Fileloc.of_lexing_loc (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)

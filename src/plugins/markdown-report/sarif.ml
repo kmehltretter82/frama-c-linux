@@ -251,7 +251,7 @@ module Region = struct
   let default = create ()
 
   let of_loc loc =
-    let (start, finish) = Fileloc.extract loc in
+    let (start, finish) = Fileloc.positions loc in
     let startLine = Filepos.line start in
     let startColumn = Filepos.input_column start  in
     let endLine = Filepos.line finish in

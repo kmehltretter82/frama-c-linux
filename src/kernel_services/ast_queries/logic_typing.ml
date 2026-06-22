@@ -3195,7 +3195,7 @@ struct
     fun ctxt env f t1 op t2 ->
     let loc1 = t1.lexpr_loc in
     let loc2 = t2.lexpr_loc in
-    let loc = Fileloc.range ~loc_start:t1.lexpr_loc ~loc_end:t2.lexpr_loc in
+    let loc = Fileloc.range ~start_loc:t1.lexpr_loc ~end_loc:t2.lexpr_loc in
     let t1 = ctxt.type_term ctxt env t1 in
     let ty1 = t1.term_type in
     let t2 = ctxt.type_term ctxt env t2 in

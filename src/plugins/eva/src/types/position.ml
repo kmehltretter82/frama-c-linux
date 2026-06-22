@@ -43,7 +43,7 @@ struct
     Cil_datatype.Stmt.loc stmt
 
   let pos lpos =
-    Fileloc.loc_start (loc lpos)
+    Fileloc.start_pos (loc lpos)
 
   let kinstr lpos =
     Cil_types.Kstmt (fst lpos)
@@ -115,7 +115,7 @@ let loc pos =
   | Local l -> Local.loc l
 
 let pos pos =
-  loc pos |> Fileloc.loc_start
+  loc pos |> Fileloc.start_pos
 
 let kinstr pos =
   match pos with
