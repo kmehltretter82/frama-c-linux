@@ -24,7 +24,7 @@ module type S_no_log = sig
   val gen_loc: Fileloc.t
 
   (** Make a new location for a generated input. The given location is copied
-      except for its origin which will use the plug-in's shortname as generator.
+      except for its origin which will use the plug-in's name as generator.
       @since Frama-C+dev
   *)
   val gen_loc_from: Fileloc.t -> Fileloc.t

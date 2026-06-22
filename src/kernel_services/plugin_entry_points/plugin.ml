@@ -199,8 +199,8 @@ struct
   let verbose_level = Extlib.mk_fun "verbose_level"
   let debug_level = Extlib.mk_fun "debug_level"
 
-  let gen_loc = Fileloc.generated P.shortname
-  let gen_loc_from loc = Fileloc.generated ~loc P.shortname
+  let gen_loc = Fileloc.generated P.name
+  let gen_loc_from loc = Fileloc.generated ~loc P.name
 
   (* unused by the kernel: it uses Kernel_log instead;
      see module [L] below *)

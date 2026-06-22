@@ -225,10 +225,7 @@ let rec is_exit_status t = match t.term_node with
 (** {2 Predicate constructors} *)
 (* empty line for ocamldoc *)
 
-let generated_loc =
-  let p = Filepos.generated "kernel" in (p,p)
-
-let pred ?(loc=generated_loc) ?(names=[]) p =
+let pred ?(loc=Kernel.gen_loc) ?(names=[]) p =
   { pred_content = p ; pred_loc = loc ; pred_name = names }
 
 let unnamed ?loc p = pred ?loc p
