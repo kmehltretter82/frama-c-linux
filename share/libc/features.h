@@ -154,5 +154,7 @@
 #define __FC_BOOL _Bool
 #endif
 
+#include "__fc_machdep.h"
+
 /* end __FC_FEATURES_H */
 #endif

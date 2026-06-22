@@ -1016,7 +1016,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 743;
+    __gen_e_acsl_assert_data.line = 742;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     __e_acsl_delete_block((void *)(& status));

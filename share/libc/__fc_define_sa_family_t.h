@@ -10,7 +10,6 @@
 #define __FC_DEFINE_SA_FAMILY_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 typedef __UINT_LEAST16_T sa_family_t;
 __END_DECLS

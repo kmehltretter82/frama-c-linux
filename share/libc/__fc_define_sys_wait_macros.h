@@ -10,7 +10,6 @@
 #define __FC_DEFINE_SYS_WAIT_MACROS_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 
 // The values for the constants/macros below are based on the glibc on

@@ -11,7 +11,6 @@
 #define __FC_STDARG_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h" // for __FC_VA_LIST_T
 __BEGIN_DECLS
 typedef __FC_VA_LIST_T va_list;
 __END_DECLS

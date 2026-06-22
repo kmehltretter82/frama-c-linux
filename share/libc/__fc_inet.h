@@ -19,7 +19,6 @@
 #define __FC_INET_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 
 #include "__fc_string_axiomatic.h"

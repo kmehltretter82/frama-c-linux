@@ -11,7 +11,6 @@
 
 #ifndef __FC_GCC_BUILTINS_H
 #define __FC_GCC_BUILTINS_H
-#include "__fc_machdep.h"
 #include "features.h"
 
 __PUSH_FC_STDLIB

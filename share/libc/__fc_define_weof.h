@@ -10,7 +10,6 @@
 #define __FC_DEFINE_WEOF_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 #define WEOF __FC_WEOF
 __END_DECLS

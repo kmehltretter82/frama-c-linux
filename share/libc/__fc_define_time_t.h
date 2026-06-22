@@ -10,7 +10,6 @@
 #define __FC_DEFINE_TIME_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 #ifndef __time_t_defined
 typedef __FC_TIME_T time_t;

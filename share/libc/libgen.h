@@ -9,7 +9,6 @@
 #ifndef __FC_LIBGEN_H
 #define __FC_LIBGEN_H
 #include "features.h"
-#include "__fc_machdep.h"
 #include "__fc_string_axiomatic.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

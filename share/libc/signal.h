@@ -13,7 +13,6 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 #include "__fc_define_pid_t.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_pthread_types.h"

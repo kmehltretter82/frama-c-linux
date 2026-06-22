@@ -5,58 +5,58 @@
 [e-acsl] Warning: annotating undefined function `posix_memalign':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:537: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1017: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1016: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1025: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1024: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1021: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1020: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:550: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:549: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:560: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:559: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:537: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:537: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:556: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:555: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:537: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:537: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1006: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
+[eva] FRAMAC_SHARE/libc/stdlib.h:1004: Warning: 
   ignoring unsupported allocates clause
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1014: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1013: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1028: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1027: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1021: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1020: Warning: 
   function __gen_e_acsl_posix_memalign, behavior allocation: postcondition 'allocation' got status unknown.
 [eva:alarm] memalign.c:17: Warning: 
   accessing uninitialized left-value. assert \initialized(memptr);

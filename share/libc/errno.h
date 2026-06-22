@@ -11,7 +11,6 @@
 #define __FC_ERRNO_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 
 /* Mandatory */
 #define EDOM __FC_EDOM

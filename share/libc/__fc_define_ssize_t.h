@@ -10,7 +10,6 @@
 #define __FC_DEFINE_SSIZE_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 // This file may be included by non-POSIX machdeps (e.g. via sys/types.h),
 // so we must check if ssize_t should be defined

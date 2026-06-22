@@ -635,7 +635,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 743;
+    __gen_e_acsl_assert_data.line = 742;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
@@ -670,7 +670,7 @@ int __gen_e_acsl_fclose(FILE *stream)
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(stream,4)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_2.fct = "fclose";
-      __gen_e_acsl_assert_data_2.line = 148;
+      __gen_e_acsl_assert_data_2.line = 147;
       __gen_e_acsl_assert_data_2.name = "pointer alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -689,7 +689,7 @@ int __gen_e_acsl_fclose(FILE *stream)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(stream)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data.fct = "fclose";
-    __gen_e_acsl_assert_data.line = 148;
+    __gen_e_acsl_assert_data.line = 147;
     __gen_e_acsl_assert_data.name = "valid_stream";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -712,7 +712,7 @@ int __gen_e_acsl_fclose(FILE *stream)
     __gen_e_acsl_assert_data_3.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_3.fct = "fclose";
-    __gen_e_acsl_assert_data_3.line = 150;
+    __gen_e_acsl_assert_data_3.line = 149;
     __gen_e_acsl_assert_data_3.name = "result_zero_or_EOF";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);

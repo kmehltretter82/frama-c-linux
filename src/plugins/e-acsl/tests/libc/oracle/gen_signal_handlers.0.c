@@ -213,7 +213,7 @@ int __gen_e_acsl_raise(int sig)
     __gen_e_acsl_assert_data.pred_txt = "0 <= sig <= 64";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data.fct = "raise";
-    __gen_e_acsl_assert_data.line = 153;
+    __gen_e_acsl_assert_data.line = 152;
     __gen_e_acsl_assert_data.name = "valid_signal";
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -292,7 +292,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data.fct = "signal";
-      __gen_e_acsl_assert_data.line = 139;
+      __gen_e_acsl_assert_data.line = 138;
       __gen_e_acsl_assert_data.name = "index out of bounds";
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -317,7 +317,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_2.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_2.fct = "signal";
-      __gen_e_acsl_assert_data_2.line = 132;
+      __gen_e_acsl_assert_data_2.line = 131;
       __gen_e_acsl_assert_data_2.name = "index out of bounds";
       __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -344,7 +344,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __gen_e_acsl_assert_data_3.pred_txt = "0 <= sig <= 64";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_3.fct = "signal";
-    __gen_e_acsl_assert_data_3.line = 122;
+    __gen_e_acsl_assert_data_3.line = 121;
     __gen_e_acsl_assert_data_3.name = "valid_signal";
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -357,7 +357,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __gen_e_acsl_assert_data_4.pred_txt = "func != \\null";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_4.fct = "signal";
-    __gen_e_acsl_assert_data_4.line = 123;
+    __gen_e_acsl_assert_data_4.line = 122;
     __gen_e_acsl_assert_data_4.name = "func_not_null";
     __e_acsl_assert(func != (void (*)(int ))0,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -376,7 +376,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_5.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_5.fct = "signal";
-      __gen_e_acsl_assert_data_5.line = 137;
+      __gen_e_acsl_assert_data_5.line = 136;
       __gen_e_acsl_assert_data_5.name = "index out of bounds";
       __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -398,7 +398,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_6.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_6.fct = "signal";
-      __gen_e_acsl_assert_data_6.line = 143;
+      __gen_e_acsl_assert_data_6.line = 142;
       __gen_e_acsl_assert_data_6.name = "index out of bounds";
       __e_acsl_assert(__gen_e_acsl_and_5,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -417,7 +417,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_7.pred_txt = "all behaviors complete";
       __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_7.fct = "signal";
-      __gen_e_acsl_assert_data_7.line = 121;
+      __gen_e_acsl_assert_data_7.line = 120;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,
                       & __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -426,7 +426,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_8.pred_txt = "all behaviors disjoint";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_8.fct = "signal";
-      __gen_e_acsl_assert_data_8.line = 121;
+      __gen_e_acsl_assert_data_8.line = 120;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
                       & __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
@@ -447,7 +447,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __gen_e_acsl_assert_data_9.pred_txt = "\\result != \\null";
     __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_9.fct = "signal";
-    __gen_e_acsl_assert_data_9.line = 129;
+    __gen_e_acsl_assert_data_9.line = 128;
     __gen_e_acsl_assert_data_9.name = "result_not_null";
     __e_acsl_assert(__retres != (void (*)(int ))0,
                     & __gen_e_acsl_assert_data_9);
@@ -471,7 +471,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_11.pred_txt = "0 <= \\old(sig) < (int)65";
       __gen_e_acsl_assert_data_11.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_11.fct = "signal";
-      __gen_e_acsl_assert_data_11.line = 131;
+      __gen_e_acsl_assert_data_11.line = 130;
       __gen_e_acsl_assert_data_11.name = "index out of bounds";
       __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_11);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
@@ -502,7 +502,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
         __gen_e_acsl_assert_data_12.pred_txt = "0 <= \\old(sig) < (int)65";
         __gen_e_acsl_assert_data_12.file = "FRAMAC_SHARE/libc/signal.h";
         __gen_e_acsl_assert_data_12.fct = "signal";
-        __gen_e_acsl_assert_data_12.line = 132;
+        __gen_e_acsl_assert_data_12.line = 131;
         __gen_e_acsl_assert_data_12.name = "index out of bounds";
         __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_12);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
@@ -520,7 +520,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __gen_e_acsl_assert_data_10.pred_txt = "__fc_signal_handlers[\\old(sig)] == \\old(func) ||\n__fc_signal_handlers[\\old(sig)] == \\old(__fc_signal_handlers[sig])";
     __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_10.fct = "signal";
-    __gen_e_acsl_assert_data_10.line = 131;
+    __gen_e_acsl_assert_data_10.line = 130;
     __gen_e_acsl_assert_data_10.name = "handler_saved_or_unchanged";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
@@ -550,7 +550,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
         __gen_e_acsl_assert_data_14.pred_txt = "0 <= \\old(sig) < (int)65";
         __gen_e_acsl_assert_data_14.file = "FRAMAC_SHARE/libc/signal.h";
         __gen_e_acsl_assert_data_14.fct = "signal";
-        __gen_e_acsl_assert_data_14.line = 134;
+        __gen_e_acsl_assert_data_14.line = 133;
         __gen_e_acsl_assert_data_14.name = "index out of bounds";
         __e_acsl_assert(__gen_e_acsl_and_8,& __gen_e_acsl_assert_data_14);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
@@ -567,7 +567,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __gen_e_acsl_assert_data_13.pred_txt = "\\result == &SIG_ERR || __fc_signal_handlers[\\old(sig)] == \\old(func)";
     __gen_e_acsl_assert_data_13.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_13.fct = "signal";
-    __gen_e_acsl_assert_data_13.line = 134;
+    __gen_e_acsl_assert_data_13.line = 133;
     __gen_e_acsl_assert_data_13.name = "handler_saved_if_ok";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_13);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
@@ -595,7 +595,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_15.pred_txt = "\\result == \\old(__fc_signal_handlers[sig]) || \\result == &SIG_ERR";
       __gen_e_acsl_assert_data_15.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_15.fct = "signal";
-      __gen_e_acsl_assert_data_15.line = 139;
+      __gen_e_acsl_assert_data_15.line = 138;
       __gen_e_acsl_assert_data_15.name = "old_handler_is_set/result_old_handler_or_error";
       __e_acsl_assert(__gen_e_acsl_or_3,& __gen_e_acsl_assert_data_15);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
@@ -632,7 +632,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       __gen_e_acsl_assert_data_16.pred_txt = "\\result == &SIG_DFL || \\result == &SIG_IGN || \\result == &SIG_ERR";
       __gen_e_acsl_assert_data_16.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_16.fct = "signal";
-      __gen_e_acsl_assert_data_16.line = 145;
+      __gen_e_acsl_assert_data_16.line = 144;
       __gen_e_acsl_assert_data_16.name = "old_handler_not_set/result_ok_or_error";
       __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_16);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
