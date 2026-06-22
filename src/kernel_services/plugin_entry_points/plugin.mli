@@ -17,8 +17,8 @@
 *)
 module type S_no_log = sig
 
-  (** Location generated for the plug-in, to be used when we need a location
-      but none is provided.
+  (** Location generated for the plug-in, to be used when a location is
+      required (e.g., to build Cil fragments) but none is available.
       @since Frama-C+dev
   *)
   val gen_loc: Fileloc.t

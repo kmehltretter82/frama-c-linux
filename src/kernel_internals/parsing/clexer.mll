@@ -41,19 +41,16 @@ let is_ghost_code () = !ghost_code
 let enter_ghost_code () = ghost_code := true
 let exit_ghost_code () = ghost_code := false
 
-let ghost_annot = ref false
 let ghost_annot_start = ref None
-let is_ghost_annot () = !ghost_annot
+let is_ghost_annot () = Option.is_some !ghost_annot_start
 let get_ghost_annot_start () =
   match !ghost_annot_start with
   | None -> Kernel.fatal "This function should always be called after entering a ghost annot"
   | Some loc -> loc
 
 let enter_ghost_annot () =
-  ghost_annot := true;
   ghost_annot_start:= Some (currentLoc())
 let exit_ghost_annot () =
-  ghost_annot := false;
   ghost_annot_start := None
 
 let add_comment c = Cabshelper.Comments.add (currentLoc()) c

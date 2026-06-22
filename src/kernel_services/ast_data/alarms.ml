@@ -419,7 +419,7 @@ let get_description = function
 
 
 (* Given a "topmost" location and another one supposed to be more precise,
-   returns the best (hopefully not unknown) one. *)
+   returns the best (hopefully not empty) one. *)
 let best_loc ~loc loc' =
   if Fileloc.is_empty loc' then loc else loc'
 
