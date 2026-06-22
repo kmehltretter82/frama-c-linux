@@ -33,10 +33,6 @@ val find_field : data -> string -> field
 (** Record datatype the field belong to *)
 val record_of_field : field -> data
 
-(** Fields are re-ordered if necessary.
-    @raise Invalid_arg for empty fields *)
-val record : (field * term) list -> term
-
 (** Ordering with respect to field declaration order in record *)
 val by_field_rank : field -> field -> int
 

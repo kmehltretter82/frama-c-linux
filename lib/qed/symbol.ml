@@ -213,13 +213,6 @@ let record_of_field (Field a) = a.data
 
 let by_field_rank (Field a) (Field b) = b.rank - a.rank
 
-let record = function
-  | [] -> invalid_arg "Qed.Symbol.record"
-  | ((Field { ls },_)::_) as fvs ->
-    let fvs = List.sort (fun (f,_) (g,_) -> by_field_rank f g) fvs in
-    let ts = List.map snd fvs in
-    Why3.Term.t_app_infer ls ts
-
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Functions & Predicates                                       --- *)
 (* -------------------------------------------------------------------------- *)

@@ -38,8 +38,6 @@ module SMAP(S : sig type data val name : string end) =
 
 module TS = SMAP(struct type data = Why3.Ty.tysymbol let name = "TS" end)
 module LS = SMAP(struct type data = Why3.Term.lsymbol let name = "LS" end)
-module FS = SMAP(struct type data = Why3.Term.lsymbol let name = "FS" end)
-module CS = SMAP(struct type data = Why3.Term.lsymbol let name = "CS" end)
 
 let get_ts ctxt name =
   let data = Qed.Symbol.find_data ctxt.env name in
@@ -124,9 +122,15 @@ let cc_lfun (lf : Lang.lfun) =
     | CTOR c -> LS.find (Lang.ctor_id c)
   with Not_found -> failwith "Undefined logic symbol %S" @@ Lang.Fun.fullname lf
 
-let cc_field (fd : Lang.field) =
-  try FS.find (Lang.Field.name fd)
-  with Not_found -> failwith "Undefined field symbol %S" @@ Lang.Field.fullname fd
+let cc_field ctxt (fd : Lang.field) =
+  Qed.Symbol.Field.use ctxt.cluster fd ;
+  Qed.Symbol.Field.symbol fd
+
+let cc_record ctxt fvs =
+  let data = Qed.Symbol.record_of_field @@ fst @@ List.hd fvs in
+  Qed.Symbol.Data.use ctxt.cluster data ;
+  fst @@ List.hd @@ Qed.Symbol.constructors data,
+  List.sort (fun (f,_) (g,_) -> Qed.Symbol.by_field_rank f g) fvs
 
 let is_cassoc = function Qed.Logic.Operator op -> op.associative | _ -> false
 
@@ -316,9 +320,11 @@ and cc_any env t =
         else call ts
     end
   | Rget(e,fd) ->
-    Why3.Term.t_app_infer (cc_field fd) [cc_term env e]
+    Why3.Term.t_app_infer (cc_field env.context fd) [cc_term env e]
   | Rdef fvs ->
-    Qed.Symbol.record @@ List.map (fun (fd,v) -> fd,cc_term env v) fvs
+    let mk,fvs = cc_record env.context fvs in
+    let ts = List.map (fun (_,v) -> cc_term env v) fvs in
+    Why3.Term.t_app_infer mk ts
 
 and cc_equal env a b =
   let a = cc env a in
@@ -519,12 +525,10 @@ class visitor ctxt c =
               let id = Why3.Ident.id_fresh name in
               let ty = Option.get (cc_tau ctxt ty) in
               let ls = Why3.Term.create_fsymbol ~proj:true id [rty] ty in
-              FS.update name ls ;
               Some ls,ty
             ) fields in
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let ctor = Why3.Term.create_fsymbol ~constr:1 id args rty in
-        CS.update name ctor ;
         Qed.Symbol.add ctxt.cluster @@
         Why3.Decl.create_data_decl [tys,[ctor,fields]]
 
