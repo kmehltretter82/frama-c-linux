@@ -43,12 +43,12 @@ module CS = SMAP(struct type data = Why3.Term.lsymbol let name = "CS" end)
 
 let get_ts ctxt name =
   let data = Qed.Symbol.find_data ctxt.env name in
-  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Data.theory data ;
+  Qed.Symbol.Data.use ctxt.cluster data ;
   Qed.Symbol.Data.symbol data
 
 let get_ls ctxt name =
   let lfun  = Qed.Symbol.find_lfun ctxt.env name in
-  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
+  Qed.Symbol.Fun.use ctxt.cluster lfun ;
   Qed.Symbol.Fun.symbol lfun
 
 let t_app env name ?result tl =
@@ -108,9 +108,11 @@ let subterms f e =
 
 (* conversion *)
 
-let cc_adt (adt : Lang.adt) =
+let cc_adt context (adt : Lang.adt) =
   try match adt with
-    | Qdata a -> Qed.Symbol.Data.symbol a
+    | Qdata a ->
+      Qed.Symbol.Data.use context.cluster a ;
+      Qed.Symbol.Data.symbol a
     | Atype lt -> TS.find (Lang.type_id lt)
   with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
 
@@ -144,7 +146,7 @@ let rec cc_tau ctxt (t:Lang.F.tau) =
     let ts = get_ts ctxt "map.Map.map" in
     Some (Why3.Ty.ty_app ts [Option.get (cc_tau ctxt k); Option.get (cc_tau ctxt v)])
   | Data(adt,l) ->
-    let ts = cc_adt adt in
+    let ts = cc_adt ctxt adt in
     Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
   | Tvar i -> Some (Why3.Ty.ty_var (Qed.Symbol.tvar i))
 
@@ -639,10 +641,11 @@ class visitor ctxt c =
 module CC =
 struct
   type nonrec env = env
-
-  let export name =
+  let cluster env = env.context.cluster
+  let export name cc =
     let context = context (Why3Env.env ()) name in
-    gamma context, context.cluster
+    let data = cc (gamma context) in
+    Qed.Symbol.close context.cluster, data
 
   let find_ts env = get_ts env.context
   let find_ls env = get_ls env.context

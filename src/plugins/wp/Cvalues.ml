@@ -83,12 +83,12 @@ struct
         let name = "CValues.VCOMP"
         let compile c =
           let open ExportWhy3.CC in
-          let env,cluster = export c.cname in
+          snd @@ export c.cname @@ fun env ->
           match c.cfields with
-          | None -> Qed.Symbol.new_type cluster name
+          | None -> Qed.Symbol.new_type (cluster env) name
           | Some fds ->
             let data,_,fields =
-              Qed.Symbol.new_record cluster c.cname @@
+              Qed.Symbol.new_record (cluster env) c.cname @@
               List.map
                 (fun fd ->
                    fd.fname,

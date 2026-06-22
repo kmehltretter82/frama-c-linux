@@ -166,6 +166,7 @@ sig
   val symbol : t -> symbol
   val ident : t -> ident
   val theory : t -> theory
+  val use : cluster -> t -> unit
 end
 
 module Data : Symbol with type t = data and type symbol = tysymbol

@@ -120,7 +120,7 @@ let close = function
     let th = Why3.Theory.close_theory uc in
     c.closed <- Some th ; th
 
-let context = function
+let theory = function
   | Theory th | Cluster { closed = Some th } -> th
   | Cluster { closed = None } -> invalid_arg "Qed.Symbol.theory"
 
@@ -180,7 +180,7 @@ let constructors (Data a) =
   match a.cs with
   | Some cs -> cs
   | None ->
-    let th = context a.ct in
+    let th = theory a.ct in
     let cs = try Why3.Decl.find_constructors th.th_known a.ts with _ -> [] in
     a.cs <- Some cs ; cs
 
@@ -256,7 +256,7 @@ module type Sid =
 sig
   type t
   type symbol
-  val theory : t -> Why3.Theory.theory
+  val context : t -> context
   val symbol : t -> symbol
   val ident : t -> Why3.Ident.ident
 end
@@ -274,6 +274,7 @@ sig
   val symbol : t -> symbol
   val ident : t -> Why3.Ident.ident
   val theory : t -> Why3.Theory.theory
+  val use : cluster -> t -> unit
 end
 
 module Make(S : Sid) : Symbol with type t = S.t and type symbol = S.symbol =
@@ -285,13 +286,15 @@ struct
   let name a = of_infix (ident a).id_string
   let fullname a = fullname (ident a)
   let pretty fmt a = Format.pp_print_string fmt @@ name a
+  let theory a = theory @@ S.context a
+  let use cluster a = iter (use cluster) @@ S.context a
 end
 
 module Data = Make
     (struct
       type t = data
       type symbol = Why3.Ty.tysymbol
-      let theory (Data a) = context a.ct
+      let context (Data a) = a.ct
       let symbol (Data a) = a.ts
       let ident (Data a) = a.ts.ts_name
     end)
@@ -300,7 +303,7 @@ module Field = Make
     (struct
       type t = field
       type symbol = Why3.Term.lsymbol
-      let theory (Field fd) = context fd.ct
+      let context (Field fd) = fd.ct
       let symbol (Field fd) = fd.ls
       let ident (Field fd) = fd.ls.ls_name
     end)
@@ -309,7 +312,7 @@ module Fun = Make
     (struct
       type t = lfun
       type symbol = Why3.Term.lsymbol
-      let theory (Fun fn) = context fn.ct
+      let context (Fun fn) = fn.ct
       let symbol (Fun fn) = fn.ls
       let ident (Fun fn) = fn.ls.ls_name
     end)
@@ -408,7 +411,7 @@ let apply (Fun f) ?result ts =
   let s = ref Why3.Ty.Mtv.empty in
   unify_all s f.ls.ls_args ts ;
   Option.iter (unify_opt s f.ls.ls_value) result ;
-  of_oty ~sigma:!s (context f.ct) f.ls.ls_value
+  of_oty ~sigma:!s (theory f.ct) f.ls.ls_value
 
 (* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
@@ -427,7 +430,7 @@ let signature (Fun f) =
     | Tyapp(_,ts) -> List.iter addt ts in
   Option.iter addt f.ls.ls_value ;
   List.iter addt f.ls.ls_args ;
-  let th = context f.ct in
+  let th = theory f.ct in
   !r, of_oty ~sigma:!s th f.ls.ls_value,
   List.map (of_ty ~sigma:!s th) f.ls.ls_args
 
@@ -438,7 +441,7 @@ let definition (Fun f) =
     let def =
       try
         Option.map Why3.Decl.open_ls_defn @@
-        Why3.Decl.find_logic_definition (context f.ct).th_known f.ls
+        Why3.Decl.find_logic_definition (theory f.ct).th_known f.ls
       with _ -> None
     in f.def <- Some def ; def
 
@@ -509,7 +512,7 @@ let new_record cluster ?loc name fds =
   let ls = Why3.Term.create_lsymbol ~constr:1 mk fts (Some tr) in
   let record = Fun { ct ; ls ; def = None } in
   let ctors = [ls,prjs] in
-  let decl = Why3.Decl.create_data_decl [ts,[ls,prjs]] in
+  let decl = Why3.Decl.create_data_decl [ts,ctors] in
   let Data d = data in d.fs <- Some fields ; d.cs <- Some ctors ;
   add cluster decl ; data, record, fields
 
