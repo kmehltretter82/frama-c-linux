@@ -343,7 +343,7 @@ function GetCache
     else
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Cmd git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" pull --rebase --autostash
     fi
 }
 
