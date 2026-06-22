@@ -1,0 +1,106 @@
+\chapter{Datamodels}
+\label{toc:datamodels}
+
+\section{Syntax}
+\label{toc:syntax}
+
+A datamodel is defined with the clause block \texttt{datamodel}. It can
+contain \texttt{pmodel}, which are ghost model fields common to all
+constructors, \texttt{pinvariant}, which are global invariants for the
+datamodel, and none or several constructors, defined with \texttt{pcase}.
+
+A constructor Cons, defined with a clause block \texttt{pcase} must contain
+a clause \texttt{pwhen} --- if the constructor is the last constructor defined
+in the datamodel, the clause \texttt{pwhen} may be omitted --- that declares the
+guard of the constructor. It can also
+contain \texttt{pframe}, which are distinct local frames or self-framing local
+locations, and \texttt{pinvariant}.
+
+In function contracts, the instances of data models consumed and produced
+are specified using the \texttt{produces} and \texttt{consumes} clauses.
+Each global model field must be associated with a corresponding variable
+or value. The instances of data models manipulated in a loop are specified
+similarly using the \texttt{loop frame} clause.
+
+The heap and the frame can be manipulated inside a function with several
+clauses. The clause \texttt{heap} allows redefining the heap and the clause
+\texttt{frame} allows renaming some instances of data models in the frame.
+The clause \texttt{produce} is used to create a new instance of a data model in
+the frame with a given constructor ; all the model fields must be associated
+with a value and all the local frames must be associated with an instance of
+a data model of the frame.
+Conversely, the clause \texttt{consume} is used to remove an instance of a
+data model of the frame with a given constructor. Similarly, to
+\texttt{produce}, all the model fields and the local frame must be associated
+with a value and a new instance of a data model.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{tabular}{|ccl@{\hspace{.5cm}}l|}
+    % LTeX: enabled=false
+    \hline
+    \rule{0pt}{2em}
+    \textit{clause} & ::= & \ldots & \\
+     & $\mid$ &
+      \texttt{datamodel} Type \{\textit{field}, \dots, \textit{field}\} ;
+    & Datamodel specification\\
+    & $\mid$ &
+      \texttt{consume} Name: \{ Type::Cons \textbackslash with&\\
+    &&\quad.Model = Value, \dots, .Frame = Object\} ;
+    & \\
+    & $\mid$ &
+      \texttt{produce} Name: \{ Type::Cons \textbackslash with &\\
+    &&\quad.Model = Value, \dots, .Frame = Object\} ;
+    & \\
+    & $\mid$ &
+     \texttt{consumes} CName: \{ Type \textbackslash with
+    & Function contract\\
+    &&\quad.Model = Value, \dots, .Model = Value\} ;&\\
+    & $\mid$ &
+      \texttt{produces} PName: \{ Type \textbackslash with
+    & Function contract \\
+    &&\quad.Model = Value,\dots, .Model = value\} ;&\\
+    & $\mid$ &
+      \texttt{loop frame} PName: \{ Type \textbackslash with
+    & \\
+    &&\quad.Model = Value,\dots, .Model = value\} ;&\\
+    & $\mid$ &
+      \texttt{call} \{ Fun \textbackslash with
+    & Function call\\
+    &&\quad.CName = - -Object, \dots, .PName = ++Object\} ;&\\
+    & $\mid$ &
+      \texttt{heap} &\\
+    & $\mid$ &
+      \texttt{frame} &\\
+
+    \rule{0pt}{2em}
+      \textit{field} & ::= &&\\
+    & $\mid$ &
+      \texttt{pmodel} (type) Model ; &\\
+    & $\mid$ &
+      \texttt{pframe} Frame: \{ Type \textbackslash with&\\
+     &&\quad.Model = Value,\dots, .Frame = Object\} ; &\\
+    & $\mid$ &
+      \texttt{pinvariant} $\varphi$ ;&\\
+    & $\mid$ &
+      \texttt{pcase} Cons \{ \textit{casefield}, \dots, \textit{casefield}\} ;
+    &\\
+
+    \rule{0pt}{2em}
+      \textit{casefield} & ::= &&\\
+    & $\mid$ &
+      \texttt{pwhen} $\varphi$ ; &\\
+    & $\mid$ &
+      \texttt{pframe} Frame: \{ Type \textbackslash with&\\
+     &&\quad.Model = Value,\dots, .Frame = Object\} ; &\\
+    & $\mid$ &
+      \texttt{pinvariant} $\varphi$ ;&\\
+
+    &&& \\
+    \hline
+  % LTeX: enabled=true
+  \end{tabular}
+  \end{center}
+  \caption{Syntax of Datamodels}
+  \label{fig:datamodels}
+\end{figure}
