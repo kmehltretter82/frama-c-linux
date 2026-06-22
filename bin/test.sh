@@ -144,7 +144,10 @@ function RunBench
 {
     if [ "$BENCH" = "yes" ]; then
         echo "Running hyperfine benchmarks"
-        Run hyperfine -w 5 "$*"
+        # The --prepare option is because we cannot use dune --force to re-run
+        # our tests for now. It can be removed once dune --force works as
+        # expected.
+        Run hyperfine --warmup 5 --prepare "make clean && make && make run-ptests" "$*"
     else
         Run "$@"
     fi

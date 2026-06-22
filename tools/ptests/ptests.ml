@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Testlib
+
 (** Command-line flags *)
 
 let verbosity = ref 0
@@ -32,42 +34,6 @@ type env_t = {
 ; dune_alias: string
 ; absolute_cwd: string
 }
-
-module Filename = struct
-  include Filename
-  let concat =
-    if Sys.os_type = "Win32" then fun a b -> a ^ "/" ^ b else concat
-
-  let cygpath r =
-    let cmd =
-      Format.sprintf
-        "bash -c \"cygpath -m %s\""
-        (String.escaped (String.escaped r))
-    in
-    let in_channel  = Unix.open_process_in cmd in
-    let result = input_line in_channel in
-    ignore(Unix.close_process_in in_channel);
-    result
-
-  let temp_file =
-    if Sys.os_type = "Win32" then
-      fun a b -> cygpath (temp_file a b)
-    else
-      fun a b -> temp_file a b
-  [@@ warning "-32"]
-
-  let sanitize f = String.escaped f
-
-  let sanitize_with_space =
-    let regexp = Str.regexp "[\\] " in
-    let subst = Str.global_replace regexp " " in
-    subst
-
-  let remove_extension_opt suffixes name =
-    let ext = extension name in
-    if (String.equal "" ext) || not (List.mem ext suffixes) then name
-    else remove_extension name
-end
 
 let str_string_match1 regexp line pos =
   if Str.string_match regexp line pos then
@@ -1433,25 +1399,6 @@ let redirection ?reslog ?errlog cmd =
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
-type wtest = {
-  dir: (string [@default ""]); (* information on the test directory *)
-  info: (string [@default ""]); (* information *)
-  cmd: (string [@default "echo unknown command"]);
-  ret_code: (int [@default 0]);
-  out: (string [@default "" (* bin target built by the command *) ]); (* sdtout target *)
-  err: (string [@default "" (* bin target built by the command *) ]); (* stderr target *)
-  tmpout: (string [@default ""]); (* temporary file to filter stdout result *)
-  tmperr: (string [@default ""]); (* temporary file to filter stderr result *)
-  sedout: (string [@default ""]); (* filter command for the stdout result *)
-  sederr: (string [@default ""]); (* filter command for the stderr result *)
-  bin: (string list [@default []]); (* binary targets (without oracles) *)
-  log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
-  oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
-  oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
-}
-[@@deriving yojson]
-
 let update_oracle_dir ~env wtest =
   if wtest.log = [] then wtest else
     { wtest with
@@ -1578,6 +1525,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   in
   let subtest_alias = subtest_alias_prefix command in
   let wrapper_basename = subtest_alias ^ ".wtests" in
+
+  (* Produce result files *)
   if !wrapper_cmd <> "" then begin
     Format.fprintf result_fmt
       "(rule ; %s\n  \
@@ -1585,7 +1534,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
        %a\n\
-       (action %a(run %s %S %S %a))%a\n\
+       (action %a(run %s %S %S))%a\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1608,8 +1557,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       pp_env command.env_var
       !wrapper_cmd
       wrapper_basename
-      wtest.cmd
-      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr])
+      wtest.cmd (* write the command in the action so that dune can
+                   extract dependencies from it *)
       pp_close_env command.env_var
     ;
 
@@ -1654,10 +1603,20 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       command_string
       pp_close_env command.env_var
   end;
+
+  (* Filter result files *)
   let filter_rule txt fin fout cmd =
+    if fin = "" && (fout <> "" || cmd <> "") then begin
+      let msg =
+        Format.asprintf "In %s, filter cannot be applied for %s (in: %S, out: %S, cmd: %S)"
+          wtest.info txt fin fout cmd
+      in
+      fail msg
+    end;
     if cmd <> "" then
       Format.fprintf result_fmt
         "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
+         (targets %S)\n  \
          (deps %S)
          %a\n\
          (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
@@ -1666,6 +1625,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         txt
         command.nth
         command.file
+        (* targets: *)
+        fout
         (* deps: *)
         fin
         (* enabled_if: *)
@@ -1675,23 +1636,63 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   in
   filter_rule "RES" cmdreslog reslog filter_res ;
   filter_rule "ERR" cmderrlog errlog filter_err ;
-  List.iteri (fun n log ->
-      Format.fprintf result_fmt
-        "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
-         (alias %s)\n  \
-         %a\n\
-         (action (diff %S %S))\n\
-         )@."
-        (* rule: *)
-        n command.nth command.file
-        (* alias: *)
-        (subtest_alias ^ ".diff")
-        (* enabled_if: *)
-        pp_enabled_if command.deps
-        (* action: *)
-        (SubDir.make_file (SubDir.oracle_dir ~env) log)
-        log
-    ) command.log_files;
+
+  (* Diff with oracles *)
+  let diff_alias = subtest_alias ^ ".diff" in
+  let compare_rule txt log oracle =
+    if (log <> "") <> (oracle <> "") then begin
+      let msg =
+        Format.asprintf "In %s, file cannot be compared to an oracle for %s"
+          wtest.info txt
+      in
+      fail msg
+    end;
+    Format.fprintf result_fmt
+      "(rule ; COMPARE %s OF TEST #%d FOR TEST FILE %S \n  \
+       (alias %S)\n  \
+       %a\n\
+       (action (diff %%{dep:%s} %%{dep:%s}))\n\
+       )@."
+      (* rule: *)
+      txt
+      command.nth
+      command.file
+      (* alias: *)
+      diff_alias
+      (* enabled_if: *)
+      pp_enabled_if command.deps
+      (* action: *)
+      oracle
+      log;
+  in
+  compare_rule "RES" reslog wtest.oracle_out;
+  compare_rule "ERR" errlog wtest.oracle_err;
+  List.iteri
+    (fun n log ->
+       let txt = Format.asprintf "TARGET #%d" n in
+       let oracle = SubDir.make_file (SubDir.oracle_dir ~env) log in
+       compare_rule txt log oracle)
+    command.log_files;
+
+  (* Register test to global aliases *)
+  Format.fprintf result_fmt
+    "(alias (name %S)\n  \
+     (deps (alias %S))\n  \
+     %a\n\
+     )@."
+    (command.test_name ^ ".diff")
+    diff_alias
+    pp_enabled_if command.deps;
+  Format.fprintf result_fmt
+    "(alias (name %S)\n  \
+     (deps (alias %S))\n  \
+     %a\n\
+     )@."
+    (ptests_alias ~env)
+    (command.test_name ^ ".diff")
+    pp_enabled_if command.deps;
+
+  (* Standalone commands *)
   Format.fprintf result_fmt
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
@@ -1711,8 +1712,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     pp_env command.env_var
     pp_accepted_exit_code command
     command_string
-    pp_close_env command.env_var
-  ;
+    pp_close_env command.env_var;
 
   Format.fprintf result_fmt
     "(rule ; BENCHMARK TEST #%d OF TEST FILE %S\n  \
@@ -1734,8 +1734,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* No need for pp_accepted_exit_code here, the exit code is used by
        hyperfine which exit with 0 unless an error occurs. *)
     pp_hyperfine_command (command.exit_code, command_string)
-    pp_close_env command.env_var
-  ;
+    pp_close_env command.env_var;
+
   Format.fprintf result_fmt
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
@@ -1754,51 +1754,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
-  let diff_alias = subtest_alias ^ ".diff" in
-  (* diff with oracles *)
-  Format.fprintf result_fmt
-    "(rule\n  \
-     (alias %S)\n  \
-     %a\n\
-     (action (diff %S %S))\n\
-     )@."
-    (* alias: *)
-    diff_alias
-    (* enabled_if: *)
-    pp_enabled_if command.deps
-    (* action: *)
-    wtest.oracle_out
-    reslog;
-  Format.fprintf result_fmt
-    "(rule\n  \
-     (alias %S)\n  \
-     %a\n\
-     (action (diff %S %S))\n\
-     )@."
-    (* alias: *)
-    diff_alias
-    (* enabled_if: *)
-    pp_enabled_if command.deps
-    (* action: *)
-    wtest.oracle_err
-    errlog;
-  Format.fprintf result_fmt
-    "(alias (name %S)\n  \
-     (deps (alias %S))\n  \
-     %a\n\
-     )@."
-    (command.test_name ^ ".diff")
-    diff_alias
-    pp_enabled_if command.deps;
-  Format.fprintf result_fmt
-    "(alias (name %S)\n  \
-     (deps (alias %S))\n  \
-     %a\n\
-     )@."
-    (ptests_alias ~env)
-    (command.test_name ^ ".diff")
-    pp_enabled_if command.deps
-  ;
+  (* Generate empty oracles for the test *)
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
   oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".err.oracle"));
   oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".res.oracle"));
@@ -1933,7 +1889,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             pp_env cmd.env_var
             !wrapper_cmd
             wrapper_basename
-            wtest.cmd
+            wtest.cmd (* write the command in the action so that dune can
+                         extract dependencies from it *)
             pp_close_env cmd.env_var;
           let wtest =
             { wtest with
@@ -1997,7 +1954,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
               "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
                (alias %s)\n  \
                %a\n\
-               (action (diff %S %S))\n\
+               (action (diff %%{dep:%s} %%{dep:%s}))\n\
                )@."
               (* rule: *)
               n nth file
