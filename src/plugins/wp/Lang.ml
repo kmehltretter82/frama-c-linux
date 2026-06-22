@@ -95,15 +95,14 @@ type datakind = KValue | KInit
 type adt =
   | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
   | Atype of logic_type_info (* ACSL Logic Type *)
-  | Comp of compinfo * datakind (* C-code struct or union *)
-
-(** name to print to the provers *)
-and fields = { mutable fields : field list }
-and field = Cfield of fieldinfo * datakind
+and field = Qed.Symbol.field
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
 let floats = Context.create "Lang.floats"
+let comp = Context.create "Lang.comp"
+let field = Context.create "Lang.field"
+let fields = function Qdata d -> Qed.Symbol.fields d | Atype _ -> []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sorting & Typing                                                   --- *)
@@ -113,10 +112,6 @@ let sort_of_object = function
   | C_int _ -> Logic.Sint
   | C_pointer _ | C_comp _ | C_array _ -> Logic.Sdata
   | C_float f -> Qed.Kind.of_tau (Context.get floats f)
-
-let init_sort_of_object = function
-  | C_int _ | C_float _ | C_pointer _ -> Logic.Sbool
-  | C_comp _ | C_array _ -> Logic.Sdata
 
 let sort_of_ctype t = sort_of_object (Ctypes.object_of t)
 
@@ -133,11 +128,12 @@ let t_real = Logic.Real
 let t_prop = Logic.Prop
 let t_addr () = Context.get pointer
 let t_float f = Context.get floats f
-let t_comp c = Logic.Data(Comp (c, KValue),[])
-let t_init c = Logic.Data(Comp (c, KInit), [])
+let t_comp c = Context.get comp KValue c
+let t_init c = Context.get comp KInit c
 let t_array a = Logic.Array(Logic.Int,a)
 let t_farray a b = Logic.Array(a,b)
 let t_data adt ts = Logic.Data(adt,ts)
+let t_qdata d ts = Logic.Data(Qdata d,ts)
 let rec t_matrix a n = if n > 0 then t_matrix (t_array a) (pred n) else a
 
 let rec tau_of_object = function
@@ -218,26 +214,18 @@ struct
 
   let name = function
     | Qdata a -> Qed.Symbol.Data.name a
-    | Comp (c, KValue) -> comp_id c
-    | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
 
   let basename = function
     | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
-    | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
-    | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
 
   let fullname = function
     | Qdata a -> Qed.Symbol.Data.fullname a
-    | Comp (c, KValue) -> comp_id c
-    | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
 
   let hash = function
     | Qdata a -> Qed.Symbol.Data.hash a
-    | Comp (c, KValue) -> Compinfo.hash c
-    | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
 
   let compare a b =
@@ -246,12 +234,6 @@ struct
       | Qdata a , Qdata b -> Qed.Symbol.Data.compare a b
       | Qdata _ , _ -> (-1)
       | _ , Qdata _ -> (+1)
-      | Comp (a, KValue) , Comp (b, KValue)
-      | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
-      | Comp (_, KValue) , Comp (_, KInit) -> (-1)
-      | Comp (_, KInit)  , Comp (_, KValue) -> (+1)
-      | Comp _ , _ -> (-1)
-      | _ , Comp _ -> (+1)
       | Atype a , Atype b -> Logic_type_info.compare a b
 
   let equal a b = (compare a b = 0)
@@ -268,66 +250,15 @@ let field_observers = ref []
 let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
 let on_field f = field_observers := f :: !field_observers
 
-let cfield ?(kind=KValue) fd = field_observe @@ Cfield(fd,kind)
-let comp c = Comp (c, KValue)
-let comp_init c = Comp (c, KInit)
+let cfield ?(kind=KValue) fd = field_observe @@ Context.get field kind fd
 
-let fields_of_adt = function
-  | Comp (c, k) ->
-    List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
-  | _ -> []
-
-let fields_of_tau = function
-  | Record fts -> List.map fst fts
-  | Data(adt,_) -> fields_of_adt adt
-  | _ -> []
-
-let fields_of_field = function
-  | Cfield(f, k) ->
-    List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
-
-let tau_of_field = function
-  | Cfield(f, KValue) -> tau_of_ctype f.ftype
-  | Cfield(f, KInit) -> init_of_ctype f.ftype
-
-let adt_of_field = function Cfield(f,kd) -> Comp(f.fcomp,kd)
-
-let tau_of_record = function
-  | Cfield(f, KValue) -> t_comp f.fcomp
-  | Cfield(f, KInit) -> t_init f.fcomp
+let fields_of_adt = function Qdata d -> Qed.Symbol.fields d | Atype _ -> []
+let fields_of_field fd = Qed.Symbol.(fields @@ record_of_field fd)
 
 module Field =
 struct
-
-  type t = field
-
-  let name = function
-    | Cfield(f, KValue) -> field_id f
-    | Cfield(f, KInit) -> field_init_id f
-
-  let fullname = name
-
-  let hash = function
-    | Cfield(f, KValue) -> Fieldinfo.hash f
-    | Cfield(f, KInit) -> 13 * Fieldinfo.hash f
-
-  let compare f g =
-    if f==g then 0 else
-      match f , g with
-      | Cfield(f, KValue) , Cfield(g, KValue)
-      | Cfield(f, KInit) , Cfield(g, KInit) ->
-        Fieldinfo.compare f g
-      | Cfield(_, KInit), Cfield(_, KValue) -> (-1)
-      | Cfield(_, KValue), Cfield(_, KInit) -> (+1)
-
-  let equal f g = (compare f g = 0)
-
-  let pretty fmt f = Format.pp_print_string fmt @@ name f
-
-  let sort = function
-    | Cfield(f, KValue) -> sort_of_object (Ctypes.object_of f.ftype)
-    | Cfield(f, KInit) -> init_sort_of_object (Ctypes.object_of f.ftype)
-
+  include Qed.Symbol.Field
+  let sort fd = Qed.Symbol.osort (symbol fd).ls_value
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -467,6 +398,11 @@ let tau_of_lfun phi ts =
         (List.map (Option.get ~exn:Not_found) ts)
     with _ -> raise Not_found
 
+let tau_of_field fd =
+  let th = Qed.Symbol.Field.theory fd in
+  let ls = Qed.Symbol.Field.symbol fd in
+  of_qtau @@ Qed.Symbol.of_oty th ls.ls_value
+
 let is_coloring_lfun = function
   | ACSL _ | CTOR _ -> false
   | LFUN { m_coloring } -> m_coloring
@@ -604,13 +540,9 @@ class virtual idprinting =
 
     method datatype = function
       | Qdata a -> Qed.Symbol.Data.name a
-      | Comp(c, KValue) -> self#sanitize_type (comp_id c)
-      | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
 
-    method field = function
-      | Cfield(f, KValue) -> self#sanitize_field (field_id f)
-      | Cfield(f, KInit) -> self#sanitize_field (field_init_id f)
+    method field fd = Qed.Symbol.Field.name fd
 
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
@@ -689,8 +621,6 @@ struct
   module QED =
   struct
     include QZERO
-    let typeof ?(field=tau_of_field) ?(record=tau_of_record) ?(call=tau_of_lfun) e =
-      QZERO.typeof ~field ~record ~call e
   end
   include QED
 
@@ -722,10 +652,10 @@ struct
   let e_range a b = e_sum [b;e_one;e_opp a]
 
   let e_setfield r f v =
-    (*TODO:NUPW: check for UNIONS *)
-    let r = List.map
+    let r =
+      List.map
         (fun g -> g,if Field.equal f g then v else e_getfield r g)
-        (fields_of_field f)
+        Qed.Symbol.(fields @@ record_of_field f)
     in e_record r
 
   (* -------------------------------------------------------------------------- *)

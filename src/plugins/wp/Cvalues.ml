@@ -61,6 +61,11 @@ and constant_term t =
 (* --- Compound Types                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+module FS = Hashtbl.Make(Qed.Symbol.Field)
+let revfs = FS.create 0
+
+let fieldinfo = FS.find revfs
+
 module CC_COMP(K : sig val name : string val tau : typ -> tau end) =
 struct
   module F = WpContext.Generator(Cil_datatype.Fieldinfo)
@@ -70,6 +75,7 @@ struct
         let name = Printf.sprintf "CValues.%s.F" K.name
         let compile _ = assert false
       end)
+  let set_field fd fs = F.set fd fs ; FS.add revfs fs fd
   module C = WpContext.Generator(Cil_datatype.Compinfo)
       (struct
         type key = compinfo
@@ -88,20 +94,20 @@ struct
                    fd.fname,
                    Option.get @@ cc_tau env @@ K.tau fd.ftype
                 ) fds in
-            List.iter2 F.set fds fields ; data
+            List.iter2 set_field fds fields ; data
       end)
-  let comp = C.get
+  let comp c = Lang.t_qdata (C.get c) []
   let field fd = let _ = C.get fd.fcomp in F.get fd
 end
 
 module VCOMP = CC_COMP(struct let name = "VCOMP" let tau = tau_of_ctype end)
 module ICOMP = CC_COMP(struct let name = "ICOMP" let tau = init_of_ctype end)
 
-let cc_comp = VCOMP.comp
-let cc_field = VCOMP.field
+let cc_comp = function KValue -> VCOMP.comp | KInit -> ICOMP.comp
+let cc_field = function KValue -> VCOMP.field | KInit -> ICOMP.field
 
-let cc_comp_init = ICOMP.comp
-let cc_field_init = ICOMP.field
+let () = Context.set Lang.comp cc_comp
+let () = Context.set Lang.field cc_field
 
 (* -------------------------------------------------------------------------- *)
 (* --- Initialization values                                              --- *)

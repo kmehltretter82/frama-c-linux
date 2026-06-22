@@ -206,8 +206,10 @@ let fields (Data a as data) =
       with Not_found -> []
     in a.fs <- Some fds ; fds
 
-let field data fd =
+let find_field data fd =
   List.find (function Field f -> f.ls.ls_name.id_string = fd) @@ fields data
+
+let record_of_field (Field a) = a.data
 
 let by_field_rank (Field a) (Field b) = b.rank - a.rank
 
@@ -343,6 +345,16 @@ let data (Data d as adt) = function
   | [] when Why3.Ty.(ts_equal d.ts ts_bool) -> Logic.Bool
   | [a;b] when Why3.Ty.(ts_equal d.ts ts_func) -> Logic.Array(a,b)
   | ts -> Logic.Data(adt, ts)
+
+let sort ty =
+  let open Logic in
+  let open Why3.Ty in
+  if ty_equal ty ty_int then Sint else
+  if ty_equal ty ty_bool then Sbool else
+  if ty_equal ty ty_real then Sreal else
+    Sdata
+
+let osort = function None -> Logic.Sprop | Some ty -> sort ty
 
 let rec of_ty context ?(sigma=Why3.Ty.Mtv.empty) ty =
   try Why3.Ty.Hty.find hty ty with Not_found ->

@@ -1392,7 +1392,7 @@ struct
     | _ -> Fset.empty
 
   and fset_of_adt adt =
-    fsetmap fset_of_field (Lang.fields_of_adt adt)
+    fsetmap fset_of_field (fields_of_adt adt)
 
   and fset_of_field fd =
     let tf = Lang.tau_of_field fd in

@@ -56,14 +56,6 @@ val is_null : c_object -> term -> pred
 (** Shift a location with 0-indices wrt to its array type *)
 val startof : shift:('a -> c_object -> term -> 'a) -> 'a -> typ -> 'a
 
-(** {2 Compound Types} *)
-
-val cc_comp : compinfo -> Qed.Symbol.data
-val cc_field : fieldinfo -> Qed.Symbol.field
-
-val cc_comp_init : compinfo -> Qed.Symbol.data
-val cc_field_init : fieldinfo -> Qed.Symbol.field
-
 (** {2 Typing and Sub-Typing for C and ACSL Types} *)
 
 val is_object : c_object -> 'a value -> pred
@@ -71,6 +63,9 @@ val has_ctype : typ -> term -> pred
 
 val cdomain : c_object -> (term -> pred) option
 val ldomain : logic_type -> (term -> pred) option
+
+(** @raise Not_found *)
+val fieldinfo : Lang.field -> fieldinfo
 
 (** {2 Volatile Access} *)
 

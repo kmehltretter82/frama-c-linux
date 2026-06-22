@@ -107,8 +107,6 @@ class virtual visitor : cluster ->
 
     method vadt : ADT.t -> unit
     method vtype : logic_type_info -> unit
-    method vcomp : compinfo -> unit
-    method vicomp : compinfo -> unit
     method vfield : Field.t -> unit
     method vtau : tau -> unit
     method vparam : var -> unit
@@ -147,12 +145,6 @@ class virtual visitor : cluster ->
 
     method virtual on_type : logic_type_info -> typedef -> unit
     (** This local type must be defined *)
-
-    method virtual on_comp : compinfo -> (field * tau) list option -> unit
-    (** This local compinfo must be defined *)
-
-    method virtual on_icomp : compinfo -> (field * tau) list option -> unit
-    (** This local compinfo initialization must be defined *)
 
     method virtual on_dlemma : dlemma -> unit
     (** This local lemma must be defined *)

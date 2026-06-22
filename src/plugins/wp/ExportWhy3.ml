@@ -112,8 +112,6 @@ let cc_adt (adt : Lang.adt) =
   try match adt with
     | Qdata a -> Qed.Symbol.Data.symbol a
     | Atype lt -> TS.find (Lang.type_id lt)
-    | Comp(c,KValue) -> TS.find (Lang.comp_id c)
-    | Comp(c,KInit) -> TS.find (Lang.comp_init_id c)
   with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
 
 let cc_lfun (lf : Lang.lfun) =
@@ -127,12 +125,6 @@ let cc_lfun (lf : Lang.lfun) =
 let cc_field (fd : Lang.field) =
   try FS.find (Lang.Field.name fd)
   with Not_found -> failwith "Undefined field symbol %S" @@ Lang.Field.fullname fd
-
-let cc_comp = function
-  | [] -> assert false
-  | (fd,_) :: _ ->
-    try CS.find (Lang.ADT.name @@ Lang.adt_of_field fd)
-    with Not_found -> failwith "Undefined record symbol for field %S" @@ Lang.Field.fullname fd
 
 let is_cassoc = function Qed.Logic.Operator op -> op.associative | _ -> false
 
@@ -325,8 +317,7 @@ and cc_any env t =
   | Rget(e,fd) ->
     Why3.Term.t_app_infer (cc_field fd) [cc_term env e]
   | Rdef fvs ->
-    let ts = List.map (fun (_,v) -> cc_term env v) fvs in
-    Why3.Term.t_app_infer (cc_comp fvs) ts
+    Qed.Symbol.record @@ List.map (fun (fd,v) -> fd,cc_term env v) fvs
 
 and cc_equal env a b =
   let a = cc env a in
@@ -535,43 +526,6 @@ class visitor ctxt c =
         CS.update name ctor ;
         Qed.Symbol.add ctxt.cluster @@
         Why3.Decl.create_data_decl [tys,[ctor,fields]]
-
-    method private on_comp_gen kind c fts =
-      begin
-        let name = match kind with
-          | Lang.KValue -> Lang.comp_id c
-          | Lang.KInit -> Lang.comp_init_id c in
-        let compare_field (f,_) (g,_) =
-          let cmp = Lang.Field.compare f g in
-          if cmp = 0 then assert false (* by definition *) else cmp
-        in
-        let fts = Option.map (List.sort compare_field) fts in
-        let id = Why3.Ident.id_fresh name in
-        let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
-        let ty = Why3.Ty.ty_app ts [] in
-        let field (fd,tau) =
-          let tf = cc_tau ctxt tau in
-          let name = Lang.Field.name fd in
-          let id = Why3.Ident.id_fresh name in
-          let ls = Why3.Term.create_lsymbol ~proj:true id [ty] tf in
-          FS.update name ls ;
-          (Some ls,Option.get tf) in
-        let decl =
-          match fts with
-          | None -> Why3.Decl.create_ty_decl ts
-          | Some fts ->
-            let projs,fields = List.split @@ List.map field fts in
-            let id = Why3.Ident.id_fresh name in
-            let ctor = Why3.Term.create_fsymbol ~constr:1 id fields ty in
-            CS.update name ctor ;
-            Why3.Decl.create_data_decl [ts,[ctor,projs]]
-        in
-        TS.update name ts ;
-        Qed.Symbol.add ctxt.cluster decl
-      end
-
-    method on_comp = self#on_comp_gen KValue
-    method on_icomp = self#on_comp_gen KInit
 
     method private make_lemma env ?prefix (l: Definitions.dlemma) =
       let name = match prefix with

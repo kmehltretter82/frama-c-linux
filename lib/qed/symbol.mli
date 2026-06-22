@@ -28,7 +28,10 @@ type field
 val fields : data -> field list
 
 (** @raise Not_found for non-record data *)
-val field : data -> string -> field
+val find_field : data -> string -> field
+
+(** Record datatype the field belong to *)
+val record_of_field : field -> data
 
 (** Fields are re-ordered if necessary.
     @raise Invalid_arg for empty fields *)
@@ -42,6 +45,9 @@ type tau = (field,data) Logic.datatype
 
 val data : data -> tau list -> tau
 (** Converts builtin Qed types from external data symbols *)
+
+val sort : Why3.Ty.ty -> Logic.sort
+val osort : Why3.Ty.ty option -> Logic.sort
 
 (** Logic Functions *)
 type lfun
