@@ -58,9 +58,9 @@ let remove_uninteresting_variables_loc loc =
   Locations.filter_base keep_base loc
 
 let error_io_whole_memory op =
-  Mt_self.error ~source:(RW.loc op) ~once:true
-    "@[%a of the whole memory.@ Ignoring to allow Mthread to continue, \
-     but the analysis will not be correct.@]"
+  Self.error ~current:true ~once:true
+    "%a of the whole memory. Ignoring to allow Mthread to continue, \
+     but the analysis is unsound."
     RW.pretty op
 
 let filter_inout_access =
@@ -169,14 +169,11 @@ class do_it cp =
           | AccessesByZone.Top -> assert false (* Top is checked above *)
           | AccessesByZone.Map m -> result <- m
       ) else
-        Mt_self.error ~current:true ~once:true
-          "@[%a@ of@ the@ whole@ memory.@ Ignoring@ to@ allow@ Mthread@ to@ \
-           continue,@ but@ the@ analysis@ will@ not@ be@ correct.@]"
-          RW.pretty op
+        error_io_whole_memory op
 
     method private cur_stmt =
       match super#current_stmt with
-      | None -> Mt_self.abort "visiting without current statement"
+      | None -> Self.fatal "visiting without current statement"
       | Some s -> s
 
     method! vstmt_aux s =
@@ -749,7 +746,7 @@ module Precise = struct
       try
         let offsm' = Cvalue.Model.find_base base m in
         match offsm' with
-        | `Top -> Mt_self.fatal "Top state"
+        | `Top -> Self.fatal "Top state"
         | `Bottom -> m (* base invalid. Probably impossible case *)
         | `Value offsm' ->
           let join = Cvalue.V_Offsetmap.join offsm offsm' in

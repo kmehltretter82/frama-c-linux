@@ -191,7 +191,7 @@ module Html = struct
             Hashtbl.find table.rows.from_id i
           with
           | Not_found ->
-            Mt_self.fatal "@[Row %d not found@]@." i
+            Self.fatal "@[Row %d not found@]@." i
         in
 
         let pp_cells fmt cell_array =
@@ -461,7 +461,7 @@ module Html = struct
       let$ cin = Filesystem.with_open_in_exn input in
       copy cin cout
     with e ->
-      Mt_self.error
+      Self.error
         "Error while appending dot file %a to %a: %s"
         Filepath.pretty input
         Filepath.pretty output
@@ -482,7 +482,7 @@ module Html = struct
       generator fmt;
       tmp_file
     with Sys_error s ->
-      Mt_self.abort
+      Self.abort
         "Unable to open file %a to generate dot graph.@ %s"
         Filepath.pretty tmp_file
         s
@@ -504,7 +504,7 @@ module Html = struct
       (Format.asprintf "%s.%s" filename dot_output_format) in
     let output = Filepath.(default_dir / link_fname) in
     let fail s =
-      Mt_self.error "%s when generating graph for thread %a."
+      Self.error "%s when generating graph for thread %a."
         s ThreadState.pretty th
     in
     begin
@@ -565,7 +565,7 @@ module Html = struct
     let async = System_config.is_gui () in
     let status = Command.Dot.(spawn ~async ~format ~output dot_file) in
     if status <> Unix.WEXITED 0 then
-      Mt_self.error "Something bad happened when running dot";
+      Self.error "Something bad happened when running dot";
     Kernel.Unicode.set unicode;
     link_fname
   ;;

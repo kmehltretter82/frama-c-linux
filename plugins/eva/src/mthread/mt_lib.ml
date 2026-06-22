@@ -13,7 +13,7 @@ let find_mthread_global_var name =
   try Globals.Vars.find_from_astinfo name Global
   with Not_found ->
     let mthread_c = Self.Share.get_file "mthread.c" in
-    Mt_self.abort
+    Self.abort
       "Variable %S not found. \
        It should be in file %a, required for the Mthread analysis. \
        Use parameter -mt-threads-lib to include this file in the parsing phase."
@@ -90,12 +90,12 @@ let has_been_parsed lib =
 let warn_on_unsupported_library_function kf =
   if is_pthread_function kf then
     if has_been_parsed Pthreads then
-      Mt_self.error ~current:true ~once:true
+      Self.error ~current:true ~once:true
         "Unsupported function %a from the pthreads library: \
          its analysis is probably unsound."
         Kernel_function.pretty kf
     else
-      Mt_self.abort ~current:true
+      Self.abort ~current:true
         "Call to %a from the pthreads library, whose Mthread files are missing. \
          Use '-mt-threads-lib pthreads' to enable the support of pthreads, \
          or write a C stub for this function using Mthread primitives."

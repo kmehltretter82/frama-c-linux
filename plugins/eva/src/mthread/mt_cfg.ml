@@ -131,10 +131,9 @@ let stmt_mt_status subtrace get_state stmt =
                    Mt_cil.StackElt.pretty selt
                    Trace.pretty subtrace
               )) callsites;
-         Mt_self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
-           "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
-            to@ another@ function:@ very@ strangely@ written@ \
-            mthread@ binding?@]";
+         Self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
+           "Simultaneous call to a mthread function and to another function: \
+            very strangely written mthread binding?";
       )
     | Instr _ ->
       maybe_basic ()
@@ -166,7 +165,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
     | None -> (* Can happen in the root thread function, if
                  nothing multithreaded happens, but we handle this case
                  explicitly *)
-      Mt_self.fatal "No events at subtrace %a" Callstack.pretty callstack
+      Self.fatal "No events at subtrace %a" Callstack.pretty callstack
     | Some { Trace.trace_states = states;
              Trace.trace_states_after = states_after } ->
       Mt_memory.Types.map_functions_states_to_get_state states,
@@ -203,12 +202,12 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
          call it *)
       let next () =
         match stmt.succs with
-        | [] -> Mt_self.fatal
+        | [] -> Self.fatal
                   ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                   "Statement with no successor encountered at \
                    an unexpected place (sid %d)" stmt.sid
         | [stmt'] -> aux stmt'
-        | _ :: _ :: _ -> Mt_self.fatal
+        | _ :: _ :: _ -> Self.fatal
                            ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                            "Statement with more than one successor encountered at an \
                             unexpected place: (sid %d), succs %a"
@@ -302,7 +301,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
               st, se
             | [], [], [s; s'] when s.sid = s'.sid ->
               s, s
-            | _ -> Mt_self.fatal
+            | _ -> Self.fatal
                      "Strange looking if: %a, (%a) as succs"
                      Printer.pp_stmt stmt pretty_succs stmt
           in
@@ -363,8 +362,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
           Mt_self.not_yet_implemented "try finally/try except"
   in
   match (Kernel_function.get_definition f).sbody.bstmts with
-  | [] -> Mt_self.abort "Function with empty body: %s"
-            (Kernel_function.get_name f)
+  | [] -> Self.abort "Function with empty body: %a" Kernel_function.pretty f
   | s :: _ -> aux s
 ;;
 
@@ -490,7 +488,7 @@ let remove_node ~keep a =
       if l' = [] then
         (* All subcalls are been recursively removed: remove [a] too *)
         match !succ with
-        | None -> Mt_self.fatal "Impossible case in cfg NCall removal"
+        | None -> Self.fatal "Impossible case in cfg NCall removal"
         | Some succ -> replace_by_succ succ
       else
         (a.cfgn_kind <- NCall (stmt, List.split l');
@@ -720,7 +718,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
                let caller = caller_in_stack 0 prevs in
                do_edge ~etype:Return caller
              with NoCaller ->
-               Mt_self.error "Strange stack in cfg, please report@.%a"
+               Self.error "Strange stack in cfg, please report@.%a"
                  CfgNode.pretty_kinds_node_list prevs
           )
 

@@ -262,7 +262,7 @@ module AccessPropertyByZone = struct
     let r1 = List.fold_left (compute_for_zone mutexes_by_zone) empty accesses in
     match r1 with
     | Top | Bottom ->
-      Mt_self.fatal "By construction, accesses_by_zone cannot be Top or Bottom"
+      Self.fatal "By construction, accesses_by_zone cannot be Top or Bottom"
     | Map m -> m
 end
 

@@ -17,8 +17,7 @@
   New thread: jobs, fun f, parent <main>, args [0..18446744073709551615]
 [eva] read_all.c:27: Start thread jobs
 [eva] read_all.c:29: User Error: 
-  read of the whole memory. Ignoring to allow Mthread to continue, but the
-  analysis will not be correct.
+  read of the whole memory. Ignoring to allow Mthread to continue, but the analysis is unsound.
 [eva] using specification for function g
 [eva:assigns:missing-result] read_all.c:16: Warning: 
   no 'assigns \result \from ...' clause specified for function g
@@ -48,8 +47,7 @@
 [eva:interferences] 
   inject threads interferences at the start of f for thread jobs
 [eva] read_all.c:19: User Error: 
-  read of the whole memory. Ignoring to allow Mthread to continue, but the
-  analysis will not be correct.
+  read of the whole memory. Ignoring to allow Mthread to continue, but the analysis is unsound.
 [eva] * Computing shared variables
 [eva] Globals accessed by thread:
   r: write by jobs at read_all.c:19 <- f
@@ -203,6 +201,5 @@
 [eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 3 iterations
 [eva] Deferred error message was emitted during execution:
-  read_all.c:29: read of the whole memory. Ignoring to allow Mthread to continue, but the
-  analysis will not be correct.
+  read_all.c:29: read of the whole memory. Ignoring to allow Mthread to continue, but the analysis is unsound.
 [kernel] Plug-in eva aborted: invalid user input.

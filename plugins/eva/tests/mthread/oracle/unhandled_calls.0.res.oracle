@@ -50,6 +50,5 @@
     interferences by mutexes:
 [eva] * Computing cfg
 [eva] unhandled_calls.c:42: User Error: 
-  simultaneous call to a mthread function and to another function: very
-  strangely written mthread binding?
+  Simultaneous call to a mthread function and to another function: very strangely written mthread binding?
 [kernel] Plug-in eva aborted: invalid user input.

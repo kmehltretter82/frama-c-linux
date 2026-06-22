@@ -112,7 +112,7 @@ let read_slice ~p ~sbytes state =
   match Cvalue.Model.copy_offsetmap loc_bits size state with
   | `Bottom ->
     assert (Cvalue.Model.equal state Cvalue.Model.bottom);
-    Mt_self.fatal "Reading inside bottom state"
+    Self.fatal "Reading inside bottom state"
   | `Value offs -> offs
 
 let write_int_pointer p i state =

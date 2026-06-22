@@ -53,7 +53,7 @@ let register_no_hooks () =
   ref_hook_end_function := no_hook;
   let register (name, _builtin) =
     let builtin _state _args =
-      Mt_self.abort
+      Self.abort
         "Builtin %s requires -mthread parameter \
          for the analysis of concurrent programs." name
     in
@@ -69,7 +69,7 @@ let () = register_no_hooks ()
 let check_options () =
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
-    Mt_self.error "Option %S needs option \"%s html\" to work."
+    Self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name
 
@@ -137,7 +137,7 @@ let post_analysis analysis =
        Mt_self.feedback "******* Outputting model for %s" s;
        (match s with
         | "html" -> Mt_outputs.Html.output_threads analysis;
-        | _ -> Mt_self.error "Unknown model %s specified" s;
+        | _ -> Self.error "Unknown model %s specified" s;
        );
        Mt_self.feedback "******* %s output done."
          (String.capitalize_ascii s);
