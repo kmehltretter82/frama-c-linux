@@ -261,6 +261,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
           Options.fatal
             "translation to GMP code should always return a C variable"
       in
+      Typing.preprocess_term ~use_gmp_opt:false ~logic_env cvar_term;
       gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
     | C_integer _ | C_float _ -> Translate_terms.to_exp ~adata kf env size_term
     | Rational | Real | Nan -> assert false

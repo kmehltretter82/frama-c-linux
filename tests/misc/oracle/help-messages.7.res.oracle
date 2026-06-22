@@ -77,6 +77,9 @@ Options taking a string as argument should preferably be written
                     extraction (set by default, opposite option is
                     -e-acsl-O-no-hyp-gath)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
+-e-acsl-O-no-omit-rte  opposite of -e-acsl-O-omit-rte (set by default)
+-e-acsl-O-omit-rte  (O ≥ 3) activate omit RTE guard generation for
+                    specifications (opposite option is -e-acsl-O-no-omit-rte)
 
 *** OUTPUT MESSAGES
 

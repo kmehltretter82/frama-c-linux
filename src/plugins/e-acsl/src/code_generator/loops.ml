@@ -364,9 +364,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       Bound_variables.get_guard_for_small_type logic_x
     in
     let stmts, env = match guard_for_small_type_opt with
-      | None ->
-        guard :: body @ [ next ], env
-      | Some p ->
+      | Some p when not @@ Options.Optimisations.Omit_rte.get () ->
         let adata, env = Assert.empty ~loc kf env in
         Typing.preprocess_predicate ~logic_env p;
         let e, adata, env =
@@ -388,6 +386,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         let b, env = Env.pop_and_get ~kf env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in
         guard_for_small_type :: guard :: body @ [ next ], env
+      | _ -> guard :: body @ [ next ], env
     in
     let start = block_to_stmt init_blk in
     let stmt = Cil.mkStmt

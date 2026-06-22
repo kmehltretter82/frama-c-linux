@@ -75,59 +75,62 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let pp = match pp with Some size_pp -> size_pp | None -> t in
   let sizet = Machine.sizeof_type () in
   let stmts = [] in
-  (* Lower guard *)
-  let stmts, env =
-    if check_lower_bound then begin
-      let zero_term = Cil.lzero ~loc () in
-      let pred_name = Format.sprintf "%s_greater_or_eq_than_0" name in
-      let lower_guard_pp =
-        Logic_const.prel ~loc ~names:[pred_name] (Rge, pp, zero_term)
+  let stmts, env = if Options.Optimisations.Omit_rte.get () then stmts, env else
+      (* Lower guard *)
+      let stmts, env =
+        if check_lower_bound then begin
+          let zero_term = Cil.lzero ~loc () in
+          let pred_name = Format.sprintf "%s_greater_or_eq_than_0" name in
+          let lower_guard_pp =
+            Logic_const.prel ~loc ~names:[pred_name] (Rge, pp, zero_term)
+          in
+          let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
+          Typing.preprocess_predicate ~logic_env lower_guard;
+          let adata_lower_guard, env = Assert.empty ~loc kf env in
+          let lower_guard, adata_lower_guard, env =
+            predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
+          in
+          let assertion, env =
+            Assert.runtime_check
+              ~adata:adata_lower_guard
+              ~pred_kind:Assert
+              RTE
+              kf
+              env
+              lower_guard
+              lower_guard_pp
+          in
+          assertion :: stmts, env
+        end
+        else stmts, env
       in
-      let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
-      Typing.preprocess_predicate ~logic_env lower_guard;
-      let adata_lower_guard, env = Assert.empty ~loc kf env in
-      let lower_guard, adata_lower_guard, env =
-        predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
+      (* Upper guard *)
+      let sizet_max =
+        Logic_const.tint ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
+      in
+      let pred_name = Format.sprintf "%s_lesser_or_eq_than_SIZE_MAX" name in
+      let upper_guard_pp =
+        Logic_const.prel ~loc ~names:[pred_name] (Rle, pp, sizet_max)
+      in
+      let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
+      Typing.preprocess_predicate ~logic_env upper_guard;
+      let adata_upper_guard, env = Assert.empty ~loc kf env in
+      let upper_guard, adata_upper_guard, env =
+        predicate_to_exp ~adata:adata_upper_guard kf env upper_guard
       in
       let assertion, env =
         Assert.runtime_check
-          ~adata:adata_lower_guard
+          ~adata:adata_upper_guard
           ~pred_kind:Assert
           RTE
           kf
           env
-          lower_guard
-          lower_guard_pp
+          upper_guard
+          upper_guard_pp
       in
-      assertion :: stmts, env
-    end
-    else stmts, env
+      let stmts = assertion :: stmts in
+      stmts, env
   in
-  (* Upper guard *)
-  let sizet_max =
-    Logic_const.tint ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
-  in
-  let pred_name = Format.sprintf "%s_lesser_or_eq_than_SIZE_MAX" name in
-  let upper_guard_pp =
-    Logic_const.prel ~loc ~names:[pred_name] (Rle, pp, sizet_max)
-  in
-  let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
-  Typing.preprocess_predicate ~logic_env upper_guard;
-  let adata_upper_guard, env = Assert.empty ~loc kf env in
-  let upper_guard, adata_upper_guard, env =
-    predicate_to_exp ~adata:adata_upper_guard kf env upper_guard
-  in
-  let assertion, env =
-    Assert.runtime_check
-      ~adata:adata_upper_guard
-      ~pred_kind:Assert
-      RTE
-      kf
-      env
-      upper_guard
-      upper_guard_pp
-  in
-  let stmts = assertion :: stmts in
   (* Translate term [t] into an exp of type [size_t] *)
   let gmp_e, adata, env = Translate_terms.to_exp ~adata kf env t in
   let  _, e, env = Env.new_var

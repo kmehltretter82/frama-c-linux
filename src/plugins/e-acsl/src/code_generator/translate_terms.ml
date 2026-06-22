@@ -22,15 +22,20 @@ open Interlang_gen.M.Operators
 
 (********************** Forward references ********************************)
 
-let translate_rte_exp_ref
-  : (?filter:(code_annotation -> bool) ->
-     kernel_function ->
-     Env.t ->
-     exp ->
-     Env.t) ref
-  =
-  ref (fun ?filter:_ _kf _env _e ->
-      Extlib.mk_labeled_fun "translate_rte_exp_ref")
+module Translate_rtes = struct
+  let exp_ref
+    : (?filter:(code_annotation -> bool) ->
+       kernel_function ->
+       Env.t ->
+       exp ->
+       Env.t) ref
+    =
+    ref (fun ?filter:_ _kf _env _e ->
+        Extlib.mk_labeled_fun "translate_rte_exp_ref")
+
+  let exp ?filter kf env e =
+    !exp_ref ?filter kf env e
+end
 
 module Translate_predicates = struct
   let to_exp_ref :
@@ -625,35 +630,36 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       (* Coerce e2 to mp_bitcnt_t *)
       let coerce_guard_cond, env =
-        let max_bitcnt =
-          Cil.lconstant ~loc @@
-          Cil.max_unsigned_number @@ Cil.bitsSizeOf @@ Gmp_types.bitcnt_t ()
-        in
-        let pred =
-          Logic_const.pand
-            ~loc
-            ~names:[bop_name ^ "_rhs_fits_in_mp_bitcnt_t"]
-            (Logic_const.prel ~loc (Rle, zero, Terms.Id.deep_copy t2),
-             Logic_const.prel ~loc (Rle, Terms.Id.deep_copy t2, max_bitcnt))
-        in
-        Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
-        let cond, env =
-          Assert.runtime_check
-            ~adata:adata2
-            ~pred_kind:Assert
-            RTE
-            kf
-            env
-            coerce_guard
-            pred
-        in
-        cond, env
+        if Options.Optimisations.Omit_rte.get () then None, env else
+          let max_bitcnt =
+            Cil.lconstant ~loc @@
+            Cil.max_unsigned_number @@ Cil.bitsSizeOf @@ Gmp_types.bitcnt_t ()
+          in
+          let pred =
+            Logic_const.pand
+              ~loc
+              ~names:[bop_name ^ "_rhs_fits_in_mp_bitcnt_t"]
+              (Logic_const.prel ~loc (Rle, zero, Terms.Id.deep_copy t2),
+               Logic_const.prel ~loc (Rle, Terms.Id.deep_copy t2, max_bitcnt))
+          in
+          Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
+          let cond, env =
+            Assert.runtime_check
+              ~adata:adata2
+              ~pred_kind:Assert
+              RTE
+              kf
+              env
+              coerce_guard
+              pred
+          in
+          Some cond, env
       in
       let mk_coerce_stmts vi _e =
         let result = Cil.var vi in
         let name = "__gmpz_get_ui" in
         let instr = Smart_stmt.rtl_call ~loc ~result ~prefix:"" name [ e2 ] in
-        [ coerce_guard_cond; instr ]
+        (Option.to_list coerce_guard_cond) @ [instr]
       in
       let name = e2_name ^ bop_name ^ "_coerced" in
       let _e2_as_bitcnt_vi, e2_as_bitcnt_e, env =
@@ -685,10 +691,12 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
 
       (* Boolean to choose whether the guard [e1 >= 0] should be added *)
       let should_guard_e1 =
-        match bop with
-        | Shiftlt -> Kernel.LeftShiftNegative.get ()
-        | Shiftrt -> Kernel.RightShiftNegative.get ()
-        | _ -> assert false
+        if not @@ Options.Optimisations.Omit_rte.get () then
+          match bop with
+          | Shiftlt -> Kernel.LeftShiftNegative.get ()
+          | Shiftrt -> Kernel.RightShiftNegative.get ()
+          | _ -> assert false
+        else false
       in
 
       (* Create the statements to initialize [e1 shift e2] *)
@@ -1044,7 +1052,7 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
           context_insensitive_term_to_exp_old ?inplace ~adata kf env t
         in
         let env =
-          if generate_rte then !translate_rte_exp_ref kf env e else env
+          if generate_rte then Translate_rtes.exp kf env e else env
         in
         let cast = Typing.get_cast ~logic_env t in
         let name = if name = "" then None else Some name in

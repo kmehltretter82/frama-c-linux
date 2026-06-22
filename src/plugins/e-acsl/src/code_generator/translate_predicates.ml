@@ -281,7 +281,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pobject_pointer _ -> Env.not_yet env "labeled \\object_pointer"
   | Pseparated tlist ->
-    let env =
+    let rtes () =
       List.fold_left
         (fun env t ->
            let name = "separated_guard" in
@@ -301,6 +301,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
         env
         tlist
     in
+    let env = if Options.Optimisations.Omit_rte.get () then env else rtes () in
     let e, adata, env =
       Memory_translate.call_with_size
         ~adata
@@ -398,11 +399,15 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
       let e, adata, env =
         predicate_content_to_exp ?inplace ~adata ?name kf env p
       in
-      let env = if rte then Translate_rtes.translate_rte_exp kf env e else env in
+      let env =
+        if rte && not @@ Options.Optimisations.Omit_rte.get () then
+          Translate_rtes.translate_rte_exp kf env e
+        else env
+      in
       (e, adata), env)
 
 and to_exp_il ~rte p =
-  if rte
+  if rte && not @@ Options.Optimisations.Omit_rte.get ()
   then M.not_covered ~pre:"with RTE" Printer.pp_predicate p
   else predicate_content_to_exp_il p
 

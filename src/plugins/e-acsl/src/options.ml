@@ -188,6 +188,13 @@ module Optimisations = struct
       let descr = "hypothesis gathering during inductive extraction"
     end)
 
+  module Omit_rte =
+    Make (struct
+      let name = "omit-rte"
+      let level = 3
+      let descr = "omit RTE guard generation for specifications"
+    end)
+
 end
 
 
