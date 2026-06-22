@@ -147,7 +147,6 @@ let rec cc_tau ctxt (t:Lang.F.tau) =
     let ts = cc_adt adt in
     Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
   | Tvar i -> Some (Why3.Ty.ty_var (Qed.Symbol.tvar i))
-  | Record _ -> failwith "Type %a not (yet) convertible" Lang.F.pp_tau t
 
 let const_int z =
   let k = Why3.BigInt.of_string (Z.to_string z) in

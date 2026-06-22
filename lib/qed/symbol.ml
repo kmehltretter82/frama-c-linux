@@ -318,15 +318,15 @@ module Fun = Make
 (* --- Types                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type tau = (field,data) Logic.datatype
+type tau = data Logic.datatype
 
 module Tau =
 struct
   type t = tau
-  let hash = Kind.hash_tau Field.hash Data.hash
-  let equal = Kind.eq_tau Field.equal Data.equal
-  let compare = Kind.compare_tau Field.compare Data.compare
-  let pretty = Kind.pp_tau Kind.pp_tvar Field.pretty Data.pretty
+  let hash = Kind.hash_tau Data.hash
+  let equal = Kind.eq_tau Data.equal
+  let compare = Kind.compare_tau Data.compare
+  let pretty = Kind.pp_tau Kind.pp_tvar Data.pretty
 end
 
 let hty : tau Why3.Ty.Hty.t = Why3.Ty.Hty.create 32

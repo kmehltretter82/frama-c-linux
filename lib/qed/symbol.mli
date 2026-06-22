@@ -41,7 +41,7 @@ val record : (field * term) list -> term
 val by_field_rank : field -> field -> int
 
 (** Logic Types *)
-type tau = (field,data) Logic.datatype
+type tau = data Logic.datatype
 
 val data : data -> tau list -> tau
 (** Converts builtin Qed types from external data symbols *)

@@ -14,8 +14,8 @@
 
 open Logic
 
-val of_tau : ('f,'a) datatype -> sort
-val of_poly : (int -> sort) -> ('f,'a) datatype -> sort
+val of_tau : 'a datatype -> sort
+val of_poly : (int -> sort) -> 'a datatype -> sort
 val image : sort -> sort
 
 val merge : sort -> sort -> sort
@@ -28,9 +28,8 @@ val pp_tvar : Format.formatter -> int -> unit
 
 val pp_tau :
   (Format.formatter -> int -> unit) ->
-  (Format.formatter -> 'f -> unit) ->
   (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> ('f,'a) datatype -> unit
+  Format.formatter -> 'a datatype -> unit
 
 val pp_data :
   (Format.formatter -> 'a -> unit) ->
@@ -43,28 +42,23 @@ val pp_record:
   Format.formatter -> ?opened:bool -> ('f * 'b) list -> unit
 
 val hash_tau :
-  ('f -> int) ->
   ('a -> int) ->
-  ('f, 'a) datatype -> int
+  'a datatype -> int
 
 val eq_tau :
-  ('f -> 'f -> bool) ->
   ('a -> 'a -> bool) ->
-  ('f,'a) datatype -> ('f,'a) datatype -> bool
+  'a datatype -> 'a datatype -> bool
 
 val compare_tau:
-  ('f -> 'f -> int) ->
   ('a -> 'a -> int) ->
-  ('f,'a) datatype -> ('f,'a) datatype -> int
+  'a datatype -> 'a datatype -> int
 
 val map_tau:
-  ('f1 -> 'f2) ->
   ('a1 -> 'a2) ->
-  ('f1,'a1) datatype -> ('f2,'a2) datatype
+  'a1 datatype -> 'a2 datatype
 
 val map_element : ('a -> 'b) -> 'a element -> 'b element
 val map_operator : ('a -> 'b) -> 'a operator -> 'b operator
 val map_category : ('a -> 'b) -> 'a category -> 'b category
 
-module MakeTau(F : Field)(A : Data) :
-  Data with type t = (F.t,A.t) datatype
+module MakeTau(A : Data) : Data with type t = A.t datatype

@@ -31,7 +31,7 @@ type adt = private
   | Qdata of Qed.Symbol.data (** Qed/Why3 Type *)
   | Atype of logic_type_info (** ACSL Logic Type *)
 and field = Qed.Symbol.field
-and tau = (field,adt) Logic.datatype
+and tau = adt Logic.datatype
 
 type lfun = private
   | ACSL of Cil_types.logic_info (** Registered in Definition.t only  *)

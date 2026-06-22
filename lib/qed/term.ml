@@ -21,17 +21,17 @@ struct
 
   (* -------------------------------------------------------------------------- *)
 
-  type tau = (Field.t,ADT.t) Logic.datatype
+  type tau = ADT.t Logic.datatype
   type path = int list
 
-  module Tau = Kind.MakeTau(Field)(ADT)
+  module Tau = Kind.MakeTau(ADT)
 
   module POOL = Pool.Make
       (struct
         type t = tau
         let dummy = Prop
-        let equal = Kind.eq_tau Field.equal ADT.equal
-        let compare = Kind.compare_tau Field.compare ADT.compare
+        let equal = Kind.eq_tau ADT.equal
+        let compare = Kind.compare_tau ADT.compare
       end)
 
   open POOL

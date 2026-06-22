@@ -96,7 +96,7 @@ type adt =
   | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
   | Atype of logic_type_info (* ACSL Logic Type *)
 and field = Qed.Symbol.field
-and tau = (field,adt) Logic.datatype
+and tau = adt Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
 let floats = Context.create "Lang.floats"
@@ -298,7 +298,7 @@ let acsl lf = lfun_observe (ACSL lf)
 let ctor cf = lfun_observe (CTOR cf)
 let lsymbol m = lfun_observe (LFUN m)
 
-let of_qtau = Kind.map_tau (fun _ -> raise Not_found) (fun d -> Qdata d)
+let of_qtau = Kind.map_tau (fun d -> Qdata d)
 
 let unroll = function
   | Qed.Logic.Data(Qdata d, ts) ->
@@ -329,7 +329,7 @@ let unroll = function
   | _ -> None
 
 
-let compare_tau = Qed.Kind.compare_tau Field.compare ADT.compare
+let compare_tau = Qed.Kind.compare_tau ADT.compare
 
 let typecheck category (tr: tau) (ps : tau list) (ts : tau list) =
   let s = ref Qed.Intmap.empty in
@@ -371,7 +371,6 @@ let typecheck category (tr: tau) (ps : tau list) (ts : tau list) =
     | Prop -> Prop
     | Tvar x -> (try Qed.Intmap.find x !s with Not_found -> Tvar (-1))
     | Array(a,b) -> Array(resolve a, resolve b)
-    | Record fts -> Record (List.map (fun (f,t) -> f,resolve t) fts)
     | Data(d,ts) -> Data(d,List.map resolve ts)
   in resolve tr
 
@@ -402,6 +401,8 @@ let tau_of_field fd =
   let th = Qed.Symbol.Field.theory fd in
   let ls = Qed.Symbol.Field.symbol fd in
   of_qtau @@ Qed.Symbol.of_oty th ls.ls_value
+
+let tau_of_record fd = t_qdata (Qed.Symbol.record_of_field fd) []
 
 let is_coloring_lfun = function
   | ACSL _ | CTOR _ -> false
@@ -621,6 +622,8 @@ struct
   module QED =
   struct
     include QZERO
+    let typeof ?(field=tau_of_field) ?(record=tau_of_record) ?(call=tau_of_lfun) e =
+      QZERO.typeof ~field ~record ~call e
   end
   include QED
 

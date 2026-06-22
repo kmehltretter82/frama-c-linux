@@ -20,8 +20,8 @@ open Engine
 val cmode : mode -> cmode
 val amode : mode -> amode
 val pmode : mode -> pmode
-val tmode : ('a,'f) Logic.datatype -> mode
-val ctau  : ('a,'f) Logic.datatype -> cmode
+val tmode : 'a datatype -> mode
+val ctau  : 'a datatype -> cmode
 
 val link_name : link -> string
 val is_identifier : string -> bool

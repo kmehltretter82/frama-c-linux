@@ -416,7 +416,6 @@ class virtual visitor main =
     method vtau = function
       | Prop | Bool | Int | Real | Tvar _ -> ()
       | Array(a,b) -> self#vtau a ; self#vtau b
-      | Record _ -> assert false
       | Data(a,ts) -> self#vadt a ; List.iter self#vtau ts
 
     method vparam x = self#vtau (tau_of_var x)
