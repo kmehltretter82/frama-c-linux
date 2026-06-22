@@ -125,19 +125,17 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
-module Interlang =
-  False
-    (struct
-      let option_name = "-e-acsl-interlang"
-      let help = "try compilation based on intermediate language"
-    end)
+module Interlang = False (struct
+    let () = Parameter_customize.is_invisible ()
+    let option_name = "-e-acsl-interlang"
+    let help = "try compilation based on intermediate language"
+  end)
 
-module Interlang_force =
-  False
-    (struct
-      let option_name = "-e-acsl-interlang-force"
-      let help = "crash if interlang compilation fails"
-    end)
+module Interlang_force = False (struct
+    let () = Parameter_customize.is_invisible ()
+    let option_name = "-e-acsl-interlang-force"
+    let help = "crash if interlang compilation fails"
+  end)
 
 
 module O = Int (struct

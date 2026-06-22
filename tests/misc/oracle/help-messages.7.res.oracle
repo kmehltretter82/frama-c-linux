@@ -36,10 +36,6 @@ Options taking a string as argument should preferably be written
 -e-acsl-instrument <f1, ..., fn>  only instrument functions f1, ..., fn. Be
                     aware that runtime verdicts may become partial.
                     (preferably use -e-acsl-instrument="f1, ..., fn")
--e-acsl-interlang   try compilation based on intermediate language (opposite
-                    option is -e-acsl-no-interlang)
--e-acsl-interlang-force  crash if interlang compilation fails (opposite
-                    option is -e-acsl-no-interlang-force)
 -e-acsl-project <prj>  the name of the generated project is <prj> (default to
                     "e-acsl") (preferably use -e-acsl-project="prj")
 -e-acsl-replace-libc-functions  replace some libc functions (such as strcpy)
