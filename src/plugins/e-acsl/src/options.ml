@@ -140,8 +140,8 @@ module Interlang_force =
     end)
 
 
-let () = Parameter_customize.set_group Group.optimisation
 module O = Int (struct
+    let () = Parameter_customize.set_group Group.optimisation
     let default = 2
     let option_name = "-e-acsl-O"
     let arg_name = "O"
@@ -211,9 +211,9 @@ module Optimisations = struct
 end
 
 
-let () = Parameter_customize.set_group Group.widening
 module Widening_arguments_base = Int
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = 1
       let option_name = "-e-acsl-widening-arguments-base"
       let arg_name = "n"
@@ -221,11 +221,11 @@ module Widening_arguments_base = Int
     end)
 let () = Widening_arguments_base.set_range ~min:0 ~max:2
 
-let () = Parameter_customize.set_group Group.widening
 module Widening_arguments =
   String_map
     (Value_int)
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-arguments"
       let arg_name = ""
@@ -233,10 +233,10 @@ module Widening_arguments =
                   basis."
     end)
 
-let () = Parameter_customize.set_group Group.widening
 module Widening_output_base =
   Int
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = 1
       let option_name = "-e-acsl-widening-output-base"
       let arg_name = "n"
@@ -244,11 +244,11 @@ module Widening_output_base =
     end)
 let () = Widening_output_base.set_range ~min:0 ~max:2
 
-let () = Parameter_customize.set_group Group.widening
 module Widening_output =
   String_map
     (Value_int)
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-output"
       let arg_name = ""
