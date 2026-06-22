@@ -459,11 +459,8 @@ let register_builtins ft =
     hack_sqrt_builtin ft ;
   end
 
-let () = Context.register
-    begin fun () ->
-      register_builtins Float32 ;
-      register_builtins Float64 ;
-    end
+let () = register_builtins Float32
+let () = register_builtins Float64
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)
