@@ -216,10 +216,13 @@ let parse_case p =
     ()
   | Ext_lexpr(e) ->
     Options.error ~current:true "The clause %s should not be used directly \
-    inside a pcase." e.ext_name;
+                                 inside a pcase."
+      e.ext_name ;
+    ()
   | Ext_extension(ext) ->
     Options.error ~current:true "The clause %s should not be used directly \
-    inside a pcase." ext.gext_name;
+                                 inside a pcase."
+      ext.gext_name ;
     ()
 
 let parse_datamodel p =
@@ -233,15 +236,15 @@ let parse_datamodel p =
   | Ext_lexpr(e) ->
     Options.error ~current:true "The clause %s should not be used directly \
                                  inside a datamodel."
-      e.ext_name;
+      e.ext_name ;
     ()
   | Ext_extension(ext) when ext.gext_name = "pcase" ->
-    List.iter parse_case ext.gext_content;
+    List.iter parse_case ext.gext_content ;
     ()
   | Ext_extension(ext) ->
     Options.error ~current:true "The clause %s should not be used directly \
                                  inside a datamodel."
-      ext.gext_name;
+      ext.gext_name ;
     ()
 
 (* -------------------------------------------------------------------------- *)
@@ -276,12 +279,12 @@ let typecheck typing_context loc ps =
   Ext_id id
 
 let typecheck_dm _ _ ps =
-  List.iter parse_datamodel (snd ps);
+  List.iter parse_datamodel (snd ps) ;
   Ext_id 1
 
 let typecheck_fail clause _ _ _ =
   Options.error ~current:true "The clause %s should not be used at top-level."
-    clause;
+    clause ;
   Ext_id 0
 
 let typecheck_tmp _ _ _ =
@@ -302,29 +305,29 @@ let () =
     Acsl_extension.register_global_block
       ~plugin: "region" "datamodel" typecheck_dm false ;
     Acsl_extension.register_global
-      ~plugin:"region" "pmodel" (typecheck_fail "pmodel") false;
+      ~plugin:"region" "pmodel" (typecheck_fail "pmodel") false ;
     Acsl_extension.register_global
-      ~plugin:"region" "pwhen" (typecheck_fail "pwhen") false;
+      ~plugin:"region" "pwhen" (typecheck_fail "pwhen") false ;
     Acsl_extension.register_global
-      ~plugin:"region" "pinvariant" (typecheck_fail "pinvariant") false;
+      ~plugin:"region" "pinvariant" (typecheck_fail "pinvariant") false ;
     Acsl_extension.register_global
-      ~plugin:"region" "pframe" (typecheck_fail "pframe") false;
+      ~plugin:"region" "pframe" (typecheck_fail "pframe") false ;
     Acsl_extension.register_global_block
-      ~plugin:"region" "pcase" (typecheck_fail "pcase") false;
+      ~plugin:"region" "pcase" (typecheck_fail "pcase") false ;
     Acsl_extension.register_code_annot
-      ~plugin:"region" "heap" typecheck_tmp false;
+      ~plugin:"region" "heap" typecheck_tmp false ;
     Acsl_extension.register_code_annot
-      ~plugin:"region" "call" typecheck_tmp false;
+      ~plugin:"region" "call" typecheck_tmp false ;
     Acsl_extension.register_code_annot
-      ~plugin:"region" "consume" typecheck_tmp false;
+      ~plugin:"region" "consume" typecheck_tmp false ;
     Acsl_extension.register_code_annot
-      ~plugin:"region" "produce" typecheck_tmp false;
+      ~plugin:"region" "produce" typecheck_tmp false ;
     Acsl_extension.register_code_annot_next_both
-      ~plugin:"region" "frame" typecheck_tmp false;
+      ~plugin:"region" "frame" typecheck_tmp false ;
     Acsl_extension.register_behavior
-      ~plugin:"region" "consumes" typecheck_tmp false;
+      ~plugin:"region" "consumes" typecheck_tmp false ;
     Acsl_extension.register_behavior
-      ~plugin:"region" "produces" typecheck_tmp false;
+      ~plugin:"region" "produces" typecheck_tmp false ;
   end
 
 
