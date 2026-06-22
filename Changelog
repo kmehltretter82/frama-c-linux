@@ -18,6 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2026-06-22] Remove unknown locations/positions. Each plug-in
+              (and Frama-C's kernel) now exports a generated location `gen_loc`
+              (via `Plugin.S`) which should be used instead of `unknown`. When a
+              location is available, use `gen_loc_from` instead to mark this
+              location as generated while keeping a precise location.
 o!  Kernel    [2026-06-11] Deprecate `Cabs.cabsloc`, `Cil_types.location` and
               `Logic_ptree.location` and replace them with `Fileloc.t`. The type
               is equivalent, we just removed an indirection.
