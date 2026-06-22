@@ -1,6 +1,6 @@
 open Cil_datatype
 
-let loc = Fileloc.unknown
+let loc = Kernel.gen_loc
 
 let null () =
   let e = Cil.zero ~loc in

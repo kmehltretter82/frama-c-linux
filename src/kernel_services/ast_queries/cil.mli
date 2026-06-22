@@ -534,7 +534,7 @@ val compatibleTypes :
     The [ghost] argument defaults to [false], and corresponds to the field
     [vghost] .
     The [alignas] argument defaults to the alignment of the provided type.
-    The [loc] argument defaults to [Fileloc.unknown], and corresponds to the field
+    The [loc] argument defaults to [Kernel.gen_loc], and corresponds to the field
     [vdecl] .
     The first unnamed argument specifies whether the varinfo is for a global and
     the second is for formals.

@@ -24,10 +24,10 @@ class annotateFunFromDeclspec =
     let rec aux = function
       | AInt i ->
         Ast_info.constant_term
-          Fileloc.unknown i
+          Kernel.gen_loc i
       | AUnOp(Neg,AInt i) ->
         Ast_info.constant_term
-          Fileloc.unknown (Z.neg i)
+          Kernel.gen_loc (Z.neg i)
       | AStr s
       | ACons(s,[]) ->
         begin try
@@ -38,7 +38,7 @@ class annotateFunFromDeclspec =
         mkterm
           (TBinOp(bop,aux attr1,aux attr2))
           Linteger
-          Fileloc.unknown
+          Kernel.gen_loc
       | ACons _
       | ASizeOf _
       | ASizeOfE _

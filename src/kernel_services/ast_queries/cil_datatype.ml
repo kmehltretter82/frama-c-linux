@@ -37,6 +37,8 @@ let hash_list f =
 (* Functions that will clear internal, non-project compliant, caches *)
 let clear_caches = ref []
 
+let dummy_loc = Fileloc.generated "cil_datatype"
+
 (**************************************************************************)
 (** {3 Generic builders for Cil datatypes} *)
 (**************************************************************************)
@@ -156,7 +158,7 @@ module Cabs_file = struct
         type t = Cabs.file
         let name = "Cabs_file"
         let reprs =
-          let loc = Filepos.(unknown, unknown) in
+          let loc = dummy_loc in
           let dummy_def =
             Cabs.DECDEF (None, ([SpecType Tint], [("dummy", JUSTBASE, [], loc),
                                                   NO_INIT]), loc)
@@ -174,14 +176,16 @@ end
 
 module Position =  struct
   include Filepos
-  let dummy = unknown
+  let unknown = unknown [@@alert "-deprecated"]
+  let dummy = fst dummy_loc
   let pp_with_col = Filepos.pretty_long
   let of_lexing_pos pos = of_lexing_pos pos (* Erase the optional parameter *)
 end
 
 module Location = struct
   include Fileloc
-  let dummy = unknown
+  let unknown = unknown [@@alert "-deprecated"]
+  let dummy = dummy_loc
   let is_unknown loc = is_empty loc
   let compare_start_semantic = compare
   let equal_start_semantic = equal
@@ -215,7 +219,7 @@ end
 module Instr = struct
 
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = Asm([], ["@dummy_instr@"], None, Fileloc.unknown)
+  let dummy = Asm([], ["@dummy_instr@"], None, dummy_loc)
 
   include Make
       (struct
@@ -281,9 +285,9 @@ module Stmt = struct
     | TryFinally (_, _, l) | TryExcept (_, _, _, l)
     | Throw (_,l) | TryCatch(_,_,l) -> l
     | Instr hd -> Instr.loc hd
-    | Block b -> (match b.bstmts with [] -> Fileloc.unknown | s :: _ -> loc s)
+    | Block b -> (match b.bstmts with [] -> dummy_loc | s :: _ -> loc s)
     | UnspecifiedSequence ((s,_,_,_,_) :: _) -> loc s
-    | UnspecifiedSequence [] -> Fileloc.unknown
+    | UnspecifiedSequence [] -> dummy_loc
 
   and loc s = loc_skind s.skind
 
@@ -636,7 +640,7 @@ end
 module Exp = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let zero = CInt64 (Z.zero, IChar, None)
-  let dummy = { eid = -1; enode = Const zero; eloc = Fileloc.unknown }
+  let dummy = { eid = -1; enode = Const zero; eloc = dummy_loc }
   include Make_with_collections
       (struct
         include Datatype.Undefined
@@ -652,13 +656,13 @@ end
 
 module Label = struct
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = Label ("@dummy_label@", Fileloc.unknown, false)
+  let dummy = Label ("@dummy_label@", dummy_loc, false)
 
   include Make_with_collections
       (struct
         type t = label
         let name = "Label"
-        let reprs = [ dummy; Default Fileloc.unknown ]
+        let reprs = [ dummy; Default dummy_loc ]
         let pretty fmt l = !pretty_ref fmt l
         let hash = function
           | Default _ -> 7
@@ -699,7 +703,7 @@ module Varinfo_Id = struct
     vdefined = false;
     vformal = false;
     vinline = false;
-    vdecl = Fileloc.unknown;
+    vdecl = dummy_loc;
     vid = -1;
     vaddrof = false;
     vreferenced = false;
@@ -768,7 +772,7 @@ module Fieldinfo = struct
     fbitfield  = None;
     falignas   = None;
     fattr      = [];
-    floc       = Fileloc.unknown;
+    floc       = dummy_loc;
     faddrof    = false;
     fsize_in_bits   = None;
     foffset_in_bits = None;
@@ -843,7 +847,7 @@ module Enumitem = struct
     einame      = "@dummy_enumitem@";
     eival       = Exp.dummy;
     eihost      = Enuminfo.dummy;
-    eiloc       = Fileloc.unknown;
+    eiloc       = dummy_loc;
   }
 
   include Make_with_collections
@@ -858,7 +862,7 @@ module Enumitem = struct
                  einame = "";
                  eival  = Exp.dummy;
                  eihost = i;
-                 eiloc = Fileloc.unknown })
+                 eiloc = dummy_loc })
             Enuminfo.reprs
         let compare v1 v2 = String.compare v1.einame v2.einame
         let hash v = Hashtbl.hash v.einame
@@ -1604,7 +1608,7 @@ module Model_info = struct
     mi_name       = "@dummy_model_info@";
     mi_base_type  = Typ.dummy;
     mi_field_type = Logic_type.dummy;
-    mi_decl       = Fileloc.unknown;
+    mi_decl       = dummy_loc;
     mi_attr       = [];
   }
 
@@ -1619,7 +1623,7 @@ module Model_info = struct
              { mi_name = "dummy";
                mi_base_type = base;
                mi_field_type = field;
-               mi_decl = Fileloc.unknown;
+               mi_decl = dummy_loc;
                mi_attr = [];
              })
           Typ.reprs
@@ -2154,7 +2158,7 @@ module Term = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     term_node = TConst (LStr "@dummy_term@");
-    term_loc  = Fileloc.unknown;
+    term_loc  = dummy_loc;
     term_type = Logic_type.dummy;
     term_name = []
   }
@@ -2167,7 +2171,7 @@ module Term = struct
           List.map
             (fun t ->
                { term_node = TConst (LStr "");
-                 term_loc = Fileloc.unknown;
+                 term_loc = dummy_loc;
                  term_type =  t;
                  term_name = [] })
             Logic_type.reprs
@@ -2295,7 +2299,7 @@ end
 
 module Global_annotation = struct
   let pretty_ref = ref (fun _ -> assert false)
-  let dummy = Dinvariant (Logic_info.dummy, Fileloc.unknown)
+  let dummy = Dinvariant (Logic_info.dummy, dummy_loc)
 
   include Make_with_collections
       (struct
@@ -2482,7 +2486,7 @@ module Global = struct
     | GAsm(_, l)
     | GPragma(_, l)
     | GAnnot (_, l) -> l
-    | GText _ -> Fileloc.unknown
+    | GText _ -> dummy_loc
 
   let attr = function
     | GVar (vi,_,_) | GFun ({svar = vi},_) | GVarDecl (vi,_) | GFunDecl (_,vi,_)->
@@ -2525,7 +2529,7 @@ module Predicate = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     pred_name    = [ "@dummy_predicate@" ];
-    pred_loc     = Fileloc.unknown;
+    pred_loc     = dummy_loc;
     pred_content = Pfalse
   }
 
@@ -2692,7 +2696,7 @@ module Kf = struct
   let id kf = (vi kf).vid
 
   let dummy = {
-    fundec = Definition (Fundec.dummy, Fileloc.unknown);
+    fundec = Definition (Fundec.dummy, dummy_loc);
     spec = Funspec.dummy;
   }
 
@@ -2767,7 +2771,7 @@ end
 module Lexpr = struct
   let dummy = Logic_ptree.{
       lexpr_node = PLvar "@dummy_lexpr@";
-      lexpr_loc = Fileloc.unknown;
+      lexpr_loc = dummy_loc;
     }
 
   include Make (struct

@@ -167,9 +167,7 @@ let is_frama_c_builtin kf =
 (* Logic_const shortcuts to extract kf location. *)
 
 let pred node kf =
-  let loc =
-    Fileloc.generated ~loc:(Kernel_function.get_location kf) "kernel"
-  in
+  let loc = Kernel.gen_loc_from (Kernel_function.get_location kf) in
   Logic_const.(new_predicate (unnamed ~loc node))
 
 let pred_true = pred Ptrue

@@ -13,7 +13,7 @@ class vis prj = object(self)
           self#behavior (Option.get self#current_func) in
       let y = Cil.makeLocalVar f ~scope:b "y" Cil_const.intType in
       my_var <- Some y;
-      let loc = Fileloc.unknown in
+      let loc = Kernel.gen_loc in
       let s2 =
         Cil.mkStmtOneInstr ~valid_sid:true
           (Local_init(y,AssignInit(SingleInit(Cil.zero ~loc)),loc))

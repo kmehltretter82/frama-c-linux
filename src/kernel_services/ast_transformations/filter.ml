@@ -445,7 +445,7 @@ end = struct
                 ([],
                  Logic_const.toplevel_predicate
                    { pred_name = [];
-                     pred_loc = Fileloc.unknown;
+                     pred_loc = Kernel.gen_loc;
                      pred_content = Ptrue})))
       end
 

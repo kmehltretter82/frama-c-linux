@@ -19,7 +19,7 @@ end
 
 let test_terms () =
   let open Cil_builder.Exp in
-  let loc = Fileloc.unknown in
+  let loc = Kernel.gen_loc in
   let e1 = lognot ((of_int 21) + (of_int 21)) in
   let e2 = lognot ((of_int 21) - (of_int 21)) in
   let e3 = lt zero (logand (of_int 42) (of_int 21)) in

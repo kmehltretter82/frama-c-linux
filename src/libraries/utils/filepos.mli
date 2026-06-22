@@ -22,8 +22,6 @@
 type t [@@deriving show]
 
 type origin =
-  | Unknown
-  (** Unknown position. This constructor should be avoided. *)
   | Original
   (** The position is in one of the user input files. *)
   | Generated of string
@@ -42,13 +40,13 @@ include Datatype.S_with_collections with type t := t
 (** {2 Pretty printing } *)
 
 (** Pretty prints a position in the format [<file>:<line>], with variants for
-    unknown files or generated positions. *)
+    unknown files and generated positions. *)
 val pretty : Format.formatter -> t -> unit
 
 (** Pretty prints a position in the format ["<file>", line <line>] or, if the
     column number is available, in the format
     ["<file>", line <line>, character <char>], with variants for unknown files
-    or generated positions. *)
+    and generated positions. *)
 val pretty_long : Format.formatter -> t -> unit
 
 (** Debug printer. Prints the internal representation of locations. *)
@@ -76,6 +74,8 @@ val generated : ?pos:t -> string -> t
 
 (** Special representation of an unknown position. *)
 val unknown : t
+[@@deprecated "Use your plug-in generated location via Self.gen_loc or \
+               Self.gen_loc_from instead."]
 
 (** {2 Conversion from/to Lexing.position } *)
 

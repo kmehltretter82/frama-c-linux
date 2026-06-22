@@ -135,7 +135,7 @@ let kf_of_property ip =
 
 let loc_of_property kf ip =
   let loc = Property.location ip in
-  if Fileloc.(equal loc unknown)
+  if Fileloc.is_empty loc
   then Kernel_function.get_location kf
   else loc
 

@@ -360,7 +360,7 @@ let add_generated_functions_to_file file =
   let added = (* to avoid adding the same function multiple times *)
     Logic_info.Hashtbl.create 7
   in
-  let rec decls_of_li ?(generated = false) ?(loc = Fileloc.unknown) li =
+  let rec decls_of_li ?(generated = false) ?(loc = Options.gen_loc) li =
     let dependencies =
       List.concat_map (decls_of_li ~generated:true ~loc)
         (Logic_info.Set.elements @@ Logic_normalizer.Logic_infos.generated_of li)
@@ -396,7 +396,7 @@ let add_generated_functions_to_file file =
     match kf with
     | Ok kf ->
       Globals.Functions.register kf;
-      GFun (get_fundef kf, Fileloc.unknown) :: acc
+      GFun (get_fundef kf, Options.gen_loc) :: acc
     | Error _ -> acc
   in
   (* append the generated function definitions at the end; as the declarations

@@ -67,7 +67,7 @@ end
 module Location: sig
   include S_with_collections with type t = Fileloc.t
   val unknown: t
-  [@@migrate { repl = Fileloc.unknown }]
+  [@@migrate { repl = Kernel.gen_loc }]
 
   val is_unknown : t -> bool
   [@@migrate { repl = fun loc -> not (Fileloc.is_known loc) }]

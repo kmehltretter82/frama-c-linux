@@ -11,7 +11,7 @@ include State_builder.Ref
     (struct
       let dependencies = []
       let name = "Current_loc"
-      let default () = Fileloc.unknown
+      let default () = Kernel.gen_loc
     end)
 
 let () = Log.set_current_source (fun () -> fst (get ()))

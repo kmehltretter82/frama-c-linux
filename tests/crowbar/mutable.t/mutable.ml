@@ -1,6 +1,6 @@
 open Cil_types
 
-let loc = Fileloc.unknown
+let loc = Kernel.gen_loc
 
 let field_name =
   let count = ref 0 in

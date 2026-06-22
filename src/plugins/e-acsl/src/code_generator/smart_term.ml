@@ -8,25 +8,25 @@
 
 open Cil_types
 
-let tsizeof ?(smart = true) ?(loc = Fileloc.unknown) typ =
+let tsizeof ?(smart = true) ?(loc = Options.gen_loc) typ =
   if smart && Options.O.get () > 0 then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesSizeOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TSizeOf typ) Linteger
   else Logic_const.term ~loc (TSizeOf typ) Linteger
 
-let talignof ?(smart = true) ?(loc = Fileloc.unknown) typ =
+let talignof ?(smart = true) ?(loc = Options.gen_loc) typ =
   if smart && Options.O.get () > 0 then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesAlignOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TAlignOf typ) Linteger
   else Logic_const.term ~loc (TAlignOf typ) Linteger
 
-let tblock_length ?(label = Logic_const.here_label) ?(loc = Fileloc.unknown) t =
+let tblock_length ?(label = Logic_const.here_label) ?(loc = Options.gen_loc) t =
   Logic_const.term ~loc (Tblock_length (label,t)) Linteger
 
-let toffset ?(label = Logic_const.here_label) ?(loc = Fileloc.unknown) t =
+let toffset ?(label = Logic_const.here_label) ?(loc = Options.gen_loc) t =
   Logic_const.term ~loc (Toffset (label,t)) Linteger
 
-let tbinop ?(smart = true) ?(loc = Fileloc.unknown) binop t1 t2 =
+let tbinop ?(smart = true) ?(loc = Options.gen_loc) binop t1 t2 =
   let tb = Logic_const.term ~loc (TBinOp (binop,t1,t2)) Linteger in
   if smart && Options.O.get () > 0 then try
       let z1 = Option.get @@ Terms.extract_integer t1 in
@@ -47,7 +47,7 @@ let copy ?(smart = true) t =
     | _ -> Terms.Id.deep_copy t
   else Terms.Id.deep_copy t
 
-let trange_array ?(smart = true) ?(loc = Fileloc.unknown) t  =
+let trange_array ?(smart = true) ?(loc = Options.gen_loc) t  =
   (* size(t) = (\block_length(array) - \offset(array)) / sizeof(typ) *)
   let approx typ =
     copy ~smart @@

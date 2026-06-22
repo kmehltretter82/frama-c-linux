@@ -55,7 +55,7 @@ let dummy_edge = {
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
-  edge_loc = Fileloc.unknown;
+  edge_loc = Self.gen_loc;
 }
 
 let (<?>) c lcmp =

@@ -105,7 +105,7 @@ end
 let print_fct_from_pdg fmt ?ff pdg  =
   let kf = PdgTypes.Pdg.get_kf pdg in
   let fct = Kernel_function.get_definition kf in
-  let loc = Fileloc.unknown in
+  let loc = SlicingParameters.gen_loc in
   let glob = Cil_types.GFun (fct, loc) in (* TODO : make it cleaner *)
   let printer = new printerClass ff in
   printer#global fmt glob

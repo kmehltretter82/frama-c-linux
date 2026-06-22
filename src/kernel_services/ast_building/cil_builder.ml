@@ -63,7 +63,7 @@ struct
 
   let array ?size = function
     | (_,Ctype t) as typ ->
-      let to_exp = Cil.integer ~loc:Fileloc.unknown in
+      let to_exp = Cil.integer ~loc:Kernel.gen_loc in
       let size = Option.map to_exp size in
       Listed typ,
       Ctype (mk_tarray t size)
@@ -1238,7 +1238,7 @@ struct
 
   let current_loc () =
     match !stack with
-    | [] -> Fileloc.unknown
+    | [] -> Kernel.gen_loc
     | state :: _ -> state.loc
 
 

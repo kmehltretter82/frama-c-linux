@@ -458,7 +458,7 @@ let visit_messages () =
       let loc_of_pos p = (p, p) in
       let loc, func =
         match ev.evt_source with
-        | None -> Fileloc.unknown, "<global>"
+        | None -> Metrics_parameters.gen_loc, "<global>"
         | Some pos ->
           let funcname =
             match FunctionAtPos.find pos with

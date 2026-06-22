@@ -39,7 +39,7 @@ let pp_thisloc fmt = Fileloc.pretty fmt (Current_loc.get ())
 
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.new_raw_eid (); enode = e }
 
-let dummy_exp e = { eid = -1; enode = e; eloc = Fileloc.unknown }
+let dummy_exp e = { eid = -1; enode = e; eloc = Kernel.gen_loc }
 
 let argsToList :
   (string * typ * attributes) list option -> (string * typ * attributes) list =
@@ -96,7 +96,7 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
     ghost = ghost;
     sattr = sattr;}
 
-let stmt_of_instr_list ?(loc=Fileloc.unknown) = function
+let stmt_of_instr_list ?(loc=Kernel.gen_loc) = function
   | [] -> Instr (Skip loc)
   | [i] -> Instr i
   | il ->
@@ -141,7 +141,7 @@ let update_var_type v t =
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
     ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?alignas
-    ?(loc=Fileloc.unknown) ?orig_name
+    ?(loc=Kernel.gen_loc) ?orig_name
     global formal name typ
   =
 
@@ -2525,13 +2525,13 @@ let mone      ~loc = integer ~loc (-1)
 
 let integer_lconstant v = TConst (Integer (Z.of_int v,None))
 
-let lconstant ?(loc=Fileloc.unknown) v =
+let lconstant ?(loc=Kernel.gen_loc) v =
   { term_node = TConst (Integer (v,None)); term_loc = loc;
     term_name = []; term_type = Linteger;}
 
-let lzero ?(loc=Fileloc.unknown) () = lconstant ~loc Z.zero
-let lone  ?(loc=Fileloc.unknown) () = lconstant ~loc Z.one
-let lmone ?(loc=Fileloc.unknown) () = lconstant ~loc (Z.minus_one)
+let lzero ?(loc=Kernel.gen_loc) () = lconstant ~loc Z.zero
+let lone  ?(loc=Kernel.gen_loc) () = lconstant ~loc Z.one
+let lmone ?(loc=Kernel.gen_loc) () = lconstant ~loc (Z.minus_one)
 
 (** Given the character c in a (CChr c), sign-extend it to 32 bits.
     (This is the official way of interpreting character constants, according
@@ -2732,7 +2732,7 @@ let mkStmtCfgBlock sl =
       old_preds;
     n
 
-let mkEmptyStmt ?ghost ?valid_sid ?sattr ?(loc=Fileloc.unknown) () =
+let mkEmptyStmt ?ghost ?valid_sid ?sattr ?(loc=Kernel.gen_loc) () =
   mkStmt ?ghost ?valid_sid ?sattr (Instr (Skip loc))
 
 let mkStmtOneInstr ?ghost ?valid_sid ?sattr i =
@@ -2751,7 +2751,7 @@ let isUnsignedInteger ty =
 let var vi : lval = (Var vi, NoOffset)
 (* let assign vi e = Cil_datatype.Instrs(Set (var vi, e), lu) *)
 
-let evar ?(loc=Fileloc.unknown) vi = new_exp ~loc (Lval (var vi))
+let evar ?(loc=Kernel.gen_loc) vi = new_exp ~loc (Lval (var vi))
 
 let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
@@ -2835,11 +2835,11 @@ let no_op_coerce typ t =
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
-let typeOf_string_literal ?(loc=Fileloc.unknown) s =
+let typeOf_string_literal ?(loc=Kernel.gen_loc) s =
   let len = kinteger ~loc (Machine.sizeof_kind()) (String.length s + 1) in
   Cil_const.(mk_tarray ~tattr:[("const",[])] charType (Some len))
 
-let typeOf_wstring_literal ?(loc=Fileloc.unknown) l =
+let typeOf_wstring_literal ?(loc=Kernel.gen_loc) l =
   let len = kinteger ~loc (Machine.sizeof_kind()) (List.length l + 1) in
   Cil_const.mk_tarray ~tattr:[("const",[])] (Machine.wchar_type()) (Some len)
 
@@ -4049,7 +4049,7 @@ let interpret_character_constant char_list =
       (CInt64(Z.of_int64 value,IULongLong,orig_rep)), Cil_const.ulongLongType
   end
 
-let invalidStmt = mkStmt (Instr (Skip Fileloc.unknown))
+let invalidStmt = mkStmt (Instr (Skip Kernel.gen_loc))
 
 let range_loc loc1 loc2 = fst loc1, snd loc2
 
@@ -4076,7 +4076,7 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
   List.iter doone' fl.globals;
   match fl.globinit with
   | None -> ()
-  | Some g -> doone' (GFun(g, Fileloc.unknown))
+  | Some g -> doone' (GFun(g, Kernel.gen_loc))
 
 (* Fold over all globals, including the global initializer *)
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
@@ -4086,7 +4086,7 @@ let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
   let acc' = List.fold_left doone' acc fl.globals in
   match fl.globinit with
   | None -> acc'
-  | Some g -> doone' acc' (GFun(g, Fileloc.unknown))
+  | Some g -> doone' acc' (GFun(g, Kernel.gen_loc))
 
 let is_skip = function Instr (Skip _) -> true | _ -> false
 
@@ -4271,7 +4271,7 @@ let create_string_literal =
   let module StrLitCounter =
     State_builder.SharedCounter(struct let name = "StrLitCounter" end)
   in
-  fun ?(loc=Fileloc.unknown) s ->
+  fun ?(loc=Kernel.gen_loc) s ->
     let i = StrLitCounter.next() in
     let vname = "__fc_lit_string" ^ (string_of_int i) in
     let typ = typeOf_string_literal ~loc s in
@@ -4284,7 +4284,7 @@ let create_wstring_literal =
   let module WStrLitCounter =
     State_builder.SharedCounter(struct let name = "WStrLitCounter" end)
   in
-  fun ?(loc=Fileloc.unknown) l ->
+  fun ?(loc=Kernel.gen_loc) l ->
     let i = WStrLitCounter.next() in
     let vname = "__fc_lit_wstring" ^ (string_of_int i) in
     let typ = typeOf_wstring_literal ~loc l in
@@ -4502,7 +4502,7 @@ let findOrCreateFunc (f:file) (name:string) (t:typ) : varinfo =
       let t' = Ast_types.C.unroll_deep t in
       let new_decl = makeGlobalVar ~temp:false name t' in
       setFormalsDecl new_decl t';
-      f.globals <- GFunDecl(empty_funspec (), new_decl, Fileloc.unknown) :: f.globals;
+      f.globals <- GFunDecl(empty_funspec (), new_decl, Kernel.gen_loc) :: f.globals;
       new_decl
   in
   search f.globals
@@ -4598,7 +4598,7 @@ let mapGlobals (fl: file)
   (match fl.globinit with
      None -> ()
    | Some g -> begin
-       match doone (GFun(g, Fileloc.unknown)) with
+       match doone (GFun(g, Kernel.gen_loc)) with
          GFun(g', _) -> fl.globinit <- Some g'
        | _ -> Kernel.fatal ~current:true "mapGlobals: globinit is not a function"
      end)

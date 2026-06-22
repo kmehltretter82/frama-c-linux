@@ -416,7 +416,7 @@ let compute_files_defining_globals gvars =
       in
       if is_def then
         let loc = Cil_datatype.Global.loc def in
-        if Fileloc.equal loc Fileloc.unknown then acc
+        if Fileloc.is_empty loc then acc
         else begin
           Metrics_parameters.feedback ~dkey "found %s at: %a"
             (if is_def then "definition" else "declaration")

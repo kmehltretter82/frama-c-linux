@@ -20,7 +20,7 @@ let getident () =
   nextident := !nextident + 1;
   !nextident
 
-let cabslu = Fileloc.unknown
+let cabslu = Kernel.gen_loc
 
 module Comments =
 struct

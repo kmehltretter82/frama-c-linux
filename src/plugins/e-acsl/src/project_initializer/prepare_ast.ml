@@ -719,7 +719,7 @@ let prepare_file file =
   (* insert the new_definitions at the end and reverse back the globals *)
   let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
   (* insert [__e_acsl_sound_verdict] at the beginning *)
-  let sg = GVarDecl(Lazy.force sound_verdict_vi, Fileloc.unknown) in
+  let sg = GVarDecl(Lazy.force sound_verdict_vi, Options.gen_loc) in
   file.globals <- sg :: globals
 
 let prepare () =

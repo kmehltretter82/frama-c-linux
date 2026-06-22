@@ -149,7 +149,7 @@ let addTermOffsetLval toadd (b, off) : term_lval =
 (* empty line for ocamldoc *)
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-let term ?(loc=Fileloc.unknown) term typ =
+let term ?(loc=Kernel.gen_loc) term typ =
   { term_node = term;
     term_type = typ;
     term_name = [];
@@ -225,10 +225,7 @@ let rec is_exit_status t = match t.term_node with
 (** {2 Predicate constructors} *)
 (* empty line for ocamldoc *)
 
-let generated_loc =
-  let p = Filepos.generated "kernel" in (p,p)
-
-let pred ?(loc=generated_loc) ?(names=[]) p =
+let pred ?(loc=Kernel.gen_loc) ?(names=[]) p =
   { pred_content = p ; pred_loc = loc ; pred_name = names }
 
 let unnamed ?loc p = pred ?loc p
@@ -279,7 +276,7 @@ let pxor ?loc ?(names=[]) (p1, p2) =
   in
   prepend_names ~names p
 
-let pnot ?(loc=Fileloc.unknown) ?(names=[]) p2 =
+let pnot ?(loc=Kernel.gen_loc) ?(names=[]) p2 =
   let p =
     match p2.pred_content with
     | Ptrue -> { p2 with pred_content = Pfalse; pred_loc = loc }
@@ -300,7 +297,7 @@ let plet ?loc ?(names=[]) v p = match p.pred_content with
   | Ptrue -> prepend_names ~names p
   | _ -> pred ?loc ~names (Plet (v, p))
 
-let pimplies ?(loc=Fileloc.unknown) ?(names=[]) (p1,p2) =
+let pimplies ?(loc=Kernel.gen_loc) ?(names=[]) (p1,p2) =
   let p =
     match p1.pred_content, p2.pred_content with
     | Ptrue, _ | _, Ptrue -> p2

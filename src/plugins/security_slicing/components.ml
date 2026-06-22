@@ -194,7 +194,7 @@ module NodeKf = Datatype.Pair(PdgTypes.Node)(Kernel_function)
                   (spec,
                    Cil_datatype.Varinfo.dummy,
                    None,
-                   Fileloc.unknown);
+                   Security_slicing_parameters.generated);
               return_stmt = None;
               spec = Cil.empty_funspec () } };
       local_tbl = Nodekfs.create 0;

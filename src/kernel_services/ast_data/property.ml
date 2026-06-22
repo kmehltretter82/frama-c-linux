@@ -341,7 +341,7 @@ let rec location = function
       match Cil_datatype.Code_annotation.loc ca with
       | None -> Cil_datatype.Stmt.loc s
       | Some loc -> loc)
-  | IPReachable {ir_kf=None; ir_kinstr=Kglobal} -> Fileloc.unknown
+  | IPReachable {ir_kf=None; ir_kinstr=Kglobal} -> Kernel.gen_loc
   | IPAssigns {ias_kf=kf; ias_kinstr=ki; ias_froms=a} ->
     (match a with
      | [] -> loc_of_kf_ki kf ki
@@ -355,11 +355,11 @@ let rec location = function
   | IPDecrease {id_variant=(t, _)} -> t.term_loc
   | IPAxiomatic {iax_props} ->
     (match iax_props with
-     | [] -> Fileloc.unknown
+     | [] -> Kernel.gen_loc
      | p :: _ -> location p)
   | IPModule {im_props} ->
     (match im_props with
-     | [] -> Fileloc.unknown
+     | [] -> Kernel.gen_loc
      | p :: _ -> location p)
   | IPLemma {il_loc} -> il_loc
   | IPExtended {ie_ext={ext_loc}} -> ext_loc
@@ -368,7 +368,7 @@ let rec location = function
 
 let source ip =
   let loc = location ip in
-  if Fileloc.equal loc Fileloc.unknown
+  if Fileloc.is_empty loc
   then None
   else Some (fst loc)
 
@@ -600,7 +600,7 @@ let reprs = [
     il_name="";il_labels=[];il_args=[];
     il_pred=Logic_const.(toplevel_predicate ptrue);
     il_attrs=[];
-    il_loc=Fileloc.unknown
+    il_loc=Kernel.gen_loc
   }]
 
 let compare_behavior_or_loop b1 b2 =

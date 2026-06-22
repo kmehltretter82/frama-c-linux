@@ -11,5 +11,7 @@
 open Parameter_sig
 include Log.Messages
 
+val gen_loc: Fileloc.t
+
 module Enabled : Bool
 module Assert : Bool

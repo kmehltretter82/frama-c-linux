@@ -490,7 +490,7 @@ let fallback alt =
   | Strategy s -> resolve_strategy s
   | Tactic _ | Auto _ | Provers _ -> None
   | Default ->
-    let loc = Filepos.(unknown, unknown) in
+    let loc = Wp_parameters.gen_loc in
     Some {
       name = { value = "\\default" ; loc } ;
       alternatives =

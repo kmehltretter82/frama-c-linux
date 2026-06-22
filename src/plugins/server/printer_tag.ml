@@ -483,9 +483,9 @@ let loc_of_localizable = function
   | PGlobal g -> Global.loc g
   | (PLval _ | PTermLval _ | PExp _) as localize ->
     (match kf_of_localizable localize with
-     | None -> Fileloc.unknown
+     | None -> Kernel.gen_loc
      | Some kf -> Kernel_function.get_location kf)
-  | PType _ -> Fileloc.unknown
+  | PType _ -> Kernel.gen_loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Helper for Globals                                                 --- *)

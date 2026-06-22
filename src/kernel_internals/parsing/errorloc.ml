@@ -285,8 +285,8 @@ let pp_context_from_file ?(ctx=2) fmt ppc_loc =
   let (ppc_start, ppc_end) = ppc_loc in
   try
     match Filepos.origin ppc_start, Filepos.origin ppc_end with
-    | (Unknown | Generated _), _ | _, (Unknown | Generated _) ->
-      (* Do not print context for unknown locations *)
+    | Generated _, _ | _, Generated _ ->
+      (* Do not print context for generated locations *)
       ()
 
     | Preprocessed orig_start, Preprocessed orig_end

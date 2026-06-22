@@ -1238,7 +1238,7 @@ module Consolidation = struct
   let get_conjunction ppts =
     let tmp =
       Property.(
-        ip_other "$Feedback.tmp$" (OLGlob Fileloc.unknown))
+        ip_other "$Feedback.tmp$" (OLGlob Kernel.gen_loc))
     in
     logical_consequence Emitter.kernel tmp ppts;
     let s = get tmp in

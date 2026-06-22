@@ -266,8 +266,8 @@ type position = {
 (** Empty position, used as 'dummy' for [Cil_datatype.Position].
     @since 30.0-Zinc *)
 val empty_pos : position
-[@@deprecated "use Filepos.unknown instead"]
-[@@migrate { repl = Filepos.unknown } ]
+[@@deprecated "use generated location, either from your plug-in via Self.gen_loc or Kernel.gen_loc."]
+[@@migrate { repl = Kernel.gen_loc } ]
 
 (** Pretty-prints a position, in the format file:line.
     @since 18.0-Argon *)
@@ -278,5 +278,5 @@ val pp_pos : Format.formatter -> position -> unit
 (** Return true if the given position is the empty position.
     @since 30.0-Zinc *)
 val is_empty_pos : position -> bool
-[@@deprecated "use Filepos.is_unknown instead"]
-[@@migrate { repl = Filepos.is_unknown } ]
+[@@deprecated "use Filepos.is_empty instead"]
+[@@migrate { repl = Filepos.is_empty } ]

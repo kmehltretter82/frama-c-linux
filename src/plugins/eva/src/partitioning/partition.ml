@@ -81,7 +81,7 @@ module SplitMonitor = Datatype.Make_with_collections (
     let reprs = [{
         split_term = Expression (List.hd Eva_ast.Exp.reprs);
         split_kind = Static;
-        split_loc = Fileloc.unknown;
+        split_loc = Self.gen_loc;
         split_limit = 0;
         split_values = Z.Set.empty
       }]

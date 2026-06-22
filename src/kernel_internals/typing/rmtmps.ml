@@ -698,7 +698,7 @@ let labelsToKeep is_removable ll =
       let newlabel', rest' = loop newlabel rest in
       newlabel', (if keepl then l :: rest' else rest')
   in
-  loop ("", Label("", Fileloc.unknown, false)) ll
+  loop ("", Label("", Kernel.gen_loc, false)) ll
 
 class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
   let keep_label dest =
