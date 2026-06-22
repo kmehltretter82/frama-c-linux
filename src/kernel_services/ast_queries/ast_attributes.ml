@@ -233,6 +233,7 @@ let fc_literal           = "fc_literal"
 let frama_c_destructor   = "fc_destructor"
 let fc_oldstyleproto     = "FC_OLDSTYLEPROTO"
 let fc_missingproto      = "missingproto"
+let fc_builtin           = "FC_BUILTIN"
 
 let () =
   register_list ~print:false ~ignore:true (AttrName false)
@@ -249,6 +250,10 @@ let () =
 let () =
   register_list ~ignore:true (AttrName false)
     [fc_oldstyleproto; fc_missingproto]
+
+let () =
+  register_list (AttrName true)
+    [fc_builtin]
 
 (* AttFuntype attributes. *)
 

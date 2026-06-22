@@ -5,24 +5,6 @@
   struct a {
      int b ;
   };
-  /* compiler builtin: 
-     void __builtin_c23_va_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     __builtin_va_list __builtin_next_arg(void);   */
-  /* compiler builtin: 
-     unsigned int __builtin_offsetof(unsigned int);   */
-  /* compiler builtin: 
-     void __builtin_stdarg_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_arg(__builtin_va_list, unsigned int, void *);   */
-  /* compiler builtin: 
-     void __builtin_va_copy(__builtin_va_list, __builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_end(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_varargs_start(__builtin_va_list);   */
   static struct a __constr_expr_0 = {.b = 1};
   struct a *d[1] = {& __constr_expr_0};
   static struct a __constr_expr_1 = {.b = 2};
@@ -42,24 +24,6 @@
   struct a {
      int b ;
   };
-  /* compiler builtin: 
-     void __builtin_c23_va_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     __builtin_va_list __builtin_next_arg(void);   */
-  /* compiler builtin: 
-     unsigned int __builtin_offsetof(unsigned int);   */
-  /* compiler builtin: 
-     void __builtin_stdarg_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_arg(__builtin_va_list, unsigned int, void *);   */
-  /* compiler builtin: 
-     void __builtin_va_copy(__builtin_va_list, __builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_end(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_va_start(__builtin_va_list);   */
-  /* compiler builtin: 
-     void __builtin_varargs_start(__builtin_va_list);   */
   static struct a __constr_expr_0 = {.b = 1};
   struct a *d[1] = {& __constr_expr_0};
   static struct a __constr_expr_1 = {.b = 5};

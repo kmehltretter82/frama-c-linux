@@ -272,7 +272,7 @@ let translate_variadics (file : file) =
       begin match exp.enode with
         | AddrOf (Var vi, NoOffset)
           when Ast_types.C.is_variadic vi.vtype
-            && Classify.is_frama_c_builtin vi ->
+            && Ast_info.is_frama_c_builtin vi ->
           Kernel.not_yet_implemented
             ~source:(fst exp.eloc)
             "Option %s doesn't handle calls to a pointer to the \

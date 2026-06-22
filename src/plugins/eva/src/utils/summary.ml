@@ -229,7 +229,7 @@ end
 
 let consider_function vi =
   vi.Cil_types.vdefined &&
-  not (Cil_builtins.is_builtin vi || Cil.is_in_libc vi.vattr)
+  not (Ast_info.is_frama_c_builtin vi || Cil.is_in_libc vi.vattr)
 
 let compute_events () =
   let eva = Events.make () and kernel = Events.make () in

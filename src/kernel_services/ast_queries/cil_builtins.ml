@@ -28,10 +28,7 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let has_fc_builtin_attr v = Ast_attributes.contains "FC_BUILTIN" v.vattr
-
-let is_unused_builtin v = has_fc_builtin_attr v && not v.vreferenced
-
+let has_fc_builtin_attr v = Ast_attributes.(contains fc_builtin v.vattr)
 
 (* [VP] Should we projectify this ?*)
 let special_builtins_table = ref Datatype.String.Set.empty
@@ -40,8 +37,6 @@ let special_builtins = Queue.create ()
 let is_special_builtin s =
   Queue.fold (fun res f -> res || f s) false special_builtins
 
-let is_builtin v =
-  has_fc_builtin_attr v || is_special_builtin v.vname
 
 let add_special_builtin_family f = Queue.add f special_builtins
 
@@ -71,8 +66,6 @@ module Builtin_functions =
    [b] is true if the built-in is variadic, false otherwise. *)
 let add_builtin ?(prefix="__builtin_") s t l b =
   Builtin_functions.add (prefix ^ s) (t, l, b)
-
-let () = Ast_attributes.register (AttrName true) "FC_BUILTIN"
 
 let custom_builtins = Queue.create ()
 
@@ -397,3 +390,14 @@ let builtinLoc: Fileloc.t = Kernel.gen_loc
 let () =
   Machine.init_builtins_ref := init_builtins
 [@@alert "-machine_init_builtins_ref"]
+
+let is_builtin v =
+  has_fc_builtin_attr v
+  (* No need to check Frama_c_builtins state as it only contains functions with
+     the FC_BUILTIN attribute *)
+  || is_special_builtin v.vname
+  || Builtin_functions.mem v.vname
+  || Builtin_templates.mem v.vname
+
+let is_unused_builtin v = is_builtin v && not v.vreferenced
+

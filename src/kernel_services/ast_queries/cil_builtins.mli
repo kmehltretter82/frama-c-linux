@@ -29,18 +29,26 @@ module Frama_c_builtins:
   State_builder.Hashtbl with type key = string and type data = varinfo
 
 val is_builtin: varinfo -> bool
-(** @return true if {!has_fc_builtin_attr} or {!is_special_builtin} are true.
-    @before 29.0-Copper Only check for {!has_fc_builtin_attr}.
-    @since Fluorine-20130401 *)
-
-val has_fc_builtin_attr: varinfo -> bool
-(** @return true if the given variable has a FC_BUILTIN attribute
-    @since 29.0-Copper *)
+(** @return true if the given [varinfo] is a builtin. Are considered builtins:
+    - [varinfo]s with a [FC_BUILTIN] attribute ({!has_fc_builtin_attr} returns
+      true;
+    - the name has been registered as a special builtin ({!is_special_builtin}
+      returns true);
+    - the name has been registered in the {!Builtin_functions} state;
+    - the name has been registered in the {!Builtin_templates} state.
+      @before 29.0-Copper Only check for {!has_fc_builtin_attr}.
+      @before Frama-C+dev Only check for {!has_fc_builtin_attr} and
+                        {!is_special_builtin}.
+      @since Fluorine-20130401 *)
 
 val is_unused_builtin: varinfo -> bool
 (** @return true if the given variable refers to a Frama-C builtin that
     is not used in the current program. Plugins may (and in fact should)
     hide this builtin from their outputs *)
+
+val has_fc_builtin_attr: varinfo -> bool
+(** @return true if the given variable has a FC_BUILTIN attribute
+    @since 29.0-Copper *)
 
 val is_special_builtin: string -> bool
 (** @return [true] if the given name refers to a special built-in function.
