@@ -14,11 +14,11 @@
 )
 
 (rule
- (alias run-kernel-tests)
+ (alias runtest-parsing)
  (deps ../logic_parser.mly)
  (action  (run %{dep:./check_logic_parser.exe})))
 
 (alias
-  (deps (alias run-kernel-tests) )
-  (name ptests)
+  (deps (alias runtest-parsing) )
+  (name runtest)
 )

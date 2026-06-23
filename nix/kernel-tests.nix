@@ -14,7 +14,7 @@ mk_tests {
       @tests/spec/ptests \
       @tests/syntax/ptests \
       @tests/variadic/ptests \
-      @src/kernel_internals/parsing/tests/ptests
+      @src/kernel_internals/parsing/tests/runtest
     dune runtest -j1 \
       tests
     dune build @runtest-frama_c_kernel
