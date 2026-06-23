@@ -630,7 +630,9 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       (* Coerce e2 to mp_bitcnt_t *)
       let coerce_guard_cond, env =
-        if Options.Optimisations.Omit_rte.get () then None, env else
+        if Options.Optimisations.Omit_rte.get ()
+        then None, env
+        else
           let max_bitcnt =
             Cil.lconstant ~loc @@
             Cil.max_unsigned_number @@ Cil.bitsSizeOf @@ Gmp_types.bitcnt_t ()

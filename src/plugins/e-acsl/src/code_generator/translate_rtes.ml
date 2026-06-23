@@ -12,7 +12,9 @@ open Cil_types
 let dkey = Options.Dkey.translation
 
 let rte_annots pp elt kf env l =
-  if Options.Optimisations.Omit_rte.get () then env else
+  if Options.Optimisations.Omit_rte.get ()
+  then env
+  else
     let old_kind = Env.annotation_kind env in
     let env = Env.set_annotation_kind env RTE in
     let env =

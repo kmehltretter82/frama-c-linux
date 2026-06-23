@@ -75,7 +75,10 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let pp = match pp with Some size_pp -> size_pp | None -> t in
   let sizet = Machine.sizeof_type () in
   let stmts = [] in
-  let stmts, env = if Options.Optimisations.Omit_rte.get () then stmts, env else
+  let stmts, env =
+    if Options.Optimisations.Omit_rte.get ()
+    then stmts, env
+    else
       (* Lower guard *)
       let stmts, env =
         if check_lower_bound then begin
