@@ -1,0 +1,62 @@
+[kernel] stable_sort.c:45: Warning: 
+  parsing obsolete ACSL construct '\valid_range(addr,min,max)'. '\valid(addr+(min..max))' should be used instead.
+[e-acsl] beginning translation.
+[e-acsl:analysis:inductive] no valid mode found for: Permut
+[e-acsl] Warning: Unable to extract executable code from inductive definition of Permut.
+  See language reference manual for details on the supported forms.
+[e-acsl] stable_sort.c:63: Warning: 
+  E-ACSL construct `@[invariant applied only on some behaviors@]'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:59: Warning: 
+  E-ACSL construct `@[invariant applied only on some behaviors@]'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:77: Warning: 
+  E-ACSL construct `@[invariant applied only on some behaviors@]'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:73: Warning: 
+  E-ACSL construct `@[invariant applied only on some behaviors@]'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:88: Warning: 
+  E-ACSL construct `predicates with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:47: Warning: 
+  no assigns clause generated for function Sorted because pointers as arguments is not yet supported
+[e-acsl] stable_sort.c:49: Warning: 
+  E-ACSL construct `predicates with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] stable_sort.c:39: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] stable_sort.c:37: Warning: 
+  E-ACSL construct `predicates with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[eva:alarm] stable_sort.c:63: Warning: loop invariant got status unknown.
+[eva:alarm] stable_sort.c:77: Warning: loop invariant got status unknown.
+[eva:alarm] stable_sort.c:80: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:73: Warning: loop invariant got status unknown.
+[eva:alarm] stable_sort.c:35: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:37: Warning: 
+  function __gen_e_acsl_swap: postcondition got status unknown.
+[eva:alarm] stable_sort.c:88: Warning: assertion got status unknown.
+[eva:alarm] stable_sort.c:59: Warning: loop invariant got status unknown.
+[eva:alarm] stable_sort.c:70: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:70: Warning: loop invariant got status unknown.
+[eva:alarm] stable_sort.c:66: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:32: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:32: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:47: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:47: Warning: 
+  function __gen_e_acsl_min_sort, behavior sorted: postcondition got status unknown.
+[eva:alarm] stable_sort.c:49: Warning: 
+  function __gen_e_acsl_min_sort, behavior permutation: postcondition got status unknown.
