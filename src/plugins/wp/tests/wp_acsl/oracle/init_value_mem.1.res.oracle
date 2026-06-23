@@ -19,13 +19,13 @@ Goal Post-condition 'P' in 'main':
 Assume {
   Type: IsS1_St(v) /\ IsS1_St(w).
   (* Initializer *)
-  Init: v.F1_St_a = 1.
+  Init: v.a = 1.
   (* Initializer *)
-  Init: v.F1_St_b = 2.
+  Init: v.b = 2.
   (* Initializer *)
-  Init: w.F1_St_a = 1.
+  Init: w.a = 1.
   (* Initializer *)
-  Init: w.F1_St_b = 2.
+  Init: w.b = 2.
 }
 Prove: EqS1_St(v, w).
 
@@ -38,9 +38,9 @@ init_value_mem.i:24: warning from Empty Model:
 Assume {
   Type: IsS1_St(w_1).
   (* Initializer *)
-  Init: w_1.F1_St_a = 1.
+  Init: w_1.a = 1.
   (* Initializer *)
-  Init: w_1.F1_St_b = 2.
+  Init: w_1.b = 2.
 }
 Prove: EqS1_St(w, w_1).
 

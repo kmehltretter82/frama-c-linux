@@ -62,7 +62,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'Pload' in 'call_on_array_in_struct_global':
-Let a = s.F2_S_tab.
+Let a = s.tab.
 Assume {
   (* Heap *)
   Type: IsS2_S(s).
@@ -150,9 +150,9 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_1_5' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (v[i_1].F1_T_a = 0))).
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (v[i_1].a = 0))).
 }
-Prove: v[i].F1_T_a = 0.
+Prove: v[i].a = 0.
 
 ------------------------------------------------------------
 
@@ -192,13 +192,12 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      (ts_0[i_1].F1_T_a = 0))).
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (ts_0[i_1].a = 0))).
   (* Call Effects *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) ->
       (((i_1 < 0) \/ (5 <= i_1)) -> (ts_1[i_1] = ts_0[i_1])))).
 }
-Prove: ts_0[i].F1_T_a = 0.
+Prove: ts_0[i].a = 0.
 
 ------------------------------------------------------------
 
@@ -239,11 +238,11 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (m[i_1].F1_T_a = 0))).
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) -> (m[i_1].a = 0))).
   (* Call Effects *)
   Have: forall i_1 : Z. ((i_1 != 1) -> (smatrix_1[i_1] = smatrix_0[i_1])).
 }
-Prove: m[i].F1_T_a = 0.
+Prove: m[i].a = 0.
 
 ------------------------------------------------------------
 

@@ -173,9 +173,8 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: (Init_s_0.Init_F1_S_i=true) /\
-    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-     (Init_s_0.Init_F1_S_a[i_2]=true)))).
+Prove: (Init_s_0.i=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (Init_s_0.a[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -273,44 +272,40 @@ Assume {
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (v[i_2]=true))).
   (* Loop assigns ... *)
-  Have: (s.F1_S_i = 0) /\
+  Have: (s.i = 0) /\
       (forall i_2 : Z. ((i_2 != 0) -> ((i_2 != 2) -> ((i_2 != 4) ->
-       ((0 <= i_2) -> ((i_2 <= 9) -> (s.F1_S_a[i_2] = v_1[i_2]))))))).
+       ((0 <= i_2) -> ((i_2 <= 9) -> (s.a[i_2] = v_1[i_2]))))))).
   (* Invariant *)
-  Have: (Init_s_1.Init_F1_S_i=true) /\
+  Have: (Init_s_1.i=true) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-       (Init_s_1.Init_F1_S_a[i_2]=true)))).
+       (Init_s_1.a[i_2]=true)))).
   (* Then *)
   Have: i_1 <= 9.
   If i_1 = 0
   Then {
     Have: Init_s_1 = Init_s_2.
-    Have: { Init_s_2 with Init_F1_S_a = Init_s_2.Init_F1_S_a[0 <- true] } =
-        Init_s_0.
+    Have: { Init_s_2 with a = Init_s_2.a[0 <- true] } = Init_s_0.
   }
   Else {
     Have: (Init_s_1 = Init_s_3) /\ (s = s_1).
     If i_1 = 2
     Then {
       Have: (Init_s_3 = Init_s_4) /\ (s_1 = s_2).
-      Have: { Init_s_4 with Init_F1_S_a = Init_s_4.Init_F1_S_a[2 <- true] } =
-          Init_s_0.
+      Have: { Init_s_4 with a = Init_s_4.a[2 <- true] } = Init_s_0.
     }
     Else {
       Have: (Init_s_3 = Init_s_5) /\ (s_1 = s_3).
       If i_1 = 4
       Then {
         Have: Init_s_5 = Init_s_6.
-        Have: { Init_s_6 with Init_F1_S_a = Init_s_6.Init_F1_S_a[4 <- true] } =
-            Init_s_0.
+        Have: { Init_s_6 with a = Init_s_6.a[4 <- true] } = Init_s_0.
       }
       Else { Have: Init_s_5 = Init_s_0. }
     }
   }
 }
-Prove: (Init_s_0.Init_F1_S_i=true) /\
-    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-     (Init_s_0.Init_F1_S_a[i_2]=true)))).
+Prove: (Init_s_0.i=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (Init_s_0.a[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -345,9 +340,9 @@ Assume {
   (* Invariant *)
   Have: forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) -> (v[i_5]=true))).
   (* Loop assigns ... *)
-  Have: (s.F1_S_i = 0) /\
+  Have: (s.i = 0) /\
       (forall i_5 : Z. ((i_5 != 0) -> ((i_5 != 2) -> ((i_5 != 4) ->
-       ((0 <= i_5) -> ((i_5 <= 9) -> (s.F1_S_a[i_5] = v_1[i_5]))))))).
+       ((0 <= i_5) -> ((i_5 <= 9) -> (s.a[i_5] = v_1[i_5]))))))).
   (* Then *)
   Have: i_3 <= 9.
   If i_3 = 0
@@ -450,9 +445,8 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: (Init_s_0.Init_F1_S_i=true) /\
-    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-     (Init_s_0.Init_F1_S_a[i_2]=true)))).
+Prove: (Init_s_0.i=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (Init_s_0.a[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -534,9 +528,8 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: (Init_s_0.Init_F1_S_i=true) /\
-    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-     (Init_s_0.Init_F1_S_a[i_2]=true)))).
+Prove: (Init_s_0.i=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (Init_s_0.a[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -696,7 +689,7 @@ Prove: (v[i]=true).
 ------------------------------------------------------------
 
 Goal Preservation of Invariant ("assigned_initialized_memvar.i", line 37, characters 20-36):
-Let a = Init_s_0.Init_F1_S_a.
+Let a = Init_s_0.a.
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i).
   (* Residual *)
@@ -712,11 +705,11 @@ Assume {
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (v[i_2]=true))).
   (* Loop assigns ... *)
-  Have: (s.F1_S_i = 0) /\
+  Have: (s.i = 0) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-       (((i_2 <= 0) \/ (5 <= i_2)) -> (s.F1_S_a[i_2] = v_1[i_2]))))).
+       (((i_2 <= 0) \/ (5 <= i_2)) -> (s.a[i_2] = v_1[i_2]))))).
   (* Invariant *)
-  Have: (Init_s_0.Init_F1_S_i=true) /\
+  Have: (Init_s_0.i=true) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (a[i_2]=true)))).
   (* Then *)
   Have: i <= 9.

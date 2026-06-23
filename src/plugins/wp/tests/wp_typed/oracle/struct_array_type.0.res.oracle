@@ -26,17 +26,13 @@ theory S1_s
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use map.Map *)
-  
-  type S1_s =
-    | S1_s1 (F1_s_a:int -> int) (F1_s_b:int -> int)
+  (* use wp.generated.S *)
   
   (* use wp.generated.Matrix *)
   
-  predicate IsS1_s (s:S1_s) =
-    IsArray_sint32 (F1_s_a s) /\ IsArray_sint32 (F1_s_b s)
+  predicate IsS1_s (s:s) = IsArray_sint32 (a s) /\ IsArray_sint32 (b s)
   
-  predicate IsArray_S1_s (t:int -> S1_s) = forall i:int. IsS1_s (get t i)
+  predicate IsArray_S1_s (t:int -> s) = forall i:int. IsS1_s (get t i)
   
 end
 [wp:print-generated] 
@@ -44,23 +40,25 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
+    (* use wp.generated.S *)
+    
     (* use wp.generated.S1_s *)
     
   end
   
   goal wp :
-    forall i:int, t:int -> S1_s.
-     let a = get t i in
-     let a1 = get (F1_s_b a) 0 in
-     let a2 = get (F1_s_a a) 0 in
-     let a3 = 2 * a2 in
+    forall i:int, t:int -> s.
+     let a1 = get t i in
+     let a2 = get (b a1) 0 in
+     let a3 = get (a a1) 0 in
+     let a4 = 2 * a3 in
      0 <= i ->
-     a1 < a2 ->
+     a2 < a3 ->
      i <= 9 ->
      IsArray_S1_s t ->
      is_uint32 i ->
-     is_sint32 a2 ->
-     is_sint32 a1 -> is_sint32 ((1 + ((- 1) * a1)) + a3) -> (2 * a1) <= a3
+     is_sint32 a3 ->
+     is_sint32 a2 -> is_sint32 ((1 + ((- 1) * a2)) + a4) -> (2 * a2) <= a4
 [wp] 1 goal generated
 ------------------------------------------------------------
   Function f
@@ -75,12 +73,10 @@ Cluster Matrix {
 
 Cluster S1_s {
   
-  Type S1_s = { F1_s_a : int[]; F1_s_b : int[]; }
+  Predicate IsArray_S1_s (T_0 : s[]) = forall i_0:int. (IsS1_s T_0[i_0])
   
-  Predicate IsArray_S1_s (T_0 : S1_s[]) = forall i_0:int. (IsS1_s T_0[i_0])
-  
-  Predicate IsS1_s (S_0 : S1_s)
-    = (IsArray_sint32 S_0.F1_s_a) /\ (IsArray_sint32 S_0.F1_s_b)
+  Predicate IsS1_s (S_0 : s)
+    = (IsArray_sint32 S_0.a) /\ (IsArray_sint32 S_0.b)
   
 }
 
@@ -92,8 +88,8 @@ Prover CFG returns Valid
 
 Goal Post-condition ("struct_array_type.i", line 16, characters 12-39) in 'f':
 Let a = t[SynchroId_0].
-Let a_1 = a.F1_s_b[0].
-Let a_2 = a.F1_s_a[0].
+Let a_1 = a.b[0].
+Let a_2 = a.a[0].
 Let a_3 = 2 * a_2.
 Assume {
   Type: is_uint32(SynchroId_0) /\ is_sint32(a_2) /\ is_sint32(a_1) /\

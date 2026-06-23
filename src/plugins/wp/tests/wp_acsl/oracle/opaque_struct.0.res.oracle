@@ -122,11 +122,9 @@ Prove: true.
 
 Goal Check 'fail' ("opaque_struct.i", line 69, characters 19-37):
 Let x = Mint_0[p].
-Let m = memcpy(Mint_0, a, Mint_undef_0, a, Length_of_S1_S).
-Let a_1 = m[p].
+Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, Length_of_S1_S)[p].
 Assume {
-  Type: is_sint32_chunk(Mint_0) /\ is_sint32(x) /\ is_sint32_chunk(m) /\
-      is_sint32(a_1).
+  Type: is_sint32(x) /\ is_sint32(a_1).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
       (region(p.base) <= 0).
@@ -152,11 +150,9 @@ Prove: of_f32(memcpy(Mf32_0, a, Mf32_undef_0, a, Length_of_S1_S)[q])
 
 Goal Check 'succeed' ("opaque_struct.i", line 71, characters 23-41):
 Let x = Mchar_0[c].
-Let m = memcpy(Mchar_0, a, Mchar_undef_0, a, Length_of_S1_S).
-Let a_1 = m[c].
+Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, Length_of_S1_S)[c].
 Assume {
-  Type: is_sint8_chunk(Mchar_0) /\ is_sint8(x) /\ is_sint8_chunk(m) /\
-      is_sint8(a_1).
+  Type: is_sint8(x) /\ is_sint8(a_1).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\ sconst(Mchar_0).
   (* Pre-condition *)
