@@ -195,19 +195,16 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     let sizet = Machine.sizeof_type () in
     let sizet_kind = Machine.sizeof_kind () in
     let check_lower_bound, check_upper_bound =
-      let lower, upper =
-        match nty with
-        | C_integer t_kind -> check_integer_bounds ~from:t_kind sizet_kind
-        | C_float _ -> true, true
-        | _ -> assert false
-      in
-      lower && check_lower_bound, upper
-    in
-    let check_lower_bound =
-      check_lower_bound && not @@ Options.Optimisations.Omit_rte.get ()
-    in
-    let check_upper_bound =
-      check_upper_bound && not @@ Options.Optimisations.Omit_rte.get ()
+      if Options.Optimisations.Omit_rte.get ()
+      then false, false
+      else
+        let lower, upper =
+          match nty with
+          | C_integer t_kind -> check_integer_bounds ~from:t_kind sizet_kind
+          | C_float _ -> true, true
+          | _ -> assert false
+        in
+        lower && check_lower_bound, upper
     in
     let stmts, env =
       if check_lower_bound then begin

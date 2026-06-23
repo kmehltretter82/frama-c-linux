@@ -151,7 +151,7 @@ module O = Int (struct
                 1: constant-time optimisations. \
                 2: moderate-cost optimisations. \
                 3: aggressive optimisations (which may even exploit \
-                undefined behaviours in specification)."
+                undefined behaviours in the annotations)."
   end)
 let () = O.set_range ~min:0 ~max:3
 
@@ -173,7 +173,7 @@ module Optimisations = struct
       set_negative_option_help ("opposite of -e-acsl-O-" ^ C.name)
     module Res = Bool (struct
         let option_name = "-e-acsl-O-" ^ C.name
-        let help = "(O ≥ " ^ string_of_int C.level ^ ") activate " ^ C.descr
+        let help = Format.asprintf "(O %t %d) %s" Unicode.pp_ge C.level C.descr
         let default = O.get_default () >= C.level
       end)
     let () = O.add_update_hook
@@ -185,7 +185,7 @@ module Optimisations = struct
     Make (struct
       let name = "hyp-gath"
       let level = 1
-      let descr = "hypothesis gathering during inductive extraction"
+      let descr = "hypothesis gathering (in inductive extraction)"
     end)
 
   module Omit_rte =
