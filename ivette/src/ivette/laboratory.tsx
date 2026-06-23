@@ -519,9 +519,8 @@ function reorderTabs(keys: tabKey[]): void {
   const state = LAB.getValue();
   // The current map insertion order is the current tab order.
   const current = Array.from(state.tabs.keys());
-  // Avoid forcing a state update when DnD reports the same order.
+  // Avoid forcing a state update on same order.
   if (equal(current, keys)) return;
-  // Rebuild the tabs map so its insertion order follows the DnD order.
   const tabs = changeTabOrder(state.tabs, keys);
   LAB.setValue({ ...state, tabs }, true);
 }
@@ -1275,21 +1274,21 @@ function ViewBar(): JSX.Element {
   const allGroups = groups.concat(Sandbox);
 
   return (<>
-      <Sidebars.SidebarTitle label='Views & Components' />
-      <div className="globals-scrollable-area">
-        <ViewSection key='views' />
-        {groups.map((group) =>
-          <GroupSection
-            key={group.id}
-            filter={inGroup(group)} {...group} />)}
+    <Sidebars.SidebarTitle label='Views & Components' />
+    <div className="globals-scrollable-area">
+      <ViewSection key='views' />
+      {groups.map((group) =>
         <GroupSection
-          key='components'
-          filter={inNoGroup(allGroups)} {...Components} />
-        <GroupSection
-          key='sandbox'
-          filter={inGroup(Sandbox)} {...Sandbox} />
-      </div>
-    </>
+          key={group.id}
+          filter={inGroup(group)} {...group} />)}
+      <GroupSection
+        key='components'
+        filter={inNoGroup(allGroups)} {...Components} />
+      <GroupSection
+        key='sandbox'
+        filter={inGroup(Sandbox)} {...Sandbox} />
+    </div>
+  </>
   );
 }
 
@@ -1438,8 +1437,7 @@ export function Tabs(): JSX.Element {
   const [{ tabKey, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
   // Shared ordered key list for rendering, resize updates, and DnD control.
-  // Memoization gives DnD.List a stable array until the tab map changes.
-  const keys = React.useMemo(() => Array.from(tabs.keys()), [tabs]);
+  const tabKeys = React.useMemo(() => Array.from(tabs.keys()), [tabs]);
 
   // Holds the DOM node whose scrollLeft position is controlled by arrows.
   const viewportRef = React.useRef<HTMLDivElement>(null);
@@ -1493,10 +1491,13 @@ export function Tabs(): JSX.Element {
     // The tabsrow node determines the full width occupied by tab buttons.
     const tabsrow = tabsRowRef.current;
     if (!viewport) return undefined;
+
     // Initialize button states immediately after the DOM nodes are available.
     updateScrollButtons();
+
     // Window resizing changes how many tabs fit in the viewport.
     window.addEventListener('resize', updateScrollButtons);
+
     // ResizeObserver catches layout and tab-content changes without polling.
     const observer =
       typeof ResizeObserver !== "undefined"
@@ -1506,13 +1507,12 @@ export function Tabs(): JSX.Element {
     observer?.observe(viewport);
     // Observe tabsrow width changes, such as opening or closing tabs.
     if (tabsrow) observer?.observe(tabsrow);
+
     return () => {
-      // Remove the global listener when the effect is rebuilt or unmounted.
       window.removeEventListener("resize", updateScrollButtons);
-      // Stop observing DOM nodes that belong to this render.
       observer?.disconnect();
     };
-  }, [keys, updateScrollButtons]);
+  }, [tabKeys, updateScrollButtons]);
 
   // When selection changes, reveal the selected tab if it is clipped by the
   // horizontal viewport.
@@ -1537,11 +1537,11 @@ export function Tabs(): JSX.Element {
       // Programmatic scrolling does not always fire before the next render.
       updateScrollButtons();
     }
-  }, [tabKey, keys, updateScrollButtons]);
+  }, [tabKey, tabKeys, updateScrollButtons]);
 
-  const items: JSX.Element[] = [];
+  const dndTabViews: JSX.Element[] = [];
   tabs.forEach((tab: TabViewState) =>
-    items.push(
+    dndTabViews.push(
       <DnD.Item key={tab.key} id={tab.key} className="labview-tab-item">
         <div ref={setTabRef(tab.key)} className="labview-tab-anchor">
           <TabView
@@ -1569,8 +1569,8 @@ export function Tabs(): JSX.Element {
         onScroll={updateScrollButtons}
       >
         <div ref={tabsRowRef} className="labview-tabs-content">
-          <DnD.List items={keys} setItems={reorderTabs}>
-            {items}
+          <DnD.List items={tabKeys} setItems={reorderTabs}>
+            {dndTabViews}
           </DnD.List>
         </div>
       </div>
