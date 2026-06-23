@@ -33,7 +33,7 @@
   (optional)
   (public_name frama-c-inout.core)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-from.core)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
   (preprocess (pps frama-c.ppx_z_literals))

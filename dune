@@ -27,7 +27,7 @@
 
 (executable
  (name tests_configurator)
- (libraries dune-configurator str)
+ (libraries dune-configurator)
  (modules tests_configurator))
 
 (rule

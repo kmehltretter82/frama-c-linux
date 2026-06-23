@@ -22,6 +22,13 @@
   I5_nt ∈ {0}
 [eva:progress] Recording results for never_terminate
 [eva:progress] Done for function never_terminate
+[inout] InOut (internal) for function never_terminate:
+  Operational inputs:
+    i1_nt; i2_nt; i3_nt
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    ANYTHING(origin:Unknown)
 [from] Computing for function never_terminate
 [from] Non-terminating function never_terminate (no dependencies)
 [from] Done for function never_terminate
@@ -30,10 +37,3 @@
 [from] Function never_terminate:
   NON TERMINATING - NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
-[inout] InOut (internal) for function never_terminate:
-  Operational inputs:
-    i1_nt; i2_nt; i3_nt
-  Operational inputs on termination:
-    \nothing
-  Sure outputs:
-    ANYTHING(origin:Unknown)

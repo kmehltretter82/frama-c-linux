@@ -126,6 +126,19 @@
   psh ∈ UNINITIALIZED
   i ∈ {3}
   p ∈ {{ &h ; &hh }}
+[inout] Out (internal) for function h:
+    X; XH
+[inout] Out (internal) for function hh:
+    X; XHH
+[inout] Out (internal) for function f:
+    R; n; X; XH; XHH
+[inout] Out (internal) for function retint:
+    __retres
+[inout] Out (internal) for function retshort:
+    __retres
+[inout] Out (internal) for function main:
+    R; n; X; XH; XHH; GLOBAL[0..1]; G; TA; in; pin; sh; psh; tmp; tmp_0; 
+    i; p; tmp_1
 [from] Computing for function h
 [from] Done for function h
 [from] Computing for function hh
@@ -169,16 +182,3 @@
   G FROM v; GLOBAL[2] (and SELF)
   TA FROM c (and SELF)
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function h:
-    X; XH
-[inout] Out (internal) for function hh:
-    X; XHH
-[inout] Out (internal) for function f:
-    R; n; X; XH; XHH
-[inout] Out (internal) for function retint:
-    __retres
-[inout] Out (internal) for function retshort:
-    __retres
-[inout] Out (internal) for function main:
-    R; n; X; XH; XHH; GLOBAL[0..1]; G; TA; in; pin; sh; psh; tmp; tmp_0; 
-    i; p; tmp_1

@@ -10,7 +10,6 @@
 
 (executable
  (name check_logic_parser)
- (libraries unix str)
 )
 
 (rule

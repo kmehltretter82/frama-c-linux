@@ -36,7 +36,7 @@
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries
     frama-c.kernel frama-c-pdg.core frama-c-slicing.core
-    frama-c-callgraph.core frama-c-inout.core frama-c-server.core)
+    frama-c-inout.core frama-c-server.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )

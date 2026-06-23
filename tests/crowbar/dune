@@ -10,7 +10,7 @@
 
 (cram
   (enabled_if (<> %{env:CROWBAR=false} "false"))
-  (deps ../../src/init/boot/empty_file.exe (package frama-c) (package crowbar_utils))
+  (deps (package frama-c) (package crowbar_utils))
 )
 
 (cram

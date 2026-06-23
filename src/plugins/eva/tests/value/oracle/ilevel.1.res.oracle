@@ -45,6 +45,11 @@
   x ∈
    {-101} ∪ [-25..-15] ∪ [0..10] ∪ {12; 17; 25; 40; 41; 42; 53; 64; 72; 81}
     ∪ [99..127] ∪ [129..200] ∪ {303; 404} or UNINITIALIZED
+[inout] Out (internal) for function large_ilevel:
+    Frama_C_entropy_source; i_0; j_0; tmp_0; k_0; a[0..10]; s2; tmp_2; 
+    tmp_3; s1; x; tmp_4; tmp_5; tmp_6
+[inout] Inputs for function large_ilevel:
+    Frama_C_entropy_source; nondet
 [from] Computing for function large_ilevel
 [from] Computing for function Frama_C_interval <-large_ilevel
 [from] Done for function Frama_C_interval
@@ -57,8 +62,3 @@
 [from] Function large_ilevel:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function large_ilevel:
-    Frama_C_entropy_source; i_0; j_0; tmp_0; k_0; a[0..10]; s2; tmp_2; 
-    tmp_3; s1; x; tmp_4; tmp_5; tmp_6
-[inout] Inputs for function large_ilevel:
-    Frama_C_entropy_source; nondet

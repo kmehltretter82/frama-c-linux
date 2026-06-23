@@ -30,16 +30,6 @@
 [from] Computing for function main3
 [from] Done for function main3
 [eva:progress] Done for function main3
-[from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f3 at bts336.i:53:3-10 (by main3):
-  a FROM p; a
-[from] call to f3 at bts336.i:54:3-10 (by main3):
-  b FROM p; b
-[from] call to f3 at bts336.i:55:3-10 (by main3):
-  c FROM p; c
-[from] entry point:
-  \result FROM \nothing
-[from] ====== END OF CALLWISE DEPENDENCIES ======
 [inout] InOut (internal) for function f3:
   Operational inputs:
     p; a; b; c
@@ -54,6 +44,16 @@
     \nothing
   Sure outputs:
     a; b; c
+[from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
+[from] call to f3 at bts336.i:53:3-10 (by main3):
+  a FROM p; a
+[from] call to f3 at bts336.i:54:3-10 (by main3):
+  b FROM p; b
+[from] call to f3 at bts336.i:55:3-10 (by main3):
+  c FROM p; c
+[from] entry point:
+  \result FROM \nothing
+[from] ====== END OF CALLWISE DEPENDENCIES ======
 [slicing] slicing requests in progress...
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...

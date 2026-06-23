@@ -77,6 +77,14 @@
   XHH ∈ {0; 1}
 [eva:final-states] Values at end of function main_uninit:
   NON TERMINATING FUNCTION
+[inout] Out (internal) for function h:
+    X; XH
+[inout] Out (internal) for function hh:
+    X; XHH
+[inout] Out (internal) for function f:
+    R; n; X; XH; XHH
+[inout] Out (internal) for function main_uninit:
+    R; n; X; XH; XHH; GLOBAL[0..2]; G; i; j
 [from] Computing for function h
 [from] Done for function h
 [from] Computing for function hh
@@ -106,11 +114,3 @@
 [from] Function main_uninit:
   NON TERMINATING - NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function h:
-    X; XH
-[inout] Out (internal) for function hh:
-    X; XHH
-[inout] Out (internal) for function f:
-    R; n; X; XH; XHH
-[inout] Out (internal) for function main_uninit:
-    R; n; X; XH; XHH; GLOBAL[0..2]; G; i; j
