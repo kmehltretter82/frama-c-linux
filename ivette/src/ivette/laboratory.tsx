@@ -1474,13 +1474,14 @@ export function Tabs(): JSX.Element {
 
   // Scroll by a viewport-relative distance so the control feels consistent
   // across narrow and wide toolbar layouts.
-  const scrollTabs = React.useCallback((direction: number): void => {
+  const scrollTabs = React.useCallback((direction: 'left' | 'right'): void => {
     const node = viewportRef.current;
     if (!node) return;
+    const sign = direction === 'left' ? -1 : 1;
     // Move by 60% of the visible area, but keep a useful minimum step.
     const distance = Math.max(120, Math.floor(node.clientWidth * 0.6));
     // Negative distances scroll left; positive distances scroll right.
-    node.scrollBy({ left: direction * distance, behavior: 'smooth' });
+    node.scrollBy({ left: sign * distance, behavior: 'smooth' });
   }, []);
 
   // Recompute arrow states when either the available viewport size or the tab
@@ -1560,7 +1561,7 @@ export function Tabs(): JSX.Element {
         icon="ANGLE.LEFT"
         title="Scroll tabs left"
         disabled={!canScrollLeft}
-        onClick={() => scrollTabs(-1)}
+        onClick={() => scrollTabs('left')}
       />
       <div
         // The clipped element that actually scrolls horizontally.
@@ -1579,7 +1580,7 @@ export function Tabs(): JSX.Element {
         icon="ANGLE.RIGHT"
         title="Scroll tabs right"
         disabled={!canScrollRight}
-        onClick={() => scrollTabs(1)}
+        onClick={() => scrollTabs('right')}
       />
     </div>
   );
