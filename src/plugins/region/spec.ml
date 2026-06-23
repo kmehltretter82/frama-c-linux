@@ -206,7 +206,7 @@ let rec parse_region (env:env) p =
     let lv = lpath env p ; parse_lval env p in
     env.rpaths <- Alias(p.lexpr_loc,lv) :: env.rpaths
 
-let parse_case p =
+let parse_datamodel_case p =
   match p.extended_node with
   | Ext_lexpr(e) when e.ext_name = "pinvariant" ->
     ()
@@ -225,7 +225,7 @@ let parse_case p =
       ext.gext_name ;
     ()
 
-let parse_datamodel p =
+let parse_datamodel_component p =
   match p.extended_node with
   | Ext_lexpr(e) when e.ext_name = "pmodel" ->
     ()
@@ -239,7 +239,7 @@ let parse_datamodel p =
       e.ext_name ;
     ()
   | Ext_extension(ext) when ext.gext_name = "pcase" ->
-    List.iter parse_case ext.gext_content ;
+    List.iter parse_datamodel_case ext.gext_content ;
     ()
   | Ext_extension(ext) ->
     Options.error ~current:true "The clause %s should not be used directly \
@@ -278,8 +278,8 @@ let typecheck typing_context loc ps =
   Hashtbl.add registry id @@ List.rev env.regions ;
   Ext_id id
 
-let typecheck_dm _ _ ps =
-  List.iter parse_datamodel (snd ps) ;
+let parse_datamodel _ _ ps =
+  List.iter parse_datamodel_component (snd ps) ;
   Ext_id 1
 
 let typecheck_fail clause _ _ _ =
@@ -303,7 +303,7 @@ let () =
     Acsl_extension.register_code_annot
       ~plugin:"region" "alias" typecheck ~printer false ;
     Acsl_extension.register_global_block
-      ~plugin: "region" "datamodel" typecheck_dm false ;
+      ~plugin: "region" "datamodel" parse_datamodel false ;
     Acsl_extension.register_global
       ~plugin:"region" "pmodel" (typecheck_fail "pmodel") false ;
     Acsl_extension.register_global
