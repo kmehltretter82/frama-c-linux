@@ -102,7 +102,7 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
 
   return (
     <SideBar>
-      <SidebarTitle label='Plugins'>
+      <SidebarTitle label='Kernel & Plugins'>
         <HelpButton id="framac-parameters" size={14} />
       </SidebarTitle>
       <div className="globals-scrollable-area">
