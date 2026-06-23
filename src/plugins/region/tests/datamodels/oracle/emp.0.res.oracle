@@ -1,4 +1,2 @@
 [kernel] Parsing emp.c (with preprocessing)
-[region] Function foo:
-  R0001: IRW- x (int) 32b (singleton) (allocated) ;
 [region] annotating function foo
