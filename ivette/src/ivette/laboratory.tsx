@@ -1445,6 +1445,8 @@ export function Tabs(): JSX.Element {
   const tabsRowRef = React.useRef<HTMLDivElement>(null);
   // Holds the rendered DOM node for each tab, indexed by tab key.
   const tabRefs = React.useRef(new Map<tabKey, HTMLDivElement>());
+  // Tracks whether the tab row overflows the whole available tab-strip width.
+  const [hasScrollButtons, setHasScrollButtons] = React.useState(false);
   // Tracks whether the viewport has hidden tab content on its left side.
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   // Tracks whether the viewport has hidden tab content on its right side.
@@ -1459,17 +1461,26 @@ export function Tabs(): JSX.Element {
     [],
   );
 
-  // Keep the arrow buttons enabled only when hidden tabs exist in that
-  // direction. The one-pixel tolerance avoids subpixel rounding artifacts.
+  // Decide whether scroll controls are needed, then keep each control enabled
+  // only when hidden tabs exist in that direction.
   const updateScrollButtons = React.useCallback((): void => {
-    const node = viewportRef.current;
-    if (!node) return;
+    const viewport = viewportRef.current;
+    const tabsRow = tabsRowRef.current;
+    if (!viewport) return;
+    // Use the full tab-strip width as scroll buttons are absent when this test
+    // decides whether they are needed; use viewport width as fallback.
+    const tabsWidth =
+      viewport.parentElement?.clientWidth ?? viewport.clientWidth;
+    // tabsRow carries the real tab-content width; use viewport scroll width as
+    // fallback.
+    const contentWidth = tabsRow?.scrollWidth ?? viewport.scrollWidth;
+    // The tolerance avoids button flickering on subpixel layout differences.
+    const needButtons = contentWidth > tabsWidth + 1;
+    setHasScrollButtons(needButtons);
+    setCanScrollLeft(needButtons && viewport.scrollLeft > 0);
     // Maximum useful horizontal scroll distance for the current content width.
-    const max = Math.max(0, node.scrollWidth - node.clientWidth);
-    // Enable the left arrow only after the viewport has moved from the origin.
-    setCanScrollLeft(node.scrollLeft > 0);
-    // Enable the right arrow until the viewport reaches the far right edge.
-    setCanScrollRight(node.scrollLeft < max - 1);
+    const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    setCanScrollRight(needButtons && viewport.scrollLeft < max - 1);
   }, []);
 
   // Scroll by a viewport-relative distance so the control feels consistent
@@ -1556,17 +1567,22 @@ export function Tabs(): JSX.Element {
 
   return (
     <div className="labview-tabs">
-      <IconButton
-        className="labview-tab-scroll"
-        icon="ANGLE.LEFT"
-        title="Scroll tabs left"
-        disabled={!canScrollLeft}
-        onClick={() => scrollTabs('left')}
-      />
+      {hasScrollButtons &&
+        <IconButton
+          className="labview-tab-scroll"
+          icon="ANGLE.LEFT"
+          title="Scroll tabs left"
+          disabled={!canScrollLeft}
+          onClick={() => scrollTabs('left')}
+        />}
       <div
         // The clipped element that actually scrolls horizontally.
         ref={viewportRef}
-        className="labview-tabs-viewport"
+        className={classes(
+          "labview-tabs-viewport",
+          canScrollLeft && "labview-tabs-viewport-scroll-left",
+          canScrollRight && "labview-tabs-viewport-scroll-right",
+        )}
         onScroll={updateScrollButtons}
       >
         <div ref={tabsRowRef} className="labview-tabs-content">
@@ -1575,13 +1591,14 @@ export function Tabs(): JSX.Element {
           </DnD.List>
         </div>
       </div>
-      <IconButton
-        className="labview-tab-scroll"
-        icon="ANGLE.RIGHT"
-        title="Scroll tabs right"
-        disabled={!canScrollRight}
-        onClick={() => scrollTabs('right')}
-      />
+      {hasScrollButtons &&
+        <IconButton
+          className="labview-tab-scroll"
+          icon="ANGLE.RIGHT"
+          title="Scroll tabs right"
+          disabled={!canScrollRight}
+          onClick={() => scrollTabs('right')}
+        />}
     </div>
   );
 }

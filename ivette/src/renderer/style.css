@@ -115,6 +115,14 @@
     scrollbar-width: none;
 }
 
+.labview-tabs-viewport-scroll-left {
+    border-left: solid 1px var(--border-discrete);
+}
+
+.labview-tabs-viewport-scroll-right {
+    border-right: solid 1px var(--border-discrete);
+}
+
 /* Long non-wrapping row containing the actual laboratory tab buttons. */
 .labview-tabs-content {
     display: flex;
@@ -155,7 +163,6 @@
     height: 21px;
     margin: 0px 2px;
     padding: 4px;
-    border-radius: 4px;
 }
 
 .dome-xIcon.labview-tab-scroll > svg {
