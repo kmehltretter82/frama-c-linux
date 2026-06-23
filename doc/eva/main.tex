@@ -5613,46 +5613,46 @@ explains in more details their effect on the analysis.
   \tabularnewline
   \midrule
   \midrule
-    \texttt{//@ loop unroll <N>;}
+    \lstinline|//@  loop unroll <N>;|
   & Loop unrolling: analyze separately each of the \texttt{<N>} first
     iterations of the given loop.
   & \ref{loop-unroll}
   \tabularnewline
   \midrule
-    \texttt{//@ split <e>;}~\\
-    \texttt{//@ dynamic\_split <e>;}
+    \lstinline|//@  split <e>;|~\\
+    \lstinline|//@  dynamic_split <e>;|
   & Case-based reasoning: separate the analysis for each possible value of expression \texttt{<e>}.
   & \multirow{2}{*}{\ref{value-partitioning}}
   \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ merge <e>;}
+    \lstinline|//@  merge <e>;|
   & Cancel previous splits on expression \texttt{<e>}.
   & \tabularnewline
   \midrule
-    \texttt{//@ split \textbackslash{}cases;}
+    \lstinline|//@  split \cases;|
   & Case-based reasoning: separate the analysis for each branch of the next
     \lstinline|if-then-else| or \lstinline|switch| statement.
   & \multirow{2}{*}{\ref{partitioning-conditional-structures}}
   \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ merge \textbackslash{}cases;}
-  & Cancel any active \texttt{split \textbackslash{}cases}.
+    \lstinline{//@  merge \cases;}
+  & Cancel any active \lstinline|split \cases|.
   & \tabularnewline
   \midrule
-    \texttt{//@ slevel <N>;}
+    \lstinline|//@  slevel <N>;|
   & Locally set the value of \texttt{-eva-slevel} to \texttt{<N>}.
   & \multirow{4}{*}{\ref{slevel}}
   \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel full;}
+    \lstinline|//@  slevel full;|
   & Locally remove the limit of \texttt{-eva-slevel}.
   & \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel default;}
+    \lstinline|//@  slevel default;|
   & Reset \texttt{-eva-slevel} to its default value.
   & \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel merge;}
+    \lstinline|//@  slevel merge;|
   & Merge all states kept separate by \texttt{-eva-slevel}.
   & \tabularnewline
   \bottomrule
