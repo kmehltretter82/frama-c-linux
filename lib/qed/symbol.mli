@@ -33,6 +33,9 @@ val find_field : data -> string -> field
 (** Record datatype the field belong to *)
 val record_of_field : field -> data
 
+(** Order of field in record definition *)
+val field_rank : field -> int
+
 (** Ordering with respect to field declaration order in record *)
 val by_field_rank : field -> field -> int
 
@@ -124,12 +127,12 @@ val close : cluster -> Why3.Theory.theory
 
 (** {2 Declaration Factory} *)
 
-(** Declares a new purely abstract type *)
+(** Declares a new abstract type in the provided cluster. *)
 val new_type :
   cluster -> ?loc:Why3.Loc.position -> ?vars:int -> string -> data
 
 
-(** Declares a new abstract datatype in the provided cluster.
+(** Declares a new data type in the provided cluster.
     Returns a tuple [d,cs] with the created datatype [d] and its constructors [cs]. *)
 val new_datatype :
   cluster -> ?loc:Why3.Loc.position -> string -> (string * Why3.Ty.ty list) list ->

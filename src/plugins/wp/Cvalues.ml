@@ -66,7 +66,7 @@ let revfs = FS.create 0
 
 let fieldinfo = FS.find revfs
 
-module CC_COMP(K : sig val name : string val tau : typ -> tau end) =
+module CC_COMP(K : sig val name : string val prefix : string val tau : typ -> tau end) =
 struct
   module F = WpContext.Generator(Cil_datatype.Fieldinfo)
       (struct
@@ -80,19 +80,19 @@ struct
       (struct
         type key = compinfo
         type data = Qed.Symbol.data
-        let name = "CValues.VCOMP"
+        let name = Printf.sprintf "CValues.%s.C" K.name
         let compile c =
           let open ExportWhy3.CC in
-          snd @@ export c.cname @@ fun env ->
+          let basename = K.prefix ^ c.cname in
+          snd @@ export basename @@ fun env ->
           match c.cfields with
-          | None -> Qed.Symbol.new_type (cluster env) name
+          | None -> Qed.Symbol.new_type (cluster env) basename
           | Some fds ->
             let data,_,fields =
-              Qed.Symbol.new_record (cluster env) c.cname @@
+              Qed.Symbol.new_record (cluster env) basename @@
               List.map
                 (fun fd ->
-                   fd.fname,
-                   Option.get @@ cc_tau env @@ K.tau fd.ftype
+                   fd.fname, Option.get @@ cc_tau env @@ K.tau fd.ftype
                 ) fds in
             List.iter2 set_field fds fields ; data
       end)
@@ -100,8 +100,8 @@ struct
   let field fd = let _ = C.get fd.fcomp in F.get fd
 end
 
-module VCOMP = CC_COMP(struct let name = "VCOMP" let tau = tau_of_ctype end)
-module ICOMP = CC_COMP(struct let name = "ICOMP" let tau = init_of_ctype end)
+module VCOMP = CC_COMP(struct let name = "VCOMP" let prefix = "" let tau = tau_of_ctype end)
+module ICOMP = CC_COMP(struct let name = "ICOMP" let prefix = "Init_" let tau = init_of_ctype end)
 
 let cc_comp = function KValue -> VCOMP.comp | KInit -> ICOMP.comp
 let cc_field = function KValue -> VCOMP.field | KInit -> ICOMP.field

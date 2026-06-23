@@ -107,12 +107,13 @@ let subterms f e =
 (* conversion *)
 
 let cc_adt context (adt : Lang.adt) =
-  try match adt with
-    | Qdata a ->
-      Qed.Symbol.Data.use context.cluster a ;
-      Qed.Symbol.Data.symbol a
-    | Atype lt -> TS.find (Lang.type_id lt)
-  with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
+  match adt with
+  | Qdata a ->
+    Qed.Symbol.Data.use context.cluster a ;
+    Qed.Symbol.Data.symbol a
+  | Atype lt ->
+    try TS.find (Lang.type_id lt)
+    with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
 
 let cc_lfun (lf : Lang.lfun) =
   try match lf with
@@ -559,8 +560,8 @@ class visitor ctxt c =
       Wp_parameters.debug ~dkey:dkey_compile "Define %a@." Lang.Fun.pretty d.d_lfun ;
       let name = Lang.Fun.name d.d_lfun in
       let id = Why3.Ident.id_fresh name in
-      let map e = Option.get (cc_tau ctxt (Lang.F.tau_of_var e)) in
-      let tvs = List.map map d.d_params in
+      let param v = Option.get (cc_tau ctxt (Lang.F.tau_of_var v)) in
+      let tvs = List.map param d.d_params in
       let env = gamma ctxt in
       List.iter (Lang.F.add_var env.pool) d.d_params;
       begin

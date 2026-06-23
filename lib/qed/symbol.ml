@@ -37,12 +37,14 @@ let to_infix s =
 (* -------------------------------------------------------------------------- *)
 
 let fullname id =
-  let ps,m,ns = Why3.Theory.restore_path id in
-  let buffer = Buffer.create 80 in
-  List.iter (Printf.bprintf buffer "%s.") ps ;
-  Buffer.add_string buffer m ;
-  List.iter (fun x -> Printf.bprintf buffer ".%s" @@ of_infix x) ns ;
-  Buffer.contents buffer
+  try
+    let ps,m,ns = Why3.Theory.restore_path id in
+    let buffer = Buffer.create 80 in
+    List.iter (Printf.bprintf buffer "%s.") ps ;
+    Buffer.add_string buffer m ;
+    List.iter (fun x -> Printf.bprintf buffer ".%s" @@ of_infix x) ns ;
+    Buffer.contents buffer
+  with Not_found -> of_infix id.id_string
 
 (* -------------------------------------------------------------------------- *)
 (* --- Why3 Symbol Generic Lookup                                         --- *)
@@ -209,9 +211,9 @@ let fields (Data a as data) =
 let find_field data fd =
   List.find (function Field f -> f.ls.ls_name.id_string = fd) @@ fields data
 
+let field_rank (Field a) = a.rank
+let by_field_rank (Field a) (Field b) = a.rank - b.rank
 let record_of_field (Field a) = a.data
-
-let by_field_rank (Field a) (Field b) = b.rank - a.rank
 
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Functions & Predicates                                       --- *)
@@ -455,7 +457,10 @@ let new_type cluster ?loc ?(vars=0) name =
   let id = Why3.Ident.id_fresh ?loc name in
   let vs = if vars = 0 then [] else tvars vars in
   let ts = Why3.Ty.create_tysymbol id  vs NoDef in
-  let { ct } = cluster in Data { ct ; ts ; cs = None ; fs = None }
+  let { ct } = cluster in
+  let data = Data { ct ; ts ; cs = None ; fs = None } in
+  let decl = Why3.Decl.create_ty_decl ts in
+  add cluster decl ; data
 
 let new_datatype cluster ?loc name ctors =
   let id = Why3.Ident.id_fresh ?loc name in
@@ -475,8 +480,10 @@ let new_datatype cluster ?loc name ctors =
          List.map (fun _ -> None) tys
       ) ctors in
   let { ct } = cluster in
-  Data { ct ; ts ; cs = Some ctors ; fs = None },
-  List.map (fun (ls,_) -> Fun { ct ; ls ; def = None }) ctors
+  let decl = Why3.Decl.create_data_decl [ts,ctors] in
+  let data = Data { ct ; ts ; cs = Some ctors ; fs = None } in
+  let cfs = List.map (fun (ls,_) -> Fun { ct ; ls ; def = None }) ctors in
+  add cluster decl ; data, cfs
 
 let new_record cluster ?loc name fds =
   let id = Why3.Ident.id_fresh ?loc name in
@@ -498,7 +505,8 @@ let new_record cluster ?loc name fds =
       ) fds in
   let { ct } = cluster in
   let data = Data { ct ; ts ; cs = None ; fs = None } in
-  let fields = List.mapi
+  let fields =
+    List.mapi
       (fun rank prj ->
          Field { ct ; rank ; ls = Option.get prj ; data }
       ) prjs in
