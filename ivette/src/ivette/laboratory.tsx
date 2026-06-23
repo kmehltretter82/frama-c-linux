@@ -1495,6 +1495,32 @@ export function Tabs(): JSX.Element {
     node.scrollBy({ left: sign * distance, behavior: 'smooth' });
   }, []);
 
+  // Translate wheel gestures into horizontal tab scrolling. Negative deltas
+  // move left, positive deltas move right; consume the event only while the
+  // tab strip can still move in that direction.
+  const wheelTabs = React.useCallback(
+    (event: React.WheelEvent<HTMLDivElement>): void => {
+      const viewport = viewportRef.current;
+      if (!hasScrollButtons || !viewport) return;
+      // Trackpads often send horizontal deltas, while mouse wheels mostly send
+      // vertical deltas. Use whichever axis carries the user's intent.
+      const delta =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+      // Let the page keep receiving wheel events when the tab strip is already
+      // at the requested edge.
+      const canScroll = delta < 0 ? canScrollLeft : canScrollRight;
+      if (!delta || !canScroll) return;
+      // Consume the event only when it actually scrolls the tab strip;
+      // otherwise it can bubble into surrounding scrollable UI.
+      event.preventDefault();
+      viewport.scrollLeft += delta;
+      updateScrollButtons();
+    },
+    [canScrollLeft, canScrollRight, hasScrollButtons, updateScrollButtons],
+  );
+
   // Recompute arrow states when either the available viewport size or the tab
   // content width changes.
   React.useEffect(() => {
@@ -1584,6 +1610,7 @@ export function Tabs(): JSX.Element {
           canScrollRight && "labview-tabs-viewport-scroll-right",
         )}
         onScroll={updateScrollButtons}
+        onWheel={wheelTabs}
       >
         <div ref={tabsRowRef} className="labview-tabs-content">
           <DnD.List items={tabKeys} setItems={reorderTabs}>
