@@ -1439,7 +1439,8 @@ export function Tabs(): JSX.Element {
   // Shared ordered key list for rendering, resize updates, and DnD control.
   const tabKeys = React.useMemo(() => Array.from(tabs.keys()), [tabs]);
 
-  // Holds the DOM node whose scrollLeft position is controlled by arrows.
+  // Holds the DOM node whose scrollLeft position is controlled by scroll
+  // buttons.
   const viewportRef = React.useRef<HTMLDivElement>(null);
   // Holds the DOM node whose width grows with the rendered tab buttons.
   const tabsRowRef = React.useRef<HTMLDivElement>(null);
@@ -1486,13 +1487,13 @@ export function Tabs(): JSX.Element {
   // Scroll by a viewport-relative distance so the control feels consistent
   // across narrow and wide toolbar layouts.
   const scrollTabs = React.useCallback((direction: 'left' | 'right'): void => {
-    const node = viewportRef.current;
-    if (!node) return;
+    const viewport = viewportRef.current;
+    if (!viewport) return;
     const sign = direction === 'left' ? -1 : 1;
     // Move by 60% of the visible area, but keep a useful minimum step.
-    const distance = Math.max(120, Math.floor(node.clientWidth * 0.6));
+    const distance = Math.max(120, Math.floor(viewport.clientWidth * 0.6));
     // Negative distances scroll left; positive distances scroll right.
-    node.scrollBy({ left: sign * distance, behavior: 'smooth' });
+    viewport.scrollBy({ left: sign * distance, behavior: 'smooth' });
   }, []);
 
   // Translate wheel gestures into horizontal tab scrolling. Negative deltas
@@ -1524,18 +1525,12 @@ export function Tabs(): JSX.Element {
   // Recompute arrow states when either the available viewport size or the tab
   // content width changes.
   React.useEffect(() => {
-    // The viewport determines the visible width and current scroll position.
     const viewport = viewportRef.current;
-    // The tabsrow node determines the full width occupied by tab buttons.
-    const tabsrow = tabsRowRef.current;
     if (!viewport) return undefined;
-
     // Initialize button states immediately after the DOM nodes are available.
     updateScrollButtons();
-
     // Window resizing changes how many tabs fit in the viewport.
     window.addEventListener('resize', updateScrollButtons);
-
     // ResizeObserver catches layout and tab-content changes without polling.
     const observer =
       typeof ResizeObserver !== "undefined"
@@ -1543,8 +1538,9 @@ export function Tabs(): JSX.Element {
         : undefined;
     // Observe viewport size changes.
     observer?.observe(viewport);
+    const tabsRow = tabsRowRef.current;
     // Observe tabsrow width changes, such as opening or closing tabs.
-    if (tabsrow) observer?.observe(tabsrow);
+    if (tabsRow) observer?.observe(tabsRow);
 
     return () => {
       window.removeEventListener("resize", updateScrollButtons);
@@ -1558,21 +1554,17 @@ export function Tabs(): JSX.Element {
     const viewport = viewportRef.current;
     const selected = tabRefs.current.get(tabKey);
     if (!viewport || !selected) return;
-
     const viewportRect = viewport.getBoundingClientRect();
     const selectedRect = selected.getBoundingClientRect();
     // Keep a small visual gap between the selected tab and scroll controls.
     const margin = 4;
-
     if (selectedRect.left < viewportRect.left + margin) {
       // Selected tab is clipped on the left; move the viewport leftward.
       viewport.scrollLeft -= viewportRect.left + margin - selectedRect.left;
-      // Programmatic scrolling does not always fire before the next render.
       updateScrollButtons();
     } else if (selectedRect.right > viewportRect.right - margin) {
       // Selected tab is clipped on the right; move the viewport rightward.
       viewport.scrollLeft += selectedRect.right - viewportRect.right + margin;
-      // Programmatic scrolling does not always fire before the next render.
       updateScrollButtons();
     }
   }, [tabKey, tabKeys, updateScrollButtons]);
