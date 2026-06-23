@@ -29,7 +29,6 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 33.0 (Arsenic)
 ###############################################################################
 
--* E-ACSL     [2026-05-26] Fix bugs and crashes due to new RTE management
 -* E-ACSL     [2026-05-22] Fix crash due to interval analysis failure.
 -  E-ACSL     [2026-04-28] Extend translation of range on array for arrays in
                            structures and dereferenced arrays.
@@ -48,17 +47,17 @@ Plugin E-ACSL 33.0 (Arsenic)
 -  E-ACSL     [2026-01-18] Improvements around inductive predicate extraction,
                            amongst others simple algebraic inversions
 -* E-ACSL     [2026-03-16] Fix memory tracking for user-defined predicates
--  E-ACSL     [2026-03-17] Handle "division by zero" RTE in annotations through
-                           a new implementation.
--* E-ACSL     [2026-03-05] Fix violations of physical term uniqueness. The
-                           -check flag now enables a uniqueness verification.
+-* E-ACSL     [2026-03-05] Fix crashes stemming from violations of physical
+                           term uniqueness.
 -* E-ACSL     [2026-02-03] Fix typing error occurring on global structs when
                            concurrency is enabled
 -* E-ACSL     [2026-05-03] Fix backslashes occurring in generated identifiers
 -* E-ACSL     [2026-03-05] Fix occurrence of \ghost attribute in generated code
                            concurrency is enabled
--* E-ACSL     [2025-12-07] Fix unsound-marking of inductive funs/predicates
--* E-ACSL     [2025-11-08] Fix some bugs in the inductive extraction.
+-* E-ACSL     [2025-12-07] Fix some potentially unsound inductive function and
+                           predicate extractions not being indicated as unsound
+-* E-ACSL     [2025-11-08] Fix incorrect extractions of inductive predicates in
+                           some cases
 -* E-ACSL     [2025-06-10] Fix ##2768: crash during instrumentation of
                            predicates over enum
 
