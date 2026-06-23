@@ -477,9 +477,13 @@ function applyTab(key: tabKey): void {
 
 function closeTab(key: tabKey): void {
   const state = LAB.getValue();
-  const tab = previousTab(state.tabs, key);
   const tabs = copyMap(state.tabs);
   tabs.delete(key);
+  if (key !== state.tabKey) {
+    LAB.setValue({ ...state, tabs });
+    return;
+  }
+  const tab = previousTab(state.tabs, key);
   if (tab === undefined) {
     LAB.setValue({
       ...state,
