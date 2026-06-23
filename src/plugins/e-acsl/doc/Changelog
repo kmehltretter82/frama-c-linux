@@ -44,22 +44,22 @@ Plugin E-ACSL 33.0 (Arsenic)
 -* E-ACSL     [2026-03-16] Fix E-ACSL API: no longer expose all of the modules.
 -* E-ACSL     [2026-03-16] Fix const assignments appearing in generated code
 -  E-ACSL     [2026-03-16] Fix occurrences of \ghost in types of generated code
--  E-ACSL     [2026-01-18] Improvements around inductive predicate extraction,
-                           amongst others simple algebraic inversions
 -* E-ACSL     [2026-03-16] Fix memory tracking for user-defined predicates
+-* E-ACSL     [2026-03-10] Fix ##2768: crash during instrumentation of
+                           predicates over enum
+-* E-ACSL     [2026-03-05] Fix backslashes occurring in generated identifiers
 -* E-ACSL     [2026-03-05] Fix crashes stemming from violations of physical
                            term uniqueness.
--* E-ACSL     [2026-02-03] Fix typing error occurring on global structs when
-                           concurrency is enabled
--* E-ACSL     [2026-05-03] Fix backslashes occurring in generated identifiers
 -* E-ACSL     [2026-03-05] Fix occurrence of \ghost attribute in generated code
                            concurrency is enabled
+-* E-ACSL     [2026-02-03] Fix typing error occurring on global structs when
+                           concurrency is enabled
+-  E-ACSL     [2026-01-18] Improvements around inductive predicate extraction,
+                           amongst others simple algebraic inversions
 -* E-ACSL     [2025-12-07] Fix some potentially unsound inductive function and
                            predicate extractions not being indicated as unsound
 -* E-ACSL     [2025-11-08] Fix incorrect extractions of inductive predicates in
                            some cases
--* E-ACSL     [2025-06-10] Fix ##2768: crash during instrumentation of
-                           predicates over enum
 
 ###############################################################################
 Plugin E-ACSL 32.0 (Germanium)
