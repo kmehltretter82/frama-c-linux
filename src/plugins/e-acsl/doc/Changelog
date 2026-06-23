@@ -58,8 +58,14 @@ Plugin E-ACSL 33.0 (Arsenic)
                            amongst others simple algebraic inversions
 -* E-ACSL     [2025-12-07] Fix some potentially unsound inductive function and
                            predicate extractions not being indicated as unsound
--* E-ACSL     [2025-11-08] Fix incorrect extractions of inductive predicates in
-                           some cases
+-* E-ACSL     [2025-11-07] Fix inductive extraction: in the presence of a
+                           let-bound variable, another let-binding of the same
+                           variable was generated instead of a comparison
+-* E-ACSL     [2025-11-06] Fix inductive extraction: sometimes the order of
+                           the hypotheses was not preserved
+-* E-ACSL     [2025-10-25] Fix extraction for unary inductive predicates:
+                           use complete mode when possible (always sound)
+                           instead of incomplete mode (sometimes unsound)
 
 ###############################################################################
 Plugin E-ACSL 32.0 (Germanium)
