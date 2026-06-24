@@ -137,6 +137,10 @@ let join (start1, end1) (start2, end2) =
   and end_pos = if Filepos.compare end1 end2 <= 0 then end2 else end1 in
   start_pos, end_pos
 
+let start_loc (start_pos, _) = start_pos, start_pos
+
+let end_loc (_, end_loc) = end_loc, end_loc
+
 (* --- Datatype with comparison/hash on original source positions  --- *)
 
 module Original = Datatype.Make_with_collections (struct

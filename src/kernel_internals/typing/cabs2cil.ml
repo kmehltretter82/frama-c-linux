@@ -528,7 +528,7 @@ let check_aligned attrs =
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
 let process_pragmas_pack_align_comp_attributes loc ci cattrs =
-  let source = Fileloc.of_pos (Fileloc.end_pos loc) in
+  let source = Fileloc.end_loc loc in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->

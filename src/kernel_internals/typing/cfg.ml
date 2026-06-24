@@ -492,7 +492,7 @@ let xform_switch_block ?(keepSwitch=false) b =
           s.skind <- If(e,b1,b2,l);
           s:: xform_switch_stmt rest break_dest cont_dest label_index 0
         | Switch(e,b,sl, l) ->
-          let loc = Fileloc.(of_pos (end_pos l)) in
+          let loc = Fileloc.end_loc l in
           if keepSwitch then begin
             let label_index = label_index + 1 in
             let break_stmt = Cil.mkStmt (Instr (Skip loc)) in

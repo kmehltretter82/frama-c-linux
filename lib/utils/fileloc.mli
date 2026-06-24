@@ -112,6 +112,16 @@ val of_pos : Filepos.t -> t
     @since Frama-C+dev *)
 val join : t -> t -> t
 
+(** [start_loc loc] returns a new location pointing only to the beginning of
+    [loc], i.e. reduced to a single position equal to the start of [loc].
+    @since Frama-C+dev *)
+val start_loc : t -> t
+
+(** [end_loc loc] returns a new location pointing only to the end of
+    [loc], i.e. reduced to a single position equal to the end of [loc].
+    @since Frama-C+dev *)
+val end_loc : t -> t
+
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

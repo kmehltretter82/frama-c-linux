@@ -127,6 +127,7 @@ let pp_stmt kloc fmt stmt =
   | Instr (Asm(_,_,_,loc)) ->
     Format.fprintf fmt "assembly%a%a" pp_labels stmt (pp_kloc kloc) loc
   | Instr (Skip loc) ->
+    let loc = Fileloc.end_loc loc in
     Format.fprintf fmt "program point%a%a" pp_labels stmt (pp_kloc kloc) loc
   | Instr (Code_annot(ca,loc)) ->
     Format.fprintf fmt "%a%a" pp_code_annot ca (pp_kloc kloc) loc
