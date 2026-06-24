@@ -454,17 +454,6 @@ build-linux-x86-64-bundle:
     - docker
   <<: *when_release
 
-build-linux-arm64-bundle:
-  stage: distrib
-  variables:
-    BUNDLE_ARCH: "linux-arm64"
-    BUNDLE_EXT: "run"
-  <<: *linux_distribution
-  timeout: 2h
-  tags:
-    - linux-arm
-  <<: *when_release
-
 # Build macOS distribution
 
 .build_template: &macos_distribution
@@ -601,7 +590,6 @@ release-content:
     - api-for-release
     - build-distrib-tarball
     - build-linux-x86-64-bundle
-    - build-linux-arm64-bundle
     - build-macos-distribution
     - build-ivette-macos-packages-release
     - manuals-for-release
@@ -658,21 +646,21 @@ additional-arch:
   <<: *manual_when_not_special_pipeline
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 additional-arch-nightly:
   <<: *additional_arch_template
   <<: *when_publish
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 additional-arch-release:
   <<: *additional_arch_template
   <<: *when_release
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 # OCaml versions
 

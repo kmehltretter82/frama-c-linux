@@ -13,7 +13,6 @@
 # Thus, it expects to be run from the root of the Frama-C directory and that
 # some CI artifacts are available. Namely:
 #   - 'frama-c.tar.gz'
-#   - 'frama-c-arm64.run'
 #   - 'frama-c-x86-64.run'
 #   - 'frama-c-macos-arm.pkg'
 #   - 'frama-c-macos-x86.pkg'
@@ -154,7 +153,6 @@ done
 show_step "Searching for Ivette packages"
 
 PACKAGES=(
-  "frama-c-arm64.run"
   "frama-c-x86-64.run"
   "frama-c-macos-arm.pkg"
   "frama-c-macos-x86.pkg"
@@ -397,11 +395,6 @@ cat >$JSON_DATA <<EOL
         "link_type":"other"
       },
       {
-        "name": "Frama-C + Frama-C GUI (Linux ARM64)",
-        "url": "https://frama-c.com/download/frama-c-arm64-$VERSION_AND_CODENAME.run",
-        "link_type":"other"
-      },
-      {
         "name": "Frama-C + Frama-C GUI (Linux x86-64)",
         "url": "https://frama-c.com/download/frama-c-x86-64-$VERSION_AND_CODENAME.run",
         "link_type":"other"
@@ -515,10 +508,6 @@ releases:
     files:
     - name: Frama-C and Frama-C GUI x86-64
       link: /download/frama-c-x86-64-$VERSION_AND_CODENAME.run
-      help: Installation instructions
-      help_link: ${PACKAGE_INSTALL}linux
-    - name: Frama-C and Frama-C GUI ARM64
-      link: /download/frama-c-arm64-$VERSION_AND_CODENAME.run
       help: Installation instructions
       help_link: ${PACKAGE_INSTALL}linux
   - name: Frama-C v$VERSION $CODENAME - macOS Packages
