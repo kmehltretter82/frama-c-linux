@@ -124,13 +124,6 @@ let stmt_mt_status subtrace get_state stmt =
        | false, false ->
          (* This case is supposed to handle [*p(...)], with [p] pointing to
             both an Mthread function and a non-Mthread one. *)
-         Mt_self.debug "%a"
-           (Pretty_utils.pp_list
-              (fun fmt (selt, subtrace) ->
-                 Format.fprintf fmt "@[<v>-- %a@.%a@]"
-                   Mt_cil.StackElt.pretty selt
-                   Trace.pretty subtrace
-              )) callsites;
          Self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
            "Simultaneous call to a mthread function and to another function: \
             very strangely written mthread binding?";

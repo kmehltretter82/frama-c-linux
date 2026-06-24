@@ -120,8 +120,6 @@ let write_int_pointer p i state =
   and value = Addresses.Bytes.inject Base.null (Ival.of_int i) in
   let pointer = location_of_pointer p in
   let p = location_with_size pointer sbytes in
-  Mt_self.debug ~level:3 "# Write %a at %a, size %d bytes"
-    Cvalue.V.pretty value Locations.pretty p sbytes;
   Cvalue.Model.add_binding ~exact:true state p value
 
 let replace_value_at_int_pointer p ~before ~after state =

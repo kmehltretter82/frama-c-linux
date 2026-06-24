@@ -486,19 +486,13 @@ struct
     X.Set.fold
       (fun o1 acc -> X.Set.fold
           (fun o2 s ->
-             Mt_self.debug ~level:2
-               "@[<hov>Possible concurrent access@ %a@ and %a@]"
-               X.Access.pretty o1 X.Access.pretty o2;
              let is_concurrent = consider o1 o2 in
-             if is_concurrent then (
-               Mt_self.debug ~level:2 "@[Above access is concurrent@]";
+             if is_concurrent then
                X.Set.join s
                  (X.Set.join (X.Set.inject_singleton o1)
                     (X.Set.inject_singleton o2))
-             ) else (
-               Mt_self.debug ~level:2 "@[Above access is not concurrent@]";
-               s)
-          ) s2 acc
+             else s)
+          s2 acc
       ) s1 X.Set.bottom
   ;;
 

@@ -254,10 +254,7 @@ let register_multiple_events analysis evts =
 
 (* Store the memory state for the function which we finished analyzing *)
 let register_memory_states analysis ~before ~after =
-  Mt_self.debug ~level:2 "Recording states for %a"
-    Kernel_function.pretty (current_fun analysis);
-  on_current_trace analysis (fun cur _ ->  Trace.add_states cur ~before ~after);
-;;
+  on_current_trace analysis (fun cur _ ->  Trace.add_states cur ~before ~after)
 
 let push_function_call analysis =
   analysis.curr_events_stack <- Trace.empty :: analysis.curr_events_stack

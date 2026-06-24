@@ -314,7 +314,6 @@ module Html = struct
         List.map snd
       in
       assert ((Thread.Hashtbl.length mq_table) > 0);
-      Mt_self.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
       Some (mq_table, QueueTable.mk queue_olist (List.map (fun th -> th.th_eva_thread) th_list));
     end
   ;;
@@ -476,7 +475,6 @@ module Html = struct
     in
     try
       let open Filesystem.Operators in
-      Mt_self.debug "Open %a for writing@." Filepath.pretty tmp_file;
       let$ otmp = Filesystem.with_open_out_exn tmp_file in
       let fmt = Format.formatter_of_out_channel otmp in
       generator fmt;
@@ -641,7 +639,6 @@ module Html = struct
   let pp_page page =
     let open Filesystem.Operators in
     let file = Filepath.(default_dir / (page.page_name ^ ".html")) in
-    Mt_self.debug "Open %a@." Filepath.pretty_abs file;
     let$ ofile = Filesystem.with_open_out_exn file in
     let fmt = Format.formatter_of_out_channel ofile in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
