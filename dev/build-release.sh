@@ -13,8 +13,10 @@
 # Thus, it expects to be run from the root of the Frama-C directory and that
 # some CI artifacts are available. Namely:
 #   - 'frama-c.tar.gz'
-#   - 'frama-c-ivette-linux-ARM64.AppImage'
-#   - 'frama-c-ivette-linux-x86-64.AppImage'
+#   - 'frama-c-arm64.run'
+#   - 'frama-c-x86-64.run'
+#   - 'frama-c-macos-arm.pkg'
+#   - 'frama-c-macos-x86.pkg'
 #   - 'frama-c-ivette-macos-universal.dmg'
 #   - 'api' directory (with api archives inside)
 #   - 'manuals' directory (with all manuals incl. acsl + version text files)
@@ -151,13 +153,15 @@ done
 
 show_step "Searching for Ivette packages"
 
-IVETTE=(
-  "frama-c-ivette-linux-ARM64.AppImage"
-  "frama-c-ivette-linux-x86-64.AppImage"
-  "frama-c-ivette-macos-universal.dmg"
+PACKAGES=(
+  "frama-c-arm64.run"
+  "frama-c-x86-64.run"
+  "frama-c-macos-arm.pkg"
+  "frama-c-macos-x86.pkg"
+  "frama-c-gui-macos-universal.dmg"
 )
 
-for package in "${IVETTE[@]}"; do
+for package in "${PACKAGES[@]}"; do
   prepare_file "$package"
 done
 
@@ -241,7 +245,7 @@ function copy_manual_e_acsl {
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name "$1").$2"
 }
 
-function copy_ivette_package {
+function copy_package {
   name="${1%%.*}"
   ext="${1#*.}"
   cp "$1" "$PKGS_TARGET_DIR/$(version_name "$name").$ext"
@@ -268,8 +272,8 @@ function copy_files {
   for api in "${API_FILES[@]}"; do
     copy_api "$api" "tar.gz"
   done
-  for package in "${IVETTE[@]}"; do
-    copy_ivette_package "$package"
+  for package in "${PACKAGES[@]}"; do
+    copy_package "$package"
   done
 
   # Eva has an old manual name that might be in use:
@@ -351,8 +355,8 @@ for archive in "${COMPANIONS[@]}"; do
   echo "- [$archive]($FRAMAC_COM_DOWNLOAD/$NAME.tar.gz)" >> $WIKI_PAGE
 done
 echo "" >> $WIKI_PAGE
-echo "## Ivette packages" >> $WIKI_PAGE
-for package in "${IVETTE[@]}"; do
+echo "## Installation packages" >> $WIKI_PAGE
+for package in "${PACKAGES[@]}"; do
   NAME="${package%%.*}"
   EXT="${package#*.}"
   echo "- [$NAME]($FRAMAC_COM_DOWNLOAD/$(version_name $NAME).$EXT)" >> $WIKI_PAGE
@@ -393,18 +397,28 @@ cat >$JSON_DATA <<EOL
         "link_type":"other"
       },
       {
-        "name": "Ivette (Linux ARM64)",
-        "url": "https://frama-c.com/download/frama-c-ivette-linux-ARM64-$VERSION_AND_CODENAME.AppImage",
+        "name": "Frama-C + Frama-C GUI (Linux ARM64)",
+        "url": "https://frama-c.com/download/frama-c-arm64-$VERSION_AND_CODENAME.run",
         "link_type":"other"
       },
       {
-        "name": "Ivette (Linux x86-64)",
-        "url": "https://frama-c.com/download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage",
+        "name": "Frama-C + Frama-C GUI (Linux x86-64)",
+        "url": "https://frama-c.com/download/frama-c-x86-64-$VERSION_AND_CODENAME.run",
         "link_type":"other"
       },
       {
-        "name": "Ivette (macOS universal)",
+        "name": "Frama-C GUI (macOS universal)",
         "url": "https://frama-c.com/download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg",
+        "link_type":"other"
+      },
+      {
+        "name": "Frama-C (macOS ARM)",
+        "url": "https://frama-c.com/download/frama-c-macos-arm-$VERSION_AND_CODENAME.pkg",
+        "link_type":"other"
+      },
+      {
+        "name": "Frama-C (macOS x86-64)",
+        "url": "https://frama-c.com/download/frama-c-macos-x86-$VERSION_AND_CODENAME.pkg",
         "link_type":"other"
       }
     ]
@@ -486,7 +500,7 @@ else
 fi
 
 INSTALL_WEBPAGE="https://git.frama-c.com/pub/frama-c/-/blob/$TAG/INSTALL.md"
-IVETTE_INSTALL="$INSTALL_WEBPAGE#installing-ivette-via-the-online-packages-on-"
+PACKAGE_INSTALL="$INSTALL_WEBPAGE#installing-frama-c-via-packages-linux"
 
 cat >$VERSION_WEBPAGE <<EOL
 ---
@@ -497,7 +511,31 @@ $ACSL_OR_BETA
 releases:
 - number: $VERSION_MINOR
   categories:
-  - name: Frama-C v$VERSION $CODENAME
+  - name: Frama-C v$VERSION $CODENAME - Linux Packages
+    files:
+    - name: Frama-C and Frama-C GUI x86-64
+      link: /download/frama-c-x86-64-$VERSION_AND_CODENAME.run
+      help: Installation instructions
+      help_link: ${PACKAGE_INSTALL}linux
+    - name: Frama-C and Frama-C GUI ARM64
+      link: /download/frama-c-arm64-$VERSION_AND_CODENAME.run
+      help: Installation instructions
+      help_link: ${PACKAGE_INSTALL}linux
+  - name: Frama-C v$VERSION $CODENAME - macOS Packages
+    files:
+    - name: Universal GUI
+      link: /download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg
+      help: Installation instructions
+      help_link: ${PACKAGE_INSTALL}macos
+    - name: macOS x86 Frama-C
+      link: /download/frama-c-macos-x86.pkg
+      help: Installation instructions
+      help_link: ${PACKAGE_INSTALL}macos
+    - name: macOS ARM Frama-C
+      link: /download/frama-c-macos-arm.pkg
+      help: Installation instructions
+      help_link: ${PACKAGE_INSTALL}macos
+  - name: Additional files
     files:
     - name: Source distribution
       link: /download/$TARGZ_VERSION
@@ -509,7 +547,7 @@ releases:
       link: /download/plugin-development-guide-$VERSION_AND_CODENAME.pdf
       help: Hello plug-in tutorial archive
       help_link: /download/hello-$VERSION_AND_CODENAME.tar.gz
-    - name: API Documentation
+    - name: Offline API Documentation
       link: /download/frama-c-$VERSION_AND_CODENAME-api.tar.gz
     - name: Server API Documentation
       link: /download/frama-c-server-$VERSION_AND_CODENAME-api.tar.gz
@@ -538,20 +576,6 @@ releases:
       link: /download/volatile-manual-$VERSION_AND_CODENAME.pdf
     - name: WP manual
       link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
-  - name: Ivette Packages
-    files:
-    - name: Linux x86-64 AppImage
-      link: /download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage
-      help: Installation instructions
-      help_link: ${IVETTE_INSTALL}linux
-    - name: Linux ARM64 AppImage
-      link: /download/frama-c-ivette-linux-ARM64-$VERSION_AND_CODENAME.AppImage
-      help: Installation instructions
-      help_link: ${IVETTE_INSTALL}linux
-    - name: macOS universal
-      link: /download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg
-      help: Installation instructions
-      help_link: ${IVETTE_INSTALL}macos
 ---
 EOL
 
