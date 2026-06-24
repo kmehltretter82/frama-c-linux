@@ -930,7 +930,7 @@ let get_comments_global g =
   let last_pos (path : Filepath.t) =
     Filepos.make ~path ~line:max_int ~column:max_int ~offset:max_int ()
   and first_pos (path : Filepath.t) =
-    Filepos.make ~path ~line:1 ~column:0 ~offset:(-1) ()
+    Filepos.make ~path ~line:1 ~column:0 ()
   in
   let add g =
     let my_loc = Cil_datatype.Global.loc g in

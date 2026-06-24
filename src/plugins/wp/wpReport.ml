@@ -884,7 +884,7 @@ let export_json gstat ?jinput ~joutput () =
           Json.load_file jpath
         else `Null
       with Json.Error(path,line,msg) ->
-        let pos = Filepos.make ~path ~line ~offset:0 () in
+        let pos = Filepos.make ~path ~line () in
         let source = Fileloc.of_pos pos in
         Wp_parameters.error ~source "Incorrect json file: %s" msg ;
         `Null

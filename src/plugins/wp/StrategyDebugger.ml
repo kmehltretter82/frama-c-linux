@@ -213,8 +213,8 @@ let parse_string s =
   let line =
     let i = ref 0 in
     String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
-  let pbeg = Filepos.make ~path ~line:0 ~column:0 ~offset:0 () in
-  let pend = Filepos.make ~path ~line ~column ~offset:0 () in
+  let pbeg = Filepos.make ~path ~line:0 ~column:0 () in
+  let pend = Filepos.make ~path ~line ~column () in
   let loc = Fileloc.make ~start_pos:pbeg ~end_pos:pend in
   let lb = Lexing.from_string s in
   let get_loc () =

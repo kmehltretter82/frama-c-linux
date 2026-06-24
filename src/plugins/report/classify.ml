@@ -166,12 +166,12 @@ let configure file =
       | _ -> failwith "Array expected"
     with
     | Json.Error(path,line,msg) ->
-      let pos = Filepos.make ~path ~line ~offset:0 () in
+      let pos = Filepos.make ~path ~line () in
       let source = Fileloc.of_pos pos in
       R.abort ~source "%s" msg
     | WrongFormat msg ->
       let path = Filepath.of_string file in
-      let pos = Filepos.make ~path ~line:1 ~offset:0 () in
+      let pos = Filepos.make ~path ~line:1 () in
       let source = Fileloc.of_pos pos in
       R.abort ~source "%s" msg
     | Sys_error msg ->

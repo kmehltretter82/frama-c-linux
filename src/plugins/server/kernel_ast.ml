@@ -78,7 +78,7 @@ struct
       begin
         match List.assoc "file" assoc, List.assoc "line" assoc with
         | `String path, `Int line ->
-          Filepos.make ~path:(Filepath.of_string path) ~line ~offset:0 ()
+          Filepos.make ~path:(Filepath.of_string path) ~line ()
         | _, _ -> fail ()
         | exception Not_found -> fail ()
       end
@@ -1217,7 +1217,7 @@ let () = Server_parameters.Debug.add_hook_on_update
 let get_marker_at ~file ~line ~col =
   if file="" then None else
     let path = Filepath.of_string file in
-    let pos = Filepos.make ~path ~line ~column:col ~offset:0 () in
+    let pos = Filepos.make ~path ~line ~column:col () in
     Printer_tag.pos_to_localizable ~precise_col:true pos
 
 let () =

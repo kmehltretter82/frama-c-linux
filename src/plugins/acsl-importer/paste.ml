@@ -900,11 +900,11 @@ let set_buff_loc line =
 (** Get location of the first character of
     the string to parse with acsl parser *)
 let get_buff_loc () =
-  Filepos.make ~path:!prop_file ~line:!buff_line ~column:0 ~offset:0 ()
+  Filepos.make ~path:!prop_file ~line:!buff_line ~column:0 ()
 
 (** Get location of the first property token *)
 let get_prop_loc () =
-  Filepos.make ~path:!prop_file ~line:!prop_line ~column:0 ~offset:0 ()
+  Filepos.make ~path:!prop_file ~line:!prop_line ~column:0 ()
 
 (*-----------------------------------------------------------------------*)
 let basename_chop_extension file =
