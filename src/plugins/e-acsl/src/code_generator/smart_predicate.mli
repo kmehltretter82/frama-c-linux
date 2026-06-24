@@ -9,7 +9,6 @@
 open Cil_types
 
 val prel :
-  ?smart:bool ->
   ?loc:Fileloc.t ->
   ?names:string list ->
   relation ->
@@ -17,14 +16,12 @@ val prel :
   term ->
   predicate
 (** create a relation predicate. Optimisation depends on the [-e-acsl-O]
-    option and [?smart]. *)
+    option. *)
 
 val pand :
-  ?smart:bool ->
   ?loc:Fileloc.t ->
   ?names:string list ->
   predicate ->
   predicate ->
   predicate
-(** create a conjunction. Optimisation depends on the [-e-acsl-O] option and
-    [?smart]. *)
+(** create a conjunction. Optimisation depends on the [-e-acsl-O] option. *)
