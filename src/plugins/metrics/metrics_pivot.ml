@@ -467,7 +467,7 @@ let visit_messages () =
               "<unknown>"
             | Some name -> name
           in
-          Fileloc.from_position pos, funcname
+          Fileloc.of_pos pos, funcname
       in
       let domain = Message (ev.evt_kind) in
       let text = Log.Event.message ev in

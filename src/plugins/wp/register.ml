@@ -290,7 +290,7 @@ let pstats_to_json (p,r) : Json.t = `Assoc [
 let stats_to_json g (s : Stats.stats) : Json.t =
   let smoke = Wpo.is_smoke_test g in
   let target = Wpo.get_target g in
-  let source = Fileloc.start_pos (Property.location target) in
+  let loc = Property.location target in
   let script = match ProofSession.get g with
     | NoScript -> []
     | Script file | Deprecated file ->
@@ -313,8 +313,8 @@ let stats_to_json g (s : Stats.stats) : Json.t =
     ([
       "goal", `String g.po_gid ;
       "property", `String (Property.Names.get_prop_name_id target) ;
-      "file", `String (Filepos.path source |> Filepath.to_string_abs) ;
-      "line", `Int (Filepos.line source) ;
+      "file", `String (Fileloc.path loc |> Filepath.to_string_abs) ;
+      "line", `Int (Fileloc.line loc) ;
     ] @ index @ [
         "smoke", `Bool smoke ;
         "passed", `Bool (Wpo.is_passed g) ;

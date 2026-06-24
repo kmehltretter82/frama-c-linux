@@ -1017,14 +1017,13 @@ let parse_spec s =
 (** Parse a code annotation. *)
 let parse_annots s =
   let start_pos = get_prop_loc () in
-  let make_loc = Fileloc.make ~start_pos in
   match Logic_lexer.annot (get_buff_loc (), s) with
   | Some (_,Logic_ptree.Acode_annot (loc,a)) ->
     (* update starting annotation location *)
-    make_loc ~end_pos:(Fileloc.end_pos loc), [a]
+    Fileloc.make ~start_pos ~end_pos:(Fileloc.end_pos loc), [a]
   | Some (_,Logic_ptree.Aloop_annot (loc,a)) ->
     (* update starting annotation location *)
-    make_loc ~end_pos:(Fileloc.end_pos loc), a
+    Fileloc.make ~start_pos ~end_pos:(Fileloc.end_pos loc), a
   | _ ->
     Options.abort "[Syntax error] Unallowed annotation."
 

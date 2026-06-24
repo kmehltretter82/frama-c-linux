@@ -130,10 +130,12 @@ let make ~start_pos ~end_pos = (start_pos, end_pos)
 
 let positions = Fun.id
 
-let from_position pos = (pos, pos)
+let of_pos pos = (pos, pos)
 
-let range ~start_loc:(loc_start, _) ~end_loc:(_, loc_end) =
-  (loc_start, loc_end)
+let join (start1, end1) (start2, end2) =
+  let start_pos = if Filepos.compare start1 start2 <= 0 then start1 else start2
+  and end_pos = if Filepos.compare end1 end2 <= 0 then end2 else end1 in
+  start_pos, end_pos
 
 (* --- Datatype with comparison/hash on original source positions  --- *)
 

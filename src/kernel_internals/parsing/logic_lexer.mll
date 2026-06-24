@@ -617,8 +617,8 @@ and comment = parse
     let open Current_loc.Operators in
     let lb = from_string s in
     let get_pos () = Errorloc.convert_pos lb.Lexing.lex_curr_p in
-    let get_loc () = Fileloc.from_position (get_pos ()) in
-    let<> UpdatedCurrentLoc = Fileloc.from_position pos in
+    let get_loc () = Errorloc.convert_pos_to_loc lb.Lexing.lex_curr_p in
+    let<> UpdatedCurrentLoc = Fileloc.of_pos pos in
     let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Filepos.to_lexing_pos pos);
     try
@@ -635,7 +635,7 @@ and comment = parse
         warn ~source:loc "%s" m; None
       | Logic_utils.Unknown_ext -> None
       | Log.FeatureRequest(pos,_,msg) ->
-        let source = Option.fold ~none:(get_loc ()) ~some:Fileloc.from_position pos in
+        let source = Option.fold ~none:(get_loc ()) ~some:Fileloc.of_pos pos in
         warn ~source "unimplemented ACSL feature: %s" msg; None
       | Log.(AbortError _ | AbortFatal _) as exn -> raise exn
       | exn ->

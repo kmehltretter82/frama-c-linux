@@ -387,7 +387,7 @@ let annot_lex initial rule lexbuf =
   try rule lexbuf
   with Parsing.Parse_error ->
     let start = Lexing.lexeme_start_p lexbuf in
-    let source = Fileloc.from_position (E.convert_pos start) in
+    let source = E.convert_pos_to_loc start in
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation" ;
     initial lexbuf
 
@@ -841,7 +841,7 @@ and annot_token = parse
     then begin
       let start_loc = get_ghost_annot_start ()
       and end_loc = currentLoc () in
-      let loc = Fileloc.range ~start_loc ~end_loc in
+      let loc = Fileloc.join start_loc end_loc in
       parse_error ~loc "Ghost multi-line annotation not terminated"
     end;
     let s = Buffer.contents buf in

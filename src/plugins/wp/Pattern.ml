@@ -62,7 +62,7 @@ let unroll op = function
 
 let assoc op a b =
   {
-    loc = Fileloc.range ~start_loc:a.loc ~end_loc:b.loc ;
+    loc = Fileloc.join a.loc b.loc ;
     value = Assoc(op,unroll op a @ unroll op b) ;
   }
 
@@ -70,7 +70,7 @@ let implies a b =
   let hs = unroll `And a in
   let hs,p = match b.value with Implies(rs,p) -> hs @ rs , p | _ -> hs, b in
   {
-    loc = Fileloc.range ~start_loc:a.loc ~end_loc:b.loc ;
+    loc = Fileloc.join a.loc b.loc ;
     value = Implies (hs, p) ;
   }
 

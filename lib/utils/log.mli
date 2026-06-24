@@ -515,7 +515,7 @@ val kernel_label_name: string
 val source : file:Filepath.t -> line:int -> Filepos.t
 (** @since Chlorine-20180501 *)
 [@@deprecated "Use Filepos.make instead"]
-[@@migrate { repl =  fun ~file ~line -> Filepos.make ~path:file ~line ~offset:0 () }]
+[@@migrate { repl =  fun ~file ~line -> Filepos.make ~path:file ~line () }]
 
 val get_current_source : unit -> Fileloc.t
 

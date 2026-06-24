@@ -23,9 +23,6 @@ module type S = sig
   val loc : t -> Fileloc.t
   (** [loc p] returns the source location of the given position. *)
 
-  val pos : t -> Filepos.t
-  (** [pos p] returns the source file of the given position. *)
-
   val kinstr : t -> Cil_types.kinstr
   (** [kinstr p] returns the kinstr associated to the position. *)
 

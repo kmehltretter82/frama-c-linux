@@ -11,7 +11,6 @@ open Cil_datatype
 module type S = sig
   include Datatype.S_with_collections
   val loc : t -> Fileloc.t
-  val pos : t -> Filepos.t
   val kinstr : t -> Cil_types.kinstr
   val pretty_loc : Format.formatter -> t -> unit
 end
@@ -41,9 +40,6 @@ struct
 
   let loc (stmt, _cs) =
     Cil_datatype.Stmt.loc stmt
-
-  let pos lpos =
-    Fileloc.start_pos (loc lpos)
 
   let kinstr lpos =
     Cil_types.Kstmt (fst lpos)
@@ -113,9 +109,6 @@ let loc pos =
     Kernel_function.get_location entry_point
   | GlobalInit vi -> vi.vdecl
   | Local l -> Local.loc l
-
-let pos pos =
-  loc pos |> Fileloc.start_pos
 
 let kinstr pos =
   match pos with

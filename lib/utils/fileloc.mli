@@ -105,12 +105,13 @@ val positions :  t -> Filepos.t * Filepos.t
 
 (** Create a location from the given position.
     @since Frama-C+dev *)
-val from_position : Filepos.t -> t
+val of_pos : Filepos.t -> t
 
-(** Create a location which ranges from the start of the first location to the
-    end of the second one.
+(** Create a location from the union of two locations using [Fileloc.compare]
+    to find the starting and ending positions.
     @since Frama-C+dev *)
-val range : start_loc:t -> end_loc:t -> t
+val join : t -> t -> t
+
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

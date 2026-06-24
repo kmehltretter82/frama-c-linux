@@ -528,7 +528,7 @@ let check_aligned attrs =
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
 let process_pragmas_pack_align_comp_attributes loc ci cattrs =
-  let source = Fileloc.from_position (Fileloc.end_pos loc) in
+  let source = Fileloc.of_pos (Fileloc.end_pos loc) in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->
@@ -8347,7 +8347,7 @@ and doInit local_env asconst preinit so acc initl =
         in
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
-        let loc = Fileloc.range ~start_loc:idxs'.eloc ~end_loc:idxe'.eloc in
+        let loc = Fileloc.join idxs'.eloc idxe'.eloc in
         let<> UpdatedCurrentLoc = loc in
         if isNotEmpty doidxs || isNotEmpty doidxe then
           Errorloc.abort_context "Range designators are not constants";
@@ -8369,7 +8369,7 @@ and doInit local_env asconst preinit so acc initl =
           else
             (top (Cabs.ATINDEX_INIT(
                  { expr_node = Cabs.CONSTANT(Cabs.CONST_INT(string_of_int i));
-                   expr_loc = Fileloc.range ~start_loc:idxs.expr_loc ~end_loc:idxe.expr_loc},
+                   expr_loc = Fileloc.join idxs.expr_loc idxe.expr_loc},
                  Cabs.NEXT_INIT)), ie)
             :: loop (i + 1)
         in
@@ -9162,7 +9162,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
     begin
       let ghost = local_env.is_ghost in
       let idloc = loc1 in
-      let funloc = Fileloc.range ~start_loc:loc1 ~end_loc:loc2 in
+      let funloc = Fileloc.join loc1 loc2 in
       let endloc = loc2 in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "Definition of %s at %a\n" n Fileloc.pretty idloc;

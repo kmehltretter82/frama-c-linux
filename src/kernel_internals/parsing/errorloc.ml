@@ -138,6 +138,10 @@ let convert_pos pos =
   in
   Filepos.of_lexing_pos ?origin pos
 
+let convert_pos_to_loc pos =
+  let pos = convert_pos pos in
+  Fileloc.make ~start_pos:pos ~end_pos:pos
+
 let convert_loc (start_pos, end_pos) =
   let start_pos = convert_pos start_pos
   and end_pos = convert_pos end_pos in
@@ -333,7 +337,7 @@ let pp_context_from_file ?(ctx=2) fmt ppc_loc =
         if Filepath.equal
             (Filepos.input_path ppc_start) (Filepos.input_path ppc_end)
         then ppc_loc
-        else Fileloc.from_position ppc_end
+        else Fileloc.of_pos ppc_end
       in
       let ppc_lines = get_context_from_file ~ctx ppc_loc in
       pp_context fmt (ppc_loc, ppc_lines)

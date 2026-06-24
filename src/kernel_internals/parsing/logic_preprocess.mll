@@ -89,8 +89,8 @@
 
   let abort_preprocess reason =
     let path = Filepath.of_string !curr_file in
-    let pos = Filepos.make ~path ~line:!curr_line ~offset:0 () in
-    let source = Fileloc.from_position pos in
+    let pos = Filepos.make ~path ~line:!curr_line () in
+    let source = Fileloc.of_pos pos in
     Kernel.error ~source
       "Can't preprocess annotation: %s\nSome annotations will be kept as is"
       reason

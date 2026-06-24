@@ -1006,7 +1006,7 @@ let compute_pdg kf =
     Pdg_parameters.warning "too imprecise value analysis : abort" ;
     degenerated true kf
   | Log.FeatureRequest (pos, who, what) ->
-    let source = Option.map Fileloc.from_position pos in
+    let source = Option.map Fileloc.of_pos pos in
     (* [JS 2012/08/24] nobody should catch this exception *)
     Pdg_parameters.warning ?source "not implemented by %s yet: %s" who what;
     degenerated true kf

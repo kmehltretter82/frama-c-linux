@@ -27,9 +27,6 @@ open Cabshelper
    removing Logic_ptree.location. *)
 type location = Fileloc.t
 
-let loc_range {expr_loc = start_loc} {expr_loc = end_loc} =
-  Fileloc.range ~start_loc ~end_loc
-
 (*
 ** Expression building
 *)
@@ -38,11 +35,13 @@ let smooth_expression lst =
   | [] -> Kernel.fatal "empty COMMA expression, should not happen"
   | [expr] -> expr
   | hd :: _ ->
-    let expr_loc = loc_range hd (List.last lst) in
+    let loc1 = hd.expr_loc
+    and loc2 = (List.last lst).expr_loc in
+    let expr_loc = Fileloc.join loc1 loc2 in
     { expr_loc; expr_node = COMMA (lst) }
 
-let merge_string (c1, start_loc) (l2, end_loc) =
-  let loc = Fileloc.range ~start_loc ~end_loc in
+let merge_string (c1, loc1) (l2, loc2) =
+  let loc = Fileloc.join loc1 loc2 in
   c1 :: l2, loc
 
 (* To be called only inside a grammar rule. *)
