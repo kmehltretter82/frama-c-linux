@@ -456,8 +456,7 @@ export function RenderMessages(): JSX.Element {
   React.useEffect(() => {
     const fetchPlugins = async (): Promise<void> => {
       const plugins = await Server.send(Params.getPlugins, {});
-      setPlugins(plugins.filter(v => v.shortname !== "kernel")
-        .sort((a, b) => Compare.alpha(a.name, b.name)));
+      setPlugins(plugins.sort((a, b) => Compare.alpha(a.name, b.name)));
     };
     if(Server.isRunning()) fetchPlugins();
     else Server.onReady(fetchPlugins);

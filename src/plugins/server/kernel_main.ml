@@ -157,11 +157,22 @@ module PluginData = struct
   let of_json _ = Data.failure "Plugin.of_json not implemented"
 end
 
+let plugin_list () =
+  let is_kernel p = Plugin.(p.p_shortname = kernel_shortname) in
+  Plugin.fold_on_plugins
+    (fun p acc -> if not (is_kernel p) then p :: acc else acc) []
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"getKernel"
+    ~descr:(Md.plain "Return the Frama-C kernel information")
+    ~input:(module Junit) ~output:(module PluginData)
+    (fun () -> Plugin.(get_from_shortname kernel_shortname))
+
 let () = Request.register
     ~package ~kind:`GET ~name:"getPlugins"
     ~descr:(Md.plain "Return the list of available Frama-C plug-ins")
     ~input:(module Junit) ~output:(module Jlist (PluginData))
-    (fun () -> Plugin.fold_on_plugins (fun p acc -> p :: acc) [])
+    (fun () -> plugin_list ())
 
 let () = Request.register
     ~package ~kind:`GET ~name:"getPluginParameters"

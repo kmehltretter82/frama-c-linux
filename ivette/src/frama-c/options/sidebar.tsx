@@ -62,6 +62,7 @@ function SidebarItem(props: SideBarItemProps): React.JSX.Element {
 }
 
 interface SideBarProps {
+  kernel: Params.plugin;
   plugins: Params.plugin[];
   isSetElement: IsSetElement;
   selectedState: [
@@ -72,7 +73,7 @@ interface SideBarProps {
 }
 
 export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
-  const { selectedState, isSetElement, plugins, remotes } = props;
+  const { selectedState, isSetElement, kernel, plugins, remotes } = props;
   const [selected, setSelected] = selectedState;
 
   const onSelection = React.useCallback(
@@ -90,20 +91,24 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
     });
   }, [setSelected]);
 
+  function makeSidebarItem(p: Params.plugin): React.JSX.Element {
+    return <SidebarItem key={p.name}
+      plugin={p}
+      isSet={isSetElement[p.name]}
+      onSelection={(e: React.MouseEvent) => onSelection(e, p)}
+      selected={selected}
+      remote={remotes[p.name]} />;
+  }
+
   return (
     <SideBar>
-      <SidebarTitle label='Plugins'>
+      <SidebarTitle label='Kernel & Plugins'>
         <HelpButton id="framac-parameters" size={14} />
       </SidebarTitle>
       <div className="globals-scrollable-area">
-        { plugins.map(p => <SidebarItem key={p.name}
-            plugin={p}
-            isSet={isSetElement[p.name]}
-            onSelection={(e: React.MouseEvent) => onSelection(e, p)}
-            selected={selected}
-            remote={remotes[p.name]} />
-          )
-        }
+        { makeSidebarItem(kernel) }
+        <div className='dome-xMenu-Item-separator' />
+        { plugins.map(makeSidebarItem) }
       </div>
     </SideBar>
   );

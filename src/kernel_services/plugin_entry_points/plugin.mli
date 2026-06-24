@@ -194,6 +194,10 @@ val fold_on_plugins: (plugin -> 'a -> 'a) -> 'a -> 'a
 (** Fold [f] on each registered plug-in.
     @since 22.0-Titanium *)
 
+val kernel_shortname: string
+(** Shortname of the Kernel.
+    @since Frama-C+dev *)
+
 (**/**)
 (* ************************************************************************* *)
 (** {2 Internal kernel stuff} *)
