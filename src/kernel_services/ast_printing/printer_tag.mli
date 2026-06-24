@@ -107,7 +107,7 @@ val pos_to_localizable: ?precise_col:bool -> Filepos.t -> localizable option
     Filepos.t. If [precise_col] is [true], takes the column number into
     account (possibly a more precise, but costly, result).
     @since 24.0-Chromium
-    @before Frama-C+dev was [loc_to_localizable] *)
+    @before 33.0-Arsenic was [loc_to_localizable] *)
 
 module type Tag =
 sig

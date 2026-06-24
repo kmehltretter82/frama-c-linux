@@ -38,12 +38,12 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
 
 (** Convert a {!Lexing.position} to a [Filepos.t] using the current parsing
     context (taking {!setCurrentLine} into account).
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val convert_pos: Lexing.position -> Filepos.t
 
 (** Convert a pair of {!Lexing.position} to a [Cil_types.location] using the
     current parsing context (taking {!setCurrentLine} into account).
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val convert_loc: Lexing.position * Lexing.position -> Cil_types.location
 
 (** prints the line(s) identified by the location, together with [ctx] lines

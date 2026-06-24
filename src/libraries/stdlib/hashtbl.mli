@@ -23,7 +23,7 @@ module type S = sig
       are put in the list in reverse order of introduction, that is,
       the most recent binding is passed first.
 
-      @since Frama-C+dev *)
+      @since 33.0-Arsenic *)
   val bindings_sorted:
     ?cmp:(key -> key -> int) -> 'a t -> (key * 'a) list
 
