@@ -244,7 +244,7 @@ let join_value v1 v2 =
 let rec join_params l1 l2 = match l1, l2 with
   | [], [] -> ([], false)
   | [], l | l, [] ->
-    Mt_self.warning "Joining parameters lists of different lengths";
+    Self.warning "Joining thread parameter lists of different lengths";
     (l, true)
   | x::xs , y::ys ->
     let v, recv = join_value x y and lv, recl = join_params xs ys in

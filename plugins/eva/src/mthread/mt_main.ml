@@ -101,7 +101,7 @@ let make_analysis_state () =
 let pre_analysis () =
   if Mt_options.Enabled.get ()
   then begin
-    Mt_self.warning
+    Self.warning ~wkey:Self.wkey_experimental
       "Analysis of concurrent programs is an experimental feature.";
     Mt_lib.check_mthread_library ();
     check_options ();
@@ -163,6 +163,6 @@ let () =
   Mt_options.ThreadsLib.add_set_hook
     (fun old_value new_value ->
        if old_value <> new_value && Ast.is_computed () then
-         Mt_self.warning
-           "ignoring option %s specified after parsing"
+         Self.warning
+           "Ignoring option %s specified after parsing."
            Mt_options.ThreadsLib.option_name)

@@ -5,7 +5,6 @@
 [kernel] Parsing utf8_names.c (with preprocessing)
 [kernel:typing:int-conversion] utf8_names.c:23: Warning: 
   Conversion from a pointer to an integer without an explicit cast
-[eva] Warning: Analysis of concurrent programs is an experimental feature.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread

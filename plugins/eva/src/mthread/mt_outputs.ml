@@ -630,7 +630,7 @@ module Html = struct
         in
         Buffer.contents b
       with Sys_error _ ->
-        Mt_self.warning "Cannot open mthread css '%a'" Filepath.pretty css_file;
+        Self.warning "Cannot open mthread css '%a'" Filepath.pretty css_file;
         ""
     )
   ;;

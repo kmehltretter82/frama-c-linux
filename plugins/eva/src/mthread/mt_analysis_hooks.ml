@@ -49,7 +49,7 @@ let result analysis =
 
 let warning analysis =
   let source, append = log_arg analysis in
-  Mt_self.warning ~once:true ?source ~append
+  Self.warning ~once:true ?source ~append
 
 let error analysis =
   let source, append = log_arg analysis in

@@ -338,9 +338,9 @@ let mark_shared_nodes_kind analysis =
            | false, true  -> Mt_cfg_types.SharedVarNonConcurrentAccess
            | true,  true  -> Mt_cfg_types.NotReallySharedVar
            | true,  false ->
-             Mt_self.warning ~once:true
-               "Incoherent@ combination@ of@ options@ %s@ \
-                and@ %s.@ Only@ non-shared@ variables@ will@ be@ removed."
+             Self.warning ~once:true
+               "Incoherent combination of options %s and %s. \
+                Only non-shared variables will be removed."
                Mt_options.KeepWhiteNodes.option_name
                Mt_options.KeepGreenNodes.option_name;
              Mt_cfg_types.SharedVarNonConcurrentAccess

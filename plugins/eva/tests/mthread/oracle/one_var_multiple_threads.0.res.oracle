@@ -5,7 +5,6 @@
 [kernel] Parsing one_var_multiple_threads.c (with preprocessing)
 [kernel:CERT:MSC:37] one_var_multiple_threads.c:33: Warning: 
   Body of function g falls-through. Adding a return statement
-[eva] Warning: Analysis of concurrent programs is an experimental feature.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread

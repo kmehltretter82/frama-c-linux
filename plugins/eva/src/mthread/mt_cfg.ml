@@ -795,7 +795,9 @@ let compute_node_context th mutexes iter state node =
   let extract ~default v = match v with
     | Ok v -> v
     | Error error ->
-      Mt_self.warning "%a: %s" CfgNode.pretty_with_stmts node error;
+      Self.warning ~once:true
+        "Error when computing Mthread CFG at node %a: %s"
+        CfgNode.pretty_with_stmts node error;
       default
   in
   let mutexes =

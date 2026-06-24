@@ -201,7 +201,7 @@ class do_it cp =
            self#add_access Read deps;
            let loc = Results.(eval_address lv request |> as_location) in
            if Addresses.Bits.(equal loc.addr top) then
-             Mt_self.warning ~current:true ~once:true
+             Self.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
                Printer.pp_lval lv;
            let loc = remove_uninteresting_variables_loc loc in
@@ -300,7 +300,7 @@ class do_it cp =
                let z = Locations.(enumerate_valid_bits Write loc) in
                self#add_access (Write loc) z
              with Eval_terms.LogicEvalError _ ->
-               Mt_self.warning ~once:true
+               Self.warning ~once:true
                  "Unsupported assigns clause for function %a. Ignoring it."
                  Kernel_function.pretty kf;
            in
@@ -645,7 +645,7 @@ module Precise = struct
   let extract_shared_value node op (loc : Locations.t) state =
     match loc.size with
     | `Top ->
-      Mt_self.warning ?source:(CfgNode.node_first_loc node)
+      Self.warning ?source:(CfgNode.node_first_loc node) ~once:true
         "Ignoring imprecise %a at %a"
         Mt_types.RW.pretty op Locations.pretty loc;
       []

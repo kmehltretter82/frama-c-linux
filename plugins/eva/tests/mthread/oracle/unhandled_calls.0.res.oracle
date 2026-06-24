@@ -9,7 +9,6 @@
   and
   int (*)(void *, int )
 [kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
-[eva] Warning: Analysis of concurrent programs is an experimental feature.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread

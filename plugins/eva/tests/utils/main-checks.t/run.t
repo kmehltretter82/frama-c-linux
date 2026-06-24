@@ -18,7 +18,8 @@ Mthread should not crash when a specification is used for the main function.
   [eva] Preparing sources for the analysis of concurrent program with builtins only
   [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
-  [eva] Warning: Analysis of concurrent programs is an experimental feature.
+  [eva:experimental] Warning: 
+    Analysis of concurrent programs is an experimental feature.
   [kernel] Plug-in eva aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in eva] Using an ACSL specification or a builtin to interpret entry point main of thread <main> is not supported.'.
@@ -29,7 +30,8 @@ Mthread should not crash when the main function has no body.
   [eva] Preparing sources for the analysis of concurrent program with builtins only
   [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
-  [eva] Warning: Analysis of concurrent programs is an experimental feature.
+  [eva:experimental] Warning: 
+    Analysis of concurrent programs is an experimental feature.
   [kernel] Plug-in eva aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in eva] Using an ACSL specification or a builtin to interpret entry point spec_only of thread <main> is not supported.'.
@@ -40,7 +42,8 @@ Mthread should not crash when a builtin is used for the main function.
   [eva] Preparing sources for the analysis of concurrent program with builtins only
   [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
-  [eva] Warning: Analysis of concurrent programs is an experimental feature.
+  [eva:experimental] Warning: 
+    Analysis of concurrent programs is an experimental feature.
   [kernel] Plug-in eva aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in eva] Using an ACSL specification or a builtin to interpret entry point strlen of thread <main> is not supported.'.
