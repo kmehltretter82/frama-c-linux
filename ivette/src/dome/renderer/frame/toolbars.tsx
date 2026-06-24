@@ -140,13 +140,19 @@ export function delPinnedMessage(id: string): void {
 }
 
 export function PinnedMessages(): React.ReactNode {
-  const [ messages, ] = useGlobalState(pinnedMessage);
+  const [messages,] = useGlobalState(pinnedMessage);
   const hasMessages = messages.length > 0;
+  const className = classes(
+    'dome-xIcon-pinned',
+    hasMessages && 'dome-xIcon-pinned-messages',
+  );
   const button = (
     <Button
       enabled={hasMessages}
-      className='dome-xIcon-pinned'
-      title={hasMessages ? undefined : 'No pinned messages'}
+      className={className}
+      title={
+        hasMessages ? "Selection of Eva results" : "No selection of Eva results"
+      }
     >
       <SVG
         id='PIN'
@@ -156,21 +162,21 @@ export function PinnedMessages(): React.ReactNode {
     </Button>
   );
 
-  if(!hasMessages) return button;
+  if (!hasMessages) return button;
   return (
     <Dropdown control={button}>
       <div className='dome-xIcon-pinned-content'>
-        { messages.map(e =>
-            <div key={e.id}>
-              <div className='message' title={e.title}>
-                <LED
-                  status={e.statusMessage ?? 'warning'}
-                  style={{ width: '10px', height: '10px' }}
-                />
-                <div>{e.message}</div>
-              </div>
-              <div className='action'>{e.actions}</div>
-            </div>)
+        {messages.map(e =>
+          <div key={e.id}>
+            <div className='message' title={e.title}>
+              <LED
+                status={e.statusMessage ?? 'warning'}
+                style={{ width: '10px', height: '10px' }}
+              />
+              <div>{e.message}</div>
+            </div>
+            <div className='action'>{e.actions}</div>
+          </div>)
         }
       </div>
     </Dropdown>
