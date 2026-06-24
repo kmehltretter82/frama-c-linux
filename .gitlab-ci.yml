@@ -413,7 +413,7 @@ build-distrib-tarball:
       - ./*.tar.gz
     expire_in: 1 week
 
-# Build linux distribution
+# Build linux bundle
 
 .build_template: &bundle_docker_setup
   image: "debian:$BUNDLE_DEBIAN"
@@ -435,7 +435,7 @@ build-distrib-tarball:
     - rm install.sh
     - opam init -y
 
-.build_template: &linux_distribution
+.build_template: &linux_bundle
   script:
     - ./dev/build-bundle.sh
   artifacts:
@@ -443,20 +443,27 @@ build-distrib-tarball:
       - ./*.run
     expire_in: 1 week
 
-build-linux-x86-64-bundle:
+.build_template: &linux_x86_64_bundle
   stage: distrib
   variables:
     BUNDLE_ARCH: "linux-x86-64"
     BUNDLE_EXT:  "run"
   <<: *bundle_docker_setup
-  <<: *linux_distribution
+  <<: *linux_bundle
   tags:
     - docker
+
+build-linux-x86-64-bundle:
+  <<: *linux_x86_64_bundle
+  <<: *manual_when_not_special_pipeline
+
+build-linux-x86-64-bundle-release:
+  <<: *linux_x86_64_bundle
   <<: *when_release
 
-# Build macOS distribution
+# Build macOS bundle
 
-.build_template: &macos_distribution
+.build_template: &macos_bundle
   stage: distrib
   variables:
     BUNDLE_EXT: "pkg"
@@ -467,14 +474,18 @@ build-linux-x86-64-bundle:
     paths:
       - ./*.pkg
     expire_in: 1 week
-  tags:
-    - ${BUNDLE_ARCH}
-
-build-macos-distribution:
-  <<: *macos_distribution
   parallel:
     matrix:
       - BUNDLE_ARCH: [macos-x86, macos-arm]
+  tags:
+    - ${BUNDLE_ARCH}
+
+build-macos-bundle:
+  <<: *macos_bundle
+  <<: *manual_when_not_special_pipeline
+
+build-macos-bundle-release:
+  <<: *macos_bundle
   <<: *when_release
 
 # Build ivette macOS dmg
@@ -589,8 +600,8 @@ release-content:
   needs:
     - api-for-release
     - build-distrib-tarball
-    - build-linux-x86-64-bundle
-    - build-macos-distribution
+    - build-linux-x86-64-bundle-release
+    - build-macos-bundle-release
     - build-ivette-macos-packages-release
     - manuals-for-release
   artifacts:
