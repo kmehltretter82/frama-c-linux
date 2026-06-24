@@ -499,7 +499,7 @@
 
 "@electron-toolkit/utils@^3.0.0":
   version "3.0.0"
-  resolved "https://registry.npmjs.org/@electron-toolkit/utils/-/utils-3.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/@electron-toolkit/utils/-/utils-3.0.0.tgz#74626893d93025eacba086d497b615cf927d42c4"
   integrity sha512-GaXHDhiT7KCvMJjXdp/QqpYinq69T/Pdl49Z1XLf8mKGf63dnsODMWyrmIjEQ0z/vG7dO8qF3fvmI6Eb2lUNZA==
 
 "@electron/asar@3.4.1", "@electron/asar@^3.3.1":
@@ -2900,13 +2900,6 @@ cytoscape-klay@:
   integrity sha512-VwPj0VR25GPfy6qXVQRi/MYlZM/zkdvRhHlgqbM//lSvstgM6fhp3ik/uM8Wr8nlhskfqz/M1fIDmR6UckbS2A==
   dependencies:
     klayjs "^0.4.1"
-
-cytoscape-panzoom@:
-  version "2.5.3"
-  resolved "https://registry.npmjs.org/cytoscape-panzoom/-/cytoscape-panzoom-2.5.3.tgz"
-  integrity sha512-//qLOqbbFUCGddarNKHDZArItOJHgnkQ1TvxI9nV2/8aOOl/5wuEOHmra3fL/aWSjB4AYpYTG4LX7w96uWfRTQ==
-  dependencies:
-    jquery "^1.4 || ^2.0 || ^3.0"
 
 cytoscape-popper@:
   version "2.0.0"
@@ -5477,11 +5470,6 @@ jiti@^2.4.2:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.6.1.tgz#178ef2fc9a1a594248c20627cd820187a4d78d92"
   integrity sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==
-
-"jquery@^1.4 || ^2.0 || ^3.0":
-  version "3.7.1"
-  resolved "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz"
-  integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
