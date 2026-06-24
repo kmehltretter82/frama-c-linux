@@ -28,14 +28,18 @@ rm -rf "$OPAM"
 opam switch create --empty .
 eval $(opam env)
 
-opam install -y \
+opam pin add -n \
+  https://github.com/Frama-C/ocaml-universal-installer.git#reference
+
+opam install -y --confirm-level=unsafe-yes \
   dune \
   dune-configurator \
   dune-site \
   camlzip \
   menhir \
-  ocaml \
+  ocaml."$BUNDLE_OCAML" \
   ocamlgraph \
+  oui \
   unionFind \
   yaml \
   yojson \
@@ -45,11 +49,10 @@ opam install -y \
   ppx_deriving_yaml \
   ppx_inline_test
 
-opam pin add -y https://github.com/Frama-C/ocaml-universal-installer.git#feat/app-armor
-
 # build why3 relocatable
 
-WHY3="why3-1.8.2"
+WHY3_VERSION="$(grep '^- why3' reference-configuration.md | sed 's/^- why3\.//' | sed 's/ (.*)//')"
+WHY3="why3-$WHY3_VERSION"
 
 rm -rf "$WHY3*"
 curl "https://why3.gitlabpages.inria.fr/releases/$WHY3.tar.gz" -o "$WHY3.tar.gz"
@@ -139,7 +142,7 @@ if [ ! -n "$NOGUI" ]; then
   yarn run build
   yarn run electron-builder build --dir
 
-  cp -r ./dist/linux-unpacked ../bundle/lib/frama-c/gui
+  cp -r ./dist/linux-*unpacked ../bundle/lib/frama-c/gui
 
   cd ..
 fi
@@ -148,4 +151,9 @@ fi
 
 ./dev/clean-bundle.sh --quiet bundle
 
-oui build "dev/$OUI_FILE" bundle
+oui build "dev/$OUI_FILE" -o "frama-c-$BUNDLE_ARCH.$BUNDLE_EXT" bundle
+
+if [ -f "frama-c-$BUNDLE_ARCH.pkg" ]; then # sign macOS bundle
+  xattr -dr com.apple.quarantine "frama-c-$BUNDLE_ARCH.pkg"
+  codesign -s - --deep --force ./"frama-c-$BUNDLE_ARCH.pkg"
+fi
