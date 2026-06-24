@@ -930,12 +930,13 @@ let get_comments_global g =
   let last_pos (path : Filepath.t) =
     Filepos.make ~path ~line:max_int ~column:max_int ~offset:max_int ()
   and first_pos (path : Filepath.t) =
-    Filepos.make ~path ~line:1 ~column:0 ~offset:(-1) ()
+    Filepos.make ~path ~line:1 ~column:0 ()
   in
   let add g =
     let my_loc = Cil_datatype.Global.loc g in
+    let my_loc_start, my_loc_end = Fileloc.positions my_loc in
     let path = Fileloc.path my_loc in
-    let input_path = Filepos.input_path (fst my_loc) in
+    let input_path = Filepos.input_path my_loc_start in
     let globs = FileIndex.get_symbols path in
     let globs = List.sort
         (fun g1 g2 ->
@@ -953,24 +954,25 @@ let get_comments_global g =
       | g' :: l when Cil_datatype.Global.equal g g' ->
         first_pos input_path, l = []
       | g' :: g'' :: l when Cil_datatype.Global.equal g'' g ->
-        snd (Cil_datatype.Global.loc g'), l = []
+        Fileloc.end_pos (Cil_datatype.Global.loc g'), l = []
       | _ :: l -> find_prev l
     in
-    let first, is_last = find_prev globs in
+    let start_pos, is_last = find_prev globs in
     match g with
       GFun (f,_) ->
       let kf = Functions.get f.svar in
       let s = !find_first_stmt kf in
-      let last = fst (Cil_datatype.Stmt.loc s) in
-      let comments = Cabshelper.Comments.get (first,last) in
+      let end_pos = Fileloc.start_pos (Cil_datatype.Stmt.loc s) in
+      let comments = Cabshelper.Comments.get (Fileloc.make ~start_pos ~end_pos) in
       if is_last then begin
-        let first = snd my_loc in
-        let last = last_pos input_path in
-        comments @ (Cabshelper.Comments.get (first, last))
+        let end_pos = last_pos input_path in
+        let loc = Fileloc.make ~start_pos:my_loc_end ~end_pos in
+        comments @ (Cabshelper.Comments.get loc)
       end else comments
     | _ ->
-      let last = if is_last then last_pos input_path else snd my_loc in
-      Cabshelper.Comments.get (first,last)
+      let end_pos = if is_last then last_pos input_path else my_loc_end in
+      let loc = Fileloc.make ~start_pos ~end_pos in
+      Cabshelper.Comments.get loc
   in Comments_global_cache.memo add g
 
 let get_comments_stmt s =
@@ -981,16 +983,17 @@ let get_comments_stmt s =
       | [] ->
         Kernel.fatal "Cannot find statement %d in its enclosing block" s.sid
       | s' :: _ when Cil_datatype.Stmt.equal s s' ->
-        fst (Cil_datatype.Stmt.loc s')
+        Fileloc.start_pos (Cil_datatype.Stmt.loc s')
       | s' :: s'' :: _ when Cil_datatype.Stmt.equal s'' s ->
-        snd (Cil_datatype.Stmt.loc s')
+        Fileloc.end_pos (Cil_datatype.Stmt.loc s')
       | { skind = UnspecifiedSequence l1} :: l2 ->
         find_prev ((List.map (fun (x,_,_,_,_) -> x) l1) @ l2)
       | _::l -> find_prev l
     in
-    let first = find_prev b.bstmts in
-    let last = snd (Cil_datatype.Stmt.loc s) in
-    Cabshelper.Comments.get (first,last)
+    let start_pos = find_prev b.bstmts in
+    let end_pos = Fileloc.end_pos (Cil_datatype.Stmt.loc s) in
+    let loc = Fileloc.make ~start_pos ~end_pos in
+    Cabshelper.Comments.get loc
   in Comments_stmt_cache.memo add s
 
 (* ************************************************************************* *)

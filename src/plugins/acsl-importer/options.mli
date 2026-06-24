@@ -19,11 +19,11 @@ val main_import: File.code_transformation_category
    So, they can always be considered an informative message.
    Kernel category: "annot-error"
    @raise the given exception *)
-val annot_warning: ?source:Filepos.t -> raising:(unit -> 'b)
+val annot_warning: ?source:Fileloc.t -> raising:(unit -> 'b)
   -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (* Kernel category: "annot-error" *)
-val annot_error: ?source:Filepos.t
+val annot_error: ?source:Fileloc.t
   -> ('a,Format.formatter,unit) format -> 'a
 
 val wkey_integer_cast: warn_category

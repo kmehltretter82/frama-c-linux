@@ -16,7 +16,7 @@
     @before 33.0-Arsenic This module was {!Cil_datatype.Location}.
 *)
 
-type t = Filepos.t * Filepos.t [@@deriving show]
+type t [@@deriving show]
 
 include Datatype.S_with_collections with type t := t
 
@@ -59,6 +59,10 @@ val pretty_debug: t Pretty_utils.formatter
 
 (** {2 Conversion from/to Lexing.position } *)
 
+(** Convert a [Lexing.position] to a [Fileloc.t].
+    @since Frama-C+dev *)
+val of_lexing_pos : Lexing.position -> t
+
 (** Convert a pair of [Lexing.position] to a [Fileloc.t]. *)
 val of_lexing_loc : Lexing.position * Lexing.position -> t
 
@@ -66,6 +70,14 @@ val of_lexing_loc : Lexing.position * Lexing.position -> t
 val to_lexing_loc : t -> Lexing.position * Lexing.position
 
 (** {2 Accessors } *)
+
+(** Get the starting position of a location
+    @since Frama-C+dev. *)
+val start_pos : t -> Filepos.t
+
+(** Get the ending position of a location
+    @since Frama-C+dev. *)
+val end_pos : t -> Filepos.t
 
 (** Get the first line of the location. *)
 val line : t -> int
@@ -76,6 +88,40 @@ val path : t -> Filepath.t
 (** [is_empty loc] returns true if the first position is empty according to
     {!Filepos.is_empty}. *)
 val is_empty : t -> bool
+
+(** {2 Constructors } *)
+
+(** It is not recommended to manipulate / create locations manually, only the
+    parser should do it. But if really necessary, these functions provides
+    ways to to it. *)
+
+(** Create a location between a starting and ending position.
+    @since Frama-C+dev *)
+val make : start_pos:Filepos.t -> end_pos:Filepos.t -> t
+
+(** Convert a location to a pair of positions.
+    @since Frama-C+dev *)
+val positions :  t -> Filepos.t * Filepos.t
+
+(** Create a location from the given position.
+    @since Frama-C+dev *)
+val of_pos : Filepos.t -> t
+
+(** Create a location from the union of two locations using [Fileloc.compare]
+    to find the starting and ending positions.
+    @since Frama-C+dev *)
+val join : t -> t -> t
+
+(** [start_loc loc] returns a new location pointing only to the beginning of
+    [loc], i.e. reduced to a single position equal to the start of [loc].
+    @since Frama-C+dev *)
+val start_loc : t -> t
+
+(** [end_loc loc] returns a new location pointing only to the end of
+    [loc], i.e. reduced to a single position equal to the end of [loc].
+    @since Frama-C+dev *)
+val end_loc : t -> t
+
 
 (** {2 Datatype with comparison/hash on original source positions} *)
 

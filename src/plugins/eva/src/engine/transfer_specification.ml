@@ -49,7 +49,7 @@ let warn_empty_from list =
   match no_from with
   | [] -> ()
   | (out, _) :: _ ->
-    let source = fst out.it_content.term_loc in
+    let source = out.it_content.term_loc in
     Self.warning ~source ~once:true ~wkey:Self.wkey_missing_assigns
       "@[no \\from part for clause@ '%a'.@ Assuming \\from \\nothing so that \
        the analysis can continue, but be aware this is probably incorrect.@]"
@@ -123,7 +123,7 @@ let warn_on_missing_result_assigns kinstr kf spec =
   in
   if return_used && not (List.for_all assigns_result spec.spec_behavior)
   then
-    let source = fst (Kernel_function.get_location kf) in
+    let source = Kernel_function.get_location kf in
     Self.warning ~wkey:Self.wkey_missing_assigns_result  ~once:true ~source
       "@[no 'assigns \\result \\from ...' clause specified for function %a@]"
       Kernel_function.pretty kf

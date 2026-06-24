@@ -177,7 +177,7 @@ end
 module Position =  struct
   include Filepos
   let unknown = unknown [@@alert "-deprecated"]
-  let dummy = fst dummy_loc
+  let dummy = Fileloc.start_pos dummy_loc
   let pp_with_col = Filepos.pretty_long
   let of_lexing_pos pos = of_lexing_pos pos (* Erase the optional parameter *)
 end
@@ -189,7 +189,7 @@ module Location = struct
   let is_unknown loc = is_empty loc
   let compare_start_semantic = compare
   let equal_start_semantic = equal
-  let pretty_line fmt loc = Filepos.pretty_long fmt (fst loc)
+  let pretty_line fmt loc = Filepos.pretty_long fmt (start_pos loc)
 end
 
 module File = struct
@@ -2360,7 +2360,7 @@ module Global_annotation = struct
 
         let rec hash g = match g with
           | Dfun_or_pred (l,_) -> 2 * Logic_info.hash l
-          | Dvolatile ([],_,_,_,(_source,_)) ->
+          | Dvolatile ([],_,_,_,_) ->
             Kernel_log.fatal
               "Empty location list for volatile annotation@."
           | Dvolatile (t::_,_,_,_,_) -> 3 * Identified_term.hash t

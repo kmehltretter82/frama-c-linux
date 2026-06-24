@@ -123,7 +123,7 @@ let code_annot kf stmt s =
   let pa =
     Option.bind
       (function (_, Logic_ptree.Acode_annot (_,a)) -> Some a | _ -> None)
-      (Logic_lexer.annot (fst loc,s))
+      (Logic_lexer.annot (Fileloc.start_pos loc,s))
   in
   let parse pa =
     Populate_spec.populate_funspec kf [`Assigns];
@@ -140,7 +140,7 @@ let default_term_env () =
 let term kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
   sync_typedefs ();
   let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
-  let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
+  let pa_expr = Option.map snd (Logic_lexer.lexpr (Fileloc.start_pos loc, s)) in
   let parse pa_expr = LT.term env pa_expr in
   wrap parse pa_expr loc
 
@@ -152,6 +152,6 @@ let term_lval kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
 let predicate kf ?(loc=Kernel.gen_loc) ?(env=default_term_env ()) s =
   sync_typedefs ();
   let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
-  let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
+  let pa_expr = Option.map snd (Logic_lexer.lexpr (Fileloc.start_pos loc, s)) in
   let parse pa_expr = LT.predicate env pa_expr in
   wrap parse pa_expr loc

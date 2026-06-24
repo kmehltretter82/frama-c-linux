@@ -211,7 +211,7 @@ let axiomatic_of_global ~context = function
   | (Daxiomatic(name,globals,_,loc) | Dmodule(name,globals,_,_,loc)) as g ->
     let a = {
       ax_name = name ;
-      ax_position = fst loc ;
+      ax_position = Fileloc.start_pos loc ;
       ax_property = ip_of_axiomatic g ;
       ax_reads = Varinfo.Set.empty ;
       ax_types = [] ; ax_lemmas = [] ; ax_logics = [] ;

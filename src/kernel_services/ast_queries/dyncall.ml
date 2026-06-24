@@ -130,7 +130,7 @@ class dyncall =
             | bhvs -> bhvs
           in
           let debug_calls bhv stmt kfs =
-            let source = snd (Stmt.loc stmt) in
+            let source = Stmt.loc stmt in
             let dkey = Kernel.dkey_dyncalls in
             Kernel.feedback ~source ~dkey
               "@[<hov 2>Calls %s%a@]"

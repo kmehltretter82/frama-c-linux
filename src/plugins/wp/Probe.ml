@@ -70,7 +70,7 @@ let annotations stmt =
   let mk_probe t =
     try name_of_term t, t
     with Not_found ->
-      Wp_parameters.abort ~source:(fst t.term_loc)
+      Wp_parameters.abort ~source:t.term_loc
         "Missing name for probe, use @probe A: term;"
   in List.rev_map mk_probe (Annotations.fold_code_annot collect stmt [])
 

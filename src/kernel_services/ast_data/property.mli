@@ -518,7 +518,7 @@ val location: identified_property -> Fileloc.t
 (** returns the location of the property.
     @since Oxygen-20120901 *)
 
-val source: identified_property -> Filepos.t option
+val source: identified_property -> Fileloc.t option
 (** returns the location of the property, if not unknown.
     @since Chlorine-20180501 *)
 

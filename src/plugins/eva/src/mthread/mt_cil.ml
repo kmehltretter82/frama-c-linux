@@ -21,7 +21,7 @@ let is_call_to_sync stmt =
 
 let kinstr_to_source = function
   | Kglobal -> None
-  | Kstmt stmt -> Some (fst (Cil_datatype.Stmt.loc stmt))
+  | Kstmt stmt -> Some (Cil_datatype.Stmt.loc stmt)
 
 
 let pretty_succs fmt stmt =

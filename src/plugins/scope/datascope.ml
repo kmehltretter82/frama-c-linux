@@ -613,7 +613,7 @@ let rm_asserts () =
     R.feedback ~dkey:cat_rm_asserts "removing %d assertion(s)@." n;
     let aux ca (stmt_ca, ca_because, stmt_because) =
       let loc = Cil_datatype.Stmt.loc stmt_ca in
-      R.result ~source:(fst loc) ~dkey:cat_rm_asserts ~level:2
+      R.result ~source:loc ~dkey:cat_rm_asserts ~level:2
         "@[removing redundant@ %a@]" Printer.pp_code_annotation ca;
       let kf = Kernel_function.find_englobing_kf stmt_ca in
       let ip_ca = Property.ip_of_code_annot_single kf stmt_ca ca in

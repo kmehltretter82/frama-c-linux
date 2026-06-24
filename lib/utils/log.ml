@@ -298,9 +298,6 @@ let do_transient terminal ~plugin message =
 (* --- Source                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let source ~file ~line =
-  Filepos.make ~path:file ~line ~column:0 ~offset:0 ()
-
 let current_loc = ref (fun () -> raise Not_found)
 
 let set_current_source fpos = current_loc := fpos
@@ -308,8 +305,8 @@ let set_current_source fpos = current_loc := fpos
 let get_current_source () = !current_loc ()
 
 let get_source current = function
-  | None -> if current then Some (!current_loc ()) else None
-  | Some _ as s -> s
+  | None -> if current then Some (Fileloc.start_pos (!current_loc ())) else None
+  | Some loc -> Some (Fileloc.start_pos loc)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Channels                                                           --- *)
@@ -601,13 +598,13 @@ let treat_deferred_error () =
 (* -------------------------------------------------------------------------- *)
 
 type 'a pretty_printer =
-  ?current:bool -> ?source:Filepos.t ->
+  ?current:bool -> ?source:Fileloc.t ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  ?current:bool -> ?source:Filepos.t -> ?echo:bool ->
+  ?current:bool -> ?source:Fileloc.t -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
@@ -833,7 +830,7 @@ sig
   val debug_atleast: int -> bool
 
   val printf : ?level:int -> ?dkey:category ->
-    ?current:bool -> ?source:Filepos.t ->
+    ?current:bool -> ?source:Fileloc.t ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
     ('a,Format.formatter,unit) format -> 'a
@@ -849,7 +846,7 @@ sig
   val fatal   : ('a,'b) pretty_aborter
   val verify  : bool -> ('a,bool) pretty_aborter
 
-  val not_yet_implemented : ?current:bool -> ?source:Filepos.t ->
+  val not_yet_implemented : ?current:bool -> ?source:Fileloc.t ->
     ('a,Format.formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 
@@ -1332,6 +1329,9 @@ let kernel_label_name = "kernel"
 
 let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
 let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
+
+let source ~file ~line =
+  Filepos.make ~path:file ~line ()
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tests                                                             --- *)

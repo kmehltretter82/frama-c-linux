@@ -36,7 +36,7 @@ sig
 end
 
 type 'a pretty_printer =
-  ?current:bool -> ?source:Filepos.t ->
+  ?current:bool -> ?source:Fileloc.t ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit) format -> 'a
@@ -58,7 +58,7 @@ type 'a pretty_printer =
      @since Beryllium-20090601-beta1 *)
 
 type ('a,'b) pretty_aborter =
-  ?current:bool -> ?source:Filepos.t -> ?echo:bool ->
+  ?current:bool -> ?source:Fileloc.t -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 (** Same as {!Log.pretty_printer} except that channels having this type
@@ -85,7 +85,7 @@ exception AbortFatal of string
 exception FeatureRequest of Filepos.t option * string * string
 (** Raised by [not_yet_implemented].
     You may catch [FeatureRequest(s,p,r)] to support degenerated behavior.
-    The (optional) source location is s, the responsible plugin is 'p'
+    The (optional) source position is s, the responsible plugin is 'p'
     and the feature request is 'r'.
     @before 23.0-Vanadium there was no source location
 *)
@@ -150,7 +150,7 @@ sig
   (** @since Beryllium-20090601-beta1 *)
 
   val printf : ?level:int -> ?dkey:category ->
-    ?current:bool -> ?source:Filepos.t ->
+    ?current:bool -> ?source:Fileloc.t ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
     ('a,Format.formatter,unit) format -> 'a
@@ -214,7 +214,7 @@ sig
       @since Beryllium-20090601-beta1
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val not_yet_implemented : ?current:bool -> ?source:Filepos.t ->
+  val not_yet_implemented : ?current:bool -> ?source:Fileloc.t ->
     ('a,Format.formatter,unit,'b) format4 -> 'a
   (** raises [FeatureRequest] but {i does not} send any message.
       If the exception is not caught, Frama-C displays a feature-request
@@ -514,8 +514,10 @@ val kernel_label_name: string
 
 val source : file:Filepath.t -> line:int -> Filepos.t
 (** @since Chlorine-20180501 *)
+[@@deprecated "Use Filepos.make instead"]
+[@@migrate { repl =  fun ~file ~line -> Filepos.make ~path:file ~line () }]
 
-val get_current_source : unit -> Filepos.t
+val get_current_source : unit -> Fileloc.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Terminal interface}
@@ -560,7 +562,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 
 (**/**)
 
-val set_current_source : (unit -> Filepos.t) -> unit
+val set_current_source : (unit -> Fileloc.t) -> unit
 (** Forward reference to the function returning the current location,
     used when [~current:true] is set on printers. Currently set
     in {!Cil}. Not for the casual user. *)

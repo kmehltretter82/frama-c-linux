@@ -162,7 +162,7 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
   { loc; kf; alarm; kind; text; status; contexts }
 
 let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
-  let pos = fst loc in
+  let pos = Fileloc.start_pos loc in
   let path = Filepos.path pos in
   let dir = Filepath.(dirname path |> to_string_rel) in
   let file = Filepath.basename path in

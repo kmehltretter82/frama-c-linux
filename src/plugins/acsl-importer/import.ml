@@ -48,21 +48,20 @@ let parse ~iDir ~pfile ~init_module_from_file_name ~init_typenames ast =
       with
       | Failure s ->
         Options.abort
-          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Fileloc.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[Failure while parsing] %s."
           s
       | Sys_error s ->
         Options.abort
-          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Fileloc.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[System error while parsing] %s."
           s
-      | Logic_utils.Not_well_formed(loc, s)         ->
-        Options.abort ~source:(fst loc)
-          "[Syntax error] %s (near %s)." s
+      | Logic_utils.Not_well_formed(loc, s) ->
+        Options.abort ~source:loc "[Syntax error] %s (near %s)." s
           (Lexing.lexeme lexbuf)
       | Parsing.Parse_error ->
         Options.abort
-          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Fileloc.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[Syntax error] %s."
           (Lexing.lexeme lexbuf)
     with
@@ -132,7 +131,8 @@ let typecheck ~iDir ext_spec_file ast =
     let paste_fun_spec = function
       | Ext_glob decl_spec -> paste_decl_spec decl_spec
       | Ext_spec (spec, loc) -> if Options.continue_after_parsing () then Paste.add_funspec spec loc
-      | Ext_stmt (stmt_markup, annot, (source,_loc2)) ->
+      | Ext_stmt (stmt_markup, annot, loc) ->
+        let source = loc in
         if Options.continue_after_parsing () then
           begin
             let at_markup = decode stmt_markup in

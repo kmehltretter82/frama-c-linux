@@ -1419,7 +1419,7 @@ and logic_label =
 (** Logic terms. *)
 and term = {
   term_node : term_node; (** kind of term. *)
-  term_loc : Filepos.t * Filepos.t;
+  term_loc : Fileloc.t;
   (** position in the source file. *)
   term_type : logic_type; (** type of the term. *)
   term_name: string list;

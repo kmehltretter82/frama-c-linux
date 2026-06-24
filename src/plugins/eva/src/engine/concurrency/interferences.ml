@@ -220,7 +220,7 @@ struct
     in
     let new_interferences_by_pos =
       let add (stmt, callstack as pos) acc_map =
-        let source = Pos.pos pos in
+        let source = Pos.loc pos in
         let state = Engine.get_state ~callstack (After stmt) in
         match state with
         | `Bottom -> acc_map (* no interference to add *)

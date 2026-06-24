@@ -715,8 +715,7 @@ let infer_format_from_args vf format_fun args =
       | PrintfLike -> t
       | ScanfLike ->
         if not (Ast_types.C.is_ptr t) then begin
-          let source = fst arg.eloc in
-          Kernel.warning ~source ~wkey:Kernel.wkey_typing
+          Kernel.warning ~source:arg.eloc ~wkey:Kernel.wkey_typing
             "Expecting pointer as parameter of scanf function. \
              Argument %a has type %a"
             Cil_printer.pp_exp arg Cil_printer.pp_typ t;

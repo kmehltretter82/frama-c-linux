@@ -16,7 +16,6 @@ exception Backtrack
 
 let ($) = Fun.compose
 
-let loc_join (b,_) (_,e) = (b,e)
 let unescape s = Logic_lexer.chr (Lexing.from_string s)
 
 let fkind_to_string fk = Format.asprintf "%a" Cil_printer.pp_fkind fk
@@ -1921,8 +1920,7 @@ struct
                     | TFloat fk -> fkind_to_string fk
                     | _ -> Kernel.fatal "floating point type expected"
                   in
-                  let source = fst loc in
-                  Kernel.warning ~source
+                  Kernel.warning ~source:loc
                     ~wkey:Kernel.wkey_acsl_float_compare
                     "comparing two %s values as real values. You might \
                      want to use \\%s_%s instead" kind
@@ -3197,7 +3195,7 @@ struct
     fun ctxt env f t1 op t2 ->
     let loc1 = t1.lexpr_loc in
     let loc2 = t2.lexpr_loc in
-    let loc = loc_join t1.lexpr_loc t2.lexpr_loc in
+    let loc = Fileloc.join t1.lexpr_loc t2.lexpr_loc in
     let t1 = ctxt.type_term ctxt env t1 in
     let ty1 = t1.term_type in
     let t2 = ctxt.type_term ctxt env t2 in
@@ -3924,7 +3922,7 @@ struct
     append_loop_labels (append_here_label (append_pre_label (Lenv.empty())))
 
   let code_annot loc current_behaviors current_return_type ca =
-    let source = fst loc in
+    let source = loc in
     let annot = match ca with
       | AAssert (behav,{tp_kind = kind; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
@@ -4360,7 +4358,7 @@ struct
     match def.l_body with
     | LBnone -> (pos_use, neg_use)
     | LBreads _ | LBinductive _ ->
-      Kernel.fatal ~source:(fst loc) "Unexpected definition in a \\let"
+      Kernel.fatal ~source:loc "Unexpected definition in a \\let"
     | LBterm t ->
       find_occurrences_term def.l_var_info ~polarity ~pos_use ~neg_use t
     | LBpred p ->

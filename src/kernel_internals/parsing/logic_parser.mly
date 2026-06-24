@@ -22,12 +22,10 @@
   let loc (start_pos, end_pos) =
     Errorloc.convert_loc (start_pos, end_pos)
 
-  let pos pos =
-    Errorloc.convert_pos pos
+  let from_pos pos =
+    Errorloc.convert_pos_to_loc pos
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
-  let loc_start x = fst x.lexpr_loc
-  let loc_end x = snd x.lexpr_loc
 
   let info start_end x = loc_info (loc start_end) x
 
@@ -35,14 +33,14 @@
   let rec pland p1 p2 =
     match p2.lexpr_node with
       | PLand (p3,p4) ->
-        let loc = (loc_start p1, loc_end p3) in
+        let loc = Fileloc.join p1.lexpr_loc p3.lexpr_loc in
         PLand(loc_info loc (pland p1 p3),p4)
       | _ -> PLand(p1,p2)
 
   let rec plor p1 p2 =
     match p2.lexpr_node with
       | PLor(p3,p4) ->
-        let loc = (loc_start p1, loc_end p3) in
+        let loc = Fileloc.join p1.lexpr_loc p3.lexpr_loc in
         PLor(loc_info loc (plor p1 p3),p4)
       | _ -> PLor(p1,p2)
 
@@ -410,7 +408,7 @@ lexpr_rel:
 | lexpr_end_rel  { $1 }
 | lexpr_inner rel_list
       { let rel, rhs, _, oth_rel = $2 in
-        let loc = loc_start $1, loc_end rhs in
+        let loc = Fileloc.join $1.lexpr_loc rhs.lexpr_loc in
         let relation = loc_info loc (PLrel($1,rel,rhs)) in
         match oth_rel with
             None -> relation
@@ -444,13 +442,14 @@ rel_list:
     let (sense, correct) = relation_sense $1 sense
     in
     if correct then
-      let loc = loc_start $2, loc_end rhs in
+      let loc = Fileloc.join $2.lexpr_loc rhs.lexpr_loc in
       let my_rel = loc_info loc (PLrel($2,next_rel,rhs)) in
-      let oth_rel = match oth_rel with
-          None -> my_rel
+      let oth_rel =
+        match oth_rel with
+        | None -> my_rel
         | Some rel ->
-	    let loc = loc_start $2, loc_end rel in
-	    loc_info loc (pland my_rel rel)
+          let loc = Fileloc.join $2.lexpr_loc rel.lexpr_loc in
+	        loc_info loc (pland my_rel rel)
       in
       $1,$2,sense,Some oth_rel
     else begin
@@ -494,11 +493,11 @@ lexpr_inner:
 | VALID_READ opt_label_1 LPAR lexpr RPAR { info $sloc (PLvalid_read ($2,$4)) }
 | VALID_FUNCTION LPAR lexpr RPAR { info $sloc (PLvalid_function $3) }
 | VALID_INDEX opt_label_1 LPAR lexpr COMMA lexpr RPAR {
-  let source = pos $symbolstartpos in
+  let source = loc $sloc in
   obsolete ~source "\\valid_index(addr,idx)" ~now:"\\valid(addr+idx)";
   info $sloc (PLvalid ($2,info $sloc (PLbinop ($4, Badd, $6)))) }
 | VALID_RANGE opt_label_1 LPAR lexpr COMMA lexpr COMMA lexpr RPAR {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   obsolete "\\valid_range(addr,min,max)"
     ~source ~now:"\\valid(addr+(min..max))";
   info $sloc (PLvalid
@@ -514,22 +513,22 @@ lexpr_inner:
 | ALLOCABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLallocable ($2,$4)) }
 | FREEABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLfreeable ($2,$4)) }
 | ALLOCATION opt_label_1 LPAR lexpr RPAR
-  { let source = pos $symbolstartpos in
+  { let source = from_pos $symbolstartpos in
     Kernel.not_yet_implemented ~source "\\allocation" }
 | AUTOMATIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\automatic" }
 | DYNAMIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\dynamic" }
 | REGISTER {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\register" }
 | STATIC {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\static" }
 | UNALLOCATED {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\unallocated" }
 | NULL { info $sloc PLnull }
 | constant { info $sloc (PLconstant $1) }
@@ -733,7 +732,7 @@ abs_param_type_list:
 | /* empty */    { [ ] }
 | abs_param_list { $1 }
 | abs_param_list COMMA DOTDOTDOT {
-  let source = pos $symbolstartpos in
+  let source = from_pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "variadic C function types"
   }
 ;
@@ -1515,7 +1514,7 @@ loop_grammar_extension:
       | _ -> raise Not_found
     end
   with Not_found ->
-    Kernel.fatal ~source:(pos $startpos($2))
+    Kernel.fatal ~source:(loc $loc($2))
       "%s is not a code annotation extension. Parser got wrong lexeme." name
 }
 ;
@@ -1569,7 +1568,7 @@ code_annotation:
         | _ -> raise Not_found
       end
     with Not_found ->
-      Kernel.fatal ~source:(pos $startpos($1))
+      Kernel.fatal ~source:(from_pos $startpos($1))
         "%s is not a code annotation extension. Parser got wrong lexeme" name
   }
 ;
@@ -1746,7 +1745,7 @@ push_module_name:
 ext_loader:
 | IDENTIFIER COLON {
     Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown
-      ~source:(fst (loc $sloc))
+      ~source:(loc $sloc)
       "Ignoring unregistered module importer extension '%s'" $1;
     raise Unknown_ext
   }

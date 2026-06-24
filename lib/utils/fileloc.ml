@@ -101,6 +101,10 @@ let generated ?loc generator_name =
 
 (* --- Conversion from/to Lexing.position  --- *)
 
+let of_lexing_pos pos =
+  let pos = Filepos.of_lexing_pos pos in
+  pos, pos
+
 let of_lexing_loc (pos1, pos2) =
   Filepos.of_lexing_pos pos1, Filepos.of_lexing_pos pos2
 
@@ -110,11 +114,32 @@ let to_lexing_loc (pos1, pos2) =
 
 (* --- Accessors  --- *)
 
+let start_pos = fst
+
+let end_pos = snd
+
 let path loc = fst loc |> Filepos.path
 
 let line loc = fst loc |> Filepos.line
 
 let is_empty loc = fst loc |> Filepos.is_empty
+
+(* --- Constructors --- *)
+
+let make ~start_pos ~end_pos = (start_pos, end_pos)
+
+let positions = Fun.id
+
+let of_pos pos = (pos, pos)
+
+let join (start1, end1) (start2, end2) =
+  let start_pos = if Filepos.compare start1 start2 <= 0 then start1 else start2
+  and end_pos = if Filepos.compare end1 end2 <= 0 then end2 else end1 in
+  start_pos, end_pos
+
+let start_loc (start_pos, _) = start_pos, start_pos
+
+let end_loc (_, end_loc) = end_loc, end_loc
 
 (* --- Datatype with comparison/hash on original source positions  --- *)
 

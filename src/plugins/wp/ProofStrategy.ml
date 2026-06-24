@@ -600,7 +600,7 @@ let subgoal (children : (string loc * string loc) list)
     | None, None -> ()
     | Some s , _ | None , Some s ->
       if not @@ Hashtbl.mem strategies s.value then
-        Wp_parameters.error ~source:(fst s.loc)
+        Wp_parameters.error ~source:s.loc
           "Unknown strategy '%s' (skipped)" s.value
       else ProofEngine.set_hint node s.value
   end ; node
@@ -628,12 +628,12 @@ let tactic tree node strategy alt =
             | Not_applicable ->
               raise Not_found
             | exception exn when Wp_parameters.protect exn ->
-              Wp_parameters.warning ~source:(fst t.tactic.loc)
+              Wp_parameters.warning ~source:t.tactic.loc
                 "Tactical '%s' configuration error (%s)"
                 t.tactic.value (Printexc.to_string exn) ;
               raise Not_found
             | Not_configured ->
-              Wp_parameters.error ~source:(fst t.tactic.loc)
+              Wp_parameters.error ~source:t.tactic.loc
                 "Tactical '%s' configuration error"
                 t.tactic.value ;
               raise Not_found

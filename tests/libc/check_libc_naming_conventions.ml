@@ -4,7 +4,7 @@ open Cil_types
 
 let warn_if_unnamed pred_type pred =
   if pred.pred_name = [] then
-    Kernel.warning ~source:(fst pred.pred_loc) ~once:true
+    Kernel.warning ~source:pred.pred_loc ~once:true
       "unnamed %s" pred_type
 
 class special_pred_visitor p_cond p_name required_name outermost_pred_name = object
@@ -13,7 +13,7 @@ class special_pred_visitor p_cond p_name required_name outermost_pred_name = obj
   method! vpredicate pred =
     if p_cond pred.pred_content &&
        not (List.mem required_name outermost_pred_name) then begin
-      Kernel.warning ~source:(fst pred.pred_loc) ~once:true
+      Kernel.warning ~source:pred.pred_loc ~once:true
         "clause with '%s' must contain name '%s'"
         p_name required_name;
       Cil.SkipChildren

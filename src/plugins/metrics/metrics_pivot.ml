@@ -455,7 +455,6 @@ let visit_messages () =
   FunctionAtPos.compute ();
   Messages.iter (fun ev ->
       let plugin = ev.evt_plugin in
-      let loc_of_pos p = (p, p) in
       let loc, func =
         match ev.evt_source with
         | None -> Metrics_parameters.gen_loc, "<global>"
@@ -468,7 +467,7 @@ let visit_messages () =
               "<unknown>"
             | Some name -> name
           in
-          loc_of_pos pos, funcname
+          Fileloc.of_pos pos, funcname
       in
       let domain = Message (ev.evt_kind) in
       let text = Log.Event.message ev in

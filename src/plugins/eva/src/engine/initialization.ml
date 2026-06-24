@@ -192,8 +192,7 @@ module Make (Engine: Engine_Subset) = struct
     then initialize_top_volatile lval state
     else
       match init with
-      | SingleInit (exp, loc) ->
-        let source = fst loc in
+      | SingleInit (exp, source) ->
         apply_eva_single_initializer_or_str ~pos ~source state lval exp
       | CompoundInit (_typ, l) ->
         let doinit state (off, init) =
@@ -215,7 +214,7 @@ module Make (Engine: Engine_Subset) = struct
   (* Initializes a varinfo, padding bits + optionally an initializer. *)
   let initialize_var_not_lib_entry ~pos ~local vi init state =
     ignore (warn_unknown_size vi);
-    let source = fst vi.vdecl in
+    let source = vi.vdecl in
     let lval = Eva_ast.Build.var vi in
     let volatile_everywhere = Ast_types.C.has_qualifier "volatile" vi.vtype in
     let state =
@@ -256,7 +255,7 @@ module Make (Engine: Engine_Subset) = struct
       then
         let lval = Eva_ast.translate_lval lval
         and exp = Eva_ast.translate_exp exp
-        and source = fst exp.eloc in
+        and source = exp.eloc in
         apply_eva_single_initializer_or_str ~pos ~source state lval exp
       else state
     | CompoundInit (typ, l) ->

@@ -4,7 +4,7 @@ let find_comment () =
   let kf = Globals.Functions.find_by_name "f" in
   let loc1 = Kernel_function.get_location kf in
   let loc2 = Cil_datatype.Stmt.loc (Kernel_function.find_return kf) in
-  let zone = (fst loc1, snd loc2) in
+  let zone = Fileloc.join loc1 loc2 in
   Format.printf
     "@[In project %s, searching for comments between %a and %a:@\n%a\
      @\nEnd of comments@."

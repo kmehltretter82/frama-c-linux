@@ -160,7 +160,7 @@ let rec parse input =
     let source = source input in
     skipkey input "=" ;
     let link = link input in
-    LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~link ;
+    LogicBuiltins.add_type ~source:(Fileloc.of_lexing_pos source) name ~link ;
     skipkey input ";" ;
     parse input
   | KEY "ctor" ->
@@ -170,7 +170,7 @@ let rec parse input =
     let args = signature input in
     skipkey input "=" ;
     let link = link input in
-    LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~link ;
+    LogicBuiltins.add_ctor ~source:(Fileloc.of_lexing_pos source) name args ~link ;
     skipkey input ";" ;
     parse input
   | KEY "logic" ->
@@ -183,7 +183,7 @@ let rec parse input =
       begin
         let alias = ident input in
         LogicBuiltins.add_alias
-          ~source:(Filepos.of_lexing_pos src)
+          ~source:(Fileloc.of_lexing_pos src)
           name args ~alias ;
       end
     else
@@ -191,7 +191,7 @@ let rec parse input =
         skipkey input "=" ;
         let category,link = logic_link input in
         LogicBuiltins.add_logic
-          ~source:(Filepos.of_lexing_pos src)
+          ~source:(Fileloc.of_lexing_pos src)
           ~category result name args ~link ;
       end ;
     skipkey input ";" ;
@@ -205,7 +205,7 @@ let rec parse input =
       begin
         let alias = ident input in
         LogicBuiltins.add_alias
-          ~source:(Filepos.of_lexing_pos source)
+          ~source:(Fileloc.of_lexing_pos source)
           name args ~alias ;
       end
     else
@@ -213,7 +213,7 @@ let rec parse input =
         skipkey input "=" ;
         let link = link input in
         LogicBuiltins.add_predicate
-          ~source:(Filepos.of_lexing_pos source)
+          ~source:(Fileloc.of_lexing_pos source)
           name args ~link ;
       end ;
     skipkey input ";" ;
@@ -240,7 +240,7 @@ let load_file ?(ontty=`Transient) file =
       close_in inc ;
       let source = lex.lex_start_p in
       Wp_parameters.abort ~current:false
-        ~source:(Filepos.of_lexing_pos source) "(Driver Error) %s (at %a)" msg
+        ~source:(Fileloc.of_lexing_pos source) "(Driver Error) %s (at %a)" msg
         pretty (token input)
   with exn ->
     Wp_parameters.abort

@@ -721,7 +721,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) env t =
       let attr = Ident.create_model_trace_attr (string_of_int p.id) in
       let attrs = Ident.Sattr.singleton attr in
       let loc =
-        let (pos1,pos2) = p.loc in
+        let (pos1,pos2) = Fileloc.positions p.loc in
         let path = Filepos.path pos1 |> Filepath.to_string
         and l1 = Filepos.line pos1 and c1 = Filepos.input_column pos1 - 1
         and l2 = Filepos.line pos2 and c2 = Filepos.input_column pos2 - 1 in

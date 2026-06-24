@@ -105,7 +105,7 @@ let check_assigns kf assigns =
         incomplete acc
           begin fun kf ->
             Wp_parameters.warning ~wkey:wkey_pedantic
-              ~once:true ~source:(fst (Kernel_function.get_location kf))
+              ~once:true ~source:(Kernel_function.get_location kf)
               "No 'assigns \\result \\from ...' specification for function '%a'\
                returning pointer type.@ Callers assumptions might be imprecise."
               Kernel_function.pretty kf ;
@@ -117,7 +117,7 @@ let check_assigns kf assigns =
         incomplete acc
           begin fun _kf ->
             Wp_parameters.warning ~wkey:wkey_pedantic
-              ~once:true ~source:(fst t.it_content.term_loc)
+              ~once:true ~source:(t.it_content.term_loc)
               "No \\from specification for assigned pointer '%a'.@ \
                Callers assumptions might be imprecise."
               Cil_printer.pp_identified_term t
@@ -130,7 +130,7 @@ let check_assigns kf assigns =
     false,
     begin fun kf ->
       Wp_parameters.warning ~wkey:wkey_pedantic
-        ~once:true ~source:(fst (Kernel_function.get_location kf))
+        ~once:true ~source:(Kernel_function.get_location kf)
         "No 'assigns' specification for function '%a'.@\n%a\
          Callers assumptions might be imprecise."
         Kernel_function.pretty kf

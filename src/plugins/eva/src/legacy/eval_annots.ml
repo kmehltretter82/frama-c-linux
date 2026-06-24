@@ -196,7 +196,7 @@ let mark_green_and_red () =
             | `False -> Property_status.False_if_reachable, "invalid"
           in
           Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
-          let source = fst loc in
+          let source = loc in
           let text_ca = code_annotation_text ca in
           Self.result ~level:3 ~once:true ~source "%s%a got final status %s."
             text_ca Description.pp_named p text_status;

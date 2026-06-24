@@ -15,11 +15,11 @@ class tags_visitor = object
           match g with
           | GEnumTag (ei, loc) | GEnumTagDecl (ei, loc) ->
             if ei.eorig_name = "" && !in_stdlib then
-              Kernel.warning ~source:(fst loc) ~once:true
+              Kernel.warning ~source:loc ~once:true
                 "anonymous enum in Frama-C stdlib";
           | GCompTag (ci, loc) | GCompTagDecl (ci, loc) ->
             if ci.corig_name = "" && !in_stdlib then
-              Kernel.warning ~source:(fst loc) ~once:true
+              Kernel.warning ~source:loc ~once:true
                 "anonymous %s in Frama-C stdlib"
                 (if ci.cstruct then "struct" else "union");
           | _ -> ()

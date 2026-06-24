@@ -96,7 +96,7 @@ end (* auxiliary functions *)
 let is_inductive = function {l_body = LBinductive _; _} -> true | _ -> false
 
 let unsupported ?loc x y z =
-  Options.feedback ~dkey ?source:(Option.map fst loc) x y z;
+  Options.feedback ~dkey ?source:loc x y z;
   raise Unsupported
 
 

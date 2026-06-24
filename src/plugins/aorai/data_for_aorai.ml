@@ -686,7 +686,7 @@ struct
       "term %a has type %a, but %a is expected."
       Printer.pp_term t Printer.pp_logic_type Linteger Printer.pp_typ ty
 
-  let error (source,_) msg = Aorai_option.abort ~source msg
+  let error source msg = Aorai_option.abort ~source msg
 
   (* we never attempt to recover on an error. *)
   let on_error f _ x = f x

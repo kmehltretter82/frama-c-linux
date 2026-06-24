@@ -235,7 +235,7 @@ module CfgNode = struct
   let node_stmt n = node_kind_stmt n.cfgn_kind
   let node_first_loc n = match node_stmt n with
     | [] -> None
-    | s :: _ -> Some (fst (Cil_datatype.Stmt.loc s))
+    | s :: _ -> Some (Cil_datatype.Stmt.loc s)
 
   let pretty_stmts fmt node =
     match node_stmt node with

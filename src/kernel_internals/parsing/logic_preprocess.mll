@@ -88,8 +88,9 @@
   let annot_end_comment = "////////////////__ANNOT_END_COMMENT__"
 
   let abort_preprocess reason =
-    let file = Filepath.of_string !curr_file in
-    let source = Log.source ~file ~line:!curr_line in
+    let path = Filepath.of_string !curr_file in
+    let pos = Filepos.make ~path ~line:!curr_line () in
+    let source = Fileloc.of_pos pos in
     Kernel.error ~source
       "Can't preprocess annotation: %s\nSome annotations will be kept as is"
       reason

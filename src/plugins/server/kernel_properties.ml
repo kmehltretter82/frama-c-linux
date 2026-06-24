@@ -237,9 +237,9 @@ let find_alarm = function
 let is_libc ip =
   match Property.source ip with
   | None -> false
-  | Some position ->
+  | Some loc ->
     let libc_path = Kernel.Share.get_dir "libc" in
-    Filepath.is_relative ~base:libc_path (Filepos.path position)
+    Filepath.is_relative ~base:libc_path (Fileloc.path loc)
 
 let model = States.model ()
 
@@ -280,7 +280,7 @@ let () = States.column model ~name:"kinstr"
 let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
     ~data:(module Kernel_ast.Position)
-    ~get:(fun ip -> Property.location ip |> fst)
+    ~get:(fun ip -> Property.location ip |> Fileloc.start_pos)
 
 let () = States.column model ~name:"from_libc"
     ~descr:(Md.plain "Is the property from the Frama-C libc?")

@@ -17,8 +17,8 @@ class print_term = object(self)
       Kernel.feedback
         "Term %a:@\nstart %a@\nend %a"
         Printer.pp_term v
-        print_pos (fst v.term_loc)
-        print_pos (snd v.term_loc);
+        print_pos (Fileloc.start_pos v.term_loc)
+        print_pos (Fileloc.end_pos v.term_loc);
       Cil.DoChildren
     end
   method! vpredicate p =
@@ -27,8 +27,8 @@ class print_term = object(self)
       Kernel.feedback
         "Predicate %a:@\nstart %a@\nend %a"
         Printer.pp_predicate p
-        print_pos (fst p.pred_loc)
-        print_pos (snd p.pred_loc);
+        print_pos (Fileloc.start_pos p.pred_loc)
+        print_pos (Fileloc.end_pos p.pred_loc);
       Cil.DoChildren
     end
 end
