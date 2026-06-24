@@ -40,61 +40,51 @@ with a value and a new instance of a data model.
     % LTeX: enabled=false
     \hline
     \rule{0pt}{2em}
-    \textit{clause} & ::= & \ldots & \\
-     & $\mid$ &
-      \texttt{datamodel} Type \{\textit{field}, \dots, \textit{field}\} ;
-    & Datamodel specification\\
-    & $\mid$ &
-      \texttt{consume} Name: \{ Type::Cons \textbackslash with&\\
-    &&\quad.Model = Value, \dots, .Frame = Object\} ;
+    \textit{top-level-clause} & ::= &
+    \texttt{datamodel} \textit{id} \{ \textit{data-decl}, \dots,
+        \textit{data-decl} \} ;
     & \\
+    \rule{0pt}{2em}
+      \textit{contract-clause} & ::= &
+      \texttt{consumes} \textit{id}: \textit{term} ; & \\
     & $\mid$ &
-      \texttt{produce} Name: \{ Type::Cons \textbackslash with &\\
-    &&\quad.Model = Value, \dots, .Frame = Object\} ;
-    & \\
+      \texttt{produces} \textit{id}: \textit{term} ; & \\
+    \rule{0pt}{2em}
+      \textit{loop-clause} & ::= &
+      \texttt{loop frame} \textit{id}: \textit{term} ; & \\
+     \rule{0pt}{2em}
+      \textit{code-anotation-clause} & ::= &
+      \texttt{call} \{ \textit{id} \textbackslash with
+      . \textit{id} = \textit{term} , \dots, . \textit{id} =
+    \textit{term} \} ;&\\
     & $\mid$ &
-     \texttt{consumes} CName: \{ Type \textbackslash with
-    & Function contract\\
-    &&\quad.Model = Value, \dots, .Model = Value\} ;&\\
+      \texttt{consume} \textit{id}: \textit{term} ; & \\
     & $\mid$ &
-      \texttt{produces} PName: \{ Type \textbackslash with
-    & Function contract \\
-    &&\quad.Model = Value,\dots, .Model = value\} ;&\\
+      \texttt{produce} \textit{id}: \textit{term} ; & \\
     & $\mid$ &
-      \texttt{loop frame} PName: \{ Type \textbackslash with
-    & \\
-    &&\quad.Model = Value,\dots, .Model = value\} ;&\\
+      \texttt{heap} \textit{term}, \dots, \textit{term} ;&\\
     & $\mid$ &
-      \texttt{call} \{ Fun \textbackslash with
-    & Function call\\
-    &&\quad.CName = - -Object, \dots, .PName = ++Object\} ;&\\
-    & $\mid$ &
-      \texttt{heap} &\\
-    & $\mid$ &
-      \texttt{frame} &\\
+      \texttt{frame} \textit{term}, \dots, \textit{term} ;&\\
 
     \rule{0pt}{2em}
-      \textit{field} & ::= &&\\
+      \textit{data-decl} & ::= &
+      \texttt{pmodel} (type) \textit{id}: \textit{term} ; &\\
     & $\mid$ &
-      \texttt{pmodel} (type) Model ; &\\
+      \texttt{pframe} \textit{id}: \textit{term} ; &\\
     & $\mid$ &
-      \texttt{pframe} Frame: \{ Type \textbackslash with&\\
-     &&\quad.Model = Value,\dots, .Frame = Object\} ; &\\
+      \texttt{pinvariant} \textit{term}, \dots, \textit{term} ;&\\
     & $\mid$ &
-      \texttt{pinvariant} $\varphi$ ;&\\
-    & $\mid$ &
-      \texttt{pcase} Cons \{ \textit{casefield}, \dots, \textit{casefield}\} ;
+    \texttt{pcase} \textit{id} \{ \textit{case-decl}, \dots,
+        \textit{case-decl} \} ;
     &\\
 
     \rule{0pt}{2em}
-      \textit{casefield} & ::= &&\\
+      \textit{case-decl} & ::= &
+    \texttt{pwhen} \textit{term} ; &\\
     & $\mid$ &
-      \texttt{pwhen} $\varphi$ ; &\\
+    \texttt{pframe} \textit{id}: \textit{term} ; &\\
     & $\mid$ &
-      \texttt{pframe} Frame: \{ Type \textbackslash with&\\
-     &&\quad.Model = Value,\dots, .Frame = Object\} ; &\\
-    & $\mid$ &
-      \texttt{pinvariant} $\varphi$ ;&\\
+    \texttt{pinvariant} \textit{term}, \dots, \textit{term};&\\
 
     &&& \\
     \hline
