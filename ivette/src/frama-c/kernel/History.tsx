@@ -11,8 +11,25 @@
 /* --------------------------------------------------------------------------*/
 
 import React from 'react';
+import * as Dome from 'dome';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as States from 'frama-c/states';
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.history.prev',
+  label: 'Previous location',
+  key: 'Alt+Left',
+  onClick: States.gotoPrev,
+});
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.history.next',
+  label: 'Next location',
+  key: 'Alt+Right',
+  onClick: States.gotoNext,
+});
 
 export default function History(): JSX.Element {
   const history = States.useHistory();
