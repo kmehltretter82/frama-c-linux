@@ -134,7 +134,7 @@ module ThreadState = struct
     else Recompute
 
   let recompute_feedback = function
-    | NoNeed -> Mt_self.debug "No need to recompute thread %a"
+    | NoNeed -> Self.debug "No need to recompute thread %a"
     | NotStarted ->
       Mt_self.feedback "*** Thread %a has been created but not started. Skipping."
     | Recompute -> fun _ _ -> ()

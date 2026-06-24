@@ -27,7 +27,7 @@ let mark_new_messages_received analysis =
            | SendMsg (q, _) -> Mqueue.Set.add q queues
            | _ -> queues) diff Mqueue.Set.empty
     in
-    Mt_self.debug "@[New message(s) sent@ on@ queue(s) %a@]"
+    Self.debug "New message(s) sent on queue(s) %a"
       (Pretty_utils.pp_iter Mqueue.Set.iter Mqueue.pretty) queues;
     iter_threads analysis
       (fun th ->
@@ -36,7 +36,7 @@ let mark_new_messages_received analysis =
            | _ -> false
          in
          if Trace.exists th.th_amap should_recompute
-         then (Mt_self.debug "Marking %a as having received new message(s)"
+         then (Self.debug "Marking %a as having received new message(s)"
                  ThreadState.pretty th;
                ThreadState.recompute_because th NewMsgReceived)
       );
@@ -90,9 +90,9 @@ let pre_thread_analysis analysis th =
 
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
-  Mt_self.debug "@[<hov>Arguments@ %a@]"
+  Self.debug "@[<hov>Arguments@ %a@]"
     (Pretty_utils.pp_list Cvalue.V.pretty) th.th_params;
-  Mt_self.debug ~level:2 "Initial state %a"
+  Self.debug ~level:2 "Initial state %a"
     Cvalue.Model.pretty th.th_init_state;
 
   (* We set the values that depend on the thread analysed *)
@@ -165,7 +165,7 @@ let compute_shared_vars analysis =
       Mt_shared_vars.Global.concurrent_accesses_all_threads
         (threads analysis) in
     let accesses = ww_accesses @ rw_accesses in
-    Mt_self.debug ~level:2 "Global concurrent var accesses:@.%a"
+    Self.debug ~level:2 "Global concurrent var accesses:@.%a"
       (Mt_shared_vars.Global.pretty_concurrent_accesses ()) accesses;
     let all_zones = Mt_shared_vars.Global.all_zones_accessed accesses in
     Mt_self.result ~level:3 "@[<hov 2>Imprecise locations to watch: %a@]"
