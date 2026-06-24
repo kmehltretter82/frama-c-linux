@@ -40,55 +40,65 @@ with a value and a new instance of a data model.
     % LTeX: enabled=false
     \hline
     \rule{0pt}{2em}
-    \textit{top-level-clause} & ::= &
+    \textit{top-level-clause} & ::= & \ldots &\\
+    & $\mid$ &
     \texttt{datamodel} \textit{id} \{&\\
-                              &&\textit{  data-decl}&\\
-                              &&\hspace{1cm}\vdots&\\
-                              &&\textit{  data-decl} \}
-    & \\
+                              &&\quad\textit{data-decl} &\\
+                              &&\qquad\ldots   &\\
+                              &&\quad\textit{data-decl} &\\
+                              && \} & \\
+
     \rule{0pt}{2em}
-      \textit{contract-clause} & ::= &
-      \texttt{consumes} \textit{id}: \textit{term} ; & \\
-    & $\mid$ &
-      \texttt{produces} \textit{id}: \textit{term} ; & \\
+      \textit{contract-clause} & ::= & \ldots &\\
+      & $\mid$ &
+      \texttt{consumes} \textit{term}\,, \ldots \;; & \\
+      & $\mid$ &
+      \texttt{produces} \textit{term}\,, \ldots \;; & \\
+      \rule{0pt}{2em}
+      \textit{loop-clause} & ::= & \ldots &\\
+      & $\mid$ &
+      \texttt{loop frame} \textit{term}\,, \ldots \;; & \\
+
     \rule{0pt}{2em}
-      \textit{loop-clause} & ::= &
-      \texttt{loop frame} \textit{id}: \textit{term} ; & \\
-     \rule{0pt}{2em}
-      \textit{code-annotation-clause} & ::= &
-      \texttt{call} \{ \textit{id} \textbackslash with
-      . \textit{id} = \textit{term} , \dots, . \textit{id} =
-    \textit{term} \} ;&\\
+      \textit{code-annotation-clause} & ::= & \ldots &\\
     & $\mid$ &
-      \texttt{consume} \textit{id}: \textit{term} ; & \\
+      \texttt{heap} \textit{term}\,, \dots \;;&\\
     & $\mid$ &
-      \texttt{produce} \textit{id}: \textit{term} ; & \\
+      \texttt{frame} \textit{term}\,, \dots \;;&\\
     & $\mid$ &
-      \texttt{heap} \textit{term}, \dots, \textit{term} ;&\\
+      \texttt{call} \textit{assignation} ;&\\
     & $\mid$ &
-      \texttt{frame} \textit{term}, \dots, \textit{term} ;&\\
+      \texttt{consume} \textit{id}: \textit{assignation} ; &\\
+    & $\mid$ &
+      \texttt{produce} \textit{id}: \textit{assignation} ; &\\
+
+    \rule{0pt}{2em}
+      \textit{assignation} & ::= &
+      \{ \textit{id} \textbackslash{with}
+         \textit{.id} = \textit{term} , \dots \;\} &\\
 
     \rule{0pt}{2em}
       \textit{data-decl} & ::= &
-      \texttt{pmodel} (type) \textit{id}: \textit{term} ; &\\
+      \texttt{pmodel} (\textit{logic-type}) \textit{id}, \ldots \;; &\\
     & $\mid$ &
-      \texttt{pframe} \textit{id}: \textit{term} ; &\\
+      \texttt{pframe} \textit{term}, \ldots \;; &\\
     & $\mid$ &
-      \texttt{pinvariant} \textit{term}, \dots, \textit{term} ;&\\
+      \texttt{pinvariant} \textit{term}, \dots \;;&\\
     & $\mid$ &
       \texttt{pcase} \textit{id} \{&\\
-       &&\textit{  case-decl}&\\
-       &&\hspace{1cm}\vdots&\\
-       &&\textit{case-decl} \}
+       &&\quad\textit{case-decl} &\\
+       &&\qquad\ldots            &\\
+       &&\quad\textit{case-decl} &\\
+       &&\}
     &\\
 
     \rule{0pt}{2em}
       \textit{case-decl} & ::= &
     \texttt{pwhen} \textit{term} ; &\\
     & $\mid$ &
-    \texttt{pframe} \textit{id}: \textit{term} ; &\\
+    \texttt{pframe} \textit{term}, \ldots \;; &\\
     & $\mid$ &
-    \texttt{pinvariant} \textit{term}, \dots, \textit{term};&\\
+    \texttt{pinvariant} \textit{term}, \dots \;; &\\
 
     &&& \\
     \hline
