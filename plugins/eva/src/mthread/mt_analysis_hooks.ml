@@ -342,7 +342,7 @@ let check_thread_analysis thread kf =
   match Function_calls.analysis_target kf Kglobal with
   | `Body _ -> ()
   | `Builtin _ | `Spec _ ->
-    Mt_self.not_yet_implemented
+    Self.not_yet_implemented
       "Using an ACSL specification or a builtin to interpret entry point %a \
        of thread %a is not supported."
       Kernel_function.pretty kf Thread.pretty thread

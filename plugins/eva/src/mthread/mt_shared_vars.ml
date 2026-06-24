@@ -697,8 +697,8 @@ module Precise = struct
            (fun (op, node, _thid as access) () ->
               match op with
               | ReadPos _ | WritePos _ ->
-                Mt_self.not_yet_implemented ~current:true ~once:true
-                  "MtSharedVars.Precise.display_shared_vars_value for ALoc"
+                Self.not_yet_implemented ~current:true
+                  "Mt_shared_vars.Precise.display_shared_vars_value on positions"
               | Write _ -> ()
               | Read ->
                 let state = node.cfgn_value_state.state_before in
@@ -717,8 +717,8 @@ module Precise = struct
       let aux_nodes (op, node, th as access) (seen, _wr as acc) =
         match op with
         | ReadPos _ | WritePos _ ->
-          Mt_self.not_yet_implemented ~current:true ~once:true
-            "MtSharedVars.Precise.enumerate_written_vars_value for ALoc"
+          Self.not_yet_implemented ~current:true
+            "Mt_shared_vars.Precise.enumerate_written_vars_value on positions"
         | Read -> acc
         | Write loc ->
           if not (WriteSeen.Set.mem (node, th, loc) seen) then

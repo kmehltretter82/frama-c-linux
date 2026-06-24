@@ -150,7 +150,7 @@ let stmt_mt_status subtrace get_state stmt =
       Complex
 
     | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-      Mt_self.not_yet_implemented "try finally/except/throw/catch"
+      Self.not_yet_implemented "try finally/except/throw/catch"
 ;;
 
 let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
@@ -359,7 +359,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
           set (NSwitch (stmt, e, l))
 
         | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-          Mt_self.not_yet_implemented "try finally/try except"
+          Self.not_yet_implemented "try finally/try except"
   in
   match (Kernel_function.get_definition f).sbody.bstmts with
   | [] -> Self.abort "Function with empty body: %a" Kernel_function.pretty f
