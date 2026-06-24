@@ -41,8 +41,10 @@ with a value and a new instance of a data model.
     \hline
     \rule{0pt}{2em}
     \textit{top-level-clause} & ::= &
-    \texttt{datamodel} \textit{id} \{ \textit{data-decl}, \dots,
-        \textit{data-decl} \} ;
+    \texttt{datamodel} \textit{id} \{&\\
+                              &&\textit{  data-decl}&\\
+                              &&\hspace{1cm}\vdots&\\
+                              &&\textit{  data-decl} \}
     & \\
     \rule{0pt}{2em}
       \textit{contract-clause} & ::= &
@@ -74,8 +76,10 @@ with a value and a new instance of a data model.
     & $\mid$ &
       \texttt{pinvariant} \textit{term}, \dots, \textit{term} ;&\\
     & $\mid$ &
-    \texttt{pcase} \textit{id} \{ \textit{case-decl}, \dots,
-        \textit{case-decl} \} ;
+      \texttt{pcase} \textit{id} \{&\\
+       &&\textit{  case-decl}&\\
+       &&\hspace{1cm}\vdots&\\
+       &&\textit{case-decl} \}
     &\\
 
     \rule{0pt}{2em}
