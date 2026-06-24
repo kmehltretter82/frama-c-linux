@@ -1,0 +1,5 @@
+[kernel] Parsing list_reverse.c (with preprocessing)
+[kernel:annot:missing-spec] list_reverse.c:12: Warning: 
+  Neither code nor explicit assigns for function newcell, generating default
+  clauses. See -generated-spec-* options for more info.
+[region] annotating function reverse

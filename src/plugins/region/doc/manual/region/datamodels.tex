@@ -1,0 +1,110 @@
+\chapter{Datamodels}
+\label{toc:datamodels}
+
+\section{Syntax}
+\label{toc:syntax}
+
+A datamodel is defined with the clause block \texttt{datamodel}. It can
+contain \texttt{pmodel}, which are ghost model fields common to all
+constructors, \texttt{pinvariant}, which are global invariants for the
+datamodel, and none or several constructors, defined with \texttt{pcase}.
+
+A constructor Cons, defined with a clause block \texttt{pcase} must contain
+a clause \texttt{pwhen} --- if the constructor is the last constructor defined
+in the datamodel, the clause \texttt{pwhen} may be omitted --- that declares the
+guard of the constructor. It can also
+contain \texttt{pframe}, which are distinct local frames or self-framing local
+locations, and \texttt{pinvariant}.
+
+In function contracts, the instances of data models consumed and produced
+are specified using the \texttt{produces} and \texttt{consumes} clauses.
+Each global model field must be associated with a corresponding variable
+or value. The instances of data models manipulated in a loop are specified
+similarly using the \texttt{loop frame} clause.
+
+The heap and the frame can be manipulated inside a function with several
+clauses. The clause \texttt{heap} allows redefining the heap and the clause
+\texttt{frame} allows renaming some instances of data models in the frame.
+The clause \texttt{produce} is used to create a new instance of a data model in
+the frame with a given constructor ; all the model fields must be associated
+with a value and all the local frames must be associated with an instance of
+a data model of the frame.
+Conversely, the clause \texttt{consume} is used to remove an instance of a
+data model of the frame with a given constructor. Similarly, to
+\texttt{produce}, all the model fields and the local frame must be associated
+with a value and a new instance of a data model.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{tabular}{|ccl@{\hspace{.5cm}}l|}
+    % LTeX: enabled=false
+    \hline
+    \rule{0pt}{2em}
+    \textit{top-level-clause} & ::= & \ldots &\\
+    & $\mid$ &
+    \texttt{datamodel} \textit{id} \{&\\
+                              &&\quad\textit{data-decl} &\\
+                              &&\qquad\ldots   &\\
+                              &&\quad\textit{data-decl} &\\
+                              && \} & \\
+
+    \rule{0pt}{2em}
+      \textit{contract-clause} & ::= & \ldots &\\
+      & $\mid$ &
+      \texttt{consumes} \textit{term}\,, \ldots \;; & \\
+      & $\mid$ &
+      \texttt{produces} \textit{term}\,, \ldots \;; & \\
+      \rule{0pt}{2em}
+      \textit{loop-clause} & ::= & \ldots &\\
+      & $\mid$ &
+      \texttt{loop frame} \textit{term}\,, \ldots \;; & \\
+
+    \rule{0pt}{2em}
+      \textit{code-annotation-clause} & ::= & \ldots &\\
+    & $\mid$ &
+      \texttt{heap} \textit{term}\,, \dots \;;&\\
+    & $\mid$ &
+      \texttt{frame} \textit{term}\,, \dots \;;&\\
+    & $\mid$ &
+      \texttt{call} \textit{assignation} ;&\\
+    & $\mid$ &
+      \texttt{consume} \textit{id}: \textit{assignation} ; &\\
+    & $\mid$ &
+      \texttt{produce} \textit{id}: \textit{assignation} ; &\\
+
+    \rule{0pt}{2em}
+      \textit{assignation} & ::= &
+      \{ \textit{id} \textbackslash{with}
+         \textit{.id} = \textit{term} , \dots \;\} &\\
+
+    \rule{0pt}{2em}
+      \textit{data-decl} & ::= &
+      \texttt{pmodel} (\textit{logic-type}) \textit{id}, \ldots \;; &\\
+    & $\mid$ &
+      \texttt{pframe} \textit{term}, \ldots \;; &\\
+    & $\mid$ &
+      \texttt{pinvariant} \textit{term}, \dots \;;&\\
+    & $\mid$ &
+      \texttt{pcase} \textit{id} \{&\\
+       &&\quad\textit{case-decl} &\\
+       &&\qquad\ldots            &\\
+       &&\quad\textit{case-decl} &\\
+       &&\}
+    &\\
+
+    \rule{0pt}{2em}
+      \textit{case-decl} & ::= &
+    \texttt{pwhen} \textit{term} ; &\\
+    & $\mid$ &
+    \texttt{pframe} \textit{term}, \ldots \;; &\\
+    & $\mid$ &
+    \texttt{pinvariant} \textit{term}, \dots \;; &\\
+
+    &&& \\
+    \hline
+  % LTeX: enabled=true
+  \end{tabular}
+  \end{center}
+  \caption{Syntax of Datamodels}
+  \label{fig:datamodels}
+\end{figure}

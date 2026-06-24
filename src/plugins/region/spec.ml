@@ -206,6 +206,47 @@ let rec parse_region (env:env) p =
     let lv = lpath env p ; parse_lval env p in
     env.rpaths <- Alias(p.lexpr_loc,lv) :: env.rpaths
 
+let parse_datamodel_case p =
+  match p.extended_node with
+  | Ext_lexpr(e) when e.ext_name = "pinvariant" ->
+    ()
+  | Ext_lexpr(e) when e.ext_name = "pframe" ->
+    ()
+  | Ext_lexpr(e) when e.ext_name = "pwhen" ->
+    ()
+  | Ext_lexpr(e) ->
+    Options.error ~current:true "The clause %s should not be used directly \
+                                 inside a pcase."
+      e.ext_name ;
+    ()
+  | Ext_extension(ext) ->
+    Options.error ~current:true "The clause %s should not be used directly \
+                                 inside a pcase."
+      ext.gext_name ;
+    ()
+
+let parse_datamodel_component p =
+  match p.extended_node with
+  | Ext_lexpr(e) when e.ext_name = "pmodel" ->
+    ()
+  | Ext_lexpr(e) when e.ext_name = "pinvariant" ->
+    ()
+  | Ext_lexpr(e) when e.ext_name = "pframe" ->
+    ()
+  | Ext_lexpr(e) ->
+    Options.error ~current:true "The clause %s should not be used directly \
+                                 inside a datamodel."
+      e.ext_name ;
+    ()
+  | Ext_extension(ext) when ext.gext_name = "pcase" ->
+    List.iter parse_datamodel_case ext.gext_content ;
+    ()
+  | Ext_extension(ext) ->
+    Options.error ~current:true "The clause %s should not be used directly \
+                                 inside a datamodel."
+      ext.gext_name ;
+    ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- Spec Typechecking & Printing                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -237,6 +278,18 @@ let typecheck typing_context loc ps =
   Hashtbl.add registry id @@ List.rev env.regions ;
   Ext_id id
 
+let parse_datamodel _ _ ps =
+  List.iter parse_datamodel_component (snd ps) ;
+  Ext_id 1
+
+let typecheck_fail clause _ _ _ =
+  Options.error ~current:true "The clause %s should not be used at top-level."
+    clause ;
+  Ext_id 0
+
+let typecheck_tmp _ _ _ =
+  Ext_id 1
+
 let printer _pp fmt = function
   | Ext_id k ->
     let rs  = try Hashtbl.find registry k with Not_found -> [] in
@@ -249,6 +302,32 @@ let () =
       ~plugin:"region" "region" typecheck ~printer false ;
     Acsl_extension.register_code_annot
       ~plugin:"region" "alias" typecheck ~printer false ;
+    Acsl_extension.register_global_block
+      ~plugin: "region" "datamodel" parse_datamodel false ;
+    Acsl_extension.register_global
+      ~plugin:"region" "pmodel" (typecheck_fail "pmodel") false ;
+    Acsl_extension.register_global
+      ~plugin:"region" "pwhen" (typecheck_fail "pwhen") false ;
+    Acsl_extension.register_global
+      ~plugin:"region" "pinvariant" (typecheck_fail "pinvariant") false ;
+    Acsl_extension.register_global
+      ~plugin:"region" "pframe" (typecheck_fail "pframe") false ;
+    Acsl_extension.register_global_block
+      ~plugin:"region" "pcase" (typecheck_fail "pcase") false ;
+    Acsl_extension.register_code_annot
+      ~plugin:"region" "heap" typecheck_tmp false ;
+    Acsl_extension.register_code_annot
+      ~plugin:"region" "call" typecheck_tmp false ;
+    Acsl_extension.register_code_annot
+      ~plugin:"region" "consume" typecheck_tmp false ;
+    Acsl_extension.register_code_annot
+      ~plugin:"region" "produce" typecheck_tmp false ;
+    Acsl_extension.register_code_annot_next_both
+      ~plugin:"region" "frame" typecheck_tmp false ;
+    Acsl_extension.register_behavior
+      ~plugin:"region" "consumes" typecheck_tmp false ;
+    Acsl_extension.register_behavior
+      ~plugin:"region" "produces" typecheck_tmp false ;
   end
 
 
