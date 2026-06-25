@@ -517,11 +517,11 @@ build-macos-bundle-release:
   tags:
     - macos-arm
 
-build-ivette-macos-packages:
+build-ivette-macos-package:
   <<: *ivette_macos_build_template
   <<: *manual_when_not_special_pipeline
 
-build-ivette-macos-packages-release:
+build-ivette-macos-package-release:
   <<: *ivette_macos_build_template
   <<: *when_release
 
@@ -602,7 +602,7 @@ release-content:
     - build-distrib-tarball
     - build-linux-x86-64-bundle-release
     - build-macos-bundle-release
-    - build-ivette-macos-packages-release
+    - build-ivette-macos-package-release
     - manuals-for-release
   artifacts:
     paths:
