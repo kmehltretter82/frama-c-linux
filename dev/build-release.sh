@@ -13,10 +13,10 @@
 # Thus, it expects to be run from the root of the Frama-C directory and that
 # some CI artifacts are available. Namely:
 #   - 'frama-c.tar.gz'
-#   - 'frama-c-x86-64.run'
+#   - 'frama-c-linux-x86-64.run'
 #   - 'frama-c-macos-arm.pkg'
 #   - 'frama-c-macos-x86.pkg'
-#   - 'frama-c-ivette-macos-universal.dmg'
+#   - 'frama-c-gui-macos-universal.dmg'
 #   - 'api' directory (with api archives inside)
 #   - 'manuals' directory (with all manuals incl. acsl + version text files)
 # Availability of the files is checked when the script starts. The script also
@@ -150,10 +150,10 @@ for file in "${API_FILES[@]}"; do
   prepare_file "$API_DIR/$file-api.tar.gz"
 done
 
-show_step "Searching for Ivette packages"
+show_step "Searching for installation packages"
 
 PACKAGES=(
-  "frama-c-x86-64.run"
+  "frama-c-linux-x86-64.run"
   "frama-c-macos-arm.pkg"
   "frama-c-macos-x86.pkg"
   "frama-c-gui-macos-universal.dmg"
