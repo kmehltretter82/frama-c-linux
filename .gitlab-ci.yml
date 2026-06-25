@@ -510,7 +510,7 @@ build-macos-bundle-release:
     - make -C ivette api
     # Build Ivette
     - make -C ivette dist-macOS
-    - mv ivette/dist/Ivette-universal.dmg ./frama-c-gui-macos-universal.dmg
+    - mv ivette/dist/Frama-C\ GUI-universal.dmg ./frama-c-gui-macos-universal.dmg
   artifacts:
     paths:
       - ./*.dmg
