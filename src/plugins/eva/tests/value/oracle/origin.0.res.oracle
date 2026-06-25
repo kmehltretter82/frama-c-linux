@@ -312,6 +312,28 @@
   esc3 ∈ [--..--] or ESCAPINGADDR
   esc4 ∈ {12} or ESCAPINGADDR
   esc5 ∈ {{ (int)&esc1 }}
+[inout] Out (internal) for function local_escape_1:
+    esc1; esc2; esc3; esc4; esc5; local2
+[inout] Out (internal) for function origin_arithmetic_1:
+    pa1; ta1[0..9]
+[inout] Out (internal) for function origin_arithmetic_2:
+    pa2; qa2; ta2[0..9]; tta2[0..9]
+[inout] Out (internal) for function origin_arithmetic_3:
+    pa3; ta3[0..9]
+[inout] Out (internal) for function origin_leaf_1:
+    l1
+[inout] Out (internal) for function origin_misalign_1:
+    a; b; pm1
+[inout] Out (internal) for function origin_misalign_2:
+    a; b; pm2; qm2
+[inout] Out (internal) for function origin_uninitialized_1:
+    pun; pi
+[inout] Out (internal) for function origin_uninitialized_2:
+    pun2; qun2; pi
+[inout] Out (internal) for function main:
+    a; b; p; pa1; pa2; qa2; pa3; q; ta1[0..9]; ta2[0..9]; ta3[0..9];
+    tta2[0..9]; l1; l2; l3; pl; pm1; pm2; qm2; pun; pun2; qun2; esc1; esc2;
+    esc3; esc4; esc5; tmp
 [from] Computing for function local_escape_1
 [from] Done for function local_escape_1
 [from] Computing for function origin_arithmetic_1
@@ -407,25 +429,3 @@
   esc4 FROM random
   esc5 FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function local_escape_1:
-    esc1; esc2; esc3; esc4; esc5; local2
-[inout] Out (internal) for function origin_arithmetic_1:
-    pa1; ta1[0..9]
-[inout] Out (internal) for function origin_arithmetic_2:
-    pa2; qa2; ta2[0..9]; tta2[0..9]
-[inout] Out (internal) for function origin_arithmetic_3:
-    pa3; ta3[0..9]
-[inout] Out (internal) for function origin_leaf_1:
-    l1
-[inout] Out (internal) for function origin_misalign_1:
-    a; b; pm1
-[inout] Out (internal) for function origin_misalign_2:
-    a; b; pm2; qm2
-[inout] Out (internal) for function origin_uninitialized_1:
-    pun; pi
-[inout] Out (internal) for function origin_uninitialized_2:
-    pun2; qun2; pi
-[inout] Out (internal) for function main:
-    a; b; p; pa1; pa2; qa2; pa3; q; ta1[0..9]; ta2[0..9]; ta3[0..9];
-    tta2[0..9]; l1; l2; l3; pl; pm1; pm2; qm2; pun; pun2; qun2; esc1; esc2;
-    esc3; esc4; esc5; tmp

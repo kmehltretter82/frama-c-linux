@@ -86,7 +86,7 @@ Here is an example \texttt{dune} file:
 (executable
   (name "script") ; must match the name of the .ml file
   (modes plugin)
-  (libraries frama-c.init frama-c.kernel) ; add more if needed
+  (libraries frama-c.kernel) ; add more if needed
   (flags -open Frama_c_kernel :standard)
   (promote (until-clean)) ; keeps script.cmxs in the base directory
 )

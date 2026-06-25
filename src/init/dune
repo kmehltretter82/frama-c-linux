@@ -6,11 +6,12 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Library loaded by Frama-C's kernel so that its toplevel is run before the
+; kernel's toplevel
 (library
   (name frama_c_very_first)
   (public_name frama-c.init)
   (modules frama_c_init)
-  (libraries threads)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )

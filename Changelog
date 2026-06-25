@@ -23,6 +23,11 @@ o!  Fclib     [2026-06-25] Changed the `source` optional parameter of Log
               instead of a position.
 o!  Fclib     [2026-06-25] `Fileloc.t` is now abstract and the module provides
               constructors and accessors to manipulate locations.
+o!  Kernel    [2026-06-25] The dune library `frama-c.boot` is removed.
+              Plug-in developers should only depend on `frama-c.kernel`,
+              and users needing the functionality of `frama-c.boot` can
+              manually call `Frama_c_kernel.Boot.boot ()` to run the
+              entry-point of Frama-C.
 o!  Kernel    [2026-06-22] Remove unknown locations/positions. Each plug-in
               (and Frama-C's kernel) now exports a generated location `gen_loc`
               (via `Plugin.S`) which should be used instead of `unknown`. When a

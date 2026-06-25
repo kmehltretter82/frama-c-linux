@@ -2036,7 +2036,7 @@ let build_modules fmt modules =
          (name %S)\n  \
          (modules %S)\n  \
          (modes plugin)\n  \
-         (libraries frama-c.init frama-c.boot frama-c.kernel %a)\n  \
+         (libraries frama-c.kernel %a)\n  \
          (flags :standard -w -50-9-32-6-34 -open Frama_c_kernel)\n\
          )@."
         (* executable: *)

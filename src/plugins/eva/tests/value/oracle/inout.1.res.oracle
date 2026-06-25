@@ -25,6 +25,13 @@
   accessing uninitialized left-value. assert \initialized(&r);
 [eva:progress] Recording results for inout_11_3
 [eva:progress] Done for function inout_11_3
+[inout] InOut (internal) for function inout_11_3:
+  Operational inputs:
+    I_size; Itab[0..7]; i1; i2; r
+  Operational inputs on termination:
+    I_size; Itab[0..7]; i1; i2; r
+  Sure outputs:
+    Xs; es
 [from] Computing for function inout_11_3
 [from] Done for function inout_11_3
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -34,10 +41,3 @@
   Z FROM I_size; Itab{[0]; [7]}; i2 (and SELF)
   \result FROM I_size; Itab[0..7]; i2
 [from] ====== END OF DEPENDENCIES ======
-[inout] InOut (internal) for function inout_11_3:
-  Operational inputs:
-    I_size; Itab[0..7]; i1; i2; r
-  Operational inputs on termination:
-    I_size; Itab[0..7]; i1; i2; r
-  Sure outputs:
-    Xs; es

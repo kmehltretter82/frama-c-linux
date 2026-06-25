@@ -6,9 +6,9 @@
   x ∈ {0}
 [eva:show] replace_by_show_each.c:23: Frama_C_show_each_2:
 [eva:show] replace_by_show_each.c:25: Frama_C_show_each_1:
-[from] Warning: no assigns clauses for function Frama_C_show_each_1.
-  Results will be imprecise.
 [inout] Warning: no assigns clauses for function Frama_C_show_each_1.
+  Results will be imprecise.
+[from] Warning: no assigns clauses for function Frama_C_show_each_1.
   Results will be imprecise.
 [eva:alarm] replace_by_show_each.c:26: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
@@ -22,6 +22,13 @@ Cannot filter: dumping raw memory (including unchanged variables)
   x ∈ {0}
   j ∈ [-2147483648..2147483646]
   i ∈ [-2147483647..2147483647]
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    ANYTHING(origin:Unknown)
+  Operational inputs on termination:
+    ANYTHING(origin:Unknown)
+  Sure outputs:
+    i
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to Frama_C_show_each_2 at replace_by_show_each.c:23 (by main):
   NO EFFECTS
@@ -30,10 +37,3 @@ Cannot filter: dumping raw memory (including unchanged variables)
 [from] entry point:
   \result FROM j
 [from] ====== END OF CALLWISE DEPENDENCIES ======
-[inout] InOut (internal) for function main:
-  Operational inputs:
-    ANYTHING(origin:Unknown)
-  Operational inputs on termination:
-    ANYTHING(origin:Unknown)
-  Sure outputs:
-    i

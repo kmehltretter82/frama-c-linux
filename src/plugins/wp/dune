@@ -47,7 +47,7 @@
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
   (preprocess (pps frama-c.ppx_z_literals ppx_inline_test))
-  (inline_tests (libraries frama-c.init))
+  (inline_tests)
 )
 
 (plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
