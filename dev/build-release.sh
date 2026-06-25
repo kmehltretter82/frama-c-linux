@@ -396,12 +396,12 @@ cat >$JSON_DATA <<EOL
       },
       {
         "name": "Frama-C + Frama-C GUI (Linux x86-64)",
-        "url": "https://frama-c.com/download/frama-c-x86-64-$VERSION_AND_CODENAME.run",
+        "url": "https://frama-c.com/download/frama-c-linux-x86-64-$VERSION_AND_CODENAME.run",
         "link_type":"other"
       },
       {
         "name": "Frama-C GUI (macOS universal)",
-        "url": "https://frama-c.com/download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg",
+        "url": "https://frama-c.com/download/frama-c-gui-macos-universal-$VERSION_AND_CODENAME.dmg",
         "link_type":"other"
       },
       {
@@ -493,7 +493,7 @@ else
 fi
 
 INSTALL_WEBPAGE="https://git.frama-c.com/pub/frama-c/-/blob/$TAG/INSTALL.md"
-PACKAGE_INSTALL="$INSTALL_WEBPAGE#installing-frama-c-via-packages-linux"
+PACKAGE_INSTALL="$INSTALL_WEBPAGE#installing-frama-c-via-packages-"
 
 cat >$VERSION_WEBPAGE <<EOL
 ---
@@ -507,21 +507,21 @@ releases:
   - name: Frama-C v$VERSION $CODENAME - Linux Packages
     files:
     - name: Frama-C and Frama-C GUI x86-64
-      link: /download/frama-c-x86-64-$VERSION_AND_CODENAME.run
+      link: /download/frama-c-linux-x86-64-$VERSION_AND_CODENAME.run
       help: Installation instructions
       help_link: ${PACKAGE_INSTALL}linux
   - name: Frama-C v$VERSION $CODENAME - macOS Packages
     files:
     - name: Universal GUI
-      link: /download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg
+      link: /download/frama-c-gui-macos-universal-$VERSION_AND_CODENAME.dmg
       help: Installation instructions
       help_link: ${PACKAGE_INSTALL}macos
     - name: macOS x86 Frama-C
-      link: /download/frama-c-macos-x86.pkg
+      link: /download/frama-c-macos-x86-$VERSION_AND_CODENAME.pkg
       help: Installation instructions
       help_link: ${PACKAGE_INSTALL}macos
     - name: macOS ARM Frama-C
-      link: /download/frama-c-macos-arm.pkg
+      link: /download/frama-c-macos-arm-$VERSION_AND_CODENAME.pkg
       help: Installation instructions
       help_link: ${PACKAGE_INSTALL}macos
   - name: Additional files
