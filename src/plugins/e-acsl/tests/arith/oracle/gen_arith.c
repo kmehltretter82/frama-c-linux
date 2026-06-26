@@ -347,7 +347,7 @@ int main(void)
     __gen_e_acsl_assert_data_19.file = "arith.i";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 24;
-    __e_acsl_assert(0,& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_19);
   }
   /*@ assert -5 / 3 == -1; */ ;
   {
@@ -359,7 +359,7 @@ int main(void)
     __gen_e_acsl_assert_data_20.file = "arith.i";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 25;
-    __e_acsl_assert(0,& __gen_e_acsl_assert_data_20);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_20);
   }
   /*@ assert -5 % 3 == -2; */ ;
   {
@@ -789,6 +789,8 @@ int main(void)
     __gen_e_acsl_assert_data_42.file = "arith.i";
     __gen_e_acsl_assert_data_42.fct = "main";
     __gen_e_acsl_assert_data_42.line = 42;
+    /*@ assert Eva: signed_overflow: -2147483648 <= 1 + __gen_e_acsl__2; */
+    /*@ assert Eva: signed_overflow: 1 + __gen_e_acsl__2 <= 2147483647; */
     __e_acsl_assert(1 + __gen_e_acsl__2 == 1,& __gen_e_acsl_assert_data_42);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_42);
     __gmpz_clear(__gen_e_acsl_z);

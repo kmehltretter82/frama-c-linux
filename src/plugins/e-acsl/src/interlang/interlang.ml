@@ -195,7 +195,7 @@ module Optimisation = struct
     | Integer {n = z1}, _ when Z.is_zero z1 ->
       integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.zero)
     | Integer {n = z1}, Integer {n = z2} when not (Z.is_zero z2) ->
-      integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.ediv z1 z2)
+      integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.div z1 z2)
     | _ -> raise No_opt
 
   let modulo ~origin ~ity e1 e2 =
@@ -203,7 +203,7 @@ module Optimisation = struct
     | Integer {n = z1}, _ when Z.is_zero z1 ->
       integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.zero)
     | Integer {n = z1}, Integer {n = z2} when not (Z.is_zero z2) ->
-      integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.erem z1 z2)
+      integer ~origin ~rtes:(e1.rtes @ e2.rtes) ~ity (Z.rem z1 z2)
     | _ -> raise No_opt
 
   let lt ~origin e1 e2 =

@@ -466,7 +466,7 @@ int main(void)
     __gen_e_acsl_assert_data_19.file = "arith.i";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 24;
-    __e_acsl_assert(0,& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_19);
   }
   /*@ assert -5 / 3 == -1; */ ;
   {
@@ -478,7 +478,7 @@ int main(void)
     __gen_e_acsl_assert_data_20.file = "arith.i";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 25;
-    __e_acsl_assert(0,& __gen_e_acsl_assert_data_20);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_20);
   }
   /*@ assert -5 % 3 == -2; */ ;
   {
