@@ -155,7 +155,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s4; s6
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -363,7 +362,6 @@
     shared bases: {s4, s6}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: u3; s4; s5; s6
 [eva] Concurrent imprecise accesses have changed: before
     s4; s6
   vs.
@@ -671,7 +669,6 @@
         s4 ∈ {-1; 0; 1; 4}
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
-[eva] Imprecise locations to watch: u3; s4; s5; s6
 [eva] jobs4 reads  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:68 f4
 [eva] jobs51 reads  s5 ∈ {0; 5}  // sharedvars.c:77 f51
 [eva] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:71 f4
@@ -985,7 +982,6 @@
         s4 ∈ {-1; 0; 1; 2; 3; 4}
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
-[eva] Imprecise locations to watch: u3; s4; s5; s6
 [eva] jobs4 reads  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:68 f4
 [eva] jobs51 reads  s5 ∈ {0; 5; 51}  // sharedvars.c:77 f51
 [eva] <main> writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:115 main
@@ -1284,7 +1280,6 @@
         s4 ∈ {-1; 0; 1; 2; 3; 4}
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
-[eva] Imprecise locations to watch: u3; s4; s5; s6
 [eva] <main> writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:115 main
 [eva] Possible read/write data races:
   s6:

@@ -86,7 +86,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -189,7 +188,6 @@
       { locks[1] }:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..10]
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
   Frama_C_interval :: thread_arg.c:26 <- job
 [eva] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
@@ -336,7 +334,6 @@
       { locks[1] }:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..20]
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45 main
 [eva] jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26 job
 [eva] <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45 main
@@ -478,7 +475,6 @@
         # cvalue:
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
 [eva] jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26 job
 [eva] <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
@@ -609,7 +605,6 @@
         # cvalue:
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
 [eva] jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
 [eva] Possible read/write data races:
@@ -664,7 +659,6 @@
     shared bases: {Frama_C_entropy_source, vars}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
 [eva] Possible read/write data races:
   vars[1]:
     read by jobs[1] at thread_arg.c:26, protected by locks[1]

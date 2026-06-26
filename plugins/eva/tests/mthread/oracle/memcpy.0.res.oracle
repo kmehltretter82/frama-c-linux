@@ -84,7 +84,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b; c; d
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -211,7 +210,6 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b; c; d
 [eva] tjob1 reads  a ∈ {3}  // memcpy.c:27 job1
 [eva] tjob2 reads  b ∈ {0; 3}  // memcpy.c:32 job2
 [eva] <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:49
@@ -265,7 +263,6 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b; c; d
 [eva] tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:27 job1
 [eva] Possible read/write data races:
   b:

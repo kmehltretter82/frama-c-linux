@@ -114,7 +114,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing
@@ -421,7 +420,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: end
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -794,7 +792,6 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva] Imprecise locations to watch: end
 [eva] <main> reads  end ∈ {0}  // recreation.c:68 main
 [eva] jobs[0] reads  end ∈ {0}  // recreation.c:28 job
 [eva] jobs[1] reads  end ∈ {0}  // recreation.c:28 job
@@ -1252,7 +1249,6 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva] Imprecise locations to watch: end
 [eva] <main> reads  end ∈ {0; 1}  // recreation.c:68 main
 [eva] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
 [eva] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job

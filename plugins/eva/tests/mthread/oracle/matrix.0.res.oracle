@@ -330,7 +330,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: matrix[0..29][0..99]
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -1070,7 +1069,6 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] Imprecise locations to watch: matrix[0..29][0..99]
 [eva] <main> reads  matrix[0][0..99] ∈ {0}  // matrix.c:58 main
 [eva] jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
 [eva] <main> reads  matrix[1][0..99] ∈ {0}  // matrix.c:58 main
@@ -1744,7 +1742,6 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] Imprecise locations to watch: matrix[0..29][0..99]
 [eva] <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:58 main
 [eva] <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:58 main
 [eva] <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:58 main
@@ -2263,7 +2260,6 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] Imprecise locations to watch: matrix[0..29][0..99]
 [eva] Possible read/write data races:
   matrix[29][0..99]:
     read by <main> at matrix.c:58, protected by locks[4]

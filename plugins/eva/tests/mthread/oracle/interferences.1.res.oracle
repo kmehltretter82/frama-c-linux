@@ -80,7 +80,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -195,7 +194,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0}  // interferences.c:106 main_ptr_write
 [eva] jobptr1 reads  shared_a ∈ {0}  // interferences.c:75 fjobptr1
 [eva] jobptr1 reads  shared_a ∈ {0}  // interferences.c:76 fjobptr1
@@ -370,7 +368,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
 [eva] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
 [eva] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
@@ -491,7 +488,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] Possible read/write data races:
   shared_b:
     read by jobptr1 at interferences.c:75, unprotected

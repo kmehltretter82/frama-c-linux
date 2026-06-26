@@ -80,7 +80,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -177,7 +176,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0}  // interferences.c:135 main_thread_loop
 [eva] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
 [eva] joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
@@ -322,7 +320,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
 [eva] <main> reads  shared_b ∈ {0; 1}  // interferences.c:135 main_thread_loop
 [eva] joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:110 fjoboneshot
@@ -456,7 +453,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2; 3}
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:135 main_thread_loop
 [eva] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:110 fjoboneshot
 [eva] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:111 fjoboneshot
@@ -596,7 +592,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ [1..2147483647]
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
   main_thread_loop
 [eva] joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:110 fjoboneshot
@@ -703,7 +698,6 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
-[eva] Imprecise locations to watch: shared_a; shared_b
 [eva] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:110
   fjoboneshot
 [eva] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:111

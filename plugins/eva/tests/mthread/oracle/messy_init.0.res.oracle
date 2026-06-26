@@ -45,7 +45,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing

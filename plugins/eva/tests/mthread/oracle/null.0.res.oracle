@@ -35,7 +35,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: NULL[100..200]
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -79,7 +78,6 @@
     interferences by mutexes:
       {}:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] Imprecise locations to watch: NULL[100..200]
 [eva] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
 [eva] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
 [eva] Possible read/write data races:
@@ -110,7 +108,6 @@
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: NULL[100..200]
 [eva] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:27, unprotected

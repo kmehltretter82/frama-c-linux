@@ -86,7 +86,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b; c; v
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -232,7 +231,6 @@
                   b ∈ {2}
                   c ∈ {0; 1; 2}
                   v ∈ {0; 1; 2}
-[eva] Imprecise locations to watch: a; b; c; v
 [eva] <main> reads  a ∈ {0}  // simple.c:50 main
 [eva] <main> reads  b ∈ {0}  // simple.c:50 main
 [eva] <main> reads  c ∈ {0}  // simple.c:50 main
@@ -421,7 +419,6 @@
                   b ∈ {2}
                   c ∈ {0; 1; 2}
                   v ∈ {0; 1; 2}
-[eva] Imprecise locations to watch: a; b; c; v
 [eva] <main> reads  a ∈ {0; 1; 2}  // simple.c:50 main
 [eva] <main> reads  b ∈ {0; 1; 2}  // simple.c:50 main
 [eva] <main> reads  c ∈ {0; 1; 2}  // simple.c:50 main
@@ -495,7 +492,6 @@
     shared bases: {a, b, c, v}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b; c; v
 [eva] Possible read/write data races:
   v:
     read by <main> at simple.c:50, protected by lock

@@ -45,7 +45,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: r
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -94,7 +93,6 @@
     interferences by mutexes:
       {}:
         # cvalue: r ∈ [--..--]
-[eva] Imprecise locations to watch: r
 [eva] <main> writes  r ∈ [--..--]  // read_all.c:29 main
 [eva] <main> writes  r ∈ [--..--]  // read_all.c:29 g :: read_all.c:29 <- main
 [eva] jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
@@ -133,7 +131,6 @@
     interferences by mutexes:
       {}:
         # cvalue: r ∈ [--..--]
-[eva] Imprecise locations to watch: r
 [eva] Possible read/write data races:
   none
 [eva] Possible write/write data races:

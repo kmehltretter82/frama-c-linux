@@ -141,7 +141,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s[0..127]
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -1059,7 +1058,6 @@
          [126].data2 ∈ [0..2147483646],0%3
          [127].data ∈ [0..2147483647]
          [127].data2 ∈ [0..2147483646],0%3
-[eva] Imprecise locations to watch: s[0..127]
 [eva] <main> reads 
   s[0].data ∈ {0}
    [1].data ∈ {0}
@@ -2271,7 +2269,6 @@
     shared bases: {s}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s[0..127]
 [eva] <main> reads 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]

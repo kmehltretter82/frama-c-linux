@@ -86,7 +86,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -164,7 +163,6 @@
       {}:
         # cvalue: interrupt_received_a ∈ {0; 1}
                   interrupt_received_b ∈ {1; 2}
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:58
   main_interrupt_cross_incr
 [eva] <interrupt_handler interrupt_cross_incr2> reads 
@@ -291,7 +289,6 @@
         # cvalue:
         interrupt_received_a ∈ {0; 1; 2; 3}
         interrupt_received_b ∈ {1; 2; 3; 4}
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] <main> reads  interrupt_received_a ∈ {0; 1}  // interrupt.c:58
   main_interrupt_cross_incr
 [eva] <interrupt_handler interrupt_cross_incr2> reads 
@@ -412,7 +409,6 @@
         # cvalue:
         interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
         interrupt_received_b ∈ {1; 2; 3; 4; 5; 6}
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] <main> reads  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:58
   main_interrupt_cross_incr
 [eva] <interrupt_handler interrupt_cross_incr2> reads 
@@ -541,7 +537,6 @@
         # cvalue:
         interrupt_received_a ∈ [0..2147483647]
         interrupt_received_b ∈ [1..2147483647]
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] <main> reads  interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}  // interrupt.c:58
   main_interrupt_cross_incr
 [eva] <interrupt_handler interrupt_cross_incr2> reads 
@@ -642,7 +637,6 @@
         # cvalue:
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647]
-[eva] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
 [eva] <main> reads  interrupt_received_a ∈ [0..2147483647]  // interrupt.c:58
   main_interrupt_cross_incr
 [eva] <main> reads  interrupt_received_b ∈ [0..2147483647]  // interrupt.c:59

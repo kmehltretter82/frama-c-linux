@@ -54,7 +54,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -125,7 +124,6 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva] Imprecise locations to watch: a; b
 [eva] jobs2 reads  a ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
 [eva] jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
 [eva] jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
@@ -211,7 +209,6 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva] Imprecise locations to watch: a; b
 [eva] jobs1 reads  b ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
 [eva] Possible read/write data races:
   b:
@@ -248,7 +245,6 @@
     shared bases: {a, b}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: a; b
 [eva] Possible read/write data races:
   b:
     read by jobs1 at assigns.c:20, unprotected

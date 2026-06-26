@@ -54,7 +54,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: interrupt_received
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -99,7 +98,6 @@
     interferences by mutexes:
       {}:
         # cvalue: interrupt_received ∈ [1..2147483647]
-[eva] Imprecise locations to watch: interrupt_received
 [eva] <main> reads  interrupt_received ∈ {0}  // interrupt.c:33 main_interrupt_incr
 [eva] <interrupt_handler interrupt_incr> reads 
   interrupt_received ∈ [0..2147483647]  // interrupt.c:29 interrupt_incr
@@ -138,7 +136,6 @@
     shared bases: {interrupt_received}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: interrupt_received
 [eva] <main> reads  interrupt_received ∈ [0..2147483647]  // interrupt.c:33
   main_interrupt_incr
 [eva] Possible read/write data races:

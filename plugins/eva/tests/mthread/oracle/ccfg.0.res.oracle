@@ -173,7 +173,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -566,7 +565,6 @@
         d ∈ {0; 1}
         e ∈ {0; 1}
         f ∈ {0; 1}
-[eva] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
 [eva] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
 [eva] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
 [eva] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
@@ -1114,7 +1112,6 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1}
-[eva] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
 [eva] <main> reads  a ∈ [--..--]  // ccfg.c:93 main
 [eva] <main> reads  b ∈ [--..--]  // ccfg.c:94 main
 [eva] job_f1 reads  b ∈ [--..--]  // ccfg.c:56 f1
@@ -1507,7 +1504,6 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1}
-[eva] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
 [eva] Possible read/write data races:
   f:
     read by <main> at ccfg.c:99, unprotected

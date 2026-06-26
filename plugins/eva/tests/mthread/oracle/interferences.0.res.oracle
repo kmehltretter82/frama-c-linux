@@ -196,7 +196,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: shared_a; shared_b; shared_c
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -408,7 +407,6 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] Imprecise locations to watch: shared_a; shared_b; shared_c
 [eva] <main> reads  shared_a ∈ {0}  // interferences.c:56 main
 [eva] <main> reads  shared_a ∈ {1}  // interferences.c:66 main
 [eva] <main> reads  shared_a ∈ {1}  // interferences.c:67 main
@@ -771,7 +769,6 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] Imprecise locations to watch: shared_a; shared_b; shared_c
 [eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:56 main
 [eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:66 main
 [eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:67 main
@@ -1110,7 +1107,6 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] Imprecise locations to watch: shared_a; shared_b; shared_c
 [eva] Possible read/write data races:
   shared_c:
     read by <main> at interferences.c:56, unprotected

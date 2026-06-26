@@ -167,8 +167,6 @@ let compute_shared_vars analysis =
     Self.debug ~level:2 "Global concurrent var accesses:@.%a"
       (Mt_shared_vars.Global.pretty_concurrent_accesses ()) accesses;
     let all_zones = Mt_shared_vars.Global.all_zones_accessed accesses in
-    Mt_self.result ~level:3 "@[<hov 2>Imprecise locations to watch: %a@]"
-      Memory_zone.pretty all_zones;
 
     (* Detect changes *)
     if not (Memory_zone.equal all_zones analysis.concurrent_accesses)

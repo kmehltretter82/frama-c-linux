@@ -109,7 +109,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s1; s2
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -226,7 +225,6 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s1; s2
 [eva] jobs2 reads  s1 ∈ {0; 1}  // mutex.c:33 f2
 [eva] jobs2 reads  s2 ∈ {0}  // mutex.c:34 f2
 [eva] jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1
@@ -354,7 +352,6 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s1; s2
 [eva] jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34 f2
 [eva] Possible read/write data races:
   s2:
@@ -396,7 +393,6 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s1; s2
 [eva] Possible read/write data races:
   s2:
     read by jobs2 at mutex.c:34, protected by m1

@@ -112,7 +112,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Imprecise locations to watch: s1; s2
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
@@ -236,7 +235,6 @@
                     .data2 ∈ {0; 3}
                   s2.data ∈ {1}
                     .data2 ∈ {0; 3}
-[eva] Imprecise locations to watch: s1; s2
 [eva] <main> reads  s1.data ∈ {0}  // one_var_multiple_threads.c:50 main
 [eva] jobs reads  s1.data ∈ {0}  // one_var_multiple_threads.c:22 f
 [eva] <main> reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:51 main
@@ -406,7 +404,6 @@
           .data2 ∈ {0; 3; 6}
         s2.data ∈ {1; 2}
           .data2 ∈ {0; 3; 6}
-[eva] Imprecise locations to watch: s1; s2
 [eva] <main> reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:50 main
 [eva] jobs reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:22 f
 [eva] <main> reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:51 main
@@ -564,7 +561,6 @@
           .data2 ∈ {0; 3; 6; 9}
         s2.data ∈ {1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-[eva] Imprecise locations to watch: s1; s2
 [eva] <main> reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:50 main
 [eva] jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
 [eva] <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51 main
@@ -742,7 +738,6 @@
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
-[eva] Imprecise locations to watch: s1; s2
 [eva] <main> reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:50
   main
 [eva] jobs reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
@@ -866,7 +861,6 @@
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-[eva] Imprecise locations to watch: s1; s2
 [eva] Possible read/write data races:
   s2.data2:
     read by jobs at one_var_multiple_threads.c:31, protected by lock2
