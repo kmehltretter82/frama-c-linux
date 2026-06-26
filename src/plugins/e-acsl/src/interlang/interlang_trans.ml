@@ -304,6 +304,25 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e, coerce, cast_info = compile_with_rtes exp in
     ignore coerce; (* coerce to A and then B ⇒ just coerce directly to B *)
     M.return (e, Some typ, cast_info)
+  | Bottom InductiveIncompleteFallthrough ->
+    let e = Cil.zero ~loc in
+    let* () = M.modify @@ fun {adata; env} ->
+      let annot_kind = Env.annotation_kind env in
+      let stmt, env =
+        Assert.runtime_check_with_msg
+          ~adata
+          ~loc
+          "Incomplete inductive function"
+          ~pred_kind:Assert
+          annot_kind
+          kf
+          env
+          e
+      in
+      let env = Env.add_stmt env stmt in
+      {env; adata = Assert.register_pred_or_term ~loc env origin e adata}
+    in
+    M.return (e, None, Some (Analyses_types.C_number, ""))
 
 and compile_lhost = function
   | Var vi -> M.return (Cil_types.Var vi, vi.vorig_name)

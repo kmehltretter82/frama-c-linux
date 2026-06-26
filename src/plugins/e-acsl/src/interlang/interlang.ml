@@ -18,6 +18,8 @@ type unop =
   | Neg   (* arithmetic operator *)
   | Not  (* Logical operator *)
 
+type bottom = InductiveIncompleteFallthrough
+
 type exp =
   {
     enode : exp_node;
@@ -33,6 +35,7 @@ and exp_node =
   | Lval of lval
   | SizeOf of typ
   | Coerce of {coerce_to : typ; coerced : exp}
+  | Bottom of bottom
 
 and unop_node = {ity : Number_ty.t; unop : unop; op : exp}
 
@@ -130,6 +133,8 @@ module Pretty = struct
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
     | Coerce {coerce_to = ty; coerced = exp} ->
       fprintf fmt "Coerce(@[%a@],@ @[%a@])" Printer.pp_typ ty pp_exp exp
+    | Bottom InductiveIncompleteFallthrough ->
+      Format.pp_print_string fmt "\"fallthrough\""
 
   let pp_rtes fmt rtes =
     let pp_rte fmt rte = fprintf fmt "%a" pp_exp_node rte.rnode in
@@ -342,6 +347,9 @@ module Exp = struct
     | {enode = Coerce c; origin} as exp -> (* collapse stacked coercions *)
       {exp with origin; enode = Coerce {c with coerce_to}}
     | exp -> of_exp_node ~origin @@ Coerce {coerce_to; coerced = exp}
+
+  let inductive_incomplete_fallthrough ~origin =
+    Aux.of_exp_node ~origin @@ Bottom InductiveIncompleteFallthrough
 end
 
 module Rte = struct

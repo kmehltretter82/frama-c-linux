@@ -385,6 +385,9 @@ and context_insensitive_term_to_exp_il ?inplace t =
   ignore inplace; (* will be required for implementing Tat *)
   let t = Logic_normalizer.get_term t in
   match t.term_node with
+  | TCast (true, _, _) when Inductive.is_fallthrough_term t ->
+    (* This node is produced by [Inductive.FunctionExtractor.Extractor.mk_false]. *)
+    M.return @@ Interlang.Exp.inductive_incomplete_fallthrough ~origin:(PoT_term t)
   | TConst c -> constant_to_exp_il t c
   | TLval lv ->
     let* l = tlval_to_lval_il lv in
@@ -861,7 +864,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         e
     in
     e, adata, env, Analyses_types.C_number, ""
-  | TCast (true, _, _) when Inductive.is_fallthrough_term t ->
+  | _ when Inductive.is_fallthrough_term t ->
     let e = Cil.zero ~loc in
     let annot_kind = Env.annotation_kind env in
     let stmt, env =
