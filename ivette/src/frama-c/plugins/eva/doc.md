@@ -16,15 +16,38 @@ The _Eva Summary_ default view shows general information about an Eva analysis
 through the components [Summary](#eva-summary), [Coverage](#eva-coverage)
 and [Flamegraph](#eva-flamegraph).
 
-Finally, the [icon-apple] Eva sidebar allows the user to change some parameters
+The [icon-apple] Eva sidebar allows the user to change some parameters
 and run the analysis. However, for large code bases, it is recommended to run the
 Eva analysis using the command line, saving the result via the -save parameter,
 and then loading the resulting file in the graphical interface.
+
+Finally, The [icon-applemore] sidebar allows you to filter the data displayed in the
+interface by taint and callstack.
+
+* Taints: If the `taints` domain is enabled, the sidebar will display a list
+  of taints. If nothing is checked, all taints will be visible, otherwise,
+  the data displayed in the interface will be filtered
+  according to the selection.
+
+* Callstacks: Here you can view all the callstacks in a tree structure.
+  The [icon-filter] icon allows you to filter them.
+  For each visible callstack, you can also see its parents and its
+  direct children. You can select one or more callstacks, which will filter
+  the data displayed on the interface according to your selection. If nothing
+  is checked, no data will be filtered.
+  The [icon-tunings] icon allows you to select all.
 
 A complete documentation for the Eva plug-in can be found online:
 [https://frama-c.com/download/frama-c-eva-manual.pdf](https://frama-c.com/download/frama-c-eva-manual.pdf)
 
 ## Status of the analysis {#eva-status}
+
+If a component or action requires an Eva analysis, you will be notified
+either directly within the component or via a modal window, and you will
+be able to run the analysis. In the case of a modal window, if you wait
+for the analysis to complete, the requested action will be carried out and
+the modal window will close. If you close the modal window, the analysis
+will continue but the action will be cancelled.
 
 All components related to the Eva plug-in show the analysis status in their
 titlebar:
@@ -86,14 +109,12 @@ Using "Alt+Click" to select an expression in the AST component creates an
 already pinned column.
 
 One can also evaluate an arbitrary expression:
-- first select a statement (or any expression within a statement)
+- first right-click on an statement (or any expression within a statement)
   in the AST component. This will be the program point where the evaluation
   takes place.
-- then use the shortcut "Ctrl+E", or the menu entry _Edit -> Evaluate_,
-  or select _Evaluation_ when clicking on the button of the global toolbar
-  search field.
-- write the desired C expression or ACSL term in the toolbar search field
-  (which should have been selected) and press _Enter_.
+- then click on _...evaluate_.
+- write the desired C expression or ACSL term in the text field
+  and press _Enter_ or click on _Evaluate_.
 
 A new pinned column is added to the table, with the values inferred for the
 given expression at the selected statement.
@@ -151,11 +172,11 @@ This component lists all statements which may read or write the selected
 lvalue, according to the Eva analysis.
 
 Studia can also be used on arbitrary lvalues:
-- select a statement in the AST component;
-- click on the button of the global toolbar search field,
-  and select _Studia: Reads_ or _Studia: Writes_;
-- write the desired C lvalue in the toolbar search field
-  (which should have been selected) and press _Enter_.
+- right-click on an statement in the AST component;
+- click on _...studia_;
+- choose _Reads of_ or _Writes to_;
+- enter the desired C lvalues in the text field and press _Enter_
+  or click on _Search_;
 
 The memory location of the lvalue is evaluated at the selected statement:
 for instance, if the lvalue is a pointer access, its memory location depends on

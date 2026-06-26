@@ -33,16 +33,32 @@ the associated documentation chapters for more details.
 
 ## The Sidebar {#ivette-sidebar}
 
-There are actually _several_ sidebars and you can use the large icons on the
-left-most side of the screen to switch from one sidebar to another. The
-[icon-sidebar] button in the top toolbar allows you to hide/show the
-sidebars. Among them, two sidebars are especially dedicated to the GUI:
+Each sidebar can be accessed via its dedicated icon in the left-handmost column
+of the interface. The sidebar can be collapsed using the [icon-angle.left]
+button at the bottom of this column or via the shortcut Ctrl+B.
 
-- The [icon-display] sidebar provides access to _all_ registered components and
-  views that you can use in the GUI.
+Sidebars :
 
-- The [icon-search] sidebar provides navigation to the _source declarations_ of
-  your project currently analyzed by Frama-C.
+* The [icon-display] is specifically dedicated to the graphical interface.
+  This sidebar provides access to _all_ the components and
+  views you have saved that can be used in the graphical interface.
+
+* The [icon-DUPLICATE] sidebar allows you to view types, variables,
+  functions and axiomatic definitions.
+
+* The [icon-FOLDER] sidebar does the same as the previous sidebar but adds
+  the option to view the file tree.
+  You can filter by type, function, variable and annotation using the
+  buttons at the top. There is also a text field for performing a text search.
+
+* The [icon-PROJECT] sidebar enables you to manage projects.
+
+* The [icon-wp] sidebar allows you to change WP settings.
+
+* The [icon-apple] [Eva sidebar](#eva) allows you to change Eva settings.
+
+* The [icon-applemore] [EvaMore sidebar](#eva)  allows you to filter the data displayed in the
+  interface by taint and callstack.
 
 ## The Laboratory {#ivette-laboratory}
 
