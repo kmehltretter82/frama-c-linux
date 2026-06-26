@@ -75,17 +75,6 @@ and offset =
 
 and rte = private {rnode : exp_node; rorigin: predicate}
 
-module Aux : sig
-  val of_bool : bool -> exp_node
-  val under_coerce : exp -> exp
-
-  val of_exp_node :
-    origin:Analyses_types.pred_or_term ->
-    ?rtes:rte list ->
-    exp_node ->
-    exp
-end
-
 module Pretty : sig
   val pp_binop : Format.formatter -> binop -> unit
   val pp_lhost : Format.formatter -> lhost -> unit
