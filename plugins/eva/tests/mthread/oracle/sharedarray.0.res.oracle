@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing sharedarray.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -20,8 +19,6 @@
 [eva] sharedarray.c:59: Start thread jobs5
 [eva] sharedarray.c:60: New thread: jobs6, fun f6, parent <main>, args {0}
 [eva] sharedarray.c:60: Start thread jobs6
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   jobs1:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
@@ -41,141 +38,94 @@
   jobs6:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
       pthread_create :: sharedarray.c:60 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread jobs1, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[1]: write by jobs1 at sharedarray.c:22 <- f1
   t[2]: write by jobs1 at sharedarray.c:23 <- f1
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs1 computed
 [eva] *** Computing thread jobs2, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[1]: write by jobs2 at sharedarray.c:28 <- f2
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs2 computed
 [eva] *** Computing thread jobs3, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[0..3]: write by jobs3 at sharedarray.c:33 <- f3
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs3
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs3 computed
 [eva] *** Computing thread jobs4, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   tt[0..25]: write by jobs4 at sharedarray.c:39 <- f4
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs4
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs4 computed
 [eva] *** Computing thread jobs5, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   tt[0..25]: write by jobs5 at sharedarray.c:45 <- f5
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs5
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs5 computed
 [eva] *** Computing thread jobs6, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs6
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs6 computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 1 iterations

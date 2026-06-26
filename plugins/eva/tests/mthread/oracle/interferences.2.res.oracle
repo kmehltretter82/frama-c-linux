@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_thread_loop
@@ -23,33 +22,23 @@
   The thread joblooped is already running.
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread joboneshot, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -61,25 +50,19 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
 [eva] *** Computing thread joblooped, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0}, {1}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joblooped at interferences.c:118 <- fjoblooped
@@ -91,20 +74,12 @@
     read by joblooped at interferences.c:120 <- fjoblooped
     read by joblooped at interferences.c:121 <- fjoblooped
     write by joblooped at interferences.c:120 <- fjoblooped
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joblooped computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
@@ -115,10 +90,7 @@
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva] Thread <main>, fun main_thread_loop
@@ -127,24 +99,18 @@
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread joboneshot, iteration 2 (potential shared vars changed
     and interferences changed)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
@@ -153,7 +119,6 @@
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -165,7 +130,6 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
@@ -179,12 +143,8 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
 [eva] *** Computing thread joblooped, iteration 2 (potential shared vars changed
     and interferences changed)
-[eva] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
@@ -193,7 +153,6 @@
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joblooped at interferences.c:118 <- fjoblooped
@@ -205,7 +164,6 @@
     read by joblooped at interferences.c:120 <- fjoblooped
     read by joblooped at interferences.c:121 <- fjoblooped
     write by joblooped at interferences.c:120 <- fjoblooped
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
@@ -219,13 +177,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joblooped computed
-[eva] ***** Threads computed for iteration 2.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0}  // interferences.c:135 main_thread_loop
 [eva] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
@@ -291,11 +242,8 @@
   interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
   interferences.c:135 (for shared_a; shared_b)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 3
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -303,29 +251,22 @@
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread joboneshot, iteration 3 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -337,7 +278,6 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
@@ -351,18 +291,13 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
 [eva] *** Computing thread joblooped, iteration 3 (shared vars values changed,
     thread initial memory state changed and interferences changed)
-[eva] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1}
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joblooped at interferences.c:118 <- fjoblooped
@@ -374,7 +309,6 @@
     read by joblooped at interferences.c:120 <- fjoblooped
     read by joblooped at interferences.c:121 <- fjoblooped
     write by joblooped at interferences.c:120 <- fjoblooped
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
@@ -388,13 +322,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joblooped computed
-[eva] ***** Threads computed for iteration 3.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
 [eva] <main> reads  shared_b ∈ {0; 1}  // interferences.c:135 main_thread_loop
@@ -448,41 +375,31 @@
   interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
   interferences.c:135 (for shared_a; shared_b)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 4
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread joboneshot, iteration 4 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2}
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -494,7 +411,6 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
@@ -508,19 +424,14 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
 [eva] *** Computing thread joblooped, iteration 4 (thread initial memory state
     changed and interferences changed)
-[eva] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1; 2}
 [eva:show] interferences.c:121: 
   Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2; 3}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joblooped at interferences.c:118 <- fjoblooped
@@ -532,7 +443,6 @@
     read by joblooped at interferences.c:120 <- fjoblooped
     read by joblooped at interferences.c:121 <- fjoblooped
     write by joblooped at interferences.c:120 <- fjoblooped
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
@@ -546,13 +456,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2; 3}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joblooped computed
-[eva] ***** Threads computed for iteration 4.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:135 main_thread_loop
 [eva] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:110 fjoboneshot
@@ -605,11 +508,8 @@
   interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
   interferences.c:135 (for shared_a; shared_b)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 5
 [eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -617,31 +517,24 @@
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread joboneshot, iteration 5 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2; 3}
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2; 3}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -653,7 +546,6 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
@@ -667,12 +559,8 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
 [eva] *** Computing thread joblooped, iteration 5 (thread initial memory state
     changed and interferences changed)
-[eva] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
@@ -683,7 +571,6 @@
   signed overflow. assert shared_b + 1 ≤ 2147483647;
 [eva:show] interferences.c:121: 
   Frama_C_show_each_fjoblooped_end: {0; 1}, [1..2147483647]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joblooped at interferences.c:118 <- fjoblooped
@@ -695,7 +582,6 @@
     read by joblooped at interferences.c:120 <- fjoblooped
     read by joblooped at interferences.c:121 <- fjoblooped
     write by joblooped at interferences.c:120 <- fjoblooped
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
@@ -710,13 +596,6 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ [1..2147483647]
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joblooped computed
-[eva] ***** Threads computed for iteration 5.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
   main_thread_loop
@@ -775,10 +654,7 @@
   interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
   interferences.c:135 (for shared_a; shared_b)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 6
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -786,30 +662,23 @@
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
   shared_a: read by <main> at interferences.c:135 <- main_thread_loop
   shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread joboneshot, iteration 6 (interferences changed)
-[eva] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, [0..2147483647]
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, [0..2147483647]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   shared_a:
     read by joboneshot at interferences.c:110 <- fjoboneshot
@@ -821,7 +690,6 @@
     read by joboneshot at interferences.c:110 <- fjoboneshot
     read by joboneshot at interferences.c:111 <- fjoboneshot
     read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
@@ -835,13 +703,6 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread joboneshot computed
-[eva] ***** Threads computed for iteration 6.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: shared_a; shared_b
 [eva] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:110
   fjoboneshot
@@ -891,5 +752,4 @@
   interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
   interferences.c:135 (for shared_a; shared_b)
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 6 iterations

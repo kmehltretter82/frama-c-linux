@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing philo_nofifo.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -23,26 +22,17 @@
 [eva] philo_nofifo.c:37: Start thread jobs[3]
 [eva] philo_nofifo.c:37: New thread: jobs[4], fun job, parent <main>, args {4}
 [eva] philo_nofifo.c:37: Start thread jobs[4]
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   jobs[0..4]:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
       pthread_create :: philo_nofifo.c:37 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread jobs[0], iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -51,7 +41,6 @@
 [eva] philo_nofifo.c:13: Lock locks[1]
 [eva] philo_nofifo.c:14: Release locks[1]
 [eva] philo_nofifo.c:15: Release locks[4]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   locks[1]:
     read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -71,18 +60,13 @@
       pthread_mutex_unlock :: philo_nofifo.c:15 <-
       aux :: philo_nofifo.c:24 <-
       job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs[0] computed
 [eva] *** Computing thread jobs[1], iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -91,7 +75,6 @@
 [eva] philo_nofifo.c:13: Lock locks[2]
 [eva] philo_nofifo.c:14: Release locks[2]
 [eva] philo_nofifo.c:15: Release locks[0]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   locks[0]:
     read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -111,18 +94,13 @@
       pthread_mutex_unlock :: philo_nofifo.c:14 <-
       aux :: philo_nofifo.c:24 <-
       job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs[1] computed
 [eva] *** Computing thread jobs[2], iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -131,7 +109,6 @@
 [eva] philo_nofifo.c:13: Lock locks[3]
 [eva] philo_nofifo.c:14: Release locks[3]
 [eva] philo_nofifo.c:15: Release locks[1]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   locks[1]:
     read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -151,18 +128,13 @@
       pthread_mutex_unlock :: philo_nofifo.c:14 <-
       aux :: philo_nofifo.c:24 <-
       job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs[2] computed
 [eva] *** Computing thread jobs[3], iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -171,7 +143,6 @@
 [eva] philo_nofifo.c:13: Lock locks[4]
 [eva] philo_nofifo.c:14: Release locks[4]
 [eva] philo_nofifo.c:15: Release locks[2]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   locks[2]:
     read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -191,18 +162,13 @@
       pthread_mutex_unlock :: philo_nofifo.c:14 <-
       aux :: philo_nofifo.c:24 <-
       job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs[3] computed
 [eva] *** Computing thread jobs[4], iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -211,7 +177,6 @@
 [eva] philo_nofifo.c:13: Lock locks[0]
 [eva] philo_nofifo.c:14: Release locks[0]
 [eva] philo_nofifo.c:15: Release locks[3]
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   locks[0]:
     read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -231,25 +196,16 @@
       pthread_mutex_unlock :: philo_nofifo.c:15 <-
       aux :: philo_nofifo.c:24 <-
       job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs[4] computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 1 iterations

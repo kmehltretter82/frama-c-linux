@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing manysharedvars.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -13,8 +12,6 @@
 [eva] manysharedvars.c:43: Start thread jobs
 [eva] manysharedvars.c:46: Lock lock
 [eva] manysharedvars.c:49: Release lock
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -66,27 +63,19 @@
       pthread_mutex_lock :: manysharedvars.c:46 <- main
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread jobs, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f for thread jobs
 [eva] manysharedvars.c:28: Lock lock
 [eva] manysharedvars.c:31: Release lock
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -141,20 +130,12 @@
       pthread_mutex_lock :: manysharedvars.c:28 <- f
     read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:31 <- f
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: s[0..127]
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
@@ -165,15 +146,11 @@
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva] Thread <main>, fun main
 [eva] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -225,26 +202,20 @@
       pthread_mutex_lock :: manysharedvars.c:46 <- main
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread jobs, iteration 2 (potential shared vars changed and
     interferences changed)
-[eva] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] manysharedvars.c:29: 
   inject threads interferences at this point
 [eva:interferences] manysharedvars.c:30: 
   inject threads interferences at this point
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -299,7 +270,6 @@
       pthread_mutex_lock :: manysharedvars.c:28 <- f
     read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:31 <- f
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -1082,13 +1052,6 @@
          [126].data2 ∈ {0; 3}
          [127].data ∈ {0; 1}
          [127].data2 ∈ {0; 3}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread jobs computed
-[eva] ***** Threads computed for iteration 2.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: s[0..127]
 [eva] <main> reads 
   s[0].data ∈ {0}
@@ -2232,18 +2195,14 @@
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
     Read by <main>, Write by jobs: protected by lock
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 3
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] manysharedvars.c:47: 
   inject threads interferences at this point
 [eva:interferences] manysharedvars.c:48: 
   inject threads interferences at this point
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -2295,20 +2254,12 @@
       pthread_mutex_lock :: manysharedvars.c:46 <- main
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ***** Threads computed for iteration 3.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: s[0..127]
 [eva] <main> reads 
   s[0].data ∈ {0; 1}
@@ -2928,5 +2879,4 @@
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
     Read by <main>, Write by jobs: protected by lock
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 3 iterations

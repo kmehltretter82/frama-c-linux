@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing protect.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -16,8 +15,6 @@
 [eva] protect.c:26: Release lock1
 [eva] protect.c:28: Lock lock2
 [eva] protect.c:30: Release lock2
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   lock1:
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -31,41 +28,25 @@
       pthread_mutex_unlock :: protect.c:30 <- main
   t[1]: write by <main> at protect.c:25 <- main
   t[3]: write by <main> at protect.c:29 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread tjob, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread tjob
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread tjob computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: t{[1]; [3]}
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
@@ -76,15 +57,11 @@
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva] Thread <main>, fun main
 [eva] protect.c:22: Thread tjob, fun job, parent <main>, args {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   lock1:
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -98,7 +75,6 @@
       pthread_mutex_unlock :: protect.c:30 <- main
   t[1]: write by <main> at protect.c:25 <- main
   t[3]: write by <main> at protect.c:29 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -127,32 +103,19 @@
                    [2] ∈ {0}
                    [3] ∈ {4}
                    [4..9] ∈ {0}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread tjob, iteration 2 (potential shared vars changed and
     interferences changed)
-[eva] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread tjob computed
-[eva] ***** Threads computed for iteration 2.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: t{[1]; [3]}
 [eva] tjob reads  t[1] ∈ {0; 1}  // protect.c:12 job
 [eva] tjob reads  t[3] ∈ {0; 4}  // protect.c:12 job
@@ -180,29 +143,17 @@
   t[1]: Read by tjob, Write by <main>: unprotected
 [eva] Statements needing manual synchronisation
   protect.c:12 (for t{[1]; [3]})
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 3
 [eva] *** Computing thread tjob, iteration 3 (shared vars values changed)
-[eva] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread tjob computed
-[eva] ***** Threads computed for iteration 3.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: t{[1]; [3]}
 [eva] Possible read/write data races:
   t[3]:
@@ -222,5 +173,4 @@
   t[1]: Read by tjob, Write by <main>: unprotected
 [eva] Statements needing manual synchronisation
   protect.c:12 (for t{[1]; [3]})
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 3 iterations

@@ -5,7 +5,6 @@
 [kernel] Parsing utf8_names.c (with preprocessing)
 [kernel:typing:int-conversion] utf8_names.c:23: Warning: 
   Conversion from a pointer to an integer without an explicit cast
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -17,16 +16,12 @@
 [eva] Start thread job / "𐍅" f2
 [eva] Receiving message on queue / "𐍅", max size 20, stored in &buf.
   No value to receive (yet?).
-[eva] *** First value analysis for main thread done.
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread job / "𐍅" f1, iteration 1 (first iteration)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -54,7 +49,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 1 (first iteration)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
@@ -77,15 +71,10 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread job / "𐍅" f2 computed
-[eva] ***** Threads computed for iteration 1.
-[eva] ***** Computing shared variables
 [eva] Possible read/write data races:
   none
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (new message received and potential
     shared vars changed)
 [eva] Analyzing a complete application starting at main
@@ -123,7 +112,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 2 (potential shared vars changed
     and interferences changed)
 [eva] Analyzing a complete application starting at f1
@@ -167,7 +155,6 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         b ∈ {0}
         c ∈ {1}
-[eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 2 (potential shared vars changed
     and interferences changed)
 [eva] Analyzing a complete application starting at f2
@@ -218,9 +205,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2}
-[eva] *** Thread job / "𐍅" f2 computed
-[eva] ***** Threads computed for iteration 2.
-[eva] ***** Computing shared variables
 [eva] job / "𐍅" f2 reads 
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -274,8 +258,6 @@
 [eva] Statements needing manual synchronisation
   utf8_names.c:23 (for a; b)
   utf8_names.c:59 (for c)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 3
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -288,7 +270,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 3 (shared vars values changed
     and interferences changed)
 [eva] Analyzing a complete application starting at f1
@@ -337,7 +318,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 3 (shared vars values changed,
     thread initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at f2
@@ -386,9 +366,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2}
-[eva] *** Thread job / "𐍅" f2 computed
-[eva] ***** Threads computed for iteration 3.
-[eva] ***** Computing shared variables
 [eva] job / "𐍅" f1 reads 
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -429,8 +406,6 @@
 [eva] Statements needing manual synchronisation
   utf8_names.c:23 (for a; b)
   utf8_names.c:59 (for c)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 4
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -440,7 +415,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -488,9 +462,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] *** Thread job / "𐍅" f1 computed
-[eva] ***** Threads computed for iteration 4.
-[eva] ***** Computing shared variables
 [eva] Possible read/write data races:
   c:
     read by <main> at utf8_names.c:59, unprotected
@@ -525,7 +496,4 @@
 [eva] Statements needing manual synchronisation
   utf8_names.c:23 (for a; b)
   utf8_names.c:59 (for c)
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 4 iterations
-[eva] ******* Outputting model for html
-[eva] ******* Html output done.

@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing messy_init.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -18,23 +17,14 @@
 [eva] messy_init.c:22: Start thread job
 [eva] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
 [eva] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread job, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread job
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -44,30 +34,20 @@
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
 [eva] messy_init.c:10: Lock lock
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   lock:
     read by job at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
       pthread_mutex_lock :: messy_init.c:10 <- fjob
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread job
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread job computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 1 iterations

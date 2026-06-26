@@ -20,7 +20,6 @@ Load parsed file and run Mthread: failure as pthreads stubs are missing.
   $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -eva -mthread
   [eva:experimental] Warning: 
     Analysis of concurrent programs is an experimental feature.
-  [eva] ******* Starting mthread
   [eva] *** Computing value analysis for main thread
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization

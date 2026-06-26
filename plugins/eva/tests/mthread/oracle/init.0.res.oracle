@@ -2,7 +2,6 @@
 [eva] Preparing sources for the analysis of concurrent program with builtins only
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing init.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -17,18 +16,11 @@
 [eva] init.c:29: Warning: 
   Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:15: Warning: The mutex 0 is already registered.
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
 [eva] ******* Analysis performed, 0 iterations

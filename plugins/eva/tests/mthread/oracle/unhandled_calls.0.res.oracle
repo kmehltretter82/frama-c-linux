@@ -9,7 +9,6 @@
   and
   int (*)(void *, int )
 [kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -27,8 +26,6 @@
 [eva] unhandled_calls.c:23: Start thread th1
 [eva] unhandled_calls.c:23: Thread th1, fun t, parent <main>, args {0}
 [eva] unhandled_calls.c:23: New context for th1, fun t, parent <main>, args {0}
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   th1:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
@@ -40,14 +37,12 @@
       pthread_create :: unhandled_calls.c:18 <-
       f1 :: unhandled_calls.c:35 <-
       main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
 [eva] unhandled_calls.c:42: User Error: 
   Simultaneous call to a mthread function and to another function: very strangely written mthread binding?
 [kernel] Plug-in eva aborted: invalid user input.

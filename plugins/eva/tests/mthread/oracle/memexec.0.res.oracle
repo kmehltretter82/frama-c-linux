@@ -3,37 +3,26 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing memexec.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [eva] New thread: <main>, fun main
 [eva] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
 [eva] memexec.c:32: Start thread th1
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
   c: read by <main> at memexec.c:33 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread th1, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   v:
     read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
@@ -42,20 +31,12 @@
   c:
     write by th1 at memexec.c:10 <-
       g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread th1 computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: a; c
 [eva] Concurrent imprecise accesses have changed: before
     \nothing
@@ -66,36 +47,26 @@
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva] Thread <main>, fun main
 [eva] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
   c: read by <main> at memexec.c:33 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, c}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
 [eva] *** Computing thread th1, iteration 2 (potential shared vars changed and
     interferences changed)
-[eva] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   v:
     read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
@@ -104,7 +75,6 @@
   c:
     write by th1 at memexec.c:10 <-
       g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
@@ -122,13 +92,6 @@
       {}:
         # cvalue: a ∈ {1}
                   c ∈ {0; 2}
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread th1 computed
-[eva] ***** Threads computed for iteration 2.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: a; c
 [eva] <main> reads  a ∈ {0}  // memexec.c:33 main
 [eva] <main> reads  c ∈ {0}  // memexec.c:33 main
@@ -174,32 +137,20 @@
   a: Read by <main>, Write by th1: unprotected
 [eva] Statements needing manual synchronisation
   memexec.c:33 (for a; c)
-[eva] ***** Shared variables computed
-[eva] ***** Iteration 3
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
-[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:33: inject threads interferences at this point
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
   c: read by <main> at memexec.c:33 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, c}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ***** Threads computed for iteration 3.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: a; c
 [eva] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
 [eva] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
@@ -227,5 +178,4 @@
   a: Read by <main>, Write by th1: unprotected
 [eva] Statements needing manual synchronisation
   memexec.c:33 (for a; c)
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 3 iterations

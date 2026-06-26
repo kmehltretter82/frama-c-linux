@@ -52,7 +52,7 @@ let post_thread_analysis analysis =
   mark_new_messages_received analysis;
 
   (* We compute the globals variables accessed by the thread *)
-  Mt_self.feedback ~level:2 "* Computing shared variables";
+  Self.debug "Computing shared variables.";
   let state_accesser = Mt_memory.Types.Global in
   let read_written =
     Mt_shared_vars.read_written_by_thread
@@ -62,7 +62,7 @@ let post_thread_analysis analysis =
   th.th_read_written <- read_written;
   Mt_self.result ~level:3 "@[<v 0>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
-  Mt_self.feedback ~level:2 "* shared variables computed";
+  Self.debug "Shared variables computed.";
 
   (* We compute interferences *)
   Mt_interferences.add_last_analysis analysis;
@@ -71,12 +71,12 @@ let post_thread_analysis analysis =
   th.th_amap <- curr_events analysis;
 
   (* Compute the concurrent graph of this thread *)
-  Mt_self.feedback ~level:2 "* Computing cfg";
+  Self.debug "Computing cfg.";
   th.th_cfg <- Mt_cfg.make_cfg th;
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
-  Mt_self.feedback ~level:2 "* Cfg computed";
+  Self.debug "Cfg computed.";
 
-  Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+  Self.debug "Thread %a computed." ThreadState.pretty th;
 
   (* (Temporary) hack to be able to retrieve temporary analysis results *)
   Self.ComputationState.set previous_computation_state
@@ -88,11 +88,10 @@ let pre_thread_analysis analysis th =
     ThreadState.pretty th analysis.iteration
     SetRecomputeReason.pretty th.th_to_recompute;
 
-  Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
-    Thread.pretty th.th_eva_thread;
-  Self.debug "@[<hov>Arguments@ %a@]"
+  Self.debug "Computing Eva analysis for thread %a with arguments %a."
+    Thread.pretty th.th_eva_thread
     (Pretty_utils.pp_list Cvalue.V.pretty) th.th_params;
-  Self.debug ~level:2 "Initial state %a"
+  Self.debug ~level:2 "Initial state: %a"
     Cvalue.Model.pretty th.th_init_state;
 
   (* We set the values that depend on the thread analysed *)
@@ -160,7 +159,7 @@ let recompute_shared_vars_values_changed analysis th before now =
 
 let compute_shared_vars analysis =
   let _imprecise =
-    Mt_self.feedback "***** Computing shared variables";
+    Self.debug "Computing shared variables.";
     let (ww_accesses, rw_accesses), _ =
       Mt_shared_vars.Global.concurrent_accesses_all_threads
         (threads analysis) in
@@ -272,9 +271,9 @@ let post_iteration analysis =
      but it supposes the thread creation structure is completely known.
      Hence, it is safer to do this at the end of a full iteration, instead
      of at the end of a thread *)
-  Mt_self.feedback ~level:2 "* Computing live threads and locked mutexes";
+  Self.debug "Computing live threads and locked mutexes.";
   iter_threads analysis (Mt_cfg.update_cfg_contexts analysis);
-  Mt_self.feedback ~level:2 "* threads and mutexes computed";
+  Self.debug "Threads and mutexes computed.";
 
   let precise_accesses, written = compute_shared_vars analysis in
   analysis.concurrent_accesses_by_nodes <- precise_accesses;
@@ -302,7 +301,7 @@ let post_iteration analysis =
         (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
     end;
   end;
-  Mt_self.feedback "***** Shared variables computed";
+  Self.debug "Shared variables computed.";
 
   save_to_disk analysis
 

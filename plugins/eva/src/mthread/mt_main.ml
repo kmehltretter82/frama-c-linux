@@ -109,7 +109,6 @@ let pre_analysis () =
     register_hooks analysis;
     (* Let Eva know about interrupt handlers. *)
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-    Mt_self.feedback "******* Starting mthread";
     Some analysis
   end else begin
     register_no_hooks ();
@@ -134,13 +133,12 @@ let post_analysis analysis =
   (* Printing results to files *)
   Mt_options.ExtractModels.iter
     (fun s ->
-       Mt_self.feedback "******* Outputting model for %s" s;
+       Self.debug "Outputting model for %s." s;
        (match s with
         | "html" -> Mt_outputs.Html.output_threads analysis;
         | _ -> Self.error "Unknown model %s specified" s;
        );
-       Mt_self.feedback "******* %s output done."
-         (String.capitalize_ascii s);
+       Self.debug "%s output done." (String.capitalize_ascii s);
     );
 
   Mt_summary.compute analysis

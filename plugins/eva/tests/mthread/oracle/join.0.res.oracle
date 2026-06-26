@@ -3,7 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing join.c (with preprocessing)
-[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
@@ -12,8 +11,6 @@
 [eva] join.c:21: Start thread th1
 [eva] join.c:22: New thread: th2, fun t2, parent <main>, args {0}
 [eva] join.c:22: Start thread th2
-[eva] *** First value analysis for main thread done.
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
   th1:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
@@ -21,65 +18,42 @@
   th2:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
       pthread_create :: join.c:22 <- main
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread <main> computed
-[eva] ******* Starting to iterate
-[eva] ***** Iteration 1
 [eva] *** Computing thread th1, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
 [eva] join.c:10: Thread exiting with value {1}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread th1 computed
 [eva] *** Computing thread th2, iteration 1 (first iteration)
-[eva] * Computing value analysis for thread th2
 [eva] Analyzing a complete application starting at t2
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t2 for thread th2
 [eva] join.c:15: Thread exiting with value {2}
-[eva] * Computing shared variables
 [eva] Globals accessed by thread:
-[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread th2
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] * Computing cfg
-[eva] * Cfg computed
-[eva] *** Thread th2 computed
-[eva] ***** Threads computed for iteration 1.
-[eva] * Computing live threads and locked mutexes
-[eva] * threads and mutexes computed
-[eva] ***** Computing shared variables
 [eva] Imprecise locations to watch: \nothing
 [eva] Possible read/write data races:
   none
 [eva] Shared memory: \nothing
 [eva] Mutexes for concurrent accesses:
 [eva] Detailed shared zones protections
-[eva] ***** Shared variables computed
 [eva] ******* Analysis performed, 1 iterations

@@ -216,11 +216,11 @@ let mthread_fixpoint engine analysis =
   Mt_self.feedback "*** Computing value analysis for main thread";
   let final_state = compute_thread engine Thread.main in
   Thread.Hashtbl.replace final_states Thread.main final_state;
-  Mt_self.feedback "*** First value analysis for main thread done." ;
+  Self.debug "First Eva analysis for main thread done." ;
   Mt_analysis_fixpoint.post_thread_analysis analysis;
 
   (* We perform the analysis iterations *)
-  Mt_self.feedback "******* Starting to iterate";
+  Self.debug "Starting to iterate.";
   let limit = Mt_options.StopAfter.get () in
   analysis.iteration <- 0;
   while
@@ -228,11 +228,10 @@ let mthread_fixpoint engine analysis =
     Mt_thread.needs_recomputation analysis
   do
     analysis.iteration <- analysis.iteration + 1;
-    Mt_self.feedback "***** Iteration %d" analysis.iteration;
+    Self.debug "Iteration %d" analysis.iteration;
     Mt_thread.iter_threads analysis
       (thread_analysis engine analysis final_states);
-    Mt_self.feedback "***** Threads computed for iteration %d."
-      analysis.iteration;
+    Self.debug "Threads computed for iteration %d." analysis.iteration;
     Mt_analysis_fixpoint.post_iteration analysis
   done;
 
