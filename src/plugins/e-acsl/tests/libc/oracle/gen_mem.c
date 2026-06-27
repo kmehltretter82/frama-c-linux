@@ -280,8 +280,8 @@ int main(void)
                                                       (size_t)__gen_e_acsl_if_2);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(c[0])",
                                  (void *)(c));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(char)",
-                                 0,1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "sizeof(char) * 1",0,1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(char)",
                                  0,1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,

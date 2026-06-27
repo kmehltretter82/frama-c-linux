@@ -58,7 +58,9 @@ and exp_node = private
       A coercion does not correspond directly to C type casts. It merely
       indicates a _potential_ point where a cast might be necessary. Also, the
       translation does not necessarily generate a type cast, but potentially a
-      more complicated conversion operation, e.g. [mpz_get_ui]. *)
+      more complicated conversion operation, e.g. [mpz_get_ui].
+      Despite being an exp, a Coerce node will never hold any RTE. This should
+      be held as an invariant of the E-ACSL flow.*)
 
 and unop_node = private {ity : number_ty; unop : unop; op : exp}
 and binop_node = private {ity : number_ty; binop : binop; op1 : exp; op2 : exp}

@@ -1071,7 +1071,7 @@ int main(void)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
                                    "&(dest_0[0])",(void *)(dest_0));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                   "sizeof(char)",0,1);
+                                   "sizeof(char) * 1",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"size",0,

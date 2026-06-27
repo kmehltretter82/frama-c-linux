@@ -195,6 +195,13 @@ module Optimisations = struct
       let descr = "omit RTE guard generation for specifications"
     end)
 
+  module Smart_il =
+    Make (struct
+      let name = "smart-il"
+      let level = 1
+      let descr = "optimises expressions using smart constructors"
+    end)
+
 end
 
 
