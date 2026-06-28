@@ -32,129 +32,130 @@
 [eva:mutex] matrix.c:59: Release locks[3]
 [eva:mutex] matrix.c:54: Lock locks[4]
 [eva:mutex] matrix.c:59: Release locks[4]
-[eva] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[1][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[2][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[3][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[4][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[5][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[6][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[7][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[8][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[9][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[10][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[11][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[12][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[13][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[14][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[15][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[16][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[17][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[18][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[19][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[20][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[21][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[22][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[23][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[24][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[25][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[26][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[27][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[28][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[29][0..99]: read by <main> at matrix.c:58 <- main
-  psum[0..99]:
-    read by <main> at matrix.c:63 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:50 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-  result: read by <main> at matrix.c:48 <- main
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[1][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[2][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[3][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[4][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[5][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[6][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[7][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[8][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[9][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[10][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[11][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[12][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[13][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[14][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[15][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[16][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[17][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[18][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[19][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[20][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[21][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[22][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[23][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[24][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[25][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[26][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[27][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[28][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[29][0..99]: read by <main> at matrix.c:58 <- main
+    psum[0..99]:
+      read by <main> at matrix.c:63 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:50 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+    result: read by <main> at matrix.c:48 <- main
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -173,25 +174,26 @@
   See -generated-spec-* options for more info.
 [eva] using specification for function f
 [eva:mutex] matrix.c:29: Release locks[0]
-[eva] Globals accessed by thread:
-  matrix[0][0..99]:
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    write by jobs[0] at matrix.c:28 <- job
-  matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]:
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      write by jobs[0] at matrix.c:28 <- job
+    matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -206,25 +208,26 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
 [eva:mutex] matrix.c:24: Lock locks[1]
 [eva:mutex] matrix.c:29: Release locks[1]
-[eva] Globals accessed by thread:
-  matrix[1][0..99]:
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    write by jobs[1] at matrix.c:28 <- job
-  matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[1][0..99]:
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      write by jobs[1] at matrix.c:28 <- job
+    matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -239,25 +242,26 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
 [eva:mutex] matrix.c:24: Lock locks[2]
 [eva:mutex] matrix.c:29: Release locks[2]
-[eva] Globals accessed by thread:
-  matrix[2][0..99]:
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    write by jobs[2] at matrix.c:28 <- job
-  matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[2][0..99]:
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      write by jobs[2] at matrix.c:28 <- job
+    matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -272,25 +276,26 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
 [eva:mutex] matrix.c:24: Lock locks[3]
 [eva:mutex] matrix.c:29: Release locks[3]
-[eva] Globals accessed by thread:
-  matrix[3][0..99]:
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    write by jobs[3] at matrix.c:28 <- job
-  matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[3][0..99]:
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      write by jobs[3] at matrix.c:28 <- job
+    matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -305,32 +310,34 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
 [eva:mutex] matrix.c:24: Lock locks[4]
 [eva:mutex] matrix.c:29: Release locks[4]
-[eva] Globals accessed by thread:
-  matrix[4][0..99]:
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    write by jobs[4] at matrix.c:28 <- job
-  matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[4][0..99]:
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      write by jobs[4] at matrix.c:28 <- job
+    matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     matrix[0..29][0..99]
@@ -343,129 +350,130 @@
 [eva:thread] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
 [eva:thread] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
 [eva:thread] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
-[eva] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[1][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[2][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[3][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[4][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[5][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[6][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[7][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[8][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[9][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[10][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[11][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[12][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[13][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[14][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[15][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[16][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[17][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[18][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[19][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[20][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[21][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[22][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[23][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[24][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[25][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[26][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[27][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[28][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[29][0..99]: read by <main> at matrix.c:58 <- main
-  psum[0..99]:
-    read by <main> at matrix.c:63 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:50 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-  result: read by <main> at matrix.c:48 <- main
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[1][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[2][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[3][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[4][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[5][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[6][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[7][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[8][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[9][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[10][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[11][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[12][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[13][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[14][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[15][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[16][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[17][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[18][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[19][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[20][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[21][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[22][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[23][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[24][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[25][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[26][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[27][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[28][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[29][0..99]: read by <main> at matrix.c:58 <- main
+    psum[0..99]:
+      read by <main> at matrix.c:63 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:50 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+    result: read by <main> at matrix.c:48 <- main
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -483,25 +491,26 @@
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
 [eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  matrix[0][0..99]:
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    write by jobs[0] at matrix.c:28 <- job
-  matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]:
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      write by jobs[0] at matrix.c:28 <- job
+    matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -617,25 +626,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[eva] Globals accessed by thread:
-  matrix[1][0..99]:
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    write by jobs[1] at matrix.c:28 <- job
-  matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[1][0..99]:
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      write by jobs[1] at matrix.c:28 <- job
+    matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -751,25 +761,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[eva] Globals accessed by thread:
-  matrix[2][0..99]:
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    write by jobs[2] at matrix.c:28 <- job
-  matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[2][0..99]:
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      write by jobs[2] at matrix.c:28 <- job
+    matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -885,25 +896,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[eva] Globals accessed by thread:
-  matrix[3][0..99]:
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    write by jobs[3] at matrix.c:28 <- job
-  matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[3][0..99]:
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      write by jobs[3] at matrix.c:28 <- job
+    matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -1019,25 +1031,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[eva] Globals accessed by thread:
-  matrix[4][0..99]:
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    write by jobs[4] at matrix.c:28 <- job
-  matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[4][0..99]:
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      write by jobs[4] at matrix.c:28 <- job
+    matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -1064,104 +1077,175 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] <main> reads  matrix[0][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] <main> reads  matrix[1][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[1] reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] <main> reads  matrix[2][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[2] reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] <main> reads  matrix[3][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[3] reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] <main> reads  matrix[4][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[4] reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] <main> reads  matrix[5][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[6][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[7][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[8][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[9][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[10][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[11][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[12][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[13][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[14][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[15][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[16][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[17][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[18][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[19][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[20][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[21][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[22][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[23][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[24][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[25][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[26][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[27][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[28][0..99] ∈ {0}  // matrix.c:58 main
-[eva] <main> reads  matrix[29][0..99] ∈ {0}  // matrix.c:58 main
-[eva] jobs[0] writes  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[0] writes  matrix[5][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[6][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[7][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[8][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[9][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[0] writes  matrix[10][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[11][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[12][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[13][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[14][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[0] writes  matrix[15][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[16][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[17][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[18][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[19][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[0] writes  matrix[20][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[21][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[22][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[23][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[24][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[0] writes  matrix[25][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[1] writes  matrix[26][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  <main> reads  matrix[0][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  <main> reads  matrix[1][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[1] reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  <main> reads  matrix[2][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[2] reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  <main> reads  matrix[3][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[3] reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  <main> reads  matrix[4][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[4] reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  <main> reads  matrix[5][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[6][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[7][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[8][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[9][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[10][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[11][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[12][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[13][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[14][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[15][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[16][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[17][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[18][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[19][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[20][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[21][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[22][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[23][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[24][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[25][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[26][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[27][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[28][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[29][0..99] ∈ {0}  // matrix.c:58 main
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[5][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[6][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[7][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[8][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[9][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[10][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[11][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[12][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[13][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[14][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[15][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[16][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[17][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[18][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[19][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[20][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[21][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[22][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[23][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[24][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[0] writes  matrix[25][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[1] writes  matrix[26][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:values] 
+  jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:28 job
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     matrix[0..29][0..99]
-[eva] Write summary for jobs[0] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[0] (updated):
   matrix[0][0..99] ∈ [--..--]
         [5][0..99] ∈ [--..--]
         [10][0..99] ∈ [--..--]
         [15][0..99] ∈ [--..--]
         [20][0..99] ∈ [--..--]
         [25][0..99] ∈ [--..--]
-[eva] Write summary for jobs[1] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[1] (updated):
   matrix[1][0..99] ∈ [--..--]
         [6][0..99] ∈ [--..--]
         [11][0..99] ∈ [--..--]
         [16][0..99] ∈ [--..--]
         [21][0..99] ∈ [--..--]
         [26][0..99] ∈ [--..--]
-[eva] Write summary for jobs[2] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[2] (updated):
   matrix[2][0..99] ∈ [--..--]
         [7][0..99] ∈ [--..--]
         [12][0..99] ∈ [--..--]
         [17][0..99] ∈ [--..--]
         [22][0..99] ∈ [--..--]
         [27][0..99] ∈ [--..--]
-[eva] Write summary for jobs[3] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[3] (updated):
   matrix[3][0..99] ∈ [--..--]
         [8][0..99] ∈ [--..--]
         [13][0..99] ∈ [--..--]
         [18][0..99] ∈ [--..--]
         [23][0..99] ∈ [--..--]
         [28][0..99] ∈ [--..--]
-[eva] Write summary for jobs[4] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[4] (updated):
   matrix[4][0..99] ∈ [--..--]
         [9][0..99] ∈ [--..--]
         [14][0..99] ∈ [--..--]
@@ -1184,129 +1268,130 @@
 [eva:thread] matrix.c:45: 
   New context for jobs[4], fun job, parent <main>, args {4}
 [eva:interferences] matrix.c:58: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[1][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[2][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[3][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[4][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[5][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[6][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[7][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[8][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[9][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[10][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[11][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[12][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[13][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[14][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[15][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[16][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[17][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[18][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[19][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[20][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[21][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[22][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[23][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[24][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[25][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[26][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[27][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[28][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[29][0..99]: read by <main> at matrix.c:58 <- main
-  psum[0..99]:
-    read by <main> at matrix.c:63 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:50 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-  result: read by <main> at matrix.c:48 <- main
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[1][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[2][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[3][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[4][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[5][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[6][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[7][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[8][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[9][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[10][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[11][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[12][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[13][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[14][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[15][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[16][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[17][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[18][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[19][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[20][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[21][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[22][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[23][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[24][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[25][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[26][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[27][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[28][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[29][0..99]: read by <main> at matrix.c:58 <- main
+    psum[0..99]:
+      read by <main> at matrix.c:63 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:50 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+    result: read by <main> at matrix.c:48 <- main
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -1323,25 +1408,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[eva] Globals accessed by thread:
-  matrix[0][0..99]:
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    write by jobs[0] at matrix.c:28 <- job
-  matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]:
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      write by jobs[0] at matrix.c:28 <- job
+    matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -1373,25 +1459,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[eva] Globals accessed by thread:
-  matrix[1][0..99]:
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    write by jobs[1] at matrix.c:28 <- job
-  matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[1][0..99]:
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      write by jobs[1] at matrix.c:28 <- job
+    matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -1423,25 +1510,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[eva] Globals accessed by thread:
-  matrix[2][0..99]:
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    write by jobs[2] at matrix.c:28 <- job
-  matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[2][0..99]:
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      write by jobs[2] at matrix.c:28 <- job
+    matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -1473,25 +1561,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[eva] Globals accessed by thread:
-  matrix[3][0..99]:
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    read by jobs[3] at matrix.c:28 <- job
-    write by jobs[3] at matrix.c:28 <- job
-  matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
-  matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[3][0..99]:
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      read by jobs[3] at matrix.c:28 <- job
+      write by jobs[3] at matrix.c:28 <- job
+    matrix[8][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[13][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[18][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[23][0..99]: write by jobs[3] at matrix.c:28 <- job
+    matrix[28][0..99]: write by jobs[3] at matrix.c:28 <- job
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -1523,25 +1612,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[eva] Globals accessed by thread:
-  matrix[4][0..99]:
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    read by jobs[4] at matrix.c:28 <- job
-    write by jobs[4] at matrix.c:28 <- job
-  matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
-  matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[4][0..99]:
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      read by jobs[4] at matrix.c:28 <- job
+      write by jobs[4] at matrix.c:28 <- job
+    matrix[9][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[14][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[19][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[24][0..99]: write by jobs[4] at matrix.c:28 <- job
+    matrix[29][0..99]: write by jobs[4] at matrix.c:28 <- job
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -1568,65 +1658,100 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[5][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[6][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[7][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[8][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[9][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[10][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[11][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[12][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[13][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[14][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[15][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[16][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[17][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[18][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[19][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[20][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[21][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[22][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[23][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[24][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[25][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[26][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[5][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[6][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[7][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[8][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[9][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[10][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[11][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[12][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[13][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[14][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[15][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[16][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[17][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[18][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[19][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[20][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[21][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[22][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[23][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[24][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[25][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[26][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:58 main
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   matrix[0][0..99] ∈ [--..--]
         [5][0..99] ∈ [--..--]
         [10][0..99] ∈ [--..--]
         [15][0..99] ∈ [--..--]
         [20][0..99] ∈ [--..--]
         [25][0..99] ∈ [--..--]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   matrix[1][0..99] ∈ [--..--]
         [6][0..99] ∈ [--..--]
         [11][0..99] ∈ [--..--]
         [16][0..99] ∈ [--..--]
         [21][0..99] ∈ [--..--]
         [26][0..99] ∈ [--..--]
-[eva] Write summary for jobs[2]:
+[eva:shared-memory:values] 
+  Write summary for jobs[2]:
   matrix[2][0..99] ∈ [--..--]
         [7][0..99] ∈ [--..--]
         [12][0..99] ∈ [--..--]
         [17][0..99] ∈ [--..--]
         [22][0..99] ∈ [--..--]
         [27][0..99] ∈ [--..--]
-[eva] Write summary for jobs[3]:
+[eva:shared-memory:values] 
+  Write summary for jobs[3]:
   matrix[3][0..99] ∈ [--..--]
         [8][0..99] ∈ [--..--]
         [13][0..99] ∈ [--..--]
         [18][0..99] ∈ [--..--]
         [23][0..99] ∈ [--..--]
         [28][0..99] ∈ [--..--]
-[eva] Write summary for jobs[4]:
+[eva:shared-memory:values] 
+  Write summary for jobs[4]:
   matrix[4][0..99] ∈ [--..--]
         [9][0..99] ∈ [--..--]
         [14][0..99] ∈ [--..--]
@@ -1636,129 +1761,130 @@
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[1][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[2][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[3][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[4][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[5][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[6][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[7][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[8][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[9][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[10][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[11][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[12][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[13][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[14][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[15][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[16][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[17][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[18][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[19][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[20][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[21][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[22][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[23][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[24][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[25][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[26][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[27][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[28][0..99]: read by <main> at matrix.c:58 <- main
-  matrix[29][0..99]: read by <main> at matrix.c:58 <- main
-  psum[0..99]:
-    read by <main> at matrix.c:63 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    read by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:50 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-    write by <main> at matrix.c:58 <- main
-  result: read by <main> at matrix.c:48 <- main
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:54 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:59 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[1][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[2][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[3][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[4][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[5][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[6][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[7][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[8][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[9][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[10][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[11][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[12][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[13][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[14][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[15][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[16][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[17][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[18][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[19][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[20][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[21][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[22][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[23][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[24][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[25][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[26][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[27][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[28][0..99]: read by <main> at matrix.c:58 <- main
+    matrix[29][0..99]: read by <main> at matrix.c:58 <- main
+    psum[0..99]:
+      read by <main> at matrix.c:63 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      read by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:50 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+      write by <main> at matrix.c:58 <- main
+    result: read by <main> at matrix.c:48 <- main
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:54 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:59 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -1774,25 +1900,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[eva] Globals accessed by thread:
-  matrix[0][0..99]:
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    read by jobs[0] at matrix.c:28 <- job
-    write by jobs[0] at matrix.c:28 <- job
-  matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
-  matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[0][0..99]:
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      read by jobs[0] at matrix.c:28 <- job
+      write by jobs[0] at matrix.c:28 <- job
+    matrix[5][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[10][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[15][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[20][0..99]: write by jobs[0] at matrix.c:28 <- job
+    matrix[25][0..99]: write by jobs[0] at matrix.c:28 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -1823,25 +1950,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[eva] Globals accessed by thread:
-  matrix[1][0..99]:
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    read by jobs[1] at matrix.c:28 <- job
-    write by jobs[1] at matrix.c:28 <- job
-  matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
-  matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[1][0..99]:
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      read by jobs[1] at matrix.c:28 <- job
+      write by jobs[1] at matrix.c:28 <- job
+    matrix[6][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[11][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[16][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[21][0..99]: write by jobs[1] at matrix.c:28 <- job
+    matrix[26][0..99]: write by jobs[1] at matrix.c:28 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -1872,25 +2000,26 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[eva] Globals accessed by thread:
-  matrix[2][0..99]:
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    read by jobs[2] at matrix.c:28 <- job
-    write by jobs[2] at matrix.c:28 <- job
-  matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
-  matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix.c:24 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix.c:29 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    matrix[2][0..99]:
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      read by jobs[2] at matrix.c:28 <- job
+      write by jobs[2] at matrix.c:28 <- job
+    matrix[7][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[12][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[17][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[22][0..99]: write by jobs[2] at matrix.c:28 <- job
+    matrix[27][0..99]: write by jobs[2] at matrix.c:28 <- job
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix.c:24 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix.c:29 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -1917,35 +2046,40 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   matrix[0][0..99] ∈ [--..--]
         [5][0..99] ∈ [--..--]
         [10][0..99] ∈ [--..--]
         [15][0..99] ∈ [--..--]
         [20][0..99] ∈ [--..--]
         [25][0..99] ∈ [--..--]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   matrix[1][0..99] ∈ [--..--]
         [6][0..99] ∈ [--..--]
         [11][0..99] ∈ [--..--]
         [16][0..99] ∈ [--..--]
         [21][0..99] ∈ [--..--]
         [26][0..99] ∈ [--..--]
-[eva] Write summary for jobs[2]:
+[eva:shared-memory:values] 
+  Write summary for jobs[2]:
   matrix[2][0..99] ∈ [--..--]
         [7][0..99] ∈ [--..--]
         [12][0..99] ∈ [--..--]
         [17][0..99] ∈ [--..--]
         [22][0..99] ∈ [--..--]
         [27][0..99] ∈ [--..--]
-[eva] Write summary for jobs[3]:
+[eva:shared-memory:values] 
+  Write summary for jobs[3]:
   matrix[3][0..99] ∈ [--..--]
         [8][0..99] ∈ [--..--]
         [13][0..99] ∈ [--..--]
         [18][0..99] ∈ [--..--]
         [23][0..99] ∈ [--..--]
         [28][0..99] ∈ [--..--]
-[eva] Write summary for jobs[4]:
+[eva:shared-memory:values] 
+  Write summary for jobs[4]:
   matrix[4][0..99] ∈ [--..--]
         [9][0..99] ∈ [--..--]
         [14][0..99] ∈ [--..--]

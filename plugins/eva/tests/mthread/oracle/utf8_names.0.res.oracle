@@ -17,6 +17,13 @@
 [eva:queue] 
   Receiving message on queue / "𐍅", max size 20, stored in &buf.
   No value to receive (yet?).
+[eva:global-accesses] 
+  Globals accessed by thread:
+    job2:
+      read by <main> at utf8_names.c:56 <- main
+      write by <main> at utf8_names.c:55 <- main
+    queue: read by <main> at utf8_names.c:60 <- main
+    c: read by <main> at utf8_names.c:59 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -45,6 +52,23 @@
   [7] ∈ {47}
   [8] ∈ {49}
   [9..19] ∈ {0}
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f1 at utf8_names.c:28 <- f1
+      read by job / "𐍅" f1 at utf8_names.c:30 <- f1
+    queue: read by job / "𐍅" f1 at utf8_names.c:33 <- f1
+    a: write by job / "𐍅" f1 at utf8_names.c:27 <- f1
+    b: read by job / "𐍅" f1 at utf8_names.c:23 <- g :: utf8_names.c:27 <- f1
+    c: write by job / "𐍅" f1 at utf8_names.c:29 <- f1
+    "\"\360\220\215\205\" /1"[0..8]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:32 <- f1
+    "\"\360\220\215\205\" /1"[9]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -68,12 +92,34 @@
   [7] ∈ {47}
   [8] ∈ {50}
   [9..19] ∈ {0}
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f2 at utf8_names.c:38 <- f2
+      read by job / "𐍅" f2 at utf8_names.c:40 <- f2
+    queue: read by job / "𐍅" f2 at utf8_names.c:43 <- f2
+    a: read by job / "𐍅" f2 at utf8_names.c:23 <- g :: utf8_names.c:37 <- f2
+    b: write by job / "𐍅" f2 at utf8_names.c:37 <- f2
+    c: write by job / "𐍅" f2 at utf8_names.c:39 <- f2
+    "\"\360\220\215\205\" /2"[0..8]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:42 <- f2
+    "\"\360\220\215\205\" /2"[9]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
 [eva:interferences] 
   Interferences from thread job / "𐍅" f2
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    a; b; c
 [eva] *** Computing thread <main>, iteration 2 (new message received and potential
     shared vars changed)
 [eva] Analyzing a complete application starting at main
@@ -106,6 +152,13 @@
   [7] ∈ {47}
   [8] ∈ {50}
   [9..19] ∈ {0}
+[eva:global-accesses] 
+  Globals accessed by thread:
+    job2:
+      read by <main> at utf8_names.c:56 <- main
+      write by <main> at utf8_names.c:55 <- main
+    queue: read by <main> at utf8_names.c:60 <- main
+    c: read by <main> at utf8_names.c:59 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -119,6 +172,23 @@
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [eva:interferences] utf8_names.c:29: inject threads interferences at this point
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f1 at utf8_names.c:28 <- f1
+      read by job / "𐍅" f1 at utf8_names.c:30 <- f1
+    queue: read by job / "𐍅" f1 at utf8_names.c:33 <- f1
+    a: write by job / "𐍅" f1 at utf8_names.c:27 <- f1
+    b: read by job / "𐍅" f1 at utf8_names.c:23 <- g :: utf8_names.c:27 <- f1
+    c: write by job / "𐍅" f1 at utf8_names.c:29 <- f1
+    "\"\360\220\215\205\" /1"[0..8]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:32 <- f1
+    "\"\360\220\215\205\" /1"[9]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -161,6 +231,23 @@
 [eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [eva:interferences] utf8_names.c:39: inject threads interferences at this point
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f2 at utf8_names.c:38 <- f2
+      read by job / "𐍅" f2 at utf8_names.c:40 <- f2
+    queue: read by job / "𐍅" f2 at utf8_names.c:43 <- f2
+    a: read by job / "𐍅" f2 at utf8_names.c:23 <- g :: utf8_names.c:37 <- f2
+    b: write by job / "𐍅" f2 at utf8_names.c:37 <- f2
+    c: write by job / "𐍅" f2 at utf8_names.c:39 <- f2
+    "\"\360\220\215\205\" /2"[0..8]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:42 <- f2
+    "\"\360\220\215\205\" /2"[9]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
 [eva:interferences] 
   Interferences from thread job / "𐍅" f2
     concurrent writes:
@@ -205,31 +292,44 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2}
-[eva] job / "𐍅" f2 reads 
+[eva:shared-memory:values] 
+  job / "𐍅" f2 reads 
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
    // utf8_names.c:23 g :: utf8_names.c:37 <- f2
-[eva] job / "𐍅" f1 reads  b ∈ {0}  // utf8_names.c:23 g :: utf8_names.c:27 <- f1
-[eva] <main> reads  c ∈ {0}  // utf8_names.c:59 main
-[eva] job / "𐍅" f1 writes 
+[eva:shared-memory:values] 
+  job / "𐍅" f1 reads  b ∈ {0}  // utf8_names.c:23 g :: utf8_names.c:27 <- f1
+[eva:shared-memory:values] <main> reads  c ∈ {0}  // utf8_names.c:59 main
+[eva:shared-memory:values] 
+  job / "𐍅" f1 writes 
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
    // utf8_names.c:27 f1
-[eva] job / "𐍅" f2 writes 
+[eva:shared-memory:values] 
+  job / "𐍅" f2 writes 
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
    // utf8_names.c:37 f2
-[eva] job / "𐍅" f1 writes  c ∈ {1}  // utf8_names.c:29 f1
-[eva] job / "𐍅" f2 writes  c ∈ {2}  // utf8_names.c:39 f2
-[eva] Write summary for job / "𐍅" f1 (updated):
+[eva:shared-memory:values] 
+  job / "𐍅" f1 writes  c ∈ {1}  // utf8_names.c:29 f1
+[eva:shared-memory:values] 
+  job / "𐍅" f2 writes  c ∈ {2}  // utf8_names.c:39 f2
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    a; b; c
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f1 (updated):
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {1}
-[eva] Write summary for job / "𐍅" f2 (updated):
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f2 (updated):
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
@@ -240,6 +340,13 @@
 [eva] Initial state supplied by user
 [eva:thread] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:interferences] utf8_names.c:59: inject threads interferences at this point
+[eva:global-accesses] 
+  Globals accessed by thread:
+    job2:
+      read by <main> at utf8_names.c:56 <- main
+      write by <main> at utf8_names.c:55 <- main
+    queue: read by <main> at utf8_names.c:60 <- main
+    c: read by <main> at utf8_names.c:59 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -250,6 +357,23 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f1 at utf8_names.c:28 <- f1
+      read by job / "𐍅" f1 at utf8_names.c:30 <- f1
+    queue: read by job / "𐍅" f1 at utf8_names.c:33 <- f1
+    a: write by job / "𐍅" f1 at utf8_names.c:27 <- f1
+    b: read by job / "𐍅" f1 at utf8_names.c:23 <- g :: utf8_names.c:27 <- f1
+    c: write by job / "𐍅" f1 at utf8_names.c:29 <- f1
+    "\"\360\220\215\205\" /1"[0..8]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:32 <- f1
+    "\"\360\220\215\205\" /1"[9]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -298,6 +422,23 @@
     thread initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f2 at utf8_names.c:38 <- f2
+      read by job / "𐍅" f2 at utf8_names.c:40 <- f2
+    queue: read by job / "𐍅" f2 at utf8_names.c:43 <- f2
+    a: read by job / "𐍅" f2 at utf8_names.c:23 <- g :: utf8_names.c:37 <- f2
+    b: write by job / "𐍅" f2 at utf8_names.c:37 <- f2
+    c: write by job / "𐍅" f2 at utf8_names.c:39 <- f2
+    "\"\360\220\215\205\" /2"[0..8]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:42 <- f2
+    "\"\360\220\215\205\" /2"[9]:
+      read by job / "𐍅" f2 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:42 <- f2
 [eva:interferences] 
   Interferences from thread job / "𐍅" f2
     concurrent writes:
@@ -342,18 +483,22 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2}
-[eva] job / "𐍅" f1 reads 
+[eva:shared-memory:values] 
+  job / "𐍅" f1 reads 
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
    // utf8_names.c:23 g :: utf8_names.c:27 <- f1
-[eva] <main> reads  c ∈ {0; 1; 2}  // utf8_names.c:59 main
-[eva] Write summary for job / "𐍅" f1:
+[eva:shared-memory:values] 
+  <main> reads  c ∈ {0; 1; 2}  // utf8_names.c:59 main
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f1:
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {1}
-[eva] Write summary for job / "𐍅" f2:
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f2:
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
@@ -361,6 +506,13 @@
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
+[eva:global-accesses] 
+  Globals accessed by thread:
+    job2:
+      read by <main> at utf8_names.c:56 <- main
+      write by <main> at utf8_names.c:55 <- main
+    queue: read by <main> at utf8_names.c:60 <- main
+    c: read by <main> at utf8_names.c:59 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -370,6 +522,23 @@
 [eva] *** Computing thread job / "𐍅" f1, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:global-accesses] 
+  Globals accessed by thread:
+    mutex:
+      read by job / "𐍅" f1 at utf8_names.c:28 <- f1
+      read by job / "𐍅" f1 at utf8_names.c:30 <- f1
+    queue: read by job / "𐍅" f1 at utf8_names.c:33 <- f1
+    a: write by job / "𐍅" f1 at utf8_names.c:27 <- f1
+    b: read by job / "𐍅" f1 at utf8_names.c:23 <- g :: utf8_names.c:27 <- f1
+    c: write by job / "𐍅" f1 at utf8_names.c:29 <- f1
+    "\"\360\220\215\205\" /1"[0..8]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:213 <-
+        strcpy :: utf8_names.c:32 <- f1
+    "\"\360\220\215\205\" /1"[9]:
+      read by job / "𐍅" f1 at FRAMAC_SHARE/libc/string.c:212 <-
+        strcpy :: utf8_names.c:32 <- f1
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -414,12 +583,14 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] Write summary for job / "𐍅" f1:
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f1:
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {1}
-[eva] Write summary for job / "𐍅" f2:
+[eva:shared-memory:values] 
+  Write summary for job / "𐍅" f2:
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}

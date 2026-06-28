@@ -108,6 +108,8 @@ Help message about message categories.
     final-states                : at the end of the analysis, print final values
                                   inferred at the return point of each analyzed
                                   function 
+    global-accesses             : print all accesses to global variables during
+                                  the analysis
     imprecision                 : messages related to possible imprecision of
                                   builtins interpreting memcpy, memmove and
                                   memset
@@ -138,10 +140,14 @@ Help message about message categories.
     queue                       : show each operation on message queues
                                   interpreted by the analysis
     shared-memory               : messages about shared memory
+    shared-memory:iteration     : evolution of shared memory detected at each
+                                  analysis iteration
     shared-memory:mutex         : list of mutexes protecting access to each
                                   shared memory location
     shared-memory:mutex-details : more details about mutexes protecting access to
                                   shared memory
+    shared-memory:values        : values read and written in shared memory during
+                                  the analysis
     shared-memory:zone          : list of shared memory locations detected by the
                                   analysis
     show                        : show values/states inferred by the analysis on
@@ -185,9 +191,9 @@ Help message about message categories.
      4: malloc:automatic-free shared-memory:mutex thread split-return partition
      5: final-states initial-state
      6: imprecision malloc shared-memory:mutex-details
-     7: widen-hints widening pointer-comparison
-     8: nonlin queue mutex
+     7: widen-hints shared-memory:iteration widening pointer-comparison
+     8: nonlin shared-memory:values queue mutex
      9: callstack-hash callstacks
     10: progress
-    11: cardinal shared-memory include-string-literals
+    11: cardinal global-accesses shared-memory include-string-literals
   -eva-verbose N automatically enables all message categories with a verbosity equal to or less than N. Default to 5.

@@ -11,9 +11,10 @@
 [eva:thread] null.c:24: Start thread tjob0
 [eva:alarm] null.c:27: Warning: 
   out of bounds read. assert \valid_read((char *)i);
-[eva] Globals accessed by thread:
-  NULL[100..200]: read by <main> at null.c:27 <- main
-  v: read by <main> at null.c:26 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    NULL[100..200]: read by <main> at null.c:27 <- main
+    v: read by <main> at null.c:26 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -26,16 +27,18 @@
 [eva:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
-[eva] Globals accessed by thread:
-  NULL[100..200]: write by tjob0 at null.c:16 <- job0
-  v: read by tjob0 at null.c:15 <- job0
+[eva:global-accesses] 
+  Globals accessed by thread:
+    NULL[100..200]: write by tjob0 at null.c:16 <- job0
+    v: read by tjob0 at null.c:15 <- job0
 [eva:interferences] 
   Interferences from thread tjob0
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
@@ -44,9 +47,10 @@
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  NULL[100..200]: read by <main> at null.c:27 <- main
-  v: read by <main> at null.c:26 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    NULL[100..200]: read by <main> at null.c:27 <- main
+    v: read by <main> at null.c:26 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -58,9 +62,10 @@
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] null.c:16: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  NULL[100..200]: write by tjob0 at null.c:16 <- job0
-  v: read by tjob0 at null.c:15 <- job0
+[eva:global-accesses] 
+  Globals accessed by thread:
+    NULL[100..200]: write by tjob0 at null.c:16 <- job0
+    v: read by tjob0 at null.c:15 <- job0
 [eva:interferences] 
   Interferences from thread tjob0
     concurrent writes:
@@ -73,28 +78,34 @@
     interferences by mutexes:
       {}:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
-[eva] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
+[eva:shared-memory:values] 
+  tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
-[eva] Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
+[eva:shared-memory:values] 
+  Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] null.c:27: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  NULL[100..200]: read by <main> at null.c:27 <- main
-  v: read by <main> at null.c:26 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    NULL[100..200]: read by <main> at null.c:27 <- main
+    v: read by <main> at null.c:26 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[eva] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
+[eva:shared-memory:values] 
+  Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
 [eva] ******* Analysis performed, 3 iterations
 [eva:shared-memory:zone] Shared memory: NULL[100..200]
 [eva:shared-memory:mutex] 

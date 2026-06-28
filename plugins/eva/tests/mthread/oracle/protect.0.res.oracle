@@ -15,19 +15,20 @@
 [eva:mutex] protect.c:26: Release lock1
 [eva:mutex] protect.c:28: Lock lock2
 [eva:mutex] protect.c:30: Release lock2
-[eva] Globals accessed by thread:
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: protect.c:24 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: protect.c:26 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: protect.c:28 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: protect.c:30 <- main
-  t[1]: write by <main> at protect.c:25 <- main
-  t[3]: write by <main> at protect.c:29 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: protect.c:24 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: protect.c:26 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: protect.c:28 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: protect.c:30 <- main
+    t[1]: write by <main> at protect.c:25 <- main
+    t[3]: write by <main> at protect.c:29 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -39,15 +40,17 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread tjob
-[eva] Globals accessed by thread:
-  t[0..9]: read by tjob at protect.c:12 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    t[0..9]: read by tjob at protect.c:12 <- job
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     t{[1]; [3]}
@@ -56,19 +59,20 @@
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] protect.c:22: Thread tjob, fun job, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: protect.c:24 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: protect.c:26 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: protect.c:28 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: protect.c:30 <- main
-  t[1]: write by <main> at protect.c:25 <- main
-  t[3]: write by <main> at protect.c:29 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: protect.c:24 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: protect.c:26 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: protect.c:28 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: protect.c:30 <- main
+    t[1]: write by <main> at protect.c:25 <- main
+    t[3]: write by <main> at protect.c:29 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -102,36 +106,41 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  t[0..9]: read by tjob at protect.c:12 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    t[0..9]: read by tjob at protect.c:12 <- job
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}
     interferences by location:
     interferences by mutexes:
-[eva] tjob reads  t[1] ∈ {0; 1}  // protect.c:12 job
-[eva] tjob reads  t[3] ∈ {0; 4}  // protect.c:12 job
-[eva] <main> writes  t[1] ∈ {1}  // protect.c:25 main
-[eva] <main> writes  t[3] ∈ {4}  // protect.c:29 main
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] tjob reads  t[1] ∈ {0; 1}  // protect.c:12 job
+[eva:shared-memory:values] tjob reads  t[3] ∈ {0; 4}  // protect.c:12 job
+[eva:shared-memory:values] <main> writes  t[1] ∈ {1}  // protect.c:25 main
+[eva:shared-memory:values] <main> writes  t[3] ∈ {4}  // protect.c:29 main
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     t{[1]; [3]}
-[eva] Write summary for <main> (updated): t[1] ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for <main> (updated): t[1] ∈ {1}
                                        [3] ∈ {4}
 [eva] *** Computing thread tjob, iteration 3 (shared vars values changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  t[0..9]: read by tjob at protect.c:12 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    t[0..9]: read by tjob at protect.c:12 <- job
 [eva:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}
     interferences by location:
     interferences by mutexes:
-[eva] Write summary for <main>: t[1] ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for <main>: t[1] ∈ {1}
                              [3] ∈ {4}
 [eva] ******* Analysis performed, 3 iterations
 [eva:shared-memory:zone] Shared memory: t{[1]; [3]}

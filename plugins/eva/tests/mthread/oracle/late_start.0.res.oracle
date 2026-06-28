@@ -10,7 +10,7 @@
 [eva:thread] late_start.c:32: New thread: job1, fun f1, parent <main>, args {0}
 [eva:thread] late_start.c:33: New thread: job2, fun f2, parent <main>, args {0}
 [eva:thread] Start thread job2
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -24,8 +24,9 @@
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job2
 [eva:thread] late_start.c:27: Start thread job1
-[eva] Globals accessed by thread:
-  job1: read by job2 at late_start.c:27 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    job1: read by job2 at late_start.c:27 <- f2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -37,7 +38,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:

@@ -19,16 +19,17 @@
 [eva:mutex] thread_arg.c:42: Lock locks[1]
 [eva:mutex] thread_arg.c:48: Release locks[0]
 [eva:mutex] thread_arg.c:48: Release locks[1]
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -43,18 +44,19 @@
 [eva:mutex] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:mutex] thread_arg.c:27: Release locks[0]
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -68,25 +70,27 @@
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] thread_arg.c:25: Lock locks[1]
 [eva:mutex] thread_arg.c:27: Release locks[1]
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     Frama_C_entropy_source; vars[0..1]
@@ -96,16 +100,17 @@
 [eva:thread] Thread <main>, fun main
 [eva:thread] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
 [eva:thread] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -118,18 +123,19 @@
 [eva] Initial state supplied by user
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -153,18 +159,19 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -183,28 +190,41 @@
       { locks[1] }:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..10]
-[eva] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
+[eva:shared-memory:values] 
+  jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
   Frama_C_interval :: thread_arg.c:26 <- job
-[eva] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
+[eva:shared-memory:values] 
+  jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
   Frama_C_interval :: thread_arg.c:26 <- job
-[eva] <main> reads  vars[0] ∈ {0}  // thread_arg.c:45 main
-[eva] jobs[0] reads  vars[0] ∈ {0}  // thread_arg.c:26 job
-[eva] <main> reads  vars[1] ∈ {0}  // thread_arg.c:45 main
-[eva] jobs[1] reads  vars[1] ∈ {0}  // thread_arg.c:26 job
-[eva] jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
+[eva:shared-memory:values] 
+  <main> reads  vars[0] ∈ {0}  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[0] reads  vars[0] ∈ {0}  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  <main> reads  vars[1] ∈ {0}  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[1] reads  vars[1] ∈ {0}  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
   Frama_C_interval :: thread_arg.c:26 <- job
-[eva] jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
+[eva:shared-memory:values] 
+  jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
   Frama_C_interval :: thread_arg.c:26 <- job
-[eva] jobs[0] writes  vars[0] ∈ [0..10]  // thread_arg.c:26 job
-[eva] jobs[1] writes  vars[1] ∈ [0..10]  // thread_arg.c:26 job
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  jobs[0] writes  vars[0] ∈ [0..10]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[1] writes  vars[1] ∈ [0..10]  // thread_arg.c:26 job
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     Frama_C_entropy_source; vars[0..1]
-[eva] Write summary for jobs[0] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[0] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..10]
-[eva] Write summary for jobs[1] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[1] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..10]
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -214,16 +234,17 @@
 [eva:thread] thread_arg.c:37: 
   New context for jobs[1], fun job, parent <main>, args {1}
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -234,18 +255,19 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -271,18 +293,19 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -302,16 +325,24 @@
       { locks[1] }:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..20]
-[eva] <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45 main
-[eva] jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26 job
-[eva] <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45 main
-[eva] jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26 job
-[eva] jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26 job
-[eva] jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26 job
-[eva] Write summary for jobs[0] (updated):
+[eva:shared-memory:values] 
+  <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  Write summary for jobs[0] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
-[eva] Write summary for jobs[1] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[1] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -320,16 +351,17 @@
 [eva] Initial state supplied by user
 [eva:alarm] thread_arg.c:45: Warning: 
   signed overflow. assert sum + vars[i_2] ≤ 2147483647;
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -340,18 +372,19 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -383,18 +416,19 @@
   signed overflow.
   assert vars[i] + tmp ≤ 2147483647;
   (tmp from Frama_C_interval(0, 10))
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -416,31 +450,40 @@
         # cvalue:
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
-[eva] <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
-[eva] jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26 job
-[eva] <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
-[eva] jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26 job
-[eva] jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
+[eva:shared-memory:values] 
+  jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
 [eva] *** Computing thread <main>, iteration 5 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -450,18 +493,19 @@
 [eva] *** Computing thread jobs[0], iteration 5 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26 <- job
-    write by jobs[0] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26 <- job
+      write by jobs[0] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -486,18 +530,19 @@
 [eva] *** Computing thread jobs[1], iteration 5 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  Frama_C_entropy_source:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:27 <- job
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26 <- job
-    write by jobs[1] at thread_arg.c:26 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    Frama_C_entropy_source:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:25 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:27 <- job
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26 <- job
+      write by jobs[1] at thread_arg.c:26 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -519,37 +564,44 @@
         # cvalue:
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
-[eva] jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0..1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: thread_arg.c:42 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: thread_arg.c:48 <- main
-  jobs[0..1]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: thread_arg.c:37 <- main
-  vars[0..1]: read by <main> at thread_arg.c:45 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0..1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: thread_arg.c:42 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: thread_arg.c:48 <- main
+    jobs[0..1]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: thread_arg.c:37 <- main
+    vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
     interferences by location:
     interferences by mutexes:
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
 [eva] ******* Analysis performed, 6 iterations

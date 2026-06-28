@@ -11,13 +11,14 @@
 [eva:thread] join.c:21: Start thread th1
 [eva:thread] join.c:22: New thread: th2, fun t2, parent <main>, args {0}
 [eva:thread] join.c:22: Start thread th2
-[eva] Globals accessed by thread:
-  th1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: join.c:21 <- main
-  th2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: join.c:22 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    th1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: join.c:21 <- main
+    th2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: join.c:22 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -30,7 +31,7 @@
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
 [eva:thread] join.c:10: Thread exiting with value {1}
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
@@ -43,7 +44,7 @@
 [eva:interferences] 
   inject threads interferences at the start of t2 for thread th2
 [eva:thread] join.c:15: Thread exiting with value {2}
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread th2
     concurrent writes:

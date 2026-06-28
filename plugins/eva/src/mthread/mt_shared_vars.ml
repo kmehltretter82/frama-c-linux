@@ -678,7 +678,8 @@ module Precise = struct
 
   let pp_access (op, node, th) base offsm =
     if Mt_options.DumpSharedVarsValues.get () > 0 then
-      Mt_self.result ~once:true "@[%a %as @ @[%a%a@]@ %a@]"
+      Self.feedback ~dkey:Self.dkey_shared_memory_values ~once:true
+        "@[%a %as @ @[%a%a@]@ %a@]"
         Thread.pretty th Mt_types.RW.pretty op Base.pretty base
         (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
         pp_stack node

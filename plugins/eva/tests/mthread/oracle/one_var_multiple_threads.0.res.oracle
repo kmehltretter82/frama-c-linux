@@ -33,27 +33,28 @@
 [eva:mutex] one_var_multiple_threads.c:52: Release lock1
 [eva:mutex] one_var_multiple_threads.c:53: Lock lock2
 [eva:mutex] one_var_multiple_threads.c:56: Release lock2
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -67,18 +68,19 @@
   inject threads interferences at the start of f for thread jobs
 [eva:mutex] one_var_multiple_threads.c:21: Lock lock1
 [eva:mutex] one_var_multiple_threads.c:24: Release lock1
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -94,25 +96,27 @@
 [eva:mutex] one_var_multiple_threads.c:32: Release lock2
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
-[eva] Globals accessed by thread:
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30 <- g
-    write by jobs at one_var_multiple_threads.c:30 <- g
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31 <- g
-    write by jobs at one_var_multiple_threads.c:31 <- g
-  lock2:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30 <- g
+      write by jobs at one_var_multiple_threads.c:30 <- g
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31 <- g
+      write by jobs at one_var_multiple_threads.c:31 <- g
+    lock2:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     s1; s2
@@ -120,27 +124,28 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -155,18 +160,19 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:23: 
   inject threads interferences at this point
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -195,18 +201,19 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:31: 
   inject threads interferences at this point
-[eva] Globals accessed by thread:
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30 <- g
-    write by jobs at one_var_multiple_threads.c:30 <- g
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31 <- g
-    write by jobs at one_var_multiple_threads.c:31 <- g
-  lock2:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30 <- g
+      write by jobs at one_var_multiple_threads.c:30 <- g
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31 <- g
+      write by jobs at one_var_multiple_threads.c:31 <- g
+    lock2:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -230,25 +237,40 @@
                     .data2 ∈ {0; 3}
                   s2.data ∈ {1}
                     .data2 ∈ {0; 3}
-[eva] <main> reads  s1.data ∈ {0}  // one_var_multiple_threads.c:50 main
-[eva] jobs reads  s1.data ∈ {0}  // one_var_multiple_threads.c:22 f
-[eva] <main> reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:51 main
-[eva] jobs reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:23 f
-[eva] <main> reads  s2.data ∈ {0}  // one_var_multiple_threads.c:54 main
-[eva] jobs reads  s2.data ∈ {0}  // one_var_multiple_threads.c:30 g
-[eva] <main> reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:55 main
-[eva] jobs reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:31 g
-[eva] jobs writes  s1.data ∈ {1}  // one_var_multiple_threads.c:22 f
-[eva] jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23 f
-[eva] jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30 g
-[eva] jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31 g
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  <main> reads  s1.data ∈ {0}  // one_var_multiple_threads.c:50 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data ∈ {0}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  <main> reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:51 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  <main> reads  s2.data ∈ {0}  // one_var_multiple_threads.c:54 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data ∈ {0}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  <main> reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:55 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:values] 
+  jobs writes  s1.data ∈ {1}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s1; s2
-[eva] Write summary for jobs (updated): s1.data ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for jobs (updated): s1.data ∈ {1}
                                       .data2 ∈ {3}
-[eva] Write summary for jobs (updated): s2.data ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for jobs (updated): s2.data ∈ {1}
                                       .data2 ∈ {3}
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
@@ -262,27 +284,28 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:55: 
   inject threads interferences at this point
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -293,18 +316,19 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -335,18 +359,19 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at g
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30 <- g
-    write by jobs at one_var_multiple_threads.c:30 <- g
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31 <- g
-    write by jobs at one_var_multiple_threads.c:31 <- g
-  lock2:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30 <- g
+      write by jobs at one_var_multiple_threads.c:30 <- g
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31 <- g
+      write by jobs at one_var_multiple_threads.c:31 <- g
+    lock2:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -373,47 +398,62 @@
           .data2 ∈ {0; 3; 6}
         s2.data ∈ {1; 2}
           .data2 ∈ {0; 3; 6}
-[eva] <main> reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:50 main
-[eva] jobs reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:22 f
-[eva] <main> reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:51 main
-[eva] jobs reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:23 f
-[eva] <main> reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:54 main
-[eva] jobs reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30 g
-[eva] <main> reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:55 main
-[eva] jobs reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31 g
-[eva] jobs writes  s1.data ∈ {1; 2}  // one_var_multiple_threads.c:22 f
-[eva] jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23 f
-[eva] jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30 g
-[eva] jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31 g
-[eva] Write summary for jobs (updated): s1.data ∈ {1; 2}
+[eva:shared-memory:values] 
+  <main> reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:50 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  <main> reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:51 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  <main> reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:54 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  <main> reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:55 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:values] 
+  jobs writes  s1.data ∈ {1; 2}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:values] 
+  Write summary for jobs (updated): s1.data ∈ {1; 2}
                                       .data2 ∈ {3; 6}
-[eva] Write summary for jobs (updated): s2.data ∈ {1; 2}
+[eva:shared-memory:values] 
+  Write summary for jobs (updated): s2.data ∈ {1; 2}
                                       .data2 ∈ {3; 6}
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -424,18 +464,19 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -466,18 +507,19 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at g
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30 <- g
-    write by jobs at one_var_multiple_threads.c:30 <- g
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31 <- g
-    write by jobs at one_var_multiple_threads.c:31 <- g
-  lock2:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30 <- g
+      write by jobs at one_var_multiple_threads.c:30 <- g
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31 <- g
+      write by jobs at one_var_multiple_threads.c:31 <- g
+    lock2:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -504,22 +546,36 @@
           .data2 ∈ {0; 3; 6; 9}
         s2.data ∈ {1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-[eva] <main> reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:50 main
-[eva] jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
-[eva] <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51 main
-[eva] jobs reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23 f
-[eva] <main> reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:54 main
-[eva] jobs reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30 g
-[eva] <main> reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:55 main
-[eva] jobs reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31 g
-[eva] jobs writes  s1.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:22 f
-[eva] jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23 f
-[eva] jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30 g
-[eva] jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31 g
-[eva] Write summary for jobs (updated):
+[eva:shared-memory:values] 
+  <main> reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:50 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51 main
+[eva:shared-memory:values] 
+  jobs reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  <main> reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:54 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  <main> reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:55 main
+[eva:shared-memory:values] 
+  jobs reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:values] 
+  jobs writes  s1.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23 f
+[eva:shared-memory:values] 
+  jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31 g
+[eva:shared-memory:values] 
+  Write summary for jobs (updated):
   s1.data ∈ [1..2147483647]
     .data2 ∈ [3..2147483646],0%3
-[eva] Write summary for jobs (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs (updated):
   s2.data ∈ [1..2147483647]
     .data2 ∈ [3..2147483646],0%3
 [eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
@@ -532,27 +588,28 @@
   signed overflow. assert t + s2.data ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:55: Warning: 
   signed overflow. assert t + s2.data2 ≤ 2147483647;
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -567,18 +624,19 @@
   signed overflow. assert s1.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:23: Warning: 
   signed overflow. assert s1.data2 + 3 ≤ 2147483647;
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -615,18 +673,19 @@
   signed overflow. assert s2.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:31: Warning: 
   signed overflow. assert s2.data2 + 3 ≤ 2147483647;
-[eva] Globals accessed by thread:
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30 <- g
-    write by jobs at one_var_multiple_threads.c:30 <- g
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31 <- g
-    write by jobs at one_var_multiple_threads.c:31 <- g
-  lock2:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30 <- g
+      write by jobs at one_var_multiple_threads.c:30 <- g
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31 <- g
+      write by jobs at one_var_multiple_threads.c:31 <- g
+    lock2:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -655,54 +714,69 @@
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
-[eva] <main> reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:50
+[eva:shared-memory:values] 
+  <main> reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:50
   main
-[eva] jobs reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
-[eva] <main> reads  s1.data2 ∈ [0..2147483646],0%3 
+[eva:shared-memory:values] 
+  jobs reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  <main> reads  s1.data2 ∈ [0..2147483646],0%3 
   // one_var_multiple_threads.c:51 main
-[eva] jobs reads  s1.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:23
+[eva:shared-memory:values] 
+  jobs reads  s1.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:23
   f
-[eva] <main> reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:54
+[eva:shared-memory:values] 
+  <main> reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:54
   main
-[eva] jobs reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
-[eva] <main> reads  s2.data2 ∈ [0..2147483646],0%3 
+[eva:shared-memory:values] 
+  jobs reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  <main> reads  s2.data2 ∈ [0..2147483646],0%3 
   // one_var_multiple_threads.c:55 main
-[eva] jobs reads  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
+[eva:shared-memory:values] 
+  jobs reads  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
   g
-[eva] jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22 f
-[eva] jobs writes  s1.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:23
+[eva:shared-memory:values] 
+  jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22 f
+[eva:shared-memory:values] 
+  jobs writes  s1.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:23
   f
-[eva] jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
-[eva] jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
+[eva:shared-memory:values] 
+  jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
+[eva:shared-memory:values] 
+  jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
   g
-[eva] Write summary for jobs: s1.data ∈ [1..2147483647]
+[eva:shared-memory:values] 
+  Write summary for jobs: s1.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
-[eva] Write summary for jobs: s2.data ∈ [1..2147483647]
+[eva:shared-memory:values] 
+  Write summary for jobs: s2.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
-  s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
-  s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
-  s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
-  jobs:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:42 <- main
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: one_var_multiple_threads.c:44 <- main
-  lock1:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
-  lock2:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
-  nondet: read by <main> at one_var_multiple_threads.c:41 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
+    s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
+    s2.data: read by <main> at one_var_multiple_threads.c:54 <- main
+    s2.data2: read by <main> at one_var_multiple_threads.c:55 <- main
+    jobs:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:42 <- main
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: one_var_multiple_threads.c:44 <- main
+    lock1:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:52 <- main
+    lock2:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:53 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
+    nondet: read by <main> at one_var_multiple_threads.c:41 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -712,18 +786,19 @@
 [eva] *** Computing thread jobs, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  s1.data:
-    read by jobs at one_var_multiple_threads.c:22 <- f
-    write by jobs at one_var_multiple_threads.c:22 <- f
-  s1.data2:
-    read by jobs at one_var_multiple_threads.c:23 <- f
-    write by jobs at one_var_multiple_threads.c:23 <- f
-  lock1:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s1.data:
+      read by jobs at one_var_multiple_threads.c:22 <- f
+      write by jobs at one_var_multiple_threads.c:22 <- f
+    s1.data2:
+      read by jobs at one_var_multiple_threads.c:23 <- f
+      write by jobs at one_var_multiple_threads.c:23 <- f
+    lock1:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -752,9 +827,11 @@
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-[eva] Write summary for jobs: s1.data ∈ [1..2147483647]
+[eva:shared-memory:values] 
+  Write summary for jobs: s1.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
-[eva] Write summary for jobs: s2.data ∈ [1..2147483647]
+[eva:shared-memory:values] 
+  Write summary for jobs: s2.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
 [eva] ******* Analysis performed, 6 iterations
 [eva:shared-memory:zone] Shared memory: s1; s2

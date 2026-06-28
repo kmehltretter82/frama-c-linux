@@ -11,13 +11,14 @@
 [eva:thread] assigns.c:30: Start thread jobs1
 [eva:thread] assigns.c:31: New thread: jobs2, fun f2, parent <main>, args {0}
 [eva:thread] assigns.c:31: Start thread jobs2
-[eva] Globals accessed by thread:
-  jobs1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:30 <- main
-  jobs2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:31 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    jobs1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:30 <- main
+    jobs2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:31 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -30,9 +31,10 @@
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva] using specification for function g1
-[eva] Globals accessed by thread:
-  a: write by jobs1 at assigns.c:20 <- f1
-  b: read by jobs1 at assigns.c:20 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by jobs1 at assigns.c:20 <- f1
+    b: read by jobs1 at assigns.c:20 <- f1
 [eva:interferences] 
   Interferences from thread jobs1
     concurrent writes:
@@ -45,16 +47,18 @@
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva] using specification for function g2
-[eva] Globals accessed by thread:
-  a: read by jobs2 at assigns.c:25 <- f2
-  b: write by jobs2 at assigns.c:25 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by jobs2 at assigns.c:25 <- f2
+    b: write by jobs2 at assigns.c:25 <- f2
 [eva:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     a; b
@@ -64,13 +68,14 @@
 [eva:thread] Thread <main>, fun main
 [eva:thread] assigns.c:30: Thread jobs1, fun f1, parent <main>, args {0}
 [eva:thread] assigns.c:31: Thread jobs2, fun f2, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  jobs1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:30 <- main
-  jobs2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:31 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    jobs1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:30 <- main
+    jobs2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:31 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -82,9 +87,10 @@
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] assigns.c:20: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: write by jobs1 at assigns.c:20 <- f1
-  b: read by jobs1 at assigns.c:20 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by jobs1 at assigns.c:20 <- f1
+    b: read by jobs1 at assigns.c:20 <- f1
 [eva:interferences] 
   Interferences from thread jobs1
     concurrent writes:
@@ -103,9 +109,10 @@
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] assigns.c:25: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: read by jobs2 at assigns.c:25 <- f2
-  b: write by jobs2 at assigns.c:25 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by jobs2 at assigns.c:25 <- f2
+    b: write by jobs2 at assigns.c:25 <- f2
 [eva:interferences] 
   Interferences from thread jobs2
     concurrent writes:
@@ -119,28 +126,34 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva] jobs2 reads  a ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
-[eva] jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
-[eva] jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
-[eva] jobs2 writes  b ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  jobs2 reads  a ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
+[eva:shared-memory:values] 
+  jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[eva:shared-memory:values] 
+  jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[eva:shared-memory:values] 
+  jobs2 writes  b ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     a; b
-[eva] Write summary for jobs1 (updated): a ∈ [--..--]
-[eva] Write summary for jobs2 (updated): b ∈ [--..--]
+[eva:shared-memory:values] Write summary for jobs1 (updated): a ∈ [--..--]
+[eva:shared-memory:values] Write summary for jobs2 (updated): b ∈ [--..--]
 [eva] *** Computing thread <main>, iteration 3 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] assigns.c:31: 
   New context for jobs2, fun f2, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  jobs1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:30 <- main
-  jobs2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:31 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    jobs1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:30 <- main
+    jobs2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:31 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -151,9 +164,10 @@
     interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  a: write by jobs1 at assigns.c:20 <- f1
-  b: read by jobs1 at assigns.c:20 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by jobs1 at assigns.c:20 <- f1
+    b: read by jobs1 at assigns.c:20 <- f1
 [eva:interferences] 
   Interferences from thread jobs1
     concurrent writes:
@@ -171,9 +185,10 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  a: read by jobs2 at assigns.c:25 <- f2
-  b: write by jobs2 at assigns.c:25 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by jobs2 at assigns.c:25 <- f2
+    b: write by jobs2 at assigns.c:25 <- f2
 [eva:interferences] 
   Interferences from thread jobs2
     concurrent writes:
@@ -187,27 +202,29 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva] jobs1 reads  b ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
-[eva] Write summary for jobs1: a ∈ [--..--]
-[eva] Write summary for jobs2: b ∈ [--..--]
+[eva:shared-memory:values] 
+  jobs1 reads  b ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[eva:shared-memory:values] Write summary for jobs1: a ∈ [--..--]
+[eva:shared-memory:values] Write summary for jobs2: b ∈ [--..--]
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  jobs1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:30 <- main
-  jobs2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: assigns.c:31 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    jobs1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:30 <- main
+    jobs2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: assigns.c:31 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, b}
     interferences by location:
     interferences by mutexes:
-[eva] Write summary for jobs1: a ∈ [--..--]
-[eva] Write summary for jobs2: b ∈ [--..--]
+[eva:shared-memory:values] Write summary for jobs1: a ∈ [--..--]
+[eva:shared-memory:values] Write summary for jobs2: b ∈ [--..--]
 [eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: a; b
 [eva:shared-memory:mutex] 

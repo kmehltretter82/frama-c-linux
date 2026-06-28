@@ -13,57 +13,58 @@
 [eva:thread] manysharedvars.c:43: Start thread jobs
 [eva:mutex] manysharedvars.c:46: Lock lock
 [eva:mutex] manysharedvars.c:49: Release lock
-[eva] Globals accessed by thread:
-  s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
-    [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
-    [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
-    [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
-    [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
-    [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
-    [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
-    [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
-    [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
-    [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
-    [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
-    [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
-    [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
-    [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
-    [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
-    [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
-    [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
-    [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
-    [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
-    [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
-    [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by <main> at manysharedvars.c:47 <- main
-  s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
-    [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
-    [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
-    [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
-    [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
-    [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
-    [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
-    [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
-    [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
-    [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
-    [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
-    [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
-    [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
-    [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
-    [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
-    [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
-    [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
-    [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
-    [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
-    [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
-    [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
-    [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
-    [127].data2}: read by <main> at manysharedvars.c:48 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: manysharedvars.c:49 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
+      [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
+      [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
+      [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
+      [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
+      [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
+      [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
+      [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
+      [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
+      [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
+      [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
+      [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
+      [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
+      [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
+      [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
+      [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
+      [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
+      [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
+      [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
+      [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
+      [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
+      read by <main> at manysharedvars.c:47 <- main
+    s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
+      [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
+      [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
+      [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
+      [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
+      [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
+      [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
+      [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
+      [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
+      [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
+      [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
+      [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
+      [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
+      [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
+      [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
+      [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
+      [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
+      [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
+      [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
+      [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
+      [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
+      [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
+      [127].data2}: read by <main> at manysharedvars.c:48 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: manysharedvars.c:46 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -81,67 +82,69 @@
   signed overflow. assert s[i].data + 1 ≤ 2147483647;
 [eva:alarm] manysharedvars.c:30: Warning: 
   signed overflow. assert s[i].data2 + 3 ≤ 2147483647;
-[eva] Globals accessed by thread:
-  s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
-    [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
-    [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
-    [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
-    [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
-    [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
-    [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
-    [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
-    [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
-    [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
-    [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
-    [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
-    [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
-    [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
-    [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
-    [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
-    [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
-    [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
-    [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
-    [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
-    [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by jobs at manysharedvars.c:29 <- f
-    write by jobs at manysharedvars.c:29 <- f
-  s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
-    [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
-    [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
-    [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
-    [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
-    [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
-    [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
-    [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
-    [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
-    [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
-    [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
-    [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
-    [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
-    [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
-    [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
-    [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
-    [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
-    [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
-    [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
-    [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
-    [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
-    [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
-    [127].data2}:
-    read by jobs at manysharedvars.c:30 <- f
-    write by jobs at manysharedvars.c:30 <- f
-  lock:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: manysharedvars.c:28 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: manysharedvars.c:31 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
+      [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
+      [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
+      [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
+      [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
+      [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
+      [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
+      [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
+      [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
+      [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
+      [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
+      [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
+      [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
+      [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
+      [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
+      [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
+      [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
+      [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
+      [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
+      [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
+      [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
+      read by jobs at manysharedvars.c:29 <- f
+      write by jobs at manysharedvars.c:29 <- f
+    s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
+      [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
+      [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
+      [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
+      [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
+      [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
+      [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
+      [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
+      [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
+      [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
+      [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
+      [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
+      [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
+      [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
+      [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
+      [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
+      [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
+      [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
+      [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
+      [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
+      [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
+      [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
+      [127].data2}:
+      read by jobs at manysharedvars.c:30 <- f
+      write by jobs at manysharedvars.c:30 <- f
+    lock:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: manysharedvars.c:28 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: manysharedvars.c:31 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     s[0..127]
@@ -150,57 +153,58 @@
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
-    [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
-    [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
-    [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
-    [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
-    [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
-    [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
-    [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
-    [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
-    [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
-    [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
-    [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
-    [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
-    [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
-    [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
-    [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
-    [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
-    [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
-    [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
-    [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
-    [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by <main> at manysharedvars.c:47 <- main
-  s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
-    [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
-    [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
-    [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
-    [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
-    [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
-    [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
-    [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
-    [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
-    [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
-    [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
-    [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
-    [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
-    [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
-    [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
-    [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
-    [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
-    [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
-    [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
-    [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
-    [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
-    [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
-    [127].data2}: read by <main> at manysharedvars.c:48 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: manysharedvars.c:49 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
+      [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
+      [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
+      [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
+      [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
+      [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
+      [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
+      [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
+      [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
+      [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
+      [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
+      [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
+      [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
+      [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
+      [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
+      [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
+      [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
+      [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
+      [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
+      [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
+      [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
+      read by <main> at manysharedvars.c:47 <- main
+    s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
+      [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
+      [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
+      [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
+      [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
+      [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
+      [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
+      [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
+      [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
+      [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
+      [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
+      [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
+      [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
+      [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
+      [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
+      [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
+      [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
+      [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
+      [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
+      [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
+      [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
+      [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
+      [127].data2}: read by <main> at manysharedvars.c:48 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: manysharedvars.c:46 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -215,60 +219,61 @@
   inject threads interferences at this point
 [eva:interferences] manysharedvars.c:30: 
   inject threads interferences at this point
-[eva] Globals accessed by thread:
-  s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
-    [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
-    [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
-    [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
-    [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
-    [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
-    [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
-    [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
-    [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
-    [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
-    [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
-    [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
-    [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
-    [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
-    [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
-    [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
-    [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
-    [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
-    [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
-    [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
-    [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by jobs at manysharedvars.c:29 <- f
-    write by jobs at manysharedvars.c:29 <- f
-  s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
-    [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
-    [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
-    [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
-    [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
-    [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
-    [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
-    [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
-    [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
-    [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
-    [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
-    [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
-    [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
-    [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
-    [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
-    [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
-    [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
-    [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
-    [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
-    [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
-    [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
-    [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
-    [127].data2}:
-    read by jobs at manysharedvars.c:30 <- f
-    write by jobs at manysharedvars.c:30 <- f
-  lock:
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: manysharedvars.c:28 <- f
-    read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: manysharedvars.c:31 <- f
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
+      [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
+      [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
+      [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
+      [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
+      [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
+      [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
+      [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
+      [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
+      [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
+      [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
+      [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
+      [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
+      [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
+      [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
+      [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
+      [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
+      [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
+      [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
+      [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
+      [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
+      read by jobs at manysharedvars.c:29 <- f
+      write by jobs at manysharedvars.c:29 <- f
+    s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
+      [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
+      [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
+      [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
+      [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
+      [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
+      [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
+      [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
+      [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
+      [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
+      [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
+      [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
+      [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
+      [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
+      [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
+      [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
+      [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
+      [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
+      [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
+      [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
+      [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
+      [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
+      [127].data2}:
+      read by jobs at manysharedvars.c:30 <- f
+      write by jobs at manysharedvars.c:30 <- f
+    lock:
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: manysharedvars.c:28 <- f
+      read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: manysharedvars.c:31 <- f
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
@@ -1053,7 +1058,8 @@
          [126].data2 ∈ [0..2147483646],0%3
          [127].data ∈ [0..2147483647]
          [127].data2 ∈ [0..2147483646],0%3
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   s[0].data ∈ {0}
    [1].data ∈ {0}
    [2].data ∈ {0}
@@ -1183,7 +1189,8 @@
    [126].data ∈ {0}
    [127].data ∈ {0}
    // manysharedvars.c:47 main
-[eva] jobs reads 
+[eva:shared-memory:values] 
+  jobs reads 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
    [2].data ∈ [0..2147483647]
@@ -1313,7 +1320,8 @@
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
    // manysharedvars.c:29 f
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   s[0].data2 ∈ {0}
    [1].data2 ∈ {0}
    [2].data2 ∈ {0}
@@ -1443,7 +1451,8 @@
    [126].data2 ∈ {0}
    [127].data2 ∈ {0}
    // manysharedvars.c:48 main
-[eva] jobs reads 
+[eva:shared-memory:values] 
+  jobs reads 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
    [2].data2 ∈ [0..2147483646],0%3
@@ -1573,7 +1582,8 @@
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
    // manysharedvars.c:30 f
-[eva] jobs writes 
+[eva:shared-memory:values] 
+  jobs writes 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
    [2].data ∈ [0..2147483647]
@@ -1703,7 +1713,8 @@
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
    // manysharedvars.c:29 f
-[eva] jobs writes 
+[eva:shared-memory:values] 
+  jobs writes 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
    [2].data2 ∈ [0..2147483646],0%3
@@ -1833,11 +1844,13 @@
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
    // manysharedvars.c:30 f
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s[0..127]
-[eva] Write summary for jobs (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs (updated):
   s[0].data ∈ [0..2147483647]
    [0].data2 ∈ [0..2147483646],0%3
    [1].data ∈ [0..2147483647]
@@ -2106,64 +2119,66 @@
   inject threads interferences at this point
 [eva:alarm] manysharedvars.c:47: Warning: 
   signed overflow. assert t + s[i].data ≤ 2147483647;
-[eva] Globals accessed by thread:
-  s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
-    [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
-    [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
-    [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
-    [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
-    [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
-    [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
-    [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
-    [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
-    [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
-    [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
-    [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
-    [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
-    [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
-    [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
-    [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
-    [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
-    [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
-    [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
-    [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
-    [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by <main> at manysharedvars.c:47 <- main
-  s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
-    [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
-    [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
-    [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
-    [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
-    [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
-    [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
-    [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
-    [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
-    [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
-    [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
-    [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
-    [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
-    [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
-    [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
-    [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
-    [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
-    [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
-    [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
-    [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
-    [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
-    [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
-    [127].data2}: read by <main> at manysharedvars.c:48 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: manysharedvars.c:49 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
+      [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
+      [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
+      [20].data; [21].data; [22].data; [23].data; [24].data; [25].data;
+      [26].data; [27].data; [28].data; [29].data; [30].data; [31].data;
+      [32].data; [33].data; [34].data; [35].data; [36].data; [37].data;
+      [38].data; [39].data; [40].data; [41].data; [42].data; [43].data;
+      [44].data; [45].data; [46].data; [47].data; [48].data; [49].data;
+      [50].data; [51].data; [52].data; [53].data; [54].data; [55].data;
+      [56].data; [57].data; [58].data; [59].data; [60].data; [61].data;
+      [62].data; [63].data; [64].data; [65].data; [66].data; [67].data;
+      [68].data; [69].data; [70].data; [71].data; [72].data; [73].data;
+      [74].data; [75].data; [76].data; [77].data; [78].data; [79].data;
+      [80].data; [81].data; [82].data; [83].data; [84].data; [85].data;
+      [86].data; [87].data; [88].data; [89].data; [90].data; [91].data;
+      [92].data; [93].data; [94].data; [95].data; [96].data; [97].data;
+      [98].data; [99].data; [100].data; [101].data; [102].data; [103].data;
+      [104].data; [105].data; [106].data; [107].data; [108].data; [109].data;
+      [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
+      [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
+      [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
+      read by <main> at manysharedvars.c:47 <- main
+    s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
+      [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
+      [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
+      [18].data2; [19].data2; [20].data2; [21].data2; [22].data2; [23].data2;
+      [24].data2; [25].data2; [26].data2; [27].data2; [28].data2; [29].data2;
+      [30].data2; [31].data2; [32].data2; [33].data2; [34].data2; [35].data2;
+      [36].data2; [37].data2; [38].data2; [39].data2; [40].data2; [41].data2;
+      [42].data2; [43].data2; [44].data2; [45].data2; [46].data2; [47].data2;
+      [48].data2; [49].data2; [50].data2; [51].data2; [52].data2; [53].data2;
+      [54].data2; [55].data2; [56].data2; [57].data2; [58].data2; [59].data2;
+      [60].data2; [61].data2; [62].data2; [63].data2; [64].data2; [65].data2;
+      [66].data2; [67].data2; [68].data2; [69].data2; [70].data2; [71].data2;
+      [72].data2; [73].data2; [74].data2; [75].data2; [76].data2; [77].data2;
+      [78].data2; [79].data2; [80].data2; [81].data2; [82].data2; [83].data2;
+      [84].data2; [85].data2; [86].data2; [87].data2; [88].data2; [89].data2;
+      [90].data2; [91].data2; [92].data2; [93].data2; [94].data2; [95].data2;
+      [96].data2; [97].data2; [98].data2; [99].data2; [100].data2; [101].data2;
+      [102].data2; [103].data2; [104].data2; [105].data2; [106].data2;
+      [107].data2; [108].data2; [109].data2; [110].data2; [111].data2;
+      [112].data2; [113].data2; [114].data2; [115].data2; [116].data2;
+      [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
+      [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
+      [127].data2}: read by <main> at manysharedvars.c:48 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: manysharedvars.c:46 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s}
     interferences by location:
     interferences by mutexes:
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
    [2].data ∈ [0..2147483647]
@@ -2293,7 +2308,8 @@
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
    // manysharedvars.c:47 main
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
    [2].data2 ∈ [0..2147483646],0%3
@@ -2423,7 +2439,8 @@
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
    // manysharedvars.c:48 main
-[eva] Write summary for jobs:
+[eva:shared-memory:values] 
+  Write summary for jobs:
   s[0].data ∈ [0..2147483647]
    [0].data2 ∈ [0..2147483646],0%3
    [1].data ∈ [0..2147483647]

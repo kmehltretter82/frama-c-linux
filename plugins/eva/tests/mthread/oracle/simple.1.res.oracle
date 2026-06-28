@@ -14,22 +14,23 @@
 [eva:thread] simple.c:47: Start thread job2
 [eva:mutex] simple.c:49: Lock lock
 [eva:mutex] simple.c:51: Release lock
-[eva] Globals accessed by thread:
-  a: read by <main> at simple.c:50 <- main
-  b: read by <main> at simple.c:50 <- main
-  c: read by <main> at simple.c:50 <- main
-  v: read by <main> at simple.c:50 <- main
-  job1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:46 <- main
-  job2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:47 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:51 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at simple.c:50 <- main
+    b: read by <main> at simple.c:50 <- main
+    c: read by <main> at simple.c:50 <- main
+    v: read by <main> at simple.c:50 <- main
+    job1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:46 <- main
+    job2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:47 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:51 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -44,17 +45,18 @@
 [eva:mutex] simple.c:22: Lock lock
 [eva] using specification for function g1
 [eva:mutex] simple.c:27: Release lock
-[eva] Globals accessed by thread:
-  a: write by job1 at simple.c:23 <- f1
-  b: write by job1 at simple.c:24 <- f1
-  c: write by job1 at simple.c:25 <- f1
-  e: write by job1 at simple.c:28 <- f1
-  v: write by job1 at simple.c:26 <- f1
-  lock:
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:27 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job1 at simple.c:23 <- f1
+    b: write by job1 at simple.c:24 <- f1
+    c: write by job1 at simple.c:25 <- f1
+    e: write by job1 at simple.c:28 <- f1
+    v: write by job1 at simple.c:26 <- f1
+    lock:
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:22 <- f1
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:27 <- f1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -69,24 +71,26 @@
 [eva:mutex] simple.c:33: Lock lock
 [eva] using specification for function g2
 [eva:mutex] simple.c:38: Release lock
-[eva] Globals accessed by thread:
-  a: write by job2 at simple.c:35 <- f2
-  b: write by job2 at simple.c:34 <- f2
-  c: write by job2 at simple.c:36 <- f2
-  d: write by job2 at simple.c:39 <- f2
-  v: write by job2 at simple.c:37 <- f2
-  lock:
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:38 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job2 at simple.c:35 <- f2
+    b: write by job2 at simple.c:34 <- f2
+    c: write by job2 at simple.c:36 <- f2
+    d: write by job2 at simple.c:39 <- f2
+    v: write by job2 at simple.c:37 <- f2
+    lock:
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:33 <- f2
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:38 <- f2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     a; b; c; v
@@ -96,22 +100,23 @@
 [eva:thread] Thread <main>, fun main
 [eva:thread] simple.c:46: Thread job1, fun f1, parent <main>, args {{ &b }}
 [eva:thread] simple.c:47: Thread job2, fun f2, parent <main>, args {{ &a }}
-[eva] Globals accessed by thread:
-  a: read by <main> at simple.c:50 <- main
-  b: read by <main> at simple.c:50 <- main
-  c: read by <main> at simple.c:50 <- main
-  v: read by <main> at simple.c:50 <- main
-  job1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:46 <- main
-  job2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:47 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:51 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at simple.c:50 <- main
+    b: read by <main> at simple.c:50 <- main
+    c: read by <main> at simple.c:50 <- main
+    v: read by <main> at simple.c:50 <- main
+    job1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:46 <- main
+    job2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:47 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:51 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -126,17 +131,18 @@
 [eva:interferences] simple.c:24: inject threads interferences at this point
 [eva:interferences] simple.c:25: inject threads interferences at this point
 [eva:interferences] simple.c:26: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: write by job1 at simple.c:23 <- f1
-  b: write by job1 at simple.c:24 <- f1
-  c: write by job1 at simple.c:25 <- f1
-  e: write by job1 at simple.c:28 <- f1
-  v: write by job1 at simple.c:26 <- f1
-  lock:
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:27 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job1 at simple.c:23 <- f1
+    b: write by job1 at simple.c:24 <- f1
+    c: write by job1 at simple.c:25 <- f1
+    e: write by job1 at simple.c:28 <- f1
+    v: write by job1 at simple.c:26 <- f1
+    lock:
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:22 <- f1
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:27 <- f1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -180,17 +186,18 @@
 [eva:interferences] simple.c:35: inject threads interferences at this point
 [eva:interferences] simple.c:36: inject threads interferences at this point
 [eva:interferences] simple.c:37: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: write by job2 at simple.c:35 <- f2
-  b: write by job2 at simple.c:34 <- f2
-  c: write by job2 at simple.c:36 <- f2
-  d: write by job2 at simple.c:39 <- f2
-  v: write by job2 at simple.c:37 <- f2
-  lock:
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:38 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job2 at simple.c:35 <- f2
+    b: write by job2 at simple.c:34 <- f2
+    c: write by job2 at simple.c:36 <- f2
+    d: write by job2 at simple.c:39 <- f2
+    v: write by job2 at simple.c:37 <- f2
+    lock:
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:33 <- f2
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:38 <- f2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -226,27 +233,32 @@
                   b ∈ {2}
                   c ∈ {0; 1; 2}
                   v ∈ {0; 1; 2}
-[eva] <main> reads  a ∈ {0}  // simple.c:50 main
-[eva] <main> reads  b ∈ {0}  // simple.c:50 main
-[eva] <main> reads  c ∈ {0}  // simple.c:50 main
-[eva] <main> reads  v ∈ {0}  // simple.c:50 main
-[eva] job1 writes  a ∈ {1}  // simple.c:23 f1
-[eva] job2 writes  a ∈ {2}  // simple.c:35 f2
-[eva] job1 writes  b ∈ {1}  // simple.c:24 f1
-[eva] job2 writes  b ∈ {2}  // simple.c:34 f2
-[eva] job1 writes  c ∈ {1}  // simple.c:25 f1
-[eva] job2 writes  c ∈ {2}  // simple.c:36 f2
-[eva] job1 writes  v ∈ {1}  // simple.c:26 g1 :: simple.c:26 <- f1
-[eva] job2 writes  v ∈ {2}  // simple.c:37 g2 :: simple.c:37 <- f2
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] <main> reads  a ∈ {0}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  b ∈ {0}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  c ∈ {0}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  v ∈ {0}  // simple.c:50 main
+[eva:shared-memory:values] job1 writes  a ∈ {1}  // simple.c:23 f1
+[eva:shared-memory:values] job2 writes  a ∈ {2}  // simple.c:35 f2
+[eva:shared-memory:values] job1 writes  b ∈ {1}  // simple.c:24 f1
+[eva:shared-memory:values] job2 writes  b ∈ {2}  // simple.c:34 f2
+[eva:shared-memory:values] job1 writes  c ∈ {1}  // simple.c:25 f1
+[eva:shared-memory:values] job2 writes  c ∈ {2}  // simple.c:36 f2
+[eva:shared-memory:values] 
+  job1 writes  v ∈ {1}  // simple.c:26 g1 :: simple.c:26 <- f1
+[eva:shared-memory:values] 
+  job2 writes  v ∈ {2}  // simple.c:37 g2 :: simple.c:37 <- f2
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     a; b; c; v
-[eva] Write summary for job1 (updated): a ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for job1 (updated): a ∈ {1}
                                     b ∈ {1}
                                     c ∈ {1}
                                     v ∈ {1}
-[eva] Write summary for job2 (updated): a ∈ {2}
+[eva:shared-memory:values] 
+  Write summary for job2 (updated): a ∈ {2}
                                     b ∈ {2}
                                     c ∈ {2}
                                     v ∈ {2}
@@ -257,22 +269,23 @@
 [eva:thread] simple.c:47: 
   New context for job2, fun f2, parent <main>, args {{ &a }}
 [eva:interferences] simple.c:50: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: read by <main> at simple.c:50 <- main
-  b: read by <main> at simple.c:50 <- main
-  c: read by <main> at simple.c:50 <- main
-  v: read by <main> at simple.c:50 <- main
-  job1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:46 <- main
-  job2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:47 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:51 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at simple.c:50 <- main
+    b: read by <main> at simple.c:50 <- main
+    c: read by <main> at simple.c:50 <- main
+    v: read by <main> at simple.c:50 <- main
+    job1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:46 <- main
+    job2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:47 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:51 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -282,17 +295,18 @@
 [eva] *** Computing thread job1, iteration 3 (interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  a: write by job1 at simple.c:23 <- f1
-  b: write by job1 at simple.c:24 <- f1
-  c: write by job1 at simple.c:25 <- f1
-  e: write by job1 at simple.c:28 <- f1
-  v: write by job1 at simple.c:26 <- f1
-  lock:
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:27 <- f1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job1 at simple.c:23 <- f1
+    b: write by job1 at simple.c:24 <- f1
+    c: write by job1 at simple.c:25 <- f1
+    e: write by job1 at simple.c:28 <- f1
+    v: write by job1 at simple.c:26 <- f1
+    lock:
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:22 <- f1
+      read by job1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:27 <- f1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -332,17 +346,18 @@
     and interferences changed)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  a: write by job2 at simple.c:35 <- f2
-  b: write by job2 at simple.c:34 <- f2
-  c: write by job2 at simple.c:36 <- f2
-  d: write by job2 at simple.c:39 <- f2
-  v: write by job2 at simple.c:37 <- f2
-  lock:
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:38 <- f2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: write by job2 at simple.c:35 <- f2
+    b: write by job2 at simple.c:34 <- f2
+    c: write by job2 at simple.c:36 <- f2
+    d: write by job2 at simple.c:39 <- f2
+    v: write by job2 at simple.c:37 <- f2
+    lock:
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:33 <- f2
+      read by job2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:38 <- f2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -378,48 +393,53 @@
                   b ∈ {2}
                   c ∈ {0; 1; 2}
                   v ∈ {0; 1; 2}
-[eva] <main> reads  a ∈ {0; 1; 2}  // simple.c:50 main
-[eva] <main> reads  b ∈ {0; 1; 2}  // simple.c:50 main
-[eva] <main> reads  c ∈ {0; 1; 2}  // simple.c:50 main
-[eva] <main> reads  v ∈ {0; 1; 2}  // simple.c:50 main
-[eva] Write summary for job1: a ∈ {1}
+[eva:shared-memory:values] <main> reads  a ∈ {0; 1; 2}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  b ∈ {0; 1; 2}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  c ∈ {0; 1; 2}  // simple.c:50 main
+[eva:shared-memory:values] <main> reads  v ∈ {0; 1; 2}  // simple.c:50 main
+[eva:shared-memory:values] 
+  Write summary for job1: a ∈ {1}
                           b ∈ {1}
                           c ∈ {1}
                           v ∈ {1}
-[eva] Write summary for job2: a ∈ {2}
+[eva:shared-memory:values] 
+  Write summary for job2: a ∈ {2}
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  a: read by <main> at simple.c:50 <- main
-  b: read by <main> at simple.c:50 <- main
-  c: read by <main> at simple.c:50 <- main
-  v: read by <main> at simple.c:50 <- main
-  job1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:46 <- main
-  job2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: simple.c:47 <- main
-  lock:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: simple.c:51 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at simple.c:50 <- main
+    b: read by <main> at simple.c:50 <- main
+    c: read by <main> at simple.c:50 <- main
+    v: read by <main> at simple.c:50 <- main
+    job1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:46 <- main
+    job2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: simple.c:47 <- main
+    lock:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: simple.c:49 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: simple.c:51 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, b, c, v}
     interferences by location:
     interferences by mutexes:
-[eva] Write summary for job1: a ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for job1: a ∈ {1}
                           b ∈ {1}
                           c ∈ {1}
                           v ∈ {1}
-[eva] Write summary for job2: a ∈ {2}
+[eva:shared-memory:values] 
+  Write summary for job2: a ∈ {2}
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}

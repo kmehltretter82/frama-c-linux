@@ -27,20 +27,24 @@
 [eva:show] interferences.c:51: Frama_C_show_each_shared_b: {0}
 [eva:show] interferences.c:52: Frama_C_show_each_shared_c: {0}
 [eva:show] interferences.c:67: Frama_C_show_each_main_end: {1}, {0}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <main> at interferences.c:50 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-    write by <main> at interferences.c:61 <- main
-  shared_b:
-    read by <main> at interferences.c:51 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-  shared_c:
-    read by <main> at interferences.c:52 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <main> at interferences.c:50 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+      write by <main> at interferences.c:61 <- main
+    shared_b:
+      read by <main> at interferences.c:51 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+    shared_c:
+      read by <main> at interferences.c:52 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -71,23 +75,27 @@
 [eva:show] interferences.c:51: Frama_C_show_each_shared_b: {0}
 [eva:show] interferences.c:52: Frama_C_show_each_shared_c: {0}
 [eva:show] interferences.c:67: Frama_C_show_each_main_end: {1}, {0}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <main> at interferences.c:50 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-    write by <main> at interferences.c:61 <- main
-  shared_b:
-    read by <main> at interferences.c:51 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-  shared_c:
-    read by <main> at interferences.c:52 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <main> at interferences.c:50 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+      write by <main> at interferences.c:61 <- main
+    shared_b:
+      read by <main> at interferences.c:51 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+    shared_c:
+      read by <main> at interferences.c:52 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -105,17 +113,18 @@
 [eva:show] interferences.c:14: 
   Frama_C_show_each_interrupt_start: {0}, {0; 1}, {0}
 [eva:show] interferences.c:16: Frama_C_show_each_interrupt_end: {0}, {1}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-  shared_b:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-    write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
-  shared_c:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+    shared_b:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+      write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
+    shared_c:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt>
     concurrent writes:
@@ -129,18 +138,19 @@
   inject threads interferences at the start of fjob1 for thread job1
 [eva:show] interferences.c:20: Frama_C_show_each_fjob1_start: {0}, {0}, {0}
 [eva:show] interferences.c:23: Frama_C_show_each_fjob1_end: {0}, {2}, {1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-  shared_b:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:21 <- fjob1
-  shared_c:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:22 <- fjob1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+    shared_b:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:21 <- fjob1
+    shared_c:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:22 <- fjob1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -154,18 +164,19 @@
   inject threads interferences at the start of fjob2 for thread job2
 [eva:show] interferences.c:28: Frama_C_show_each_fjob2_start: {1}, {0}, {0}
 [eva:show] interferences.c:31: Frama_C_show_each_fjob2_end: {3}, {0}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-    write by job2 at interferences.c:29 <- fjob2
-  shared_b:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-  shared_c:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:30 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+      write by job2 at interferences.c:29 <- fjob2
+    shared_b:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+    shared_c:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:30 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -179,24 +190,26 @@
   inject threads interferences at the start of fjob3 for thread job3
 [eva:show] interferences.c:36: Frama_C_show_each_fjob3_start: {1}, {0}, {0}
 [eva:show] interferences.c:38: Frama_C_show_each_fjob3_end: {2}, {0}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-    write by job3 at interferences.c:37 <- fjob3
-  shared_b:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-  shared_c:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+      write by job3 at interferences.c:37 <- fjob3
+    shared_b:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+    shared_c:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
 [eva:interferences] 
   Interferences from thread job3
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     shared_a; shared_b; shared_c
@@ -211,23 +224,27 @@
 [eva:show] interferences.c:51: Frama_C_show_each_shared_b: {0}
 [eva:show] interferences.c:52: Frama_C_show_each_shared_c: {0}
 [eva:show] interferences.c:67: Frama_C_show_each_main_end: {1}, {0}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <main> at interferences.c:50 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-    write by <main> at interferences.c:61 <- main
-  shared_b:
-    read by <main> at interferences.c:51 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-  shared_c:
-    read by <main> at interferences.c:52 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <main> at interferences.c:50 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+      write by <main> at interferences.c:61 <- main
+    shared_b:
+      read by <main> at interferences.c:51 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+    shared_c:
+      read by <main> at interferences.c:52 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -255,17 +272,18 @@
 [eva:show] interferences.c:14: 
   Frama_C_show_each_interrupt_start: {0; 1}, {0; 1}, {0}
 [eva:show] interferences.c:16: Frama_C_show_each_interrupt_end: {0; 1}, {1}, {0}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-  shared_b:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-    write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
-  shared_c:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+    shared_b:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+      write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
+    shared_c:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt>
     concurrent writes:
@@ -293,18 +311,19 @@
   inject threads interferences at this point
 [eva:show] interferences.c:23: 
   Frama_C_show_each_fjob1_end: {0; 1}, {0; 1; 2}, {1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-  shared_b:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:21 <- fjob1
-  shared_c:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:22 <- fjob1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+    shared_b:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:21 <- fjob1
+    shared_c:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:22 <- fjob1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -337,18 +356,19 @@
   inject threads interferences at this point
 [eva:show] interferences.c:31: 
   Frama_C_show_each_fjob2_end: {0; 1; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-    write by job2 at interferences.c:29 <- fjob2
-  shared_b:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-  shared_c:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:30 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+      write by job2 at interferences.c:29 <- fjob2
+    shared_b:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+    shared_c:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:30 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -374,17 +394,18 @@
   inject threads interferences at this point
 [eva:show] interferences.c:38: 
   Frama_C_show_each_fjob3_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-    write by job3 at interferences.c:37 <- fjob3
-  shared_b:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-  shared_c:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+      write by job3 at interferences.c:37 <- fjob3
+    shared_b:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+    shared_c:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
 [eva:interferences] 
   Interferences from thread job3
     concurrent writes:
@@ -402,69 +423,117 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] <main> reads  shared_a ∈ {0}  // interferences.c:56 main
-[eva] <main> reads  shared_a ∈ {1}  // interferences.c:66 main
-[eva] <main> reads  shared_a ∈ {1}  // interferences.c:67 main
-[eva] <main> reads  shared_a ∈ {1}  // interferences.c:50
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {0}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {1}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {1}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {1}  // interferences.c:50
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_a ∈ {0; 1}  // interferences.c:14
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_a ∈ {0; 1}  // interferences.c:14
   interrupt
-[eva] <interrupt_handler interrupt> reads  shared_a ∈ {0; 1}  // interferences.c:16
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_a ∈ {0; 1}  // interferences.c:16
   interrupt
-[eva] job1 reads  shared_a ∈ {0; 1}  // interferences.c:20 fjob1
-[eva] job1 reads  shared_a ∈ {0; 1}  // interferences.c:23 fjob1
-[eva] job2 reads  shared_a ∈ {0; 1}  // interferences.c:28 fjob2
-[eva] job2 reads  shared_a ∈ {0; 1; 3}  // interferences.c:31 fjob2
-[eva] job3 reads  shared_a ∈ {0; 1; 3}  // interferences.c:36 fjob3
-[eva] job3 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:38 fjob3
-[eva] <main> reads  shared_b ∈ {0}  // interferences.c:56 main
-[eva] <main> reads  shared_b ∈ {0}  // interferences.c:66 main
-[eva] <main> reads  shared_b ∈ {0}  // interferences.c:67 main
-[eva] <main> reads  shared_b ∈ {0}  // interferences.c:51
+[eva:shared-memory:values] 
+  job1 reads  shared_a ∈ {0; 1}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  job1 reads  shared_a ∈ {0; 1}  // interferences.c:23 fjob1
+[eva:shared-memory:values] 
+  job2 reads  shared_a ∈ {0; 1}  // interferences.c:28 fjob2
+[eva:shared-memory:values] 
+  job2 reads  shared_a ∈ {0; 1; 3}  // interferences.c:31 fjob2
+[eva:shared-memory:values] 
+  job3 reads  shared_a ∈ {0; 1; 3}  // interferences.c:36 fjob3
+[eva:shared-memory:values] 
+  job3 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:38 fjob3
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0}  // interferences.c:51
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_b ∈ {0; 1}  // interferences.c:14
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_b ∈ {0; 1}  // interferences.c:14
   interrupt
-[eva] <interrupt_handler interrupt> reads  shared_b ∈ {1}  // interferences.c:16
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_b ∈ {1}  // interferences.c:16
   interrupt
-[eva] job1 reads  shared_b ∈ {0; 1}  // interferences.c:20 fjob1
-[eva] job1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:23 fjob1
-[eva] job2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:28 fjob2
-[eva] job2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:31 fjob2
-[eva] job3 reads  shared_b ∈ {0; 1; 2}  // interferences.c:36 fjob3
-[eva] job3 reads  shared_b ∈ {0; 1; 2}  // interferences.c:38 fjob3
-[eva] <main> reads  shared_c ∈ {0}  // interferences.c:56 main
-[eva] <main> reads  shared_c ∈ {0}  // interferences.c:66 main
-[eva] <main> reads  shared_c ∈ {0}  // interferences.c:67 main
-[eva] <main> reads  shared_c ∈ {0}  // interferences.c:52
+[eva:shared-memory:values] 
+  job1 reads  shared_b ∈ {0; 1}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  job1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:23 fjob1
+[eva:shared-memory:values] 
+  job2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:28 fjob2
+[eva:shared-memory:values] 
+  job2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:31 fjob2
+[eva:shared-memory:values] 
+  job3 reads  shared_b ∈ {0; 1; 2}  // interferences.c:36 fjob3
+[eva:shared-memory:values] 
+  job3 reads  shared_b ∈ {0; 1; 2}  // interferences.c:38 fjob3
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0}  // interferences.c:52
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_c ∈ {0}  // interferences.c:14
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_c ∈ {0}  // interferences.c:14
   interrupt
-[eva] <interrupt_handler interrupt> reads  shared_c ∈ {0}  // interferences.c:16
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_c ∈ {0}  // interferences.c:16
   interrupt
-[eva] job1 reads  shared_c ∈ {0}  // interferences.c:20 fjob1
-[eva] job1 reads  shared_c ∈ {1}  // interferences.c:23 fjob1
-[eva] job2 reads  shared_c ∈ {0; 1}  // interferences.c:28 fjob2
-[eva] job2 reads  shared_c ∈ {0; 1}  // interferences.c:30 fjob2
-[eva] job2 reads  shared_c ∈ {0; 1}  // interferences.c:31 fjob2
-[eva] job3 reads  shared_c ∈ {0; 1}  // interferences.c:36 fjob3
-[eva] job3 reads  shared_c ∈ {0; 1}  // interferences.c:38 fjob3
-[eva] <main> writes  shared_a ∈ {1}  // interferences.c:61 main
-[eva] job2 writes  shared_a ∈ {0; 1; 3}  // interferences.c:29 fjob2
-[eva] job3 writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:37 fjob3
-[eva] <interrupt_handler interrupt> writes  shared_b ∈ {1}  // interferences.c:15
+[eva:shared-memory:values] 
+  job1 reads  shared_c ∈ {0}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  job1 reads  shared_c ∈ {1}  // interferences.c:23 fjob1
+[eva:shared-memory:values] 
+  job2 reads  shared_c ∈ {0; 1}  // interferences.c:28 fjob2
+[eva:shared-memory:values] 
+  job2 reads  shared_c ∈ {0; 1}  // interferences.c:30 fjob2
+[eva:shared-memory:values] 
+  job2 reads  shared_c ∈ {0; 1}  // interferences.c:31 fjob2
+[eva:shared-memory:values] 
+  job3 reads  shared_c ∈ {0; 1}  // interferences.c:36 fjob3
+[eva:shared-memory:values] 
+  job3 reads  shared_c ∈ {0; 1}  // interferences.c:38 fjob3
+[eva:shared-memory:values] 
+  <main> writes  shared_a ∈ {1}  // interferences.c:61 main
+[eva:shared-memory:values] 
+  job2 writes  shared_a ∈ {0; 1; 3}  // interferences.c:29 fjob2
+[eva:shared-memory:values] 
+  job3 writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:37 fjob3
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> writes  shared_b ∈ {1}  // interferences.c:15
   interrupt
-[eva] job1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:21 fjob1
-[eva] job1 writes  shared_c ∈ {1}  // interferences.c:22 fjob1
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] 
+  job1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:21 fjob1
+[eva:shared-memory:values] 
+  job1 writes  shared_c ∈ {1}  // interferences.c:22 fjob1
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     shared_a; shared_b; shared_c
-[eva] Write summary for <main> (updated): shared_a ∈ {1}
-[eva] Write summary for <interrupt_handler interrupt> (updated): shared_b ∈ {1}
-[eva] Write summary for job1 (updated): shared_b ∈ {0; 1; 2}
+[eva:shared-memory:values] Write summary for <main> (updated): shared_a ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt> (updated): shared_b ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for job1 (updated): shared_b ∈ {0; 1; 2}
                                     shared_c ∈ {1}
-[eva] Write summary for job2 (updated): shared_a ∈ {0; 1; 3}
-[eva] Write summary for job3 (updated): shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] 
+  Write summary for job2 (updated): shared_a ∈ {0; 1; 3}
+[eva:shared-memory:values] 
+  Write summary for job3 (updated): shared_a ∈ {0; 1; 2; 3}
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -483,23 +552,27 @@
 [eva:show] interferences.c:52: Frama_C_show_each_shared_c: {0; 1}
 [eva:show] interferences.c:67: 
   Frama_C_show_each_main_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <main> at interferences.c:50 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-    write by <main> at interferences.c:61 <- main
-  shared_b:
-    read by <main> at interferences.c:51 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-  shared_c:
-    read by <main> at interferences.c:52 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <main> at interferences.c:50 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+      write by <main> at interferences.c:61 <- main
+    shared_b:
+      read by <main> at interferences.c:51 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+    shared_c:
+      read by <main> at interferences.c:52 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -525,17 +598,18 @@
   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:16: 
   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-  shared_b:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-    write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
-  shared_c:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+    shared_b:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+      write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
+    shared_c:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt>
     concurrent writes:
@@ -561,18 +635,19 @@
   Frama_C_show_each_fjob1_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:23: 
   Frama_C_show_each_fjob1_end: {0; 1; 2; 3}, {0; 1; 2}, {1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-  shared_b:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:21 <- fjob1
-  shared_c:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:22 <- fjob1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+    shared_b:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:21 <- fjob1
+    shared_c:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:22 <- fjob1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -603,18 +678,19 @@
   Frama_C_show_each_fjob2_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:31: 
   Frama_C_show_each_fjob2_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-    write by job2 at interferences.c:29 <- fjob2
-  shared_b:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-  shared_c:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:30 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+      write by job2 at interferences.c:29 <- fjob2
+    shared_b:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+    shared_c:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:30 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -640,17 +716,18 @@
   Frama_C_show_each_fjob3_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:38: 
   Frama_C_show_each_fjob3_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-    write by job3 at interferences.c:37 <- fjob3
-  shared_b:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-  shared_c:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+      write by job3 at interferences.c:37 <- fjob3
+    shared_b:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+    shared_c:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
 [eva:interferences] 
   Interferences from thread job3
     concurrent writes:
@@ -668,51 +745,83 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:56 main
-[eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:66 main
-[eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:67 main
-[eva] <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:50
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:50
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_a ∈ {0; 1; 2; 3} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_a ∈ {0; 1; 2; 3} 
   // interferences.c:14 interrupt
-[eva] <interrupt_handler interrupt> reads  shared_a ∈ {0; 1; 2; 3} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_a ∈ {0; 1; 2; 3} 
   // interferences.c:16 interrupt
-[eva] job1 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:20 fjob1
-[eva] job1 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:23 fjob1
-[eva] job2 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:28 fjob2
-[eva] job2 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:31 fjob2
-[eva] job3 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:36 fjob3
-[eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:56 main
-[eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:66 main
-[eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:67 main
-[eva] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:51
+[eva:shared-memory:values] 
+  job1 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  job1 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:23 fjob1
+[eva:shared-memory:values] 
+  job2 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:28 fjob2
+[eva:shared-memory:values] 
+  job2 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:31 fjob2
+[eva:shared-memory:values] 
+  job3 reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:36 fjob3
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:51
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_b ∈ {0; 1; 2} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_b ∈ {0; 1; 2} 
   // interferences.c:14 interrupt
-[eva] <interrupt_handler interrupt> reads  shared_b ∈ {0; 1; 2} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_b ∈ {0; 1; 2} 
   // interferences.c:16 interrupt
-[eva] job1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:20 fjob1
-[eva] <main> reads  shared_c ∈ {0; 1}  // interferences.c:56 main
-[eva] <main> reads  shared_c ∈ {0; 1}  // interferences.c:66 main
-[eva] <main> reads  shared_c ∈ {0; 1}  // interferences.c:67 main
-[eva] <main> reads  shared_c ∈ {0; 1}  // interferences.c:52
+[eva:shared-memory:values] 
+  job1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0; 1}  // interferences.c:56 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0; 1}  // interferences.c:66 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0; 1}  // interferences.c:67 main
+[eva:shared-memory:values] 
+  <main> reads  shared_c ∈ {0; 1}  // interferences.c:52
   print :: interferences.c:66 <- main
-[eva] <interrupt_handler interrupt> reads  shared_c ∈ {0; 1}  // interferences.c:14
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_c ∈ {0; 1}  // interferences.c:14
   interrupt
-[eva] <interrupt_handler interrupt> reads  shared_c ∈ {0; 1}  // interferences.c:16
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> reads  shared_c ∈ {0; 1}  // interferences.c:16
   interrupt
-[eva] job1 reads  shared_c ∈ {0; 1}  // interferences.c:20 fjob1
-[eva] <main> writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:61 main
-[eva] job2 writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:29 fjob2
-[eva] <interrupt_handler interrupt> writes  shared_b ∈ {0; 1; 2} 
+[eva:shared-memory:values] 
+  job1 reads  shared_c ∈ {0; 1}  // interferences.c:20 fjob1
+[eva:shared-memory:values] 
+  <main> writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:61 main
+[eva:shared-memory:values] 
+  job2 writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:29 fjob2
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt> writes  shared_b ∈ {0; 1; 2} 
   // interferences.c:15 interrupt
-[eva] Write summary for <main> (updated): shared_a ∈ {0; 1; 2; 3}
-[eva] Write summary for <interrupt_handler interrupt> (updated):
+[eva:shared-memory:values] 
+  Write summary for <main> (updated): shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt> (updated):
   shared_b ∈ {0; 1; 2}
-[eva] Write summary for job1: shared_b ∈ {0; 1; 2}
+[eva:shared-memory:values] 
+  Write summary for job1: shared_b ∈ {0; 1; 2}
                           shared_c ∈ {1}
-[eva] Write summary for job2 (updated): shared_a ∈ {0; 1; 2; 3}
-[eva] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] 
+  Write summary for job2 (updated): shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -727,23 +836,27 @@
 [eva:show] interferences.c:52: Frama_C_show_each_shared_c: {0; 1}
 [eva:show] interferences.c:67: 
   Frama_C_show_each_main_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <main> at interferences.c:50 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-    write by <main> at interferences.c:61 <- main
-  shared_b:
-    read by <main> at interferences.c:51 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
-  shared_c:
-    read by <main> at interferences.c:52 <- print :: interferences.c:66 <- main
-    read by <main> at interferences.c:56 <- main
-    read by <main> at interferences.c:66 <- main
-    read by <main> at interferences.c:67 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <main> at interferences.c:50 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+      write by <main> at interferences.c:61 <- main
+    shared_b:
+      read by <main> at interferences.c:51 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
+    shared_c:
+      read by <main> at interferences.c:52 <-
+        print :: interferences.c:66 <- main
+      read by <main> at interferences.c:56 <- main
+      read by <main> at interferences.c:66 <- main
+      read by <main> at interferences.c:67 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -769,17 +882,18 @@
   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:16: 
   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-  shared_b:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
-    write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
-  shared_c:
-    read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
-    read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+    shared_b:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
+      write by <interrupt_handler interrupt> at interferences.c:15 <- interrupt
+    shared_c:
+      read by <interrupt_handler interrupt> at interferences.c:14 <- interrupt
+      read by <interrupt_handler interrupt> at interferences.c:16 <- interrupt
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt>
     concurrent writes:
@@ -805,18 +919,19 @@
   Frama_C_show_each_fjob1_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:23: 
   Frama_C_show_each_fjob1_end: {0; 1; 2; 3}, {0; 1; 2}, {1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-  shared_b:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:21 <- fjob1
-  shared_c:
-    read by job1 at interferences.c:20 <- fjob1
-    read by job1 at interferences.c:23 <- fjob1
-    write by job1 at interferences.c:22 <- fjob1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+    shared_b:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:21 <- fjob1
+    shared_c:
+      read by job1 at interferences.c:20 <- fjob1
+      read by job1 at interferences.c:23 <- fjob1
+      write by job1 at interferences.c:22 <- fjob1
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:
@@ -846,18 +961,19 @@
   Frama_C_show_each_fjob2_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:31: 
   Frama_C_show_each_fjob2_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-    write by job2 at interferences.c:29 <- fjob2
-  shared_b:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
-  shared_c:
-    read by job2 at interferences.c:28 <- fjob2
-    read by job2 at interferences.c:30 <- fjob2
-    read by job2 at interferences.c:31 <- fjob2
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+      write by job2 at interferences.c:29 <- fjob2
+    shared_b:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
+    shared_c:
+      read by job2 at interferences.c:28 <- fjob2
+      read by job2 at interferences.c:30 <- fjob2
+      read by job2 at interferences.c:31 <- fjob2
 [eva:interferences] 
   Interferences from thread job2
     concurrent writes:
@@ -882,17 +998,18 @@
   Frama_C_show_each_fjob3_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:38: 
   Frama_C_show_each_fjob3_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-[eva] Globals accessed by thread:
-  shared_a:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-    write by job3 at interferences.c:37 <- fjob3
-  shared_b:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
-  shared_c:
-    read by job3 at interferences.c:36 <- fjob3
-    read by job3 at interferences.c:38 <- fjob3
+[eva:global-accesses] 
+  Globals accessed by thread:
+    shared_a:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+      write by job3 at interferences.c:37 <- fjob3
+    shared_b:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
+    shared_c:
+      read by job3 at interferences.c:36 <- fjob3
+      read by job3 at interferences.c:38 <- fjob3
 [eva:interferences] 
   Interferences from thread job3
     concurrent writes:
@@ -910,12 +1027,14 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] Write summary for <main>: shared_a ∈ {0; 1; 2; 3}
-[eva] Write summary for <interrupt_handler interrupt>: shared_b ∈ {0; 1; 2}
-[eva] Write summary for job1: shared_b ∈ {0; 1; 2}
+[eva:shared-memory:values] Write summary for <main>: shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt>: shared_b ∈ {0; 1; 2}
+[eva:shared-memory:values] 
+  Write summary for job1: shared_b ∈ {0; 1; 2}
                           shared_c ∈ {1}
-[eva] Write summary for job2: shared_a ∈ {0; 1; 2; 3}
-[eva] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] Write summary for job2: shared_a ∈ {0; 1; 2; 3}
+[eva:shared-memory:values] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
 [eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b; shared_c
 [eva:shared-memory:mutex] 

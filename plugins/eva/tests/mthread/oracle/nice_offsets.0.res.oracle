@@ -11,7 +11,7 @@
 [eva:mutex] nice_offsets.c:20: Initializing mutex t[1].b1[2].a0
 [eva:mutex] nice_offsets.c:21: Initializing mutex t[1].b1[4].b0
 [eva:mutex] nice_offsets.c:22: Initializing mutex t[2].c1
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:

@@ -29,17 +29,18 @@
 [eva:thread] unhandled_calls.c:23: Thread th1, fun t, parent <main>, args {0}
 [eva:thread] unhandled_calls.c:23: 
   New context for th1, fun t, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  th1:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: unhandled_calls.c:23 <-
-      f2 :: unhandled_calls.c:42 <-
-      main
-  th2:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: unhandled_calls.c:18 <-
-      f1 :: unhandled_calls.c:35 <-
-      main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    th1:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: unhandled_calls.c:23 <-
+        f2 :: unhandled_calls.c:42 <-
+        main
+    th2:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: unhandled_calls.c:18 <-
+        f1 :: unhandled_calls.c:35 <-
+        main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:

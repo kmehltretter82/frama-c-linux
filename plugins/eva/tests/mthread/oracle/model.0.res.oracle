@@ -10,7 +10,7 @@
 [eva:thread] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
 [eva:thread] model.c:20: Start thread job1
 [eva] using specification for function rand
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -22,7 +22,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread job1
     concurrent writes:

@@ -26,11 +26,12 @@
 [eva:queue] philo.c:73: 
   Receiving message on queue, max size 2, stored in &end.
   No value to receive (yet?).
-[eva] Globals accessed by thread:
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: philo.c:70 <- main
-  queue: read by <main> at philo.c:73 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: philo.c:70 <- main
+    queue: read by <main> at philo.c:73 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -53,19 +54,20 @@
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[1]
 [eva:mutex] philo.c:47: Release locks[4]
-[eva] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -81,17 +83,18 @@
 [eva:mutex] philo.c:39: Lock locks[2]
 [eva:mutex] philo.c:46: Release locks[2]
 [eva:mutex] philo.c:47: Release locks[0]
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -110,19 +113,20 @@
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[3]
 [eva:mutex] philo.c:47: Release locks[1]
-[eva] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -141,19 +145,20 @@
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[4]
 [eva:mutex] philo.c:47: Release locks[2]
-[eva] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -172,19 +177,20 @@
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[0]
 [eva:mutex] philo.c:47: Release locks[3]
-[eva] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -210,31 +216,34 @@
                        [1] ∈ UNINITIALIZED
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
-[eva] Globals accessed by thread:
-  end2: read by <main> at philo.c:72 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: philo.c:70 <- main
-  queue: read by <main> at philo.c:73 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: read by <main> at philo.c:72 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: philo.c:70 <- main
+    queue: read by <main> at philo.c:73 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     end2
 [eva] *** Computing thread <main>, iteration 3 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: read by <main> at philo.c:72 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: philo.c:70 <- main
-  queue: read by <main> at philo.c:73 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: read by <main> at philo.c:72 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: philo.c:70 <- main
+    queue: read by <main> at philo.c:73 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -246,19 +255,20 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] philo.c:43: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -274,17 +284,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -295,19 +306,20 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -323,19 +335,20 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -351,19 +364,20 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -375,19 +389,24 @@
     interferences by mutexes:
       { locks[0]; locks[3] }:
         # cvalue: end2 ∈ {1}
-[eva] <main> reads  end2 ∈ {0}  // philo.c:72 main
-[eva] jobs[0] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva] jobs[2] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva] jobs[3] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva] jobs[4] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] <main> reads  end2 ∈ {0}  // philo.c:72 main
+[eva:shared-memory:values] 
+  jobs[0] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
+[eva:shared-memory:values] 
+  jobs[2] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
+[eva:shared-memory:values] 
+  jobs[3] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
+[eva:shared-memory:values] 
+  jobs[4] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     end2
-[eva] Write summary for jobs[0] (updated): end2 ∈ {1}
-[eva] Write summary for jobs[2] (updated): end2 ∈ {1}
-[eva] Write summary for jobs[3] (updated): end2 ∈ {1}
-[eva] Write summary for jobs[4] (updated): end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[0] (updated): end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[2] (updated): end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[3] (updated): end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[4] (updated): end2 ∈ {1}
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -401,12 +420,13 @@
 [eva:thread] philo.c:70: 
   New context for jobs[4], fun job, parent <main>, args {4}
 [eva:interferences] philo.c:72: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  end2: read by <main> at philo.c:72 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: philo.c:70 <- main
-  queue: read by <main> at philo.c:73 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: read by <main> at philo.c:72 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: philo.c:70 <- main
+    queue: read by <main> at philo.c:73 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -416,19 +436,20 @@
 [eva] *** Computing thread jobs[0], iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -444,17 +465,18 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -465,19 +487,20 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[1]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -493,19 +516,20 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -521,19 +545,20 @@
     changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
-  queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: philo.c:38 <- aux :: philo.c:56 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
+    queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -545,11 +570,11 @@
     interferences by mutexes:
       { locks[0]; locks[3] }:
         # cvalue: end2 ∈ {1}
-[eva] <main> reads  end2 ∈ {0; 1}  // philo.c:72 main
-[eva] Write summary for jobs[0]: end2 ∈ {1}
-[eva] Write summary for jobs[2]: end2 ∈ {1}
-[eva] Write summary for jobs[3]: end2 ∈ {1}
-[eva] Write summary for jobs[4]: end2 ∈ {1}
+[eva:shared-memory:values] <main> reads  end2 ∈ {0; 1}  // philo.c:72 main
+[eva:shared-memory:values] Write summary for jobs[0]: end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[2]: end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[3]: end2 ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[4]: end2 ∈ {1}
 [eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: end2
 [eva:shared-memory:mutex] 

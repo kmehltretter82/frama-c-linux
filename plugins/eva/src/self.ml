@@ -330,6 +330,18 @@ let dkey_shared_memory_mutex_details =
   register_category "shared-memory:mutex-details" ~level:6
     ~help:"more details about mutexes protecting access to shared memory"
 
+let dkey_shared_memory_by_iteration =
+  register_category "shared-memory:iteration" ~level:7
+    ~help:"evolution of shared memory detected at each analysis iteration"
+
+let dkey_shared_memory_values =
+  register_category "shared-memory:values" ~level:8
+    ~help:"values read and written in shared memory during the analysis"
+
+let dkey_global_accesses =
+  register_category "global-accesses" ~level:11
+    ~help:"print all accesses to global variables during the analysis"
+
 (* ----- Warning categories ------------------------------------------------- *)
 
 let wkey_alarm =

@@ -9,9 +9,10 @@
 [eva:thread] New thread: <main>, fun main
 [eva:thread] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
 [eva:thread] memexec.c:32: Start thread th1
-[eva] Globals accessed by thread:
-  a: read by <main> at memexec.c:33 <- main
-  c: read by <main> at memexec.c:33 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at memexec.c:33 <- main
+    c: read by <main> at memexec.c:33 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -23,21 +24,23 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
-[eva] Globals accessed by thread:
-  v:
-    read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
-    read by th1 at memexec.c:24 <- t1
-  a: write by th1 at memexec.c:14 <- f :: memexec.c:25 <- t1
-  c:
-    write by th1 at memexec.c:10 <-
-      g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    v:
+      read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
+      read by th1 at memexec.c:24 <- t1
+    a: write by th1 at memexec.c:14 <- f :: memexec.c:25 <- t1
+    c:
+      write by th1 at memexec.c:10 <-
+        g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     a; c
@@ -46,9 +49,10 @@
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
-[eva] Globals accessed by thread:
-  a: read by <main> at memexec.c:33 <- main
-  c: read by <main> at memexec.c:33 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at memexec.c:33 <- main
+    c: read by <main> at memexec.c:33 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -61,14 +65,15 @@
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  v:
-    read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
-    read by th1 at memexec.c:24 <- t1
-  a: write by th1 at memexec.c:14 <- f :: memexec.c:25 <- t1
-  c:
-    write by th1 at memexec.c:10 <-
-      g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+[eva:global-accesses] 
+  Globals accessed by thread:
+    v:
+      read by th1 at memexec.c:15 <- f :: memexec.c:25 <- t1
+      read by th1 at memexec.c:24 <- t1
+    a: write by th1 at memexec.c:14 <- f :: memexec.c:25 <- t1
+    c:
+      write by th1 at memexec.c:10 <-
+        g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [eva:interferences] 
   Interferences from thread th1
     concurrent writes:
@@ -86,45 +91,57 @@
       {}:
         # cvalue: a ∈ {1}
                   c ∈ {0; 2}
-[eva] <main> reads  a ∈ {0}  // memexec.c:33 main
-[eva] <main> reads  c ∈ {0}  // memexec.c:33 main
-[eva] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
-[eva] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] <main> reads  a ∈ {0}  // memexec.c:33 main
+[eva:shared-memory:values] <main> reads  c ∈ {0}  // memexec.c:33 main
+[eva:shared-memory:values] 
+  th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
+[eva:shared-memory:values] 
+  th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:19 <- f :: memexec.c:27 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:18 <- f :: memexec.c:27 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:16 <- f :: memexec.c:27 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:19 <- f :: memexec.c:25 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:18 <- f :: memexec.c:25 <- t1
-[eva] th1 writes  c ∈ {2}  // memexec.c:10
+[eva:shared-memory:values] 
+  th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     a; c
-[eva] Write summary for th1 (updated): a ∈ {1}
+[eva:shared-memory:values] 
+  Write summary for th1 (updated): a ∈ {1}
                                    c ∈ {2}
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:33: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  a: read by <main> at memexec.c:33 <- main
-  c: read by <main> at memexec.c:33 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    a: read by <main> at memexec.c:33 <- main
+    c: read by <main> at memexec.c:33 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, c}
     interferences by location:
     interferences by mutexes:
-[eva] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
-[eva] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
-[eva] Write summary for th1: a ∈ {1}
+[eva:shared-memory:values] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
+[eva:shared-memory:values] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
+[eva:shared-memory:values] 
+  Write summary for th1: a ∈ {1}
                          c ∈ {2}
 [eva] ******* Analysis performed, 3 iterations
 [eva:shared-memory:zone] Shared memory: a; c

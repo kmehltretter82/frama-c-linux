@@ -59,7 +59,8 @@ let post_thread_analysis analysis =
       th.th_eva_thread
   in
   th.th_read_written <- read_written;
-  Mt_self.result ~level:3 "@[<v 0>Globals accessed by thread:@ %a@]"
+  Self.feedback ~dkey:Self.dkey_global_accesses
+    "@[<v 2>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
   Self.debug "Shared variables computed.";
 
@@ -171,8 +172,9 @@ let compute_shared_vars analysis =
     if not (Memory_zone.equal all_zones analysis.concurrent_accesses)
     then (
       let before = analysis.concurrent_accesses in
-      Mt_self.feedback ~level:2 "@[<v>Concurrent imprecise accesses have \
-                                 changed: before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
+      Self.feedback ~dkey:Self.dkey_shared_memory_by_iteration
+        "@[<v>Concurrent imprecise accesses have changed: \
+         before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
       let after = Memory_zone.join before all_zones in
       analysis.concurrent_accesses <- after;
@@ -195,11 +197,9 @@ let compute_shared_vars analysis =
     if not (Memory_zone.equal all_zones analysis.precise_concurrent_accesses)
     then (
       let before = analysis.precise_concurrent_accesses in
-      Mt_self.feedback ~level:2
+      Self.feedback ~dkey:Self.dkey_shared_memory_by_iteration
         "@[<v>Concurrent precise var accesses have changed: before@ \
-         @[<hov 2>  %a@]@ \
-         vs.@ \
-         @[<hov 2>  %a@]@]"
+         @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
       (* let after = Memory_zone.join before all_zones in *)
       analysis.precise_concurrent_accesses <- all_zones;
@@ -232,7 +232,8 @@ let store_written_value analysis lw =
     if Mt_options.DumpSharedVarsValues.get () > 0 &&
        not (Cvalue.Model.equal Cvalue.Model.empty_map written)
     then
-      Mt_self.result "@[Write summary for %a%t:@ %a@]"
+      Self.feedback ~dkey:Self.dkey_shared_memory_values
+        "@[Write summary for %a%t:@ %a@]"
         ThreadState.pretty th
         (fun fmt -> if changed then Format.fprintf fmt " (updated)")
         Cvalue.Model.pretty written;

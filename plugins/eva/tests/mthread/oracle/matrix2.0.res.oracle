@@ -48,55 +48,56 @@
   pointer comparison.
   assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [eva:mutex] matrix2.c:58: Release locks[4]
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix2.c:46 <- main
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix2.c:46 <- main
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by <main> at matrix2.c:55 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -114,17 +115,18 @@
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function compute
 [eva:mutex] matrix2.c:34: Release locks[0]
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by jobs[0] at matrix2.c:33 <- job
-    write by jobs[0] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by jobs[0] at matrix2.c:33 <- job
+      write by jobs[0] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -138,17 +140,18 @@
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] matrix2.c:31: Lock locks[1]
 [eva:mutex] matrix2.c:34: Release locks[1]
-[eva] Globals accessed by thread:
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by jobs[1] at matrix2.c:33 <- job
-    write by jobs[1] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by jobs[1] at matrix2.c:33 <- job
+      write by jobs[1] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -162,17 +165,18 @@
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] matrix2.c:31: Lock locks[2]
 [eva:mutex] matrix2.c:34: Release locks[2]
-[eva] Globals accessed by thread:
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by jobs[2] at matrix2.c:33 <- job
-    write by jobs[2] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by jobs[2] at matrix2.c:33 <- job
+      write by jobs[2] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -186,17 +190,18 @@
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] matrix2.c:31: Lock locks[3]
 [eva:mutex] matrix2.c:34: Release locks[3]
-[eva] Globals accessed by thread:
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by jobs[3] at matrix2.c:33 <- job
-    write by jobs[3] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by jobs[3] at matrix2.c:33 <- job
+      write by jobs[3] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -210,24 +215,26 @@
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] matrix2.c:31: Lock locks[4]
 [eva:mutex] matrix2.c:34: Release locks[4]
-[eva] Globals accessed by thread:
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by jobs[4] at matrix2.c:33 <- job
-    write by jobs[4] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by jobs[4] at matrix2.c:33 <- job
+      write by jobs[4] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     matrix[0..149]
@@ -240,55 +247,56 @@
 [eva:thread] matrix2.c:46: Thread jobs[2], fun job, parent <main>, args {2}
 [eva:thread] matrix2.c:46: Thread jobs[3], fun job, parent <main>, args {3}
 [eva:thread] matrix2.c:46: Thread jobs[4], fun job, parent <main>, args {4}
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix2.c:46 <- main
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix2.c:46 <- main
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by <main> at matrix2.c:55 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -300,17 +308,18 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by jobs[0] at matrix2.c:33 <- job
-    write by jobs[0] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by jobs[0] at matrix2.c:33 <- job
+      write by jobs[0] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -446,17 +455,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by jobs[1] at matrix2.c:33 <- job
-    write by jobs[1] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by jobs[1] at matrix2.c:33 <- job
+      write by jobs[1] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -592,17 +602,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by jobs[2] at matrix2.c:33 <- job
-    write by jobs[2] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by jobs[2] at matrix2.c:33 <- job
+      write by jobs[2] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -738,17 +749,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by jobs[3] at matrix2.c:33 <- job
-    write by jobs[3] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by jobs[3] at matrix2.c:33 <- job
+      write by jobs[3] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -884,17 +896,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by jobs[4] at matrix2.c:33 <- job
-    write by jobs[4] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by jobs[4] at matrix2.c:33 <- job
+      write by jobs[4] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -906,7 +919,8 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..149] ∈ [--..--]
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[0] ∈ {0}
         [5] ∈ {0}
         [10] ∈ {0}
@@ -938,7 +952,8 @@
         [140] ∈ {0}
         [145] ∈ {0}
    // matrix2.c:55 main
-[eva] jobs[0] reads 
+[eva:shared-memory:values] 
+  jobs[0] reads 
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -970,7 +985,8 @@
         [140] ∈ [--..--]
         [145] ∈ [--..--]
    // matrix2.c:33 job
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[1] ∈ {0}
         [6] ∈ {0}
         [11] ∈ {0}
@@ -1002,7 +1018,8 @@
         [141] ∈ {0}
         [146] ∈ {0}
    // matrix2.c:55 main
-[eva] jobs[1] reads 
+[eva:shared-memory:values] 
+  jobs[1] reads 
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -1034,7 +1051,8 @@
         [141] ∈ [--..--]
         [146] ∈ [--..--]
    // matrix2.c:33 job
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[2] ∈ {0}
         [7] ∈ {0}
         [12] ∈ {0}
@@ -1066,7 +1084,8 @@
         [142] ∈ {0}
         [147] ∈ {0}
    // matrix2.c:55 main
-[eva] jobs[2] reads 
+[eva:shared-memory:values] 
+  jobs[2] reads 
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -1098,7 +1117,8 @@
         [142] ∈ [--..--]
         [147] ∈ [--..--]
    // matrix2.c:33 job
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[3] ∈ {0}
         [8] ∈ {0}
         [13] ∈ {0}
@@ -1130,7 +1150,8 @@
         [143] ∈ {0}
         [148] ∈ {0}
    // matrix2.c:55 main
-[eva] jobs[3] reads 
+[eva:shared-memory:values] 
+  jobs[3] reads 
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -1162,7 +1183,8 @@
         [143] ∈ [--..--]
         [148] ∈ [--..--]
    // matrix2.c:33 job
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[4] ∈ {0}
         [9] ∈ {0}
         [14] ∈ {0}
@@ -1194,7 +1216,8 @@
         [144] ∈ {0}
         [149] ∈ {0}
    // matrix2.c:55 main
-[eva] jobs[4] reads 
+[eva:shared-memory:values] 
+  jobs[4] reads 
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]
@@ -1226,7 +1249,8 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:33 job
-[eva] jobs[0] writes 
+[eva:shared-memory:values] 
+  jobs[0] writes 
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -1258,7 +1282,8 @@
         [140] ∈ [--..--]
         [145] ∈ [--..--]
    // matrix2.c:33 job
-[eva] jobs[1] writes 
+[eva:shared-memory:values] 
+  jobs[1] writes 
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -1290,7 +1315,8 @@
         [141] ∈ [--..--]
         [146] ∈ [--..--]
    // matrix2.c:33 job
-[eva] jobs[2] writes 
+[eva:shared-memory:values] 
+  jobs[2] writes 
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -1322,7 +1348,8 @@
         [142] ∈ [--..--]
         [147] ∈ [--..--]
    // matrix2.c:33 job
-[eva] jobs[3] writes 
+[eva:shared-memory:values] 
+  jobs[3] writes 
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -1354,7 +1381,8 @@
         [143] ∈ [--..--]
         [148] ∈ [--..--]
    // matrix2.c:33 job
-[eva] jobs[4] writes 
+[eva:shared-memory:values] 
+  jobs[4] writes 
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]
@@ -1386,11 +1414,13 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:33 job
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     matrix[0..149]
-[eva] Write summary for jobs[0] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[0] (updated):
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -1421,7 +1451,8 @@
         [135] ∈ [--..--]
         [140] ∈ [--..--]
         [145] ∈ [--..--]
-[eva] Write summary for jobs[1] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[1] (updated):
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -1452,7 +1483,8 @@
         [136] ∈ [--..--]
         [141] ∈ [--..--]
         [146] ∈ [--..--]
-[eva] Write summary for jobs[2] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[2] (updated):
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -1483,7 +1515,8 @@
         [137] ∈ [--..--]
         [142] ∈ [--..--]
         [147] ∈ [--..--]
-[eva] Write summary for jobs[3] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[3] (updated):
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -1514,7 +1547,8 @@
         [138] ∈ [--..--]
         [143] ∈ [--..--]
         [148] ∈ [--..--]
-[eva] Write summary for jobs[4] (updated):
+[eva:shared-memory:values] 
+  Write summary for jobs[4] (updated):
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]
@@ -1578,55 +1612,56 @@
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix2.c:46 <- main
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix2.c:46 <- main
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by <main> at matrix2.c:55 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -1637,17 +1672,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by jobs[0] at matrix2.c:33 <- job
-    write by jobs[0] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by jobs[0] at matrix2.c:33 <- job
+      write by jobs[0] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -1663,17 +1699,18 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by jobs[1] at matrix2.c:33 <- job
-    write by jobs[1] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by jobs[1] at matrix2.c:33 <- job
+      write by jobs[1] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -1689,17 +1726,18 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by jobs[2] at matrix2.c:33 <- job
-    write by jobs[2] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by jobs[2] at matrix2.c:33 <- job
+      write by jobs[2] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -1715,17 +1753,18 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by jobs[3] at matrix2.c:33 <- job
-    write by jobs[3] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[3]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by jobs[3] at matrix2.c:33 <- job
+      write by jobs[3] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -1741,17 +1780,18 @@
     initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by jobs[4] at matrix2.c:33 <- job
-    write by jobs[4] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[4]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by jobs[4] at matrix2.c:33 <- job
+      write by jobs[4] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -1763,7 +1803,8 @@
     interferences by mutexes:
       { locks[4] }:
         # cvalue: matrix[0..149] ∈ [--..--]
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -1795,7 +1836,8 @@
         [140] ∈ [--..--]
         [145] ∈ [--..--]
    // matrix2.c:55 main
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -1827,7 +1869,8 @@
         [141] ∈ [--..--]
         [146] ∈ [--..--]
    // matrix2.c:55 main
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -1859,7 +1902,8 @@
         [142] ∈ [--..--]
         [147] ∈ [--..--]
    // matrix2.c:55 main
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -1891,7 +1935,8 @@
         [143] ∈ [--..--]
         [148] ∈ [--..--]
    // matrix2.c:55 main
-[eva] <main> reads 
+[eva:shared-memory:values] 
+  <main> reads 
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]
@@ -1923,7 +1968,8 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:55 main
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -1954,7 +2000,8 @@
         [135] ∈ [--..--]
         [140] ∈ [--..--]
         [145] ∈ [--..--]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -1985,7 +2032,8 @@
         [136] ∈ [--..--]
         [141] ∈ [--..--]
         [146] ∈ [--..--]
-[eva] Write summary for jobs[2]:
+[eva:shared-memory:values] 
+  Write summary for jobs[2]:
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -2016,7 +2064,8 @@
         [137] ∈ [--..--]
         [142] ∈ [--..--]
         [147] ∈ [--..--]
-[eva] Write summary for jobs[3]:
+[eva:shared-memory:values] 
+  Write summary for jobs[3]:
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -2047,7 +2096,8 @@
         [138] ∈ [--..--]
         [143] ∈ [--..--]
         [148] ∈ [--..--]
-[eva] Write summary for jobs[4]:
+[eva:shared-memory:values] 
+  Write summary for jobs[4]:
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]
@@ -2081,55 +2131,56 @@
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[1]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[2]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[3]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  locks[4]:
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:52 <- main
-    read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:58 <- main
-  jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: matrix2.c:46 <- main
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55 <- main
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[1]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[2]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[3]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    locks[4]:
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:52 <- main
+      read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:58 <- main
+    jobs[0..4]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: matrix2.c:46 <- main
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by <main> at matrix2.c:55 <- main
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by <main> at matrix2.c:55 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -2139,17 +2190,18 @@
 [eva] *** Computing thread jobs[0], iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by jobs[0] at matrix2.c:33 <- job
-    write by jobs[0] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[0]:
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by jobs[0] at matrix2.c:33 <- job
+      write by jobs[0] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -2164,17 +2216,18 @@
 [eva] *** Computing thread jobs[1], iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by jobs[1] at matrix2.c:33 <- job
-    write by jobs[1] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[1]:
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by jobs[1] at matrix2.c:33 <- job
+      write by jobs[1] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -2189,17 +2242,18 @@
 [eva] *** Computing thread jobs[2], iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: matrix2.c:31 <- job
-    read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: matrix2.c:34 <- job
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by jobs[2] at matrix2.c:33 <- job
-    write by jobs[2] at matrix2.c:33 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    locks[2]:
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: matrix2.c:31 <- job
+      read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: matrix2.c:34 <- job
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by jobs[2] at matrix2.c:33 <- job
+      write by jobs[2] at matrix2.c:33 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -2211,7 +2265,8 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..149] ∈ [--..--]
-[eva] Write summary for jobs[0]:
+[eva:shared-memory:values] 
+  Write summary for jobs[0]:
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
         [10] ∈ [--..--]
@@ -2242,7 +2297,8 @@
         [135] ∈ [--..--]
         [140] ∈ [--..--]
         [145] ∈ [--..--]
-[eva] Write summary for jobs[1]:
+[eva:shared-memory:values] 
+  Write summary for jobs[1]:
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
         [11] ∈ [--..--]
@@ -2273,7 +2329,8 @@
         [136] ∈ [--..--]
         [141] ∈ [--..--]
         [146] ∈ [--..--]
-[eva] Write summary for jobs[2]:
+[eva:shared-memory:values] 
+  Write summary for jobs[2]:
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
         [12] ∈ [--..--]
@@ -2304,7 +2361,8 @@
         [137] ∈ [--..--]
         [142] ∈ [--..--]
         [147] ∈ [--..--]
-[eva] Write summary for jobs[3]:
+[eva:shared-memory:values] 
+  Write summary for jobs[3]:
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
         [13] ∈ [--..--]
@@ -2335,7 +2393,8 @@
         [138] ∈ [--..--]
         [143] ∈ [--..--]
         [148] ∈ [--..--]
-[eva] Write summary for jobs[4]:
+[eva:shared-memory:values] 
+  Write summary for jobs[4]:
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
         [14] ∈ [--..--]

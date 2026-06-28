@@ -12,5 +12,6 @@
 -add-symbolic-path ../../../share:"FRAMAC_SHARE"
 # Verbosity options
 -eva-verbose 3
--eva-msg-key interferences,thread,mutex,queue,shared-memory,data-races,-summary
+-eva-msg-key interferences,thread,mutex,queue,shared-memory,data-races,global-accesses
+-eva-msg-key=-summary
 -eva-warn-key experimental=inactive

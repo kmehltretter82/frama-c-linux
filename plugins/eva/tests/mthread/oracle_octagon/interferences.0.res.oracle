@@ -1,9 +1,9 @@
-527a528,531
+600a601,604
 > [eva:show] interferences.c:14: 
 >   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 > [eva:show] interferences.c:16: 
 >   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-767a772,775
+880a885,888
 > [eva:show] interferences.c:14: 
 >   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 > [eva:show] interferences.c:16: 

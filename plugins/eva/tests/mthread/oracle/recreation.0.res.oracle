@@ -28,11 +28,12 @@
 [eva:thread] recreation.c:66: 
   New thread: jobs[2], fun job, parent <main>, args {2}
 [eva:thread] recreation.c:66: Start thread jobs[2]
-[eva] Globals accessed by thread:
-  end: read by <main> at recreation.c:68 <- main
-  jobs[0..2]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:66 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by <main> at recreation.c:68 <- main
+    jobs[0..2]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:66 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -53,11 +54,12 @@
 [eva:thread] recreation.c:25: 
   New thread: jobs[5], fun job, parent jobs[0], args {5}
 [eva:thread] recreation.c:25: Start thread jobs[5]
-[eva] Globals accessed by thread:
-  end: read by jobs[0] at recreation.c:28 <- job
-  jobs[3..5]:
-    write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[0] at recreation.c:28 <- job
+    jobs[3..5]:
+      write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -78,11 +80,12 @@
 [eva:thread] recreation.c:25: 
   New thread: jobs[8], fun job, parent jobs[1], args {8}
 [eva:thread] recreation.c:25: Start thread jobs[8]
-[eva] Globals accessed by thread:
-  end: read by jobs[1] at recreation.c:28 <- job
-  jobs[6..8]:
-    write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[1] at recreation.c:28 <- job
+    jobs[6..8]:
+      write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -103,11 +106,12 @@
 [eva:thread] recreation.c:25: 
   New thread: jobs[11], fun job, parent jobs[2], args {11}
 [eva:thread] recreation.c:25: Start thread jobs[11]
-[eva] Globals accessed by thread:
-  end: read by jobs[2] at recreation.c:28 <- job
-  jobs[9..11]:
-    write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[2] at recreation.c:28 <- job
+    jobs[9..11]:
+      write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -129,23 +133,24 @@
 [eva:mutex] recreation.c:45: Release locks[0]
 [eva:mutex] recreation.c:48: Release locks[2]
 [eva:mutex] recreation.c:49: Release locks[4]
-[eva] Globals accessed by thread:
-  end: write by jobs[3] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[3] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -161,23 +166,24 @@
 [eva:mutex] recreation.c:38: Lock locks[5]
 [eva:mutex] recreation.c:48: Release locks[3]
 [eva:mutex] recreation.c:49: Release locks[5]
-[eva] Globals accessed by thread:
-  end: write by jobs[4] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[5]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[4] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[5]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -193,23 +199,24 @@
 [eva:mutex] recreation.c:38: Lock locks[6]
 [eva:mutex] recreation.c:48: Release locks[4]
 [eva:mutex] recreation.c:49: Release locks[6]
-[eva] Globals accessed by thread:
-  end: write by jobs[5] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[4]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[6]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[5] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[4]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[6]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
@@ -225,23 +232,24 @@
 [eva:mutex] recreation.c:38: Lock locks[7]
 [eva:mutex] recreation.c:48: Release locks[5]
 [eva:mutex] recreation.c:49: Release locks[7]
-[eva] Globals accessed by thread:
-  end: write by jobs[6] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[5]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[7]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[6] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[5]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[7]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
@@ -257,23 +265,24 @@
 [eva:mutex] recreation.c:38: Lock locks[8]
 [eva:mutex] recreation.c:48: Release locks[6]
 [eva:mutex] recreation.c:49: Release locks[8]
-[eva] Globals accessed by thread:
-  end: write by jobs[7] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[6]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[8]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[7] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[6]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[8]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
@@ -289,23 +298,24 @@
 [eva:mutex] recreation.c:38: Lock locks[9]
 [eva:mutex] recreation.c:48: Release locks[7]
 [eva:mutex] recreation.c:49: Release locks[9]
-[eva] Globals accessed by thread:
-  end: write by jobs[8] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[7]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[9]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[8] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[7]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[9]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
@@ -321,23 +331,24 @@
 [eva:mutex] recreation.c:38: Lock locks[10]
 [eva:mutex] recreation.c:48: Release locks[8]
 [eva:mutex] recreation.c:49: Release locks[10]
-[eva] Globals accessed by thread:
-  end: write by jobs[9] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[8]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[10]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[9] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[8]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[10]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
@@ -353,23 +364,24 @@
 [eva:mutex] recreation.c:38: Lock locks[11]
 [eva:mutex] recreation.c:48: Release locks[9]
 [eva:mutex] recreation.c:49: Release locks[11]
-[eva] Globals accessed by thread:
-  end: write by jobs[10] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[9]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[11]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[10] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[9]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[11]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
@@ -393,29 +405,31 @@
 [eva:mutex] recreation.c:49: Release locks[0]
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:56: Warning: 
   The mutex locks[0] is already unlocked.
-[eva] Globals accessed by thread:
-  end: write by jobs[11] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
-  locks[10]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[11] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
+    locks[10]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
 [eva:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     end
@@ -426,11 +440,12 @@
 [eva:thread] recreation.c:66: Thread jobs[0], fun job, parent <main>, args {0}
 [eva:thread] recreation.c:66: Thread jobs[1], fun job, parent <main>, args {1}
 [eva:thread] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
-[eva] Globals accessed by thread:
-  end: read by <main> at recreation.c:68 <- main
-  jobs[0..2]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:66 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by <main> at recreation.c:68 <- main
+    jobs[0..2]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:66 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -445,11 +460,12 @@
 [eva:thread] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
 [eva:thread] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
 [eva:interferences] recreation.c:28: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  end: read by jobs[0] at recreation.c:28 <- job
-  jobs[3..5]:
-    write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[0] at recreation.c:28 <- job
+    jobs[3..5]:
+      write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -463,11 +479,12 @@
 [eva:thread] recreation.c:25: Thread jobs[6], fun job, parent jobs[1], args {6}
 [eva:thread] recreation.c:25: Thread jobs[7], fun job, parent jobs[1], args {7}
 [eva:thread] recreation.c:25: Thread jobs[8], fun job, parent jobs[1], args {8}
-[eva] Globals accessed by thread:
-  end: read by jobs[1] at recreation.c:28 <- job
-  jobs[6..8]:
-    write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[1] at recreation.c:28 <- job
+    jobs[6..8]:
+      write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -483,11 +500,12 @@
   Thread jobs[10], fun job, parent jobs[2], args {10}
 [eva:thread] recreation.c:25: 
   Thread jobs[11], fun job, parent jobs[2], args {11}
-[eva] Globals accessed by thread:
-  end: read by jobs[2] at recreation.c:28 <- job
-  jobs[9..11]:
-    write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[2] at recreation.c:28 <- job
+    jobs[9..11]:
+      write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -499,23 +517,24 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] recreation.c:40: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  end: write by jobs[3] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[3] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -531,23 +550,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[4] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[5]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[4] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[5]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -563,23 +583,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[5] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[4]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[6]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[5] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[4]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[6]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
@@ -595,23 +616,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[6] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[5]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[7]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[6] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[5]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[7]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
@@ -627,23 +649,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[7] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[6]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[8]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[7] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[6]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[8]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
@@ -659,23 +682,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[8] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[7]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[9]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[8] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[7]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[9]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
@@ -691,23 +715,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[9] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[8]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[10]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[9] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[8]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[10]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
@@ -723,23 +748,24 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[10] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[9]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[11]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[10] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[9]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[11]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
@@ -755,22 +781,23 @@
     interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[11] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
-  locks[10]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[11] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
+    locks[10]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
 [eva:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
@@ -782,32 +809,33 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva] <main> reads  end ∈ {0}  // recreation.c:68 main
-[eva] jobs[0] reads  end ∈ {0}  // recreation.c:28 job
-[eva] jobs[1] reads  end ∈ {0}  // recreation.c:28 job
-[eva] jobs[2] reads  end ∈ {0}  // recreation.c:28 job
-[eva] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
-[eva] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:values] <main> reads  end ∈ {0}  // recreation.c:68 main
+[eva:shared-memory:values] jobs[0] reads  end ∈ {0}  // recreation.c:28 job
+[eva:shared-memory:values] jobs[1] reads  end ∈ {0}  // recreation.c:28 job
+[eva:shared-memory:values] jobs[2] reads  end ∈ {0}  // recreation.c:28 job
+[eva:shared-memory:values] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     end
-[eva] Write summary for jobs[3] (updated): end ∈ {1}
-[eva] Write summary for jobs[4] (updated): end ∈ {1}
-[eva] Write summary for jobs[5] (updated): end ∈ {1}
-[eva] Write summary for jobs[6] (updated): end ∈ {1}
-[eva] Write summary for jobs[7] (updated): end ∈ {1}
-[eva] Write summary for jobs[8] (updated): end ∈ {1}
-[eva] Write summary for jobs[9] (updated): end ∈ {1}
-[eva] Write summary for jobs[10] (updated): end ∈ {1}
-[eva] Write summary for jobs[11] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[3] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[4] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[5] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[6] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[7] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[8] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[9] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[10] (updated): end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[11] (updated): end ∈ {1}
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -817,11 +845,12 @@
 [eva:thread] recreation.c:66: 
   New context for jobs[2], fun job, parent <main>, args {2}
 [eva:interferences] recreation.c:68: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  end: read by <main> at recreation.c:68 <- main
-  jobs[0..2]:
-    write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:66 <- main
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by <main> at recreation.c:68 <- main
+    jobs[0..2]:
+      write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:66 <- main
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -838,11 +867,12 @@
   New context for jobs[4], fun job, parent jobs[0], args {4}
 [eva:thread] recreation.c:25: 
   New context for jobs[5], fun job, parent jobs[0], args {5}
-[eva] Globals accessed by thread:
-  end: read by jobs[0] at recreation.c:28 <- job
-  jobs[3..5]:
-    write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[0] at recreation.c:28 <- job
+    jobs[3..5]:
+      write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
@@ -859,11 +889,12 @@
   New context for jobs[7], fun job, parent jobs[1], args {7}
 [eva:thread] recreation.c:25: 
   New context for jobs[8], fun job, parent jobs[1], args {8}
-[eva] Globals accessed by thread:
-  end: read by jobs[1] at recreation.c:28 <- job
-  jobs[6..8]:
-    write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[1] at recreation.c:28 <- job
+    jobs[6..8]:
+      write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
@@ -880,11 +911,12 @@
   New context for jobs[10], fun job, parent jobs[2], args {10}
 [eva:thread] recreation.c:25: 
   New context for jobs[11], fun job, parent jobs[2], args {11}
-[eva] Globals accessed by thread:
-  end: read by jobs[2] at recreation.c:28 <- job
-  jobs[9..11]:
-    write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
-      pthread_create :: recreation.c:25 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: read by jobs[2] at recreation.c:28 <- job
+    jobs[9..11]:
+      write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
+        pthread_create :: recreation.c:25 <- job
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
@@ -895,23 +927,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[3] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[3] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[2]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[4]:
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
@@ -927,23 +960,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[4] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[5]:
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[4] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[3]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[5]:
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
@@ -959,23 +993,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[5] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[4]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[6]:
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[5] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[4]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[6]:
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
@@ -991,23 +1026,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[6] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[5]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[7]:
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[6] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[5]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[7]:
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
@@ -1023,23 +1059,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[7] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[6]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[8]:
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[7] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[6]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[8]:
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
@@ -1055,23 +1092,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[8] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[7]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[9]:
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[8] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[7]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[9]:
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
@@ -1087,23 +1125,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[9] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[8]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[10]:
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[9] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[8]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[10]:
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
@@ -1119,23 +1158,24 @@
     changed and interferences changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[10] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-  locks[9]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
-  locks[11]:
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[10] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+    locks[9]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
+    locks[11]:
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
 [eva:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
@@ -1151,22 +1191,23 @@
     changed)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  end: write by jobs[11] at recreation.c:40 <- job
-  locks[0]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:38 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:44 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:45 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:49 <- job
-  locks[10]:
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
-      pthread_mutex_lock :: recreation.c:37 <- job
-    read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
-      pthread_mutex_unlock :: recreation.c:48 <- job
+[eva:global-accesses] 
+  Globals accessed by thread:
+    end: write by jobs[11] at recreation.c:40 <- job
+    locks[0]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:38 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:44 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:45 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:49 <- job
+    locks[10]:
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
+        pthread_mutex_lock :: recreation.c:37 <- job
+      read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
+        pthread_mutex_unlock :: recreation.c:48 <- job
 [eva:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
@@ -1178,19 +1219,19 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva] <main> reads  end ∈ {0; 1}  // recreation.c:68 main
-[eva] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva] Write summary for jobs[3]: end ∈ {1}
-[eva] Write summary for jobs[4]: end ∈ {1}
-[eva] Write summary for jobs[5]: end ∈ {1}
-[eva] Write summary for jobs[6]: end ∈ {1}
-[eva] Write summary for jobs[7]: end ∈ {1}
-[eva] Write summary for jobs[8]: end ∈ {1}
-[eva] Write summary for jobs[9]: end ∈ {1}
-[eva] Write summary for jobs[10]: end ∈ {1}
-[eva] Write summary for jobs[11]: end ∈ {1}
+[eva:shared-memory:values] <main> reads  end ∈ {0; 1}  // recreation.c:68 main
+[eva:shared-memory:values] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
+[eva:shared-memory:values] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
+[eva:shared-memory:values] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
+[eva:shared-memory:values] Write summary for jobs[3]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[4]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[5]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[6]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[7]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[8]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[9]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[10]: end ∈ {1}
+[eva:shared-memory:values] Write summary for jobs[11]: end ∈ {1}
 [eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: end
 [eva:shared-memory:mutex] 

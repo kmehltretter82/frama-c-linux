@@ -12,7 +12,7 @@
 [eva:thread] 
   New context for <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] Globals accessed by thread:
+[eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -27,10 +27,11 @@
   inject threads interferences at the start of main_interrupt_one_shot for thread <main>
 [eva:thread] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] Globals accessed by thread:
-  interrupt_received:
-    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -43,17 +44,19 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
-[eva] Globals accessed by thread:
-  interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
-      interrupt_oneshot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+        interrupt_oneshot
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Concurrent imprecise accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     interrupt_received
@@ -61,10 +64,11 @@
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] Globals accessed by thread:
-  interrupt_received:
-    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -76,10 +80,11 @@
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
-[eva] Globals accessed by thread:
-  interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
-      interrupt_oneshot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+        interrupt_oneshot
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
@@ -91,17 +96,22 @@
     interferences by mutexes:
       {}:
         # cvalue: interrupt_received ∈ {1}
-[eva] <main> reads  interrupt_received ∈ {0}  // interrupt.c:18
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0}  // interrupt.c:18
   main_interrupt_one_shot
-[eva] <main> reads  interrupt_received ∈ {0}  // interrupt.c:19
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0}  // interrupt.c:19
   main_interrupt_one_shot
-[eva] <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {1} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {1} 
   // interrupt.c:9 interrupt_oneshot
-[eva] Concurrent precise var accesses have changed: before
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
     \nothing
   vs.
     interrupt_received
-[eva] Write summary for <interrupt_handler interrupt_oneshot> (updated):
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {1}
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
@@ -112,13 +122,14 @@
 [eva:show] interrupt.c:20: Frama_C_show_each: {1}
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
-[eva] Globals accessed by thread:
-  interrupt_received:
-    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:20 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:22 <- main_interrupt_one_shot
-    write by <main> at interrupt.c:21 <- main_interrupt_one_shot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:20 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:22 <- main_interrupt_one_shot
+      write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -134,10 +145,11 @@
     (interferences changed)
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
-[eva] Globals accessed by thread:
-  interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
-      interrupt_oneshot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+        interrupt_oneshot
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
@@ -149,20 +161,28 @@
     interferences by mutexes:
       {}:
         # cvalue: interrupt_received ∈ {0; 1}
-[eva] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:18
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:18
   main_interrupt_one_shot
-[eva] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:19
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:19
   main_interrupt_one_shot
-[eva] <main> reads  interrupt_received ∈ {1}  // interrupt.c:20
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {1}  // interrupt.c:20
   main_interrupt_one_shot
-[eva] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:22
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:22
   main_interrupt_one_shot
-[eva] <main> writes  interrupt_received ∈ {0; 1}  // interrupt.c:21
+[eva:shared-memory:values] 
+  <main> writes  interrupt_received ∈ {0; 1}  // interrupt.c:21
   main_interrupt_one_shot
-[eva] <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {0; 1} 
+[eva:shared-memory:values] 
+  <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {0; 1} 
   // interrupt.c:9 interrupt_oneshot
-[eva] Write summary for <main> (updated): interrupt_received ∈ {0; 1}
-[eva] Write summary for <interrupt_handler interrupt_oneshot> (updated):
+[eva:shared-memory:values] 
+  Write summary for <main> (updated): interrupt_received ∈ {0; 1}
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {0; 1}
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
@@ -171,13 +191,14 @@
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:show] interrupt.c:20: Frama_C_show_each: {0; 1}
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
-[eva] Globals accessed by thread:
-  interrupt_received:
-    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:20 <- main_interrupt_one_shot
-    read by <main> at interrupt.c:22 <- main_interrupt_one_shot
-    write by <main> at interrupt.c:21 <- main_interrupt_one_shot
+[eva:global-accesses] 
+  Globals accessed by thread:
+    interrupt_received:
+      read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:20 <- main_interrupt_one_shot
+      read by <main> at interrupt.c:22 <- main_interrupt_one_shot
+      write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -189,10 +210,13 @@
     interferences by mutexes:
       {}:
         # cvalue: interrupt_received ∈ {0; 1}
-[eva] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:20
+[eva:shared-memory:values] 
+  <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:20
   main_interrupt_one_shot
-[eva] Write summary for <main>: interrupt_received ∈ {0; 1}
-[eva] Write summary for <interrupt_handler interrupt_oneshot>:
+[eva:shared-memory:values] 
+  Write summary for <main>: interrupt_received ∈ {0; 1}
+[eva:shared-memory:values] 
+  Write summary for <interrupt_handler interrupt_oneshot>:
   interrupt_received ∈ {0; 1}
 [eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: interrupt_received
