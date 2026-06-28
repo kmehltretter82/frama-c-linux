@@ -41,11 +41,6 @@
     \nothing
   vs.
     a; c
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -107,34 +102,12 @@
   g :: memexec.c:18 <- f :: memexec.c:25 <- t1
 [eva] th1 writes  c ∈ {2}  // memexec.c:10
   g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva] Possible read/write data races:
-  c:
-    read by <main> at memexec.c:33, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-  a:
-    read by <main> at memexec.c:33, unprotected
-    write by th1 at memexec.c:14, unprotected
-    write by th1 at memexec.c:14, unprotected
-[eva] Shared memory: a; c
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     a; c
 [eva] Write summary for th1 (updated): a ∈ {1}
                                    c ∈ {2}
-[eva] Mutexes for concurrent accesses:
-  a  unprotected
-  c  unprotected
-[eva] Detailed shared zones protections
-  c: Read by <main>, Write by th1: unprotected
-  a: Read by <main>, Write by th1: unprotected
-[eva] Statements needing manual synchronisation
-  memexec.c:33 (for a; c)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -151,28 +124,32 @@
     interferences by mutexes:
 [eva] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
 [eva] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
-[eva] Possible read/write data races:
-  c:
-    read by <main> at memexec.c:33, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-    write by th1 at memexec.c:10, unprotected
-  a:
-    read by <main> at memexec.c:33, unprotected
-    write by th1 at memexec.c:14, unprotected
-    write by th1 at memexec.c:14, unprotected
-[eva] Shared memory: a; c
 [eva] Write summary for th1: a ∈ {1}
                          c ∈ {2}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 3 iterations
+[eva:shared-memory:zone] Shared memory: a; c
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   a  unprotected
   c  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   c: Read by <main>, Write by th1: unprotected
   a: Read by <main>, Write by th1: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   memexec.c:33 (for a; c)
-[eva] ******* Analysis performed, 3 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    c:
+      read by <main> at memexec.c:33, unprotected
+      write by th1 at memexec.c:10, unprotected
+      write by th1 at memexec.c:10, unprotected
+      write by th1 at memexec.c:10, unprotected
+      write by th1 at memexec.c:10, unprotected
+      write by th1 at memexec.c:10, unprotected
+      write by th1 at memexec.c:10, unprotected
+    a:
+      read by <main> at memexec.c:33, unprotected
+      write by th1 at memexec.c:14, unprotected
+      write by th1 at memexec.c:14, unprotected

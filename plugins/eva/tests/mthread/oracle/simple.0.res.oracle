@@ -90,11 +90,6 @@
     \nothing
   vs.
     a; b; c; v
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] ******* Analysis stopped after 1 iterations.
   Remaining to do:
   Thread <main>, fun main: potential shared vars changed
@@ -102,3 +97,9 @@
     changed
   Thread job2, fun f2, parent <main>, args {{ &a }}: potential shared vars
     changed
+[eva:shared-memory:zone] Shared memory: \nothing
+[eva:shared-memory:mutex] Mutexes protecting access to shared memory:
+[eva:shared-memory:mutex-details] Detailed shared memory protections
+[eva:data-races] 
+  Possible read/write data races:
+    none

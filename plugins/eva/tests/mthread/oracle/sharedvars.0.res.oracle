@@ -159,11 +159,6 @@
     \nothing
   vs.
     s4; s6
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -373,17 +368,6 @@
 [eva] jobs4 writes  s4 ∈ {-1; 1; 4}  // sharedvars.c:69 f4
 [eva] jobs4 writes  s6 ∈ {4}  // sharedvars.c:72 f4
 [eva] jobs6 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:91 f6
-[eva] Possible read/write data races:
-  s6:
-    read by jobs4 at sharedvars.c:71, unprotected
-    read by jobs6 at sharedvars.c:90, unprotected
-    write by jobs4 at sharedvars.c:72, unprotected
-    write by jobs6 at sharedvars.c:91, unprotected
-  s4:
-    read by jobs4 at sharedvars.c:68, unprotected
-    write by <main> at sharedvars.c:115, unprotected
-    write by jobs4 at sharedvars.c:69, unprotected
-[eva] Shared memory: s4; s6
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -392,18 +376,6 @@
 [eva] Write summary for jobs4 (updated): s4 ∈ {-1; 1; 4}
                                      s6 ∈ {4}
 [eva] Write summary for jobs6 (updated): s6 ∈ {0; 4; 6}
-[eva] Mutexes for concurrent accesses:
-  s4  unprotected
-  s6  unprotected
-[eva] Detailed shared zones protections
-  s6:
-    Read by jobs6, Write by jobs4: unprotected
-    Read by jobs4, Write by jobs6: unprotected
-  s4: Read by jobs4, Write by <main>: unprotected
-[eva] Statements needing manual synchronisation
-  sharedvars.c:68 (for s4)
-  sharedvars.c:71 (for s6)
-  sharedvars.c:90 (for s6)
 [eva] *** Computing thread <main>, iteration 3 (potential shared vars changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -678,21 +650,6 @@
 [eva] jobs5 writes  s5 ∈ {5}  // sharedvars.c:84 f5
 [eva] jobs51 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:78 f51
 [eva] jobs4 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:72 f4
-[eva] Possible read/write data races:
-  s6:
-    read by jobs4 at sharedvars.c:71, unprotected
-    read by jobs6 at sharedvars.c:90, unprotected
-    write by jobs4 at sharedvars.c:72, unprotected
-    write by jobs6 at sharedvars.c:91, unprotected
-  s5:
-    read by jobs51 at sharedvars.c:77, unprotected
-    write by jobs5 at sharedvars.c:84, unprotected
-    write by jobs51 at sharedvars.c:78, unprotected
-  s4:
-    read by jobs4 at sharedvars.c:68, unprotected
-    write by <main> at sharedvars.c:115, unprotected
-    write by jobs4 at sharedvars.c:69, unprotected
-[eva] Shared memory: s4; s5; s6
 [eva] Concurrent precise var accesses have changed: before
     s4; s6
   vs.
@@ -703,21 +660,6 @@
 [eva] Write summary for jobs5 (updated): s5 ∈ {5}
 [eva] Write summary for jobs6: s6 ∈ {0; 4; 6}
 [eva] Write summary for jobs51 (updated): s5 ∈ {0; 5; 51}
-[eva] Mutexes for concurrent accesses:
-  s4  unprotected
-  s5  unprotected
-  s6  unprotected
-[eva] Detailed shared zones protections
-  s6:
-    Read by jobs6, Write by jobs4: unprotected
-    Read by jobs4, Write by jobs6: unprotected
-  s5: Read by jobs51, Write by jobs5: unprotected
-  s4: Read by jobs4, Write by <main>: unprotected
-[eva] Statements needing manual synchronisation
-  sharedvars.c:68 (for s4)
-  sharedvars.c:71 (for s6)
-  sharedvars.c:77 (for s5)
-  sharedvars.c:90 (for s6)
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -987,42 +929,12 @@
 [eva] <main> writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:115 main
 [eva] jobs4 writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:69 f4
 [eva] jobs5 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:84 f5
-[eva] Possible read/write data races:
-  s6:
-    read by jobs4 at sharedvars.c:71, unprotected
-    read by jobs6 at sharedvars.c:90, unprotected
-    write by jobs4 at sharedvars.c:72, unprotected
-    write by jobs6 at sharedvars.c:91, unprotected
-  s5:
-    read by jobs51 at sharedvars.c:77, unprotected
-    write by jobs5 at sharedvars.c:84, unprotected
-    write by jobs51 at sharedvars.c:78, unprotected
-  s4:
-    read by jobs4 at sharedvars.c:68, unprotected
-    write by <main> at sharedvars.c:115, unprotected
-    write by jobs4 at sharedvars.c:69, unprotected
-[eva] Shared memory: s4; s5; s6
 [eva] Write summary for <main> (updated): s4 ∈ {-1; 0; 1; 2; 3; 4}
 [eva] Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}
                            s6 ∈ {0; 4; 6}
 [eva] Write summary for jobs5 (updated): s5 ∈ {0; 5; 51}
 [eva] Write summary for jobs6: s6 ∈ {0; 4; 6}
 [eva] Write summary for jobs51: s5 ∈ {0; 5; 51}
-[eva] Mutexes for concurrent accesses:
-  s4  unprotected
-  s5  unprotected
-  s6  unprotected
-[eva] Detailed shared zones protections
-  s6:
-    Read by jobs6, Write by jobs4: unprotected
-    Read by jobs4, Write by jobs6: unprotected
-  s5: Read by jobs51, Write by jobs5: unprotected
-  s4: Read by jobs4, Write by <main>: unprotected
-[eva] Statements needing manual synchronisation
-  sharedvars.c:68 (for s4)
-  sharedvars.c:71 (for s6)
-  sharedvars.c:77 (for s5)
-  sharedvars.c:90 (for s6)
 [eva] *** Computing thread <main>, iteration 5 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -1281,40 +1193,44 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
 [eva] <main> writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:115 main
-[eva] Possible read/write data races:
-  s6:
-    read by jobs4 at sharedvars.c:71, unprotected
-    read by jobs6 at sharedvars.c:90, unprotected
-    write by jobs4 at sharedvars.c:72, unprotected
-    write by jobs6 at sharedvars.c:91, unprotected
-  s5:
-    read by jobs51 at sharedvars.c:77, unprotected
-    write by jobs5 at sharedvars.c:84, unprotected
-    write by jobs51 at sharedvars.c:78, unprotected
-  s4:
-    read by jobs4 at sharedvars.c:68, unprotected
-    write by <main> at sharedvars.c:115, unprotected
-    write by jobs4 at sharedvars.c:69, unprotected
-[eva] Shared memory: s4; s5; s6
 [eva] Write summary for <main>: s4 ∈ {-1; 0; 1; 2; 3; 4}
 [eva] Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}
                            s6 ∈ {0; 4; 6}
 [eva] Write summary for jobs5: s5 ∈ {0; 5; 51}
 [eva] Write summary for jobs6: s6 ∈ {0; 4; 6}
 [eva] Write summary for jobs51: s5 ∈ {0; 5; 51}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 5 iterations
+[eva:shared-memory:zone] Shared memory: s4; s5; s6
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   s4  unprotected
   s5  unprotected
   s6  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   s6:
     Read by jobs6, Write by jobs4: unprotected
     Read by jobs4, Write by jobs6: unprotected
   s5: Read by jobs51, Write by jobs5: unprotected
   s4: Read by jobs4, Write by <main>: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   sharedvars.c:68 (for s4)
   sharedvars.c:71 (for s6)
   sharedvars.c:77 (for s5)
   sharedvars.c:90 (for s6)
-[eva] ******* Analysis performed, 5 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    s6:
+      read by jobs4 at sharedvars.c:71, unprotected
+      read by jobs6 at sharedvars.c:90, unprotected
+      write by jobs4 at sharedvars.c:72, unprotected
+      write by jobs6 at sharedvars.c:91, unprotected
+    s5:
+      read by jobs51 at sharedvars.c:77, unprotected
+      write by jobs5 at sharedvars.c:84, unprotected
+      write by jobs51 at sharedvars.c:78, unprotected
+    s4:
+      read by jobs4 at sharedvars.c:68, unprotected
+      write by <main> at sharedvars.c:115, unprotected
+      write by jobs4 at sharedvars.c:69, unprotected

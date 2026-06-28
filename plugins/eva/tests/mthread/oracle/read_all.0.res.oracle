@@ -49,13 +49,6 @@
     \nothing
   vs.
     r
-[eva] Possible read/write data races:
-  none
-[eva] Possible write/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -96,24 +89,12 @@
 [eva] <main> writes  r ∈ [--..--]  // read_all.c:29 main
 [eva] <main> writes  r ∈ [--..--]  // read_all.c:29 g :: read_all.c:29 <- main
 [eva] jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
-[eva] Possible read/write data races:
-  none
-[eva] Possible write/write data races:
-  r:
-    write by <main> at read_all.c:29, unprotected
-    write by <main> at read_all.c:29, unprotected
-    write by jobs at read_all.c:19, unprotected
-[eva] Shared memory: r
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     r
 [eva] Write summary for <main> (updated): r ∈ [--..--]
 [eva] Write summary for jobs (updated): r ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  r  write unprotected, read unaccessed
-[eva] Detailed shared zones protections
-  r:
 [eva] *** Computing thread <main>, iteration 3 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -131,21 +112,25 @@
     interferences by mutexes:
       {}:
         # cvalue: r ∈ [--..--]
-[eva] Possible read/write data races:
-  none
-[eva] Possible write/write data races:
-  r:
-    write by jobs at read_all.c:19, unprotected
-    write by <main> at read_all.c:29, unprotected
-    write by <main> at read_all.c:29, unprotected
-[eva] Shared memory: r
 [eva] Write summary for <main>: r ∈ [--..--]
 [eva] Write summary for jobs: r ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  r  write unprotected, read unaccessed
-[eva] Detailed shared zones protections
-  r:
 [eva] ******* Analysis performed, 3 iterations
+[eva:shared-memory:zone] Shared memory: r
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
+  r  write unprotected, read unaccessed
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
+  r:
+[eva:data-races] 
+  Possible read/write data races:
+    none
+[eva:data-races] 
+  Possible write/write data races:
+    r:
+      write by jobs at read_all.c:19, unprotected
+      write by <main> at read_all.c:29, unprotected
+      write by <main> at read_all.c:29, unprotected
 [eva] Deferred error message was emitted during execution:
   read_all.c:29: read of the whole memory. Ignoring to allow Mthread to continue, but the analysis is unsound.
 [kernel] Plug-in eva aborted: invalid user input.

@@ -39,11 +39,6 @@
     \nothing
   vs.
     NULL[100..200]
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -80,20 +75,11 @@
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [eva] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
 [eva] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
-[eva] Possible read/write data races:
-  NULL[100..200]:
-    read by <main> at null.c:27, unprotected
-    write by tjob0 at null.c:16, unprotected
-[eva] Shared memory: NULL[100..200]
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
 [eva] Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  NULL[100..200]  unprotected
-[eva] Detailed shared zones protections
-  NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -108,14 +94,17 @@
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  NULL[100..200]:
-    read by <main> at null.c:27, unprotected
-    write by tjob0 at null.c:16, unprotected
-[eva] Shared memory: NULL[100..200]
 [eva] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  NULL[100..200]  unprotected
-[eva] Detailed shared zones protections
-  NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [eva] ******* Analysis performed, 3 iterations
+[eva:shared-memory:zone] Shared memory: NULL[100..200]
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
+  NULL[100..200]  unprotected
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
+  NULL[100..200]: Read by <main>, Write by tjob0: unprotected
+[eva:data-races] 
+  Possible read/write data races:
+    NULL[100..200]:
+      read by <main> at null.c:27, unprotected
+      write by tjob0 at null.c:16, unprotected

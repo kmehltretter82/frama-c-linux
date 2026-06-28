@@ -200,11 +200,6 @@
     \nothing
   vs.
     shared_a; shared_b; shared_c
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -460,54 +455,6 @@
   interrupt
 [eva] job1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:21 fjob1
 [eva] job1 writes  shared_c ∈ {1}  // interferences.c:22 fjob1
-[eva] Possible read/write data races:
-  shared_c:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:52, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:30, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by job1 at interferences.c:22, unprotected
-  shared_b:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:51, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <interrupt_handler interrupt> at interferences.c:15, unprotected
-    write by job1 at interferences.c:21, unprotected
-  shared_a:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:50, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <main> at interferences.c:61, unprotected
-    write by job2 at interferences.c:29, unprotected
-    write by job3 at interferences.c:37, unprotected
-[eva] Shared memory: shared_a; shared_b; shared_c
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -518,54 +465,6 @@
                                     shared_c ∈ {1}
 [eva] Write summary for job2 (updated): shared_a ∈ {0; 1; 3}
 [eva] Write summary for job3 (updated): shared_a ∈ {0; 1; 2; 3}
-[eva] Mutexes for concurrent accesses:
-  shared_a  unprotected
-  shared_b  unprotected
-  shared_c  unprotected
-[eva] Detailed shared zones protections
-  shared_c:
-    Read by job3, Write by job1: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-  shared_b:
-    Read by job3, Write by job1: unprotected
-    Read by job3, Write by <interrupt_handler interrupt>: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by job2, Write by <interrupt_handler interrupt>: unprotected
-    Read by job1, Write by <interrupt_handler interrupt>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt>: unprotected
-  shared_a:
-    Read by job3, Write by job2: unprotected
-    Read by job3, Write by <main>: unprotected
-    Read by job2, Write by job3: unprotected
-    Read by job2, Write by <main>: unprotected
-    Read by job1, Write by job3: unprotected
-    Read by job1, Write by job2: unprotected
-    Read by job1, Write by <main>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job3: unprotected
-    Read by <interrupt_handler interrupt>, Write by job2: unprotected
-    Read by <interrupt_handler interrupt>, Write by <main>: unprotected
-    Read by <main>, Write by job3: unprotected
-    Read by <main>, Write by job2: unprotected
-[eva] Statements needing manual synchronisation
-  interferences.c:14 (for shared_a; shared_b; shared_c)
-  interferences.c:16 (for shared_a; shared_b; shared_c)
-  interferences.c:20 (for shared_a; shared_b)
-  interferences.c:23 (for shared_a; shared_b)
-  interferences.c:28 (for shared_a; shared_b; shared_c)
-  interferences.c:30 (for shared_c)
-  interferences.c:31 (for shared_a; shared_b; shared_c)
-  interferences.c:36 (for shared_a; shared_b; shared_c)
-  interferences.c:38 (for shared_a; shared_b; shared_c)
-  interferences.c:50 (for shared_a)
-  interferences.c:51 (for shared_b)
-  interferences.c:52 (for shared_c)
-  interferences.c:56 (for shared_a; shared_b; shared_c)
-  interferences.c:66 (for shared_a; shared_b; shared_c)
-  interferences.c:67 (for shared_a; shared_b; shared_c)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -807,54 +706,6 @@
 [eva] job2 writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:29 fjob2
 [eva] <interrupt_handler interrupt> writes  shared_b ∈ {0; 1; 2} 
   // interferences.c:15 interrupt
-[eva] Possible read/write data races:
-  shared_c:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:52, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:30, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by job1 at interferences.c:22, unprotected
-  shared_b:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:51, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <interrupt_handler interrupt> at interferences.c:15, unprotected
-    write by job1 at interferences.c:21, unprotected
-  shared_a:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:50, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <main> at interferences.c:61, unprotected
-    write by job2 at interferences.c:29, unprotected
-    write by job3 at interferences.c:37, unprotected
-[eva] Shared memory: shared_a; shared_b; shared_c
 [eva] Write summary for <main> (updated): shared_a ∈ {0; 1; 2; 3}
 [eva] Write summary for <interrupt_handler interrupt> (updated):
   shared_b ∈ {0; 1; 2}
@@ -862,54 +713,6 @@
                           shared_c ∈ {1}
 [eva] Write summary for job2 (updated): shared_a ∈ {0; 1; 2; 3}
 [eva] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
-[eva] Mutexes for concurrent accesses:
-  shared_a  unprotected
-  shared_b  unprotected
-  shared_c  unprotected
-[eva] Detailed shared zones protections
-  shared_c:
-    Read by job3, Write by job1: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-  shared_b:
-    Read by job3, Write by job1: unprotected
-    Read by job3, Write by <interrupt_handler interrupt>: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by job2, Write by <interrupt_handler interrupt>: unprotected
-    Read by job1, Write by <interrupt_handler interrupt>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt>: unprotected
-  shared_a:
-    Read by job3, Write by job2: unprotected
-    Read by job3, Write by <main>: unprotected
-    Read by job2, Write by job3: unprotected
-    Read by job2, Write by <main>: unprotected
-    Read by job1, Write by job3: unprotected
-    Read by job1, Write by job2: unprotected
-    Read by job1, Write by <main>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job3: unprotected
-    Read by <interrupt_handler interrupt>, Write by job2: unprotected
-    Read by <interrupt_handler interrupt>, Write by <main>: unprotected
-    Read by <main>, Write by job3: unprotected
-    Read by <main>, Write by job2: unprotected
-[eva] Statements needing manual synchronisation
-  interferences.c:14 (for shared_a; shared_b; shared_c)
-  interferences.c:16 (for shared_a; shared_b; shared_c)
-  interferences.c:20 (for shared_a; shared_b)
-  interferences.c:23 (for shared_a; shared_b)
-  interferences.c:28 (for shared_a; shared_b; shared_c)
-  interferences.c:30 (for shared_c)
-  interferences.c:31 (for shared_a; shared_b; shared_c)
-  interferences.c:36 (for shared_a; shared_b; shared_c)
-  interferences.c:38 (for shared_a; shared_b; shared_c)
-  interferences.c:50 (for shared_a)
-  interferences.c:51 (for shared_b)
-  interferences.c:52 (for shared_c)
-  interferences.c:56 (for shared_a; shared_b; shared_c)
-  interferences.c:66 (for shared_a; shared_b; shared_c)
-  interferences.c:67 (for shared_a; shared_b; shared_c)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -1107,65 +910,21 @@
         shared_a ∈ {0; 1; 2; 3}
         shared_b ∈ {0; 1; 2}
         shared_c ∈ {0; 1}
-[eva] Possible read/write data races:
-  shared_c:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:52, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:30, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by job1 at interferences.c:22, unprotected
-  shared_b:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:51, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <interrupt_handler interrupt> at interferences.c:15, unprotected
-    write by job1 at interferences.c:21, unprotected
-  shared_a:
-    read by <main> at interferences.c:56, unprotected
-    read by <main> at interferences.c:66, unprotected
-    read by <main> at interferences.c:67, unprotected
-    read by <main> at interferences.c:50, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:14, unprotected
-    read by <interrupt_handler interrupt> at interferences.c:16, unprotected
-    read by job1 at interferences.c:20, unprotected
-    read by job1 at interferences.c:23, unprotected
-    read by job2 at interferences.c:28, unprotected
-    read by job2 at interferences.c:31, unprotected
-    read by job3 at interferences.c:36, unprotected
-    read by job3 at interferences.c:38, unprotected
-    write by <main> at interferences.c:61, unprotected
-    write by job2 at interferences.c:29, unprotected
-    write by job3 at interferences.c:37, unprotected
-[eva] Shared memory: shared_a; shared_b; shared_c
 [eva] Write summary for <main>: shared_a ∈ {0; 1; 2; 3}
 [eva] Write summary for <interrupt_handler interrupt>: shared_b ∈ {0; 1; 2}
 [eva] Write summary for job1: shared_b ∈ {0; 1; 2}
                           shared_c ∈ {1}
 [eva] Write summary for job2: shared_a ∈ {0; 1; 2; 3}
 [eva] Write summary for job3: shared_a ∈ {0; 1; 2; 3}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: shared_a; shared_b; shared_c
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   shared_a  unprotected
   shared_b  unprotected
   shared_c  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   shared_c:
     Read by job3, Write by job1: unprotected
     Read by job2, Write by job1: unprotected
@@ -1193,7 +952,8 @@
     Read by <interrupt_handler interrupt>, Write by <main>: unprotected
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   interferences.c:14 (for shared_a; shared_b; shared_c)
   interferences.c:16 (for shared_a; shared_b; shared_c)
   interferences.c:20 (for shared_a; shared_b)
@@ -1209,4 +969,51 @@
   interferences.c:56 (for shared_a; shared_b; shared_c)
   interferences.c:66 (for shared_a; shared_b; shared_c)
   interferences.c:67 (for shared_a; shared_b; shared_c)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    shared_c:
+      read by <main> at interferences.c:56, unprotected
+      read by <main> at interferences.c:66, unprotected
+      read by <main> at interferences.c:67, unprotected
+      read by <main> at interferences.c:52, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:14, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:16, unprotected
+      read by job1 at interferences.c:20, unprotected
+      read by job1 at interferences.c:23, unprotected
+      read by job2 at interferences.c:28, unprotected
+      read by job2 at interferences.c:30, unprotected
+      read by job2 at interferences.c:31, unprotected
+      read by job3 at interferences.c:36, unprotected
+      read by job3 at interferences.c:38, unprotected
+      write by job1 at interferences.c:22, unprotected
+    shared_b:
+      read by <main> at interferences.c:56, unprotected
+      read by <main> at interferences.c:66, unprotected
+      read by <main> at interferences.c:67, unprotected
+      read by <main> at interferences.c:51, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:14, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:16, unprotected
+      read by job1 at interferences.c:20, unprotected
+      read by job1 at interferences.c:23, unprotected
+      read by job2 at interferences.c:28, unprotected
+      read by job2 at interferences.c:31, unprotected
+      read by job3 at interferences.c:36, unprotected
+      read by job3 at interferences.c:38, unprotected
+      write by <interrupt_handler interrupt> at interferences.c:15, unprotected
+      write by job1 at interferences.c:21, unprotected
+    shared_a:
+      read by <main> at interferences.c:56, unprotected
+      read by <main> at interferences.c:66, unprotected
+      read by <main> at interferences.c:67, unprotected
+      read by <main> at interferences.c:50, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:14, unprotected
+      read by <interrupt_handler interrupt> at interferences.c:16, unprotected
+      read by job1 at interferences.c:20, unprotected
+      read by job1 at interferences.c:23, unprotected
+      read by job2 at interferences.c:28, unprotected
+      read by job2 at interferences.c:31, unprotected
+      read by job3 at interferences.c:36, unprotected
+      read by job3 at interferences.c:38, unprotected
+      write by <main> at interferences.c:61, unprotected
+      write by job2 at interferences.c:29, unprotected
+      write by job3 at interferences.c:37, unprotected

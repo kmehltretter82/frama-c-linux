@@ -231,11 +231,6 @@
     \nothing
   vs.
     matrix[0..149]
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -1391,38 +1386,6 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:33 job
-[eva] Possible read/write data races:
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
-         [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
-         [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55, protected by locks[4]
-    read by jobs[4] at matrix2.c:33, protected by locks[4]
-    write by jobs[4] at matrix2.c:33, protected by locks[4]
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
-         [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
-         [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55, protected by locks[3]
-    read by jobs[3] at matrix2.c:33, protected by locks[3]
-    write by jobs[3] at matrix2.c:33, protected by locks[3]
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
-         [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
-         [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55, protected by locks[2]
-    read by jobs[2] at matrix2.c:33, protected by locks[2]
-    write by jobs[2] at matrix2.c:33, protected by locks[2]
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
-         [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
-         [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55, protected by locks[1]
-    read by jobs[1] at matrix2.c:33, protected by locks[1]
-    write by jobs[1] at matrix2.c:33, protected by locks[1]
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
-         [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
-         [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55, protected by locks[0]
-    read by jobs[0] at matrix2.c:33, protected by locks[0]
-    write by jobs[0] at matrix2.c:33, protected by locks[0]
-[eva] Shared memory: matrix[0..149]
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -1582,48 +1545,6 @@
         [139] ∈ [--..--]
         [144] ∈ [--..--]
         [149] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}
-         protected by locks[0]
-        {[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}
-         protected by locks[1]
-        {[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}
-         protected by locks[2]
-        {[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}
-         protected by locks[3]
-        {[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}
-         protected by locks[4]
-[eva] Detailed shared zones protections
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    Read by <main>, Write by jobs[0]: protected by locks[0]
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -2002,38 +1923,6 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:55 main
-[eva] Possible read/write data races:
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
-         [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
-         [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by <main> at matrix2.c:55, protected by locks[4]
-    read by jobs[4] at matrix2.c:33, protected by locks[4]
-    write by jobs[4] at matrix2.c:33, protected by locks[4]
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
-         [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
-         [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by <main> at matrix2.c:55, protected by locks[3]
-    read by jobs[3] at matrix2.c:33, protected by locks[3]
-    write by jobs[3] at matrix2.c:33, protected by locks[3]
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
-         [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
-         [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55, protected by locks[2]
-    read by jobs[2] at matrix2.c:33, protected by locks[2]
-    write by jobs[2] at matrix2.c:33, protected by locks[2]
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
-         [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
-         [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55, protected by locks[1]
-    read by jobs[1] at matrix2.c:33, protected by locks[1]
-    write by jobs[1] at matrix2.c:33, protected by locks[1]
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
-         [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
-         [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55, protected by locks[0]
-    read by jobs[0] at matrix2.c:33, protected by locks[0]
-    write by jobs[0] at matrix2.c:33, protected by locks[0]
-[eva] Shared memory: matrix[0..149]
 [eva] Write summary for jobs[0]:
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
@@ -2189,48 +2078,6 @@
         [139] ∈ [--..--]
         [144] ∈ [--..--]
         [149] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}
-         protected by locks[0]
-        {[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}
-         protected by locks[1]
-        {[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}
-         protected by locks[2]
-        {[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}
-         protected by locks[3]
-        {[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}
-         protected by locks[4]
-[eva] Detailed shared zones protections
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
-         [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
-         [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53]; [58];
-         [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108]; [113];
-         [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52]; [57];
-         [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107]; [112];
-         [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51]; [56];
-         [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106]; [111];
-         [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
-         [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
-         [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    Read by <main>, Write by jobs[0]: protected by locks[0]
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -2364,38 +2211,6 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..149] ∈ [--..--]
-[eva] Possible read/write data races:
-  matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
-         [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
-         [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
-    read by jobs[4] at matrix2.c:33, protected by locks[4]
-    read by <main> at matrix2.c:55, protected by locks[4]
-    write by jobs[4] at matrix2.c:33, protected by locks[4]
-  matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
-         [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
-         [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
-    read by jobs[3] at matrix2.c:33, protected by locks[3]
-    read by <main> at matrix2.c:55, protected by locks[3]
-    write by jobs[3] at matrix2.c:33, protected by locks[3]
-  matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
-         [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
-         [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
-    read by <main> at matrix2.c:55, protected by locks[2]
-    read by jobs[2] at matrix2.c:33, protected by locks[2]
-    write by jobs[2] at matrix2.c:33, protected by locks[2]
-  matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
-         [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
-         [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
-    read by <main> at matrix2.c:55, protected by locks[1]
-    read by jobs[1] at matrix2.c:33, protected by locks[1]
-    write by jobs[1] at matrix2.c:33, protected by locks[1]
-  matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
-         [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
-         [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
-    read by <main> at matrix2.c:55, protected by locks[0]
-    read by jobs[0] at matrix2.c:33, protected by locks[0]
-    write by jobs[0] at matrix2.c:33, protected by locks[0]
-[eva] Shared memory: matrix[0..149]
 [eva] Write summary for jobs[0]:
   matrix[0] ∈ [--..--]
         [5] ∈ [--..--]
@@ -2551,7 +2366,10 @@
         [139] ∈ [--..--]
         [144] ∈ [--..--]
         [149] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: matrix[0..149]
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50]; [55];
          [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
          [115]; [120]; [125]; [130]; [135]; [140]; [145]}
@@ -2572,7 +2390,8 @@
          [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
          [119]; [124]; [129]; [134]; [139]; [144]; [149]}
          protected by locks[4]
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54]; [59];
          [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109]; [114];
          [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
@@ -2593,4 +2412,35 @@
          [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105]; [110];
          [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
     Read by <main>, Write by jobs[0]: protected by locks[0]
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
+           [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
+           [114]; [119]; [124]; [129]; [134]; [139]; [144]; [149]}:
+      read by jobs[4] at matrix2.c:33, protected by locks[4]
+      read by <main> at matrix2.c:55, protected by locks[4]
+      write by jobs[4] at matrix2.c:33, protected by locks[4]
+    matrix{[3]; [8]; [13]; [18]; [23]; [28]; [33]; [38]; [43]; [48]; [53];
+           [58]; [63]; [68]; [73]; [78]; [83]; [88]; [93]; [98]; [103]; [108];
+           [113]; [118]; [123]; [128]; [133]; [138]; [143]; [148]}:
+      read by jobs[3] at matrix2.c:33, protected by locks[3]
+      read by <main> at matrix2.c:55, protected by locks[3]
+      write by jobs[3] at matrix2.c:33, protected by locks[3]
+    matrix{[2]; [7]; [12]; [17]; [22]; [27]; [32]; [37]; [42]; [47]; [52];
+           [57]; [62]; [67]; [72]; [77]; [82]; [87]; [92]; [97]; [102]; [107];
+           [112]; [117]; [122]; [127]; [132]; [137]; [142]; [147]}:
+      read by <main> at matrix2.c:55, protected by locks[2]
+      read by jobs[2] at matrix2.c:33, protected by locks[2]
+      write by jobs[2] at matrix2.c:33, protected by locks[2]
+    matrix{[1]; [6]; [11]; [16]; [21]; [26]; [31]; [36]; [41]; [46]; [51];
+           [56]; [61]; [66]; [71]; [76]; [81]; [86]; [91]; [96]; [101]; [106];
+           [111]; [116]; [121]; [126]; [131]; [136]; [141]; [146]}:
+      read by <main> at matrix2.c:55, protected by locks[1]
+      read by jobs[1] at matrix2.c:33, protected by locks[1]
+      write by jobs[1] at matrix2.c:33, protected by locks[1]
+    matrix{[0]; [5]; [10]; [15]; [20]; [25]; [30]; [35]; [40]; [45]; [50];
+           [55]; [60]; [65]; [70]; [75]; [80]; [85]; [90]; [95]; [100]; [105];
+           [110]; [115]; [120]; [125]; [130]; [135]; [140]; [145]}:
+      read by <main> at matrix2.c:55, protected by locks[0]
+      read by jobs[0] at matrix2.c:33, protected by locks[0]
+      write by jobs[0] at matrix2.c:33, protected by locks[0]

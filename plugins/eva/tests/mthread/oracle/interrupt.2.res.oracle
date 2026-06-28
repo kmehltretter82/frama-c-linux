@@ -90,11 +90,6 @@
     \nothing
   vs.
     interrupt_received_a; interrupt_received_b
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
@@ -175,20 +170,6 @@
   // interrupt.c:41 interrupt_cross_incr1
 [eva] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ {1; 2}  // interrupt.c:45 interrupt_cross_incr2
-[eva] Possible read/write data races:
-  interrupt_received_b:
-    read by <main> at interrupt.c:59, unprotected
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-  interrupt_received_a:
-    read by <main> at interrupt.c:58, unprotected
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-[eva] Shared memory: interrupt_received_a; interrupt_received_b
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -197,25 +178,6 @@
   interrupt_received_a ∈ {1}
 [eva] Write summary for <interrupt_handler interrupt_cross_incr2> (updated):
   interrupt_received_b ∈ {1; 2}
-[eva] Mutexes for concurrent accesses:
-  interrupt_received_a  unprotected
-  interrupt_received_b  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received_b:
-    Read by <interrupt_handler interrupt_cross_incr1>,
-      Write by <interrupt_handler interrupt_cross_incr2>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
-      unprotected
-  interrupt_received_a:
-    Read by <interrupt_handler interrupt_cross_incr2>,
-      Write by <interrupt_handler interrupt_cross_incr1>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
-      unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:45 (for interrupt_received_a)
-  interrupt.c:58 (for interrupt_received_a)
-  interrupt.c:59 (for interrupt_received_b)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
@@ -301,43 +263,10 @@
   interrupt_received_a ∈ {1; 2; 3}  // interrupt.c:41 interrupt_cross_incr1
 [eva] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ {1; 2; 3; 4}  // interrupt.c:45 interrupt_cross_incr2
-[eva] Possible read/write data races:
-  interrupt_received_b:
-    read by <main> at interrupt.c:59, unprotected
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-  interrupt_received_a:
-    read by <main> at interrupt.c:58, unprotected
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-[eva] Shared memory: interrupt_received_a; interrupt_received_b
 [eva] Write summary for <interrupt_handler interrupt_cross_incr1> (updated):
   interrupt_received_a ∈ {1; 2; 3}
 [eva] Write summary for <interrupt_handler interrupt_cross_incr2> (updated):
   interrupt_received_b ∈ [1..2147483647]
-[eva] Mutexes for concurrent accesses:
-  interrupt_received_a  unprotected
-  interrupt_received_b  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received_b:
-    Read by <interrupt_handler interrupt_cross_incr1>,
-      Write by <interrupt_handler interrupt_cross_incr2>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
-      unprotected
-  interrupt_received_a:
-    Read by <interrupt_handler interrupt_cross_incr2>,
-      Write by <interrupt_handler interrupt_cross_incr1>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
-      unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:45 (for interrupt_received_a)
-  interrupt.c:58 (for interrupt_received_a)
-  interrupt.c:59 (for interrupt_received_b)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
@@ -425,43 +354,10 @@
 [eva] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ {1; 2; 3; 4; 5; 6}  // interrupt.c:45
   interrupt_cross_incr2
-[eva] Possible read/write data races:
-  interrupt_received_b:
-    read by <main> at interrupt.c:59, unprotected
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-  interrupt_received_a:
-    read by <main> at interrupt.c:58, unprotected
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-[eva] Shared memory: interrupt_received_a; interrupt_received_b
 [eva] Write summary for <interrupt_handler interrupt_cross_incr1> (updated):
   interrupt_received_a ∈ [1..2147483647]
 [eva] Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] Mutexes for concurrent accesses:
-  interrupt_received_a  unprotected
-  interrupt_received_b  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received_b:
-    Read by <interrupt_handler interrupt_cross_incr1>,
-      Write by <interrupt_handler interrupt_cross_incr2>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
-      unprotected
-  interrupt_received_a:
-    Read by <interrupt_handler interrupt_cross_incr2>,
-      Write by <interrupt_handler interrupt_cross_incr1>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
-      unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:45 (for interrupt_received_a)
-  interrupt.c:58 (for interrupt_received_a)
-  interrupt.c:59 (for interrupt_received_b)
 [eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
@@ -553,43 +449,10 @@
 [eva] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ [1..2147483647]  // interrupt.c:45
   interrupt_cross_incr2
-[eva] Possible read/write data races:
-  interrupt_received_b:
-    read by <main> at interrupt.c:59, unprotected
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-  interrupt_received_a:
-    read by <main> at interrupt.c:58, unprotected
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-[eva] Shared memory: interrupt_received_a; interrupt_received_b
 [eva] Write summary for <interrupt_handler interrupt_cross_incr1>:
   interrupt_received_a ∈ [1..2147483647]
 [eva] Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] Mutexes for concurrent accesses:
-  interrupt_received_a  unprotected
-  interrupt_received_b  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received_b:
-    Read by <interrupt_handler interrupt_cross_incr1>,
-      Write by <interrupt_handler interrupt_cross_incr2>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
-      unprotected
-  interrupt_received_a:
-    Read by <interrupt_handler interrupt_cross_incr2>,
-      Write by <interrupt_handler interrupt_cross_incr1>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
-      unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:41 (for interrupt_received_b)
-  interrupt.c:45 (for interrupt_received_a)
-  interrupt.c:58 (for interrupt_received_a)
-  interrupt.c:59 (for interrupt_received_b)
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
@@ -647,28 +510,19 @@
 [eva] <interrupt_handler interrupt_cross_incr1> writes 
   interrupt_received_a ∈ [1..2147483647]  // interrupt.c:41
   interrupt_cross_incr1
-[eva] Possible read/write data races:
-  interrupt_received_b:
-    read by <main> at interrupt.c:59, unprotected
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-  interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
-       unprotected
-    read by <main> at interrupt.c:58, unprotected
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
-       unprotected
-[eva] Shared memory: interrupt_received_a; interrupt_received_b
 [eva] Write summary for <interrupt_handler interrupt_cross_incr1>:
   interrupt_received_a ∈ [1..2147483647]
 [eva] Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 6 iterations
+[eva:shared-memory:zone] 
+  Shared memory: interrupt_received_a; interrupt_received_b
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   interrupt_received_a  unprotected
   interrupt_received_b  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   interrupt_received_b:
     Read by <interrupt_handler interrupt_cross_incr1>,
       Write by <interrupt_handler interrupt_cross_incr2>: unprotected
@@ -679,9 +533,23 @@
       Write by <interrupt_handler interrupt_cross_incr1>: unprotected
     Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
       unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   interrupt.c:41 (for interrupt_received_b)
   interrupt.c:45 (for interrupt_received_a)
   interrupt.c:58 (for interrupt_received_a)
   interrupt.c:59 (for interrupt_received_b)
-[eva] ******* Analysis performed, 6 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    interrupt_received_b:
+      read by <main> at interrupt.c:59, unprotected
+      read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
+         unprotected
+      write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
+         unprotected
+    interrupt_received_a:
+      read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45,
+         unprotected
+      read by <main> at interrupt.c:58, unprotected
+      write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41,
+         unprotected

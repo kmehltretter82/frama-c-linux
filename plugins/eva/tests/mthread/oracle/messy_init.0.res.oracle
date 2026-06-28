@@ -45,9 +45,10 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] ******* Analysis performed, 1 iterations
+[eva:shared-memory:zone] Shared memory: \nothing
+[eva:shared-memory:mutex] Mutexes protecting access to shared memory:
+[eva:shared-memory:mutex-details] Detailed shared memory protections
+[eva:data-races] 
+  Possible read/write data races:
+    none

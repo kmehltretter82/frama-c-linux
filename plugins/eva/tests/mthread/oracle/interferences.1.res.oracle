@@ -84,11 +84,6 @@
     \nothing
   vs.
     shared_a; shared_b
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
@@ -216,28 +211,6 @@
   write :: interferences.c:80 <- fjobptr1
 [eva] jobptr2 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
   write :: interferences.c:90 <- fjobptr2
-[eva] Possible read/write data races:
-  shared_b:
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-  shared_a:
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-[eva] Shared memory: shared_a; shared_b
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -247,28 +220,6 @@
 [eva] Write summary for jobptr2 (updated):
   shared_a ∈ {0; 1; 2}
   shared_b ∈ {0; 1; 2}
-[eva] Mutexes for concurrent accesses:
-  shared_a  unprotected
-  shared_b  unprotected
-[eva] Detailed shared zones protections
-  shared_b:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
-  shared_a:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
-[eva] Statements needing manual synchronisation
-  interferences.c:75 (for shared_a; shared_b)
-  interferences.c:76 (for shared_a; shared_b)
-  interferences.c:82 (for shared_a; shared_b)
-  interferences.c:87 (for shared_a; shared_b)
-  interferences.c:88 (for shared_a; shared_b)
-  interferences.c:94 (for shared_a; shared_b)
-  interferences.c:106 (for shared_a; shared_b)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_ptr_write
@@ -384,55 +335,11 @@
   write :: interferences.c:78 <- fjobptr1
 [eva] jobptr1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
   write :: interferences.c:80 <- fjobptr1
-[eva] Possible read/write data races:
-  shared_b:
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-  shared_a:
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-[eva] Shared memory: shared_a; shared_b
 [eva] Write summary for jobptr1 (updated):
   shared_a ∈ {0; 1; 2}
   shared_b ∈ {0; 1; 2}
 [eva] Write summary for jobptr2: shared_a ∈ {0; 1; 2}
                              shared_b ∈ {0; 1; 2}
-[eva] Mutexes for concurrent accesses:
-  shared_a  unprotected
-  shared_b  unprotected
-[eva] Detailed shared zones protections
-  shared_b:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
-  shared_a:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
-[eva] Statements needing manual synchronisation
-  interferences.c:75 (for shared_a; shared_b)
-  interferences.c:76 (for shared_a; shared_b)
-  interferences.c:82 (for shared_a; shared_b)
-  interferences.c:87 (for shared_a; shared_b)
-  interferences.c:88 (for shared_a; shared_b)
-  interferences.c:94 (for shared_a; shared_b)
-  interferences.c:106 (for shared_a; shared_b)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_ptr_write
@@ -488,36 +395,18 @@
       {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
-[eva] Possible read/write data races:
-  shared_b:
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-  shared_a:
-    read by jobptr1 at interferences.c:75, unprotected
-    read by jobptr1 at interferences.c:76, unprotected
-    read by jobptr1 at interferences.c:82, unprotected
-    read by <main> at interferences.c:106, unprotected
-    read by jobptr2 at interferences.c:87, unprotected
-    read by jobptr2 at interferences.c:88, unprotected
-    read by jobptr2 at interferences.c:94, unprotected
-    write by jobptr1 at interferences.c:71, unprotected
-    write by jobptr2 at interferences.c:71, unprotected
-[eva] Shared memory: shared_a; shared_b
 [eva] Write summary for jobptr1: shared_a ∈ {0; 1; 2}
                              shared_b ∈ {0; 1; 2}
 [eva] Write summary for jobptr2: shared_a ∈ {0; 1; 2}
                              shared_b ∈ {0; 1; 2}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: shared_a; shared_b
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   shared_a  unprotected
   shared_b  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   shared_b:
     Read by jobptr2, Write by jobptr1: unprotected
     Read by jobptr1, Write by jobptr2: unprotected
@@ -528,7 +417,8 @@
     Read by jobptr1, Write by jobptr2: unprotected
     Read by <main>, Write by jobptr2: unprotected
     Read by <main>, Write by jobptr1: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   interferences.c:75 (for shared_a; shared_b)
   interferences.c:76 (for shared_a; shared_b)
   interferences.c:82 (for shared_a; shared_b)
@@ -536,4 +426,25 @@
   interferences.c:88 (for shared_a; shared_b)
   interferences.c:94 (for shared_a; shared_b)
   interferences.c:106 (for shared_a; shared_b)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    shared_b:
+      read by jobptr1 at interferences.c:75, unprotected
+      read by jobptr1 at interferences.c:76, unprotected
+      read by jobptr1 at interferences.c:82, unprotected
+      read by <main> at interferences.c:106, unprotected
+      read by jobptr2 at interferences.c:87, unprotected
+      read by jobptr2 at interferences.c:88, unprotected
+      read by jobptr2 at interferences.c:94, unprotected
+      write by jobptr1 at interferences.c:71, unprotected
+      write by jobptr2 at interferences.c:71, unprotected
+    shared_a:
+      read by jobptr1 at interferences.c:75, unprotected
+      read by jobptr1 at interferences.c:76, unprotected
+      read by jobptr1 at interferences.c:82, unprotected
+      read by <main> at interferences.c:106, unprotected
+      read by jobptr2 at interferences.c:87, unprotected
+      read by jobptr2 at interferences.c:88, unprotected
+      read by jobptr2 at interferences.c:94, unprotected
+      write by jobptr1 at interferences.c:71, unprotected
+      write by jobptr2 at interferences.c:71, unprotected

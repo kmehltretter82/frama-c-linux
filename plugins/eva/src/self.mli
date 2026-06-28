@@ -55,6 +55,10 @@ val dkey_include_string_literal: category
 val dkey_thread : category
 val dkey_mutex : category
 val dkey_queue : category
+val dkey_data_races : category
+val dkey_shared_memory_zone : category
+val dkey_shared_memory_mutex : category
+val dkey_shared_memory_mutex_details : category
 
 (** {2 Warning categories.} *)
 

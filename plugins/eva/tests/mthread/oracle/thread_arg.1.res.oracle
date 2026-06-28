@@ -90,11 +90,6 @@
     \nothing
   vs.
     Frama_C_entropy_source; vars[0..1]
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -202,21 +197,6 @@
   Frama_C_interval :: thread_arg.c:26 <- job
 [eva] jobs[0] writes  vars[0] ∈ [0..10]  // thread_arg.c:26 job
 [eva] jobs[1] writes  vars[1] ∈ [0..10]  // thread_arg.c:26 job
-[eva] Possible read/write data races:
-  vars[1]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-  vars[0]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-[eva] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -227,18 +207,6 @@
 [eva] Write summary for jobs[1] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..10]
-[eva] Mutexes for concurrent accesses:
-  Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
-  vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
-      [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
-[eva] Detailed shared zones protections
-  vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  Frama_C_entropy_source:
-    Read by jobs[1], Write by jobs[0]: unprotected
-    Read by jobs[0], Write by jobs[1]: unprotected
-[eva] Statements needing manual synchronisation
-  thread_arg.c:26 (for Frama_C_entropy_source)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -340,39 +308,12 @@
 [eva] jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26 job
 [eva] jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26 job
 [eva] jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26 job
-[eva] Possible read/write data races:
-  vars[1]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-  vars[0]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-[eva] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva] Write summary for jobs[0] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
 [eva] Write summary for jobs[1] (updated):
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
-[eva] Mutexes for concurrent accesses:
-  Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
-  vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
-      [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
-[eva] Detailed shared zones protections
-  vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  Frama_C_entropy_source:
-    Read by jobs[1], Write by jobs[0]: unprotected
-    Read by jobs[0], Write by jobs[1]: unprotected
-[eva] Statements needing manual synchronisation
-  thread_arg.c:26 (for Frama_C_entropy_source)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -481,39 +422,12 @@
 [eva] jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
 [eva] jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26 job
 [eva] jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] Possible read/write data races:
-  vars[1]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-  vars[0]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-[eva] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva] Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
 [eva] Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
-[eva] Mutexes for concurrent accesses:
-  Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
-  vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
-      [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
-[eva] Detailed shared zones protections
-  vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  Frama_C_entropy_source:
-    Read by jobs[1], Write by jobs[0]: unprotected
-    Read by jobs[0], Write by jobs[1]: unprotected
-[eva] Statements needing manual synchronisation
-  thread_arg.c:26 (for Frama_C_entropy_source)
 [eva] *** Computing thread <main>, iteration 5 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -607,39 +521,12 @@
         vars[0..1] ∈ [0..2147483647]
 [eva] jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
 [eva] jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[eva] Possible read/write data races:
-  vars[1]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-  vars[0]:
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-[eva] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva] Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
 [eva] Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
-[eva] Mutexes for concurrent accesses:
-  Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
-  vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
-      [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
-[eva] Detailed shared zones protections
-  vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  Frama_C_entropy_source:
-    Read by jobs[1], Write by jobs[0]: unprotected
-    Read by jobs[0], Write by jobs[1]: unprotected
-[eva] Statements needing manual synchronisation
-  thread_arg.c:26 (for Frama_C_entropy_source)
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -659,37 +546,41 @@
     shared bases: {Frama_C_entropy_source, vars}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  vars[1]:
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-  vars[0]:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-  Frama_C_entropy_source:
-    read by jobs[0] at thread_arg.c:26, protected by locks[0]
-    read by jobs[1] at thread_arg.c:26, protected by locks[1]
-    write by jobs[0] at thread_arg.c:26, protected by locks[0]
-    write by jobs[1] at thread_arg.c:26, protected by locks[1]
-[eva] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva] Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
   vars[0] ∈ [0..2147483647]
 [eva] Write summary for jobs[1]:
   Frama_C_entropy_source ∈ [--..--]
   vars[1] ∈ [0..2147483647]
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 6 iterations
+[eva:shared-memory:zone] Shared memory: Frama_C_entropy_source; vars[0..1]
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
   vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
       [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
   vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
   Frama_C_entropy_source:
     Read by jobs[1], Write by jobs[0]: unprotected
     Read by jobs[0], Write by jobs[1]: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   thread_arg.c:26 (for Frama_C_entropy_source)
-[eva] ******* Analysis performed, 6 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    vars[1]:
+      read by jobs[1] at thread_arg.c:26, protected by locks[1]
+      read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
+      write by jobs[1] at thread_arg.c:26, protected by locks[1]
+    vars[0]:
+      read by jobs[0] at thread_arg.c:26, protected by locks[0]
+      read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
+      write by jobs[0] at thread_arg.c:26, protected by locks[0]
+    Frama_C_entropy_source:
+      read by jobs[0] at thread_arg.c:26, protected by locks[0]
+      read by jobs[1] at thread_arg.c:26, protected by locks[1]
+      write by jobs[0] at thread_arg.c:26, protected by locks[0]
+      write by jobs[1] at thread_arg.c:26, protected by locks[1]

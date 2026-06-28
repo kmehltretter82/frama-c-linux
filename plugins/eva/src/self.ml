@@ -309,6 +309,27 @@ let dkey_queue =
   register_category "queue" ~level:8
     ~help:"show each operation on message queues interpreted by the analysis"
 
+let dkey_data_races =
+  register_category "data-races" ~level:3
+    ~help:"list of possible data-races detected by the analysis"
+
+(* Created for documentation. *)
+let _dkey_shared_memory =
+  register_category "shared-memory" ~level:11
+    ~help:"messages about shared memory"
+
+let dkey_shared_memory_zone =
+  register_category "shared-memory:zone" ~level:3
+    ~help:"list of shared memory locations detected by the analysis"
+
+let dkey_shared_memory_mutex =
+  register_category "shared-memory:mutex" ~level:4
+    ~help:"list of mutexes protecting access to each shared memory location"
+
+let dkey_shared_memory_mutex_details =
+  register_category "shared-memory:mutex-details" ~level:6
+    ~help:"more details about mutexes protecting access to shared memory"
+
 (* ----- Warning categories ------------------------------------------------- *)
 
 let wkey_alarm =

@@ -90,11 +90,6 @@
     \nothing
   vs.
     a; b; c; v
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -243,24 +238,6 @@
 [eva] job2 writes  c ∈ {2}  // simple.c:36 f2
 [eva] job1 writes  v ∈ {1}  // simple.c:26 g1 :: simple.c:26 <- f1
 [eva] job2 writes  v ∈ {2}  // simple.c:37 g2 :: simple.c:37 <- f2
-[eva] Possible read/write data races:
-  v:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:26, protected by lock
-    write by job2 at simple.c:37, protected by lock
-  c:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:25, protected by lock
-    write by job2 at simple.c:36, protected by lock
-  b:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:24, protected by lock
-    write by job2 at simple.c:34, protected by lock
-  a:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:23, protected by lock
-    write by job2 at simple.c:35, protected by lock
-[eva] Shared memory: a; b; c; v
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -273,24 +250,6 @@
                                     b ∈ {2}
                                     c ∈ {2}
                                     v ∈ {2}
-[eva] Mutexes for concurrent accesses:
-  a  protected by lock
-  b  protected by lock
-  c  protected by lock
-  v  protected by lock
-[eva] Detailed shared zones protections
-  v:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  c:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  b:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  a:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -423,24 +382,6 @@
 [eva] <main> reads  b ∈ {0; 1; 2}  // simple.c:50 main
 [eva] <main> reads  c ∈ {0; 1; 2}  // simple.c:50 main
 [eva] <main> reads  v ∈ {0; 1; 2}  // simple.c:50 main
-[eva] Possible read/write data races:
-  v:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:26, protected by lock
-    write by job2 at simple.c:37, protected by lock
-  c:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:25, protected by lock
-    write by job2 at simple.c:36, protected by lock
-  b:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:24, protected by lock
-    write by job2 at simple.c:34, protected by lock
-  a:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:23, protected by lock
-    write by job2 at simple.c:35, protected by lock
-[eva] Shared memory: a; b; c; v
 [eva] Write summary for job1: a ∈ {1}
                           b ∈ {1}
                           c ∈ {1}
@@ -449,24 +390,6 @@
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}
-[eva] Mutexes for concurrent accesses:
-  a  protected by lock
-  b  protected by lock
-  c  protected by lock
-  v  protected by lock
-[eva] Detailed shared zones protections
-  v:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  c:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  b:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  a:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -492,24 +415,6 @@
     shared bases: {a, b, c, v}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  v:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:26, protected by lock
-    write by job2 at simple.c:37, protected by lock
-  c:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:25, protected by lock
-    write by job2 at simple.c:36, protected by lock
-  b:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:24, protected by lock
-    write by job2 at simple.c:34, protected by lock
-  a:
-    read by <main> at simple.c:50, protected by lock
-    write by job1 at simple.c:23, protected by lock
-    write by job2 at simple.c:35, protected by lock
-[eva] Shared memory: a; b; c; v
 [eva] Write summary for job1: a ∈ {1}
                           b ∈ {1}
                           c ∈ {1}
@@ -518,12 +423,16 @@
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: a; b; c; v
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   a  protected by lock
   b  protected by lock
   c  protected by lock
   v  protected by lock
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   v:
     Read by <main>, Write by job2: protected by lock
     Read by <main>, Write by job1: protected by lock
@@ -536,4 +445,21 @@
   a:
     Read by <main>, Write by job2: protected by lock
     Read by <main>, Write by job1: protected by lock
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    v:
+      read by <main> at simple.c:50, protected by lock
+      write by job1 at simple.c:26, protected by lock
+      write by job2 at simple.c:37, protected by lock
+    c:
+      read by <main> at simple.c:50, protected by lock
+      write by job1 at simple.c:25, protected by lock
+      write by job2 at simple.c:36, protected by lock
+    b:
+      read by <main> at simple.c:50, protected by lock
+      write by job1 at simple.c:24, protected by lock
+      write by job2 at simple.c:34, protected by lock
+    a:
+      read by <main> at simple.c:50, protected by lock
+      write by job1 at simple.c:23, protected by lock
+      write by job2 at simple.c:35, protected by lock

@@ -114,11 +114,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread jobs[3], iteration 2 (first iteration)
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -424,11 +419,6 @@
     \nothing
   vs.
     end
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 3 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -805,22 +795,6 @@
 [eva] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
 [eva] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
 [eva] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
-[eva] Possible read/write data races:
-  end:
-    read by <main> at recreation.c:68, unprotected
-    read by jobs[0] at recreation.c:28, unprotected
-    read by jobs[1] at recreation.c:28, unprotected
-    read by jobs[2] at recreation.c:28, unprotected
-    write by jobs[3] at recreation.c:40, protected by locks[2] locks[4]
-    write by jobs[4] at recreation.c:40, protected by locks[3] locks[5]
-    write by jobs[5] at recreation.c:40, protected by locks[4] locks[6]
-    write by jobs[6] at recreation.c:40, protected by locks[5] locks[7]
-    write by jobs[7] at recreation.c:40, protected by locks[6] locks[8]
-    write by jobs[8] at recreation.c:40, protected by locks[7] locks[9]
-    write by jobs[9] at recreation.c:40, protected by locks[8] locks[10]
-    write by jobs[10] at recreation.c:40, protected by locks[9] locks[11]
-    write by jobs[11] at recreation.c:40, protected by locks[0] locks[10]
-[eva] Shared memory: end
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -834,51 +808,6 @@
 [eva] Write summary for jobs[9] (updated): end ∈ {1}
 [eva] Write summary for jobs[10] (updated): end ∈ {1}
 [eva] Write summary for jobs[11] (updated): end ∈ {1}
-[eva] Mutexes for concurrent accesses:
-  end  write protected by (?)locks[0] (?)locks[2] (?)locks[3] (?)locks[4]
-       (?)locks[5] (?)locks[6] (?)locks[7] (?)locks[8] (?)locks[9] (?)locks[10]
-       (?)locks[11], read unprotected
-[eva] Detailed shared zones protections
-  end:
-    Read by jobs[2], Write by jobs[11]: unprotected
-    Read by jobs[2], Write by jobs[10]: unprotected
-    Read by jobs[2], Write by jobs[9]: unprotected
-    Read by jobs[2], Write by jobs[8]: unprotected
-    Read by jobs[2], Write by jobs[7]: unprotected
-    Read by jobs[2], Write by jobs[6]: unprotected
-    Read by jobs[2], Write by jobs[5]: unprotected
-    Read by jobs[2], Write by jobs[4]: unprotected
-    Read by jobs[2], Write by jobs[3]: unprotected
-    Read by jobs[1], Write by jobs[11]: unprotected
-    Read by jobs[1], Write by jobs[10]: unprotected
-    Read by jobs[1], Write by jobs[9]: unprotected
-    Read by jobs[1], Write by jobs[8]: unprotected
-    Read by jobs[1], Write by jobs[7]: unprotected
-    Read by jobs[1], Write by jobs[6]: unprotected
-    Read by jobs[1], Write by jobs[5]: unprotected
-    Read by jobs[1], Write by jobs[4]: unprotected
-    Read by jobs[1], Write by jobs[3]: unprotected
-    Read by jobs[0], Write by jobs[11]: unprotected
-    Read by jobs[0], Write by jobs[10]: unprotected
-    Read by jobs[0], Write by jobs[9]: unprotected
-    Read by jobs[0], Write by jobs[8]: unprotected
-    Read by jobs[0], Write by jobs[7]: unprotected
-    Read by jobs[0], Write by jobs[6]: unprotected
-    Read by jobs[0], Write by jobs[5]: unprotected
-    Read by jobs[0], Write by jobs[4]: unprotected
-    Read by jobs[0], Write by jobs[3]: unprotected
-    Read by <main>, Write by jobs[11]: unprotected
-    Read by <main>, Write by jobs[10]: unprotected
-    Read by <main>, Write by jobs[9]: unprotected
-    Read by <main>, Write by jobs[8]: unprotected
-    Read by <main>, Write by jobs[7]: unprotected
-    Read by <main>, Write by jobs[6]: unprotected
-    Read by <main>, Write by jobs[5]: unprotected
-    Read by <main>, Write by jobs[4]: unprotected
-    Read by <main>, Write by jobs[3]: unprotected
-[eva] Statements needing manual synchronisation
-  recreation.c:28 (for end)
-  recreation.c:68 (for end)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -1253,22 +1182,6 @@
 [eva] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
 [eva] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
 [eva] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva] Possible read/write data races:
-  end:
-    read by <main> at recreation.c:68, unprotected
-    read by jobs[0] at recreation.c:28, unprotected
-    read by jobs[1] at recreation.c:28, unprotected
-    read by jobs[2] at recreation.c:28, unprotected
-    write by jobs[3] at recreation.c:40, protected by locks[2] locks[4]
-    write by jobs[4] at recreation.c:40, protected by locks[3] locks[5]
-    write by jobs[5] at recreation.c:40, protected by locks[4] locks[6]
-    write by jobs[6] at recreation.c:40, protected by locks[5] locks[7]
-    write by jobs[7] at recreation.c:40, protected by locks[6] locks[8]
-    write by jobs[8] at recreation.c:40, protected by locks[7] locks[9]
-    write by jobs[9] at recreation.c:40, protected by locks[8] locks[10]
-    write by jobs[10] at recreation.c:40, protected by locks[9] locks[11]
-    write by jobs[11] at recreation.c:40, protected by locks[0] locks[10]
-[eva] Shared memory: end
 [eva] Write summary for jobs[3]: end ∈ {1}
 [eva] Write summary for jobs[4]: end ∈ {1}
 [eva] Write summary for jobs[5]: end ∈ {1}
@@ -1278,11 +1191,15 @@
 [eva] Write summary for jobs[9]: end ∈ {1}
 [eva] Write summary for jobs[10]: end ∈ {1}
 [eva] Write summary for jobs[11]: end ∈ {1}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: end
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   end  write protected by (?)locks[0] (?)locks[2] (?)locks[3] (?)locks[4]
        (?)locks[5] (?)locks[6] (?)locks[7] (?)locks[8] (?)locks[9] (?)locks[10]
        (?)locks[11], read unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   end:
     Read by jobs[2], Write by jobs[11]: unprotected
     Read by jobs[2], Write by jobs[10]: unprotected
@@ -1320,7 +1237,23 @@
     Read by <main>, Write by jobs[5]: unprotected
     Read by <main>, Write by jobs[4]: unprotected
     Read by <main>, Write by jobs[3]: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   recreation.c:28 (for end)
   recreation.c:68 (for end)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    end:
+      read by <main> at recreation.c:68, unprotected
+      read by jobs[0] at recreation.c:28, unprotected
+      read by jobs[1] at recreation.c:28, unprotected
+      read by jobs[2] at recreation.c:28, unprotected
+      write by jobs[3] at recreation.c:40, protected by locks[2] locks[4]
+      write by jobs[4] at recreation.c:40, protected by locks[3] locks[5]
+      write by jobs[5] at recreation.c:40, protected by locks[4] locks[6]
+      write by jobs[6] at recreation.c:40, protected by locks[5] locks[7]
+      write by jobs[7] at recreation.c:40, protected by locks[6] locks[8]
+      write by jobs[8] at recreation.c:40, protected by locks[7] locks[9]
+      write by jobs[9] at recreation.c:40, protected by locks[8] locks[10]
+      write by jobs[10] at recreation.c:40, protected by locks[9] locks[11]
+      write by jobs[11] at recreation.c:40, protected by locks[0] locks[10]

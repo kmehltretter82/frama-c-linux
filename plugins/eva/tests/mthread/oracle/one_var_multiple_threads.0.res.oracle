@@ -116,11 +116,6 @@
     \nothing
   vs.
     s1; s2
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -247,24 +242,6 @@
 [eva] jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23 f
 [eva] jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30 g
 [eva] jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31 g
-[eva] Possible read/write data races:
-  s2.data2:
-    read by <main> at one_var_multiple_threads.c:55, protected by lock2
-    read by jobs at one_var_multiple_threads.c:31, protected by lock2
-    write by jobs at one_var_multiple_threads.c:31, protected by lock2
-  s2.data:
-    read by <main> at one_var_multiple_threads.c:54, protected by lock2
-    read by jobs at one_var_multiple_threads.c:30, protected by lock2
-    write by jobs at one_var_multiple_threads.c:30, protected by lock2
-  s1.data2:
-    read by <main> at one_var_multiple_threads.c:51, protected by lock1
-    read by jobs at one_var_multiple_threads.c:23, protected by lock1
-    write by jobs at one_var_multiple_threads.c:23, protected by lock1
-  s1.data:
-    read by <main> at one_var_multiple_threads.c:50, protected by lock1
-    read by jobs at one_var_multiple_threads.c:22, protected by lock1
-    write by jobs at one_var_multiple_threads.c:22, protected by lock1
-[eva] Shared memory: s1; s2
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -273,14 +250,6 @@
                                       .data2 ∈ {3}
 [eva] Write summary for jobs (updated): s2.data ∈ {1}
                                       .data2 ∈ {3}
-[eva] Mutexes for concurrent accesses:
-  s1  protected by lock1
-  s2  protected by lock2
-[eva] Detailed shared zones protections
-  s2.data2: Read by <main>, Write by jobs: protected by lock2
-  s2.data: Read by <main>, Write by jobs: protected by lock2
-  s1.data2: Read by <main>, Write by jobs: protected by lock1
-  s1.data: Read by <main>, Write by jobs: protected by lock1
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -416,36 +385,10 @@
 [eva] jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23 f
 [eva] jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30 g
 [eva] jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31 g
-[eva] Possible read/write data races:
-  s2.data2:
-    read by <main> at one_var_multiple_threads.c:55, protected by lock2
-    read by jobs at one_var_multiple_threads.c:31, protected by lock2
-    write by jobs at one_var_multiple_threads.c:31, protected by lock2
-  s2.data:
-    read by <main> at one_var_multiple_threads.c:54, protected by lock2
-    read by jobs at one_var_multiple_threads.c:30, protected by lock2
-    write by jobs at one_var_multiple_threads.c:30, protected by lock2
-  s1.data2:
-    read by <main> at one_var_multiple_threads.c:51, protected by lock1
-    read by jobs at one_var_multiple_threads.c:23, protected by lock1
-    write by jobs at one_var_multiple_threads.c:23, protected by lock1
-  s1.data:
-    read by <main> at one_var_multiple_threads.c:50, protected by lock1
-    read by jobs at one_var_multiple_threads.c:22, protected by lock1
-    write by jobs at one_var_multiple_threads.c:22, protected by lock1
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs (updated): s1.data ∈ {1; 2}
                                       .data2 ∈ {3; 6}
 [eva] Write summary for jobs (updated): s2.data ∈ {1; 2}
                                       .data2 ∈ {3; 6}
-[eva] Mutexes for concurrent accesses:
-  s1  protected by lock1
-  s2  protected by lock2
-[eva] Detailed shared zones protections
-  s2.data2: Read by <main>, Write by jobs: protected by lock2
-  s2.data: Read by <main>, Write by jobs: protected by lock2
-  s1.data2: Read by <main>, Write by jobs: protected by lock1
-  s1.data: Read by <main>, Write by jobs: protected by lock1
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -573,38 +516,12 @@
 [eva] jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23 f
 [eva] jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30 g
 [eva] jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31 g
-[eva] Possible read/write data races:
-  s2.data2:
-    read by <main> at one_var_multiple_threads.c:55, protected by lock2
-    read by jobs at one_var_multiple_threads.c:31, protected by lock2
-    write by jobs at one_var_multiple_threads.c:31, protected by lock2
-  s2.data:
-    read by <main> at one_var_multiple_threads.c:54, protected by lock2
-    read by jobs at one_var_multiple_threads.c:30, protected by lock2
-    write by jobs at one_var_multiple_threads.c:30, protected by lock2
-  s1.data2:
-    read by <main> at one_var_multiple_threads.c:51, protected by lock1
-    read by jobs at one_var_multiple_threads.c:23, protected by lock1
-    write by jobs at one_var_multiple_threads.c:23, protected by lock1
-  s1.data:
-    read by <main> at one_var_multiple_threads.c:50, protected by lock1
-    read by jobs at one_var_multiple_threads.c:22, protected by lock1
-    write by jobs at one_var_multiple_threads.c:22, protected by lock1
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs (updated):
   s1.data ∈ [1..2147483647]
     .data2 ∈ [3..2147483646],0%3
 [eva] Write summary for jobs (updated):
   s2.data ∈ [1..2147483647]
     .data2 ∈ [3..2147483646],0%3
-[eva] Mutexes for concurrent accesses:
-  s1  protected by lock1
-  s2  protected by lock2
-[eva] Detailed shared zones protections
-  s2.data2: Read by <main>, Write by jobs: protected by lock2
-  s2.data: Read by <main>, Write by jobs: protected by lock2
-  s1.data2: Read by <main>, Write by jobs: protected by lock1
-  s1.data: Read by <main>, Write by jobs: protected by lock1
 [eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -758,36 +675,10 @@
 [eva] jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
 [eva] jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
   g
-[eva] Possible read/write data races:
-  s2.data2:
-    read by <main> at one_var_multiple_threads.c:55, protected by lock2
-    read by jobs at one_var_multiple_threads.c:31, protected by lock2
-    write by jobs at one_var_multiple_threads.c:31, protected by lock2
-  s2.data:
-    read by <main> at one_var_multiple_threads.c:54, protected by lock2
-    read by jobs at one_var_multiple_threads.c:30, protected by lock2
-    write by jobs at one_var_multiple_threads.c:30, protected by lock2
-  s1.data2:
-    read by <main> at one_var_multiple_threads.c:51, protected by lock1
-    read by jobs at one_var_multiple_threads.c:23, protected by lock1
-    write by jobs at one_var_multiple_threads.c:23, protected by lock1
-  s1.data:
-    read by <main> at one_var_multiple_threads.c:50, protected by lock1
-    read by jobs at one_var_multiple_threads.c:22, protected by lock1
-    write by jobs at one_var_multiple_threads.c:22, protected by lock1
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs: s1.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
 [eva] Write summary for jobs: s2.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
-[eva] Mutexes for concurrent accesses:
-  s1  protected by lock1
-  s2  protected by lock2
-[eva] Detailed shared zones protections
-  s2.data2: Read by <main>, Write by jobs: protected by lock2
-  s2.data: Read by <main>, Write by jobs: protected by lock2
-  s1.data2: Read by <main>, Write by jobs: protected by lock1
-  s1.data: Read by <main>, Write by jobs: protected by lock1
 [eva] *** Computing thread <main>, iteration 6 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -861,34 +752,37 @@
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-[eva] Possible read/write data races:
-  s2.data2:
-    read by jobs at one_var_multiple_threads.c:31, protected by lock2
-    read by <main> at one_var_multiple_threads.c:55, protected by lock2
-    write by jobs at one_var_multiple_threads.c:31, protected by lock2
-  s2.data:
-    read by jobs at one_var_multiple_threads.c:30, protected by lock2
-    read by <main> at one_var_multiple_threads.c:54, protected by lock2
-    write by jobs at one_var_multiple_threads.c:30, protected by lock2
-  s1.data2:
-    read by <main> at one_var_multiple_threads.c:51, protected by lock1
-    read by jobs at one_var_multiple_threads.c:23, protected by lock1
-    write by jobs at one_var_multiple_threads.c:23, protected by lock1
-  s1.data:
-    read by <main> at one_var_multiple_threads.c:50, protected by lock1
-    read by jobs at one_var_multiple_threads.c:22, protected by lock1
-    write by jobs at one_var_multiple_threads.c:22, protected by lock1
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs: s1.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
 [eva] Write summary for jobs: s2.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 6 iterations
+[eva:shared-memory:zone] Shared memory: s1; s2
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   s1  protected by lock1
   s2  protected by lock2
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   s2.data2: Read by <main>, Write by jobs: protected by lock2
   s2.data: Read by <main>, Write by jobs: protected by lock2
   s1.data2: Read by <main>, Write by jobs: protected by lock1
   s1.data: Read by <main>, Write by jobs: protected by lock1
-[eva] ******* Analysis performed, 6 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    s2.data2:
+      read by jobs at one_var_multiple_threads.c:31, protected by lock2
+      read by <main> at one_var_multiple_threads.c:55, protected by lock2
+      write by jobs at one_var_multiple_threads.c:31, protected by lock2
+    s2.data:
+      read by jobs at one_var_multiple_threads.c:30, protected by lock2
+      read by <main> at one_var_multiple_threads.c:54, protected by lock2
+      write by jobs at one_var_multiple_threads.c:30, protected by lock2
+    s1.data2:
+      read by <main> at one_var_multiple_threads.c:51, protected by lock1
+      read by jobs at one_var_multiple_threads.c:23, protected by lock1
+      write by jobs at one_var_multiple_threads.c:23, protected by lock1
+    s1.data:
+      read by <main> at one_var_multiple_threads.c:50, protected by lock1
+      read by jobs at one_var_multiple_threads.c:22, protected by lock1
+      write by jobs at one_var_multiple_threads.c:22, protected by lock1

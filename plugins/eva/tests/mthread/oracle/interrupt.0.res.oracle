@@ -57,11 +57,6 @@
     \nothing
   vs.
     interrupt_received
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
@@ -102,27 +97,12 @@
   main_interrupt_one_shot
 [eva] <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {1} 
   // interrupt.c:9 interrupt_oneshot
-[eva] Possible read/write data races:
-  interrupt_received:
-    read by <main> at interrupt.c:18, unprotected
-    read by <main> at interrupt.c:19, unprotected
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9,
-       unprotected
-[eva] Shared memory: interrupt_received
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     interrupt_received
 [eva] Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {1}
-[eva] Mutexes for concurrent accesses:
-  interrupt_received  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received:
-    Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:18 (for interrupt_received)
-  interrupt.c:19 (for interrupt_received)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
@@ -181,29 +161,9 @@
   main_interrupt_one_shot
 [eva] <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {0; 1} 
   // interrupt.c:9 interrupt_oneshot
-[eva] Possible read/write data races:
-  interrupt_received:
-    read by <main> at interrupt.c:18, unprotected
-    read by <main> at interrupt.c:19, unprotected
-    read by <main> at interrupt.c:20, unprotected
-    read by <main> at interrupt.c:22, unprotected
-    write by <main> at interrupt.c:21, unprotected
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9,
-       unprotected
-[eva] Shared memory: interrupt_received
 [eva] Write summary for <main> (updated): interrupt_received ∈ {0; 1}
 [eva] Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {0; 1}
-[eva] Mutexes for concurrent accesses:
-  interrupt_received  unprotected
-[eva] Detailed shared zones protections
-  interrupt_received:
-    Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
-[eva] Statements needing manual synchronisation
-  interrupt.c:18 (for interrupt_received)
-  interrupt.c:19 (for interrupt_received)
-  interrupt.c:20 (for interrupt_received)
-  interrupt.c:22 (for interrupt_received)
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
@@ -231,27 +191,31 @@
         # cvalue: interrupt_received ∈ {0; 1}
 [eva] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:20
   main_interrupt_one_shot
-[eva] Possible read/write data races:
-  interrupt_received:
-    read by <main> at interrupt.c:18, unprotected
-    read by <main> at interrupt.c:19, unprotected
-    read by <main> at interrupt.c:20, unprotected
-    read by <main> at interrupt.c:22, unprotected
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9,
-       unprotected
-    write by <main> at interrupt.c:21, unprotected
-[eva] Shared memory: interrupt_received
 [eva] Write summary for <main>: interrupt_received ∈ {0; 1}
 [eva] Write summary for <interrupt_handler interrupt_oneshot>:
   interrupt_received ∈ {0; 1}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: interrupt_received
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   interrupt_received  unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   interrupt_received:
     Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   interrupt.c:18 (for interrupt_received)
   interrupt.c:19 (for interrupt_received)
   interrupt.c:20 (for interrupt_received)
   interrupt.c:22 (for interrupt_received)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    interrupt_received:
+      read by <main> at interrupt.c:18, unprotected
+      read by <main> at interrupt.c:19, unprotected
+      read by <main> at interrupt.c:20, unprotected
+      read by <main> at interrupt.c:22, unprotected
+      write by <interrupt_handler interrupt_oneshot> at interrupt.c:9,
+         unprotected
+      write by <main> at interrupt.c:21, unprotected

@@ -115,6 +115,54 @@ let pre_analysis () =
     None
   end
 
+(* Print information about shared memory detected by the analysis. *)
+let print_shared_memory analysis =
+  Self.result ~dkey:Self.dkey_shared_memory_zone
+    "@[<hov 2>Shared memory:@ %a@]"
+    Memory_zone.pretty analysis.precise_concurrent_accesses;
+  let precise_accesses = analysis.concurrent_accesses_by_nodes in
+  let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
+  Self.result ~dkey:Self.dkey_shared_memory_mutex
+    "@[<v 0>Mutexes protecting access to shared memory:@ %a@]"
+    Mt_mutexes_types.MutexesByZone.pretty mutexes;
+  if Mt_options.CheckProtections.get () then
+    let protections = Mt_mutexes.check_protection analysis precise_accesses in
+    Self.result ~dkey:Self.dkey_shared_memory_mutex_details
+      "Detailed shared memory protections@.%a"
+      Mt_mutexes.pretty_protections protections;
+    let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
+    let need_sync = Mt_mutexes.need_sync ill_protected in
+    if need_sync <> [] then
+      (* Sort statements before printing *)
+      let cmp (stmt1, _) (stmt2, _) = Cil_datatype.Stmt.compare stmt1 stmt2 in
+      let need_sync = List.sort cmp need_sync in
+      let pp fmt (stmt, z) =
+        Format.fprintf fmt "@[%a (for %a)@]"
+          Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
+          Memory_zone.pretty z
+      in
+      Self.result ~dkey:Self.dkey_shared_memory_mutex_details
+        "Statements needing manual synchronisation@.%a"
+        (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
+
+(* List data races detected by the analysis. *)
+let print_data_races analysis =
+  let concurrent_accesses = analysis.concurrent_accesses_by_nodes in
+  let is_write_only (_zone, access_set) =
+    let is_read (rw, _, _) = Mt_types.RW.is_read rw in
+    not (Mt_cfg_types.SetNodeIdAccess.exists is_read access_set)
+  in
+  let ww_accesses, rw_accesses =
+    List.partition is_write_only concurrent_accesses
+  in
+  Self.result ~dkey:Self.dkey_data_races
+    "@[<v 2>Possible read/write data races:@ %a@]"
+    Mt_mutexes.pretty_with_mutexes rw_accesses;
+  if Mt_options.WriteWriteRaces.get () then
+    Self.result ~dkey:Self.dkey_data_races
+      "@[<v 2>Possible write/write data races:@ %a@]"
+      Mt_mutexes.pretty_with_mutexes ww_accesses
+
 
 let post_analysis analysis =
   if not (Mt_thread.needs_recomputation analysis) then
@@ -125,6 +173,9 @@ let post_analysis analysis =
       "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
       analysis.iteration
       Mt_thread.pretty_recompute_reasons analysis;
+
+  print_shared_memory analysis;
+  print_data_races analysis;
 
   (* In the cfgs, mark whether the accesses are concurrent or not,
       and remove superfluous node *)

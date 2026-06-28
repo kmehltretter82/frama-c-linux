@@ -130,11 +130,6 @@
     \nothing
   vs.
     s1; s2
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -265,15 +260,6 @@
 [eva] <main> writes  s1 ∈ {1}  // priorities.c:64 main
 [eva] jobs3 writes  s2 ∈ {3}  // priorities.c:37 f3
 [eva] jobs4 writes  s2 ∈ {3}  // priorities.c:45 f4
-[eva] Possible read/write data races:
-  s2:
-    read by <main> at priorities.c:65, protected by m1 m2
-    write by jobs3 at priorities.c:37, unprotected
-    write by jobs4 at priorities.c:45, protected by m2
-  s1:
-    read by jobs1 at priorities.c:23, protected by m1
-    write by <main> at priorities.c:64, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -281,14 +267,6 @@
 [eva] Write summary for <main> (updated): s1 ∈ {1}
 [eva] Write summary for jobs3 (updated): s2 ∈ {3}
 [eva] Write summary for jobs4 (updated): s2 ∈ {3}
-[eva] Mutexes for concurrent accesses:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write protected by (?)m2, read protected by m1 m2
-[eva] Detailed shared zones protections
-  s2:
-    Read by <main>, Write by jobs4: protected by priorities
-    Read by <main>, Write by jobs3: protected by priorities
-  s1: Read by jobs1, Write by <main>: protected by m1
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -418,26 +396,9 @@
 [eva] <main> reads  s2 ∈ {0; 3}  // priorities.c:65 main
 [eva] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:37 f3
 [eva] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:45 f4
-[eva] Possible read/write data races:
-  s2:
-    read by <main> at priorities.c:65, protected by m1 m2
-    write by jobs3 at priorities.c:37, unprotected
-    write by jobs4 at priorities.c:45, protected by m2
-  s1:
-    read by jobs1 at priorities.c:23, protected by m1
-    write by <main> at priorities.c:64, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Write summary for <main>: s1 ∈ {1}
 [eva] Write summary for jobs3 (updated): s2 ∈ {0; 3}
 [eva] Write summary for jobs4 (updated): s2 ∈ {0; 3}
-[eva] Mutexes for concurrent accesses:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write protected by (?)m2, read protected by m1 m2
-[eva] Detailed shared zones protections
-  s2:
-    Read by <main>, Write by jobs4: protected by priorities
-    Read by <main>, Write by jobs3: protected by priorities
-  s1: Read by jobs1, Write by <main>: protected by m1
 [eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -529,24 +490,27 @@
       {}:
         # cvalue: s1 ∈ {0; 1}
                   s2 ∈ {0; 3}
-[eva] Possible read/write data races:
-  s2:
-    read by <main> at priorities.c:65, protected by m1 m2
-    write by jobs4 at priorities.c:45, protected by m2
-    write by jobs3 at priorities.c:37, unprotected
-  s1:
-    read by jobs1 at priorities.c:23, protected by m1
-    write by <main> at priorities.c:64, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Write summary for <main>: s1 ∈ {1}
 [eva] Write summary for jobs3: s2 ∈ {0; 3}
 [eva] Write summary for jobs4: s2 ∈ {0; 3}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: s1; s2
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   s1  write protected by m1 m2, read protected by m1
   s2  write protected by (?)m2, read protected by m1 m2
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   s2:
     Read by <main>, Write by jobs4: protected by priorities
     Read by <main>, Write by jobs3: protected by priorities
   s1: Read by jobs1, Write by <main>: protected by m1
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    s2:
+      read by <main> at priorities.c:65, protected by m1 m2
+      write by jobs4 at priorities.c:45, protected by m2
+      write by jobs3 at priorities.c:37, unprotected
+    s1:
+      read by jobs1 at priorities.c:23, protected by m1
+      write by <main> at priorities.c:64, protected by m1 m2

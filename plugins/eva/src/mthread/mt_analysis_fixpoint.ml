@@ -8,7 +8,6 @@
 
 open Mt_types
 open Mt_shared_vars_types
-open Mt_mutexes_types
 open Mt_thread
 
 
@@ -191,18 +190,7 @@ let compute_shared_vars analysis =
       Mt_shared_vars.Precise.display_shared_vars_value zmap;
     let written = Mt_shared_vars.Precise.enumerate_written_vars_value zmap in
     let all_accesses = ww_accesses @ rw_accesses in
-    let header fmt = Format.fprintf fmt "Possible read/write data races:" in
-    Mt_self.printf ~level:1 ~header "  @[<v 0>%a@]"
-      Mt_mutexes.pretty_with_mutexes rw_accesses;
-    if Mt_options.WriteWriteRaces.get () then begin
-      let header fmt = Format.fprintf fmt "Possible write/write data races:" in
-      Mt_self.printf ~level:1 ~header "  @[<v 0>%a@]"
-        Mt_mutexes.pretty_with_mutexes ww_accesses;
-    end;
     let all_zones = Mt_shared_vars.Precise.all_zones_accessed (ww_accesses @ rw_accesses) in
-    Mt_self.result ~level:2 "@[<hov 2>Shared memory:@ %a@]"
-      Memory_zone.pretty all_zones;
-
     (* Detect changes *)
     if not (Memory_zone.equal all_zones analysis.precise_concurrent_accesses)
     then (
@@ -277,28 +265,6 @@ let post_iteration analysis =
   analysis.concurrent_accesses_by_nodes <- precise_accesses;
   store_written_value analysis written;
 
-  let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
-  Mt_self.result "@[<v 0>Mutexes for concurrent accesses:@ %a@]"
-    MutexesByZone.pretty mutexes;
-  if Mt_options.CheckProtections.get () then begin
-    let protections = Mt_mutexes.check_protection analysis precise_accesses in
-    Mt_self.result "Detailed shared zones protections@.%a"
-      Mt_mutexes.pretty_protections protections;
-    let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
-    let need_sync = Mt_mutexes.need_sync ill_protected in
-    if need_sync <> [] then begin
-      (* Sort statements before printing *)
-      let cmp (stmt1, _) (stmt2, _) = Cil_datatype.Stmt.compare stmt1 stmt2 in
-      let need_sync = List.sort cmp need_sync in
-      let pp fmt (stmt, z) =
-        Format.fprintf fmt "@[%a (for %a)@]"
-          Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
-          Memory_zone.pretty z
-      in
-      Mt_self.result "Statements needing manual synchronisation@.%a"
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
-    end;
-  end;
   Self.debug "Shared variables computed.";
 
   save_to_disk analysis

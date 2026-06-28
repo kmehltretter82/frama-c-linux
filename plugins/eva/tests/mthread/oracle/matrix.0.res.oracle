@@ -334,11 +334,6 @@
     \nothing
   vs.
     matrix[0..29][0..99]
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -1134,128 +1129,6 @@
 [eva] jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:28 job
 [eva] jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:28 job
 [eva] jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:28 job
-[eva] Possible read/write data races:
-  matrix[29][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[28][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[27][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[26][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[25][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[24][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[23][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[22][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[21][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[20][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[19][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[18][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[17][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[16][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[15][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[14][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[13][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[12][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[11][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[10][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[9][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[8][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[7][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[6][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[5][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[4][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[3][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[2][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[1][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[0][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-[eva] Shared memory: matrix[0..29][0..99]
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
@@ -1295,53 +1168,6 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  matrix{[0][0..99]; [5][0..99]; [10][0..99]; [15][0..99]; [20][0..99];
-         [25][0..99]}
-         protected by locks[0]
-        {[1][0..99]; [6][0..99]; [11][0..99]; [16][0..99]; [21][0..99];
-         [26][0..99]}
-         protected by locks[1]
-        {[2][0..99]; [7][0..99]; [12][0..99]; [17][0..99]; [22][0..99];
-         [27][0..99]}
-         protected by locks[2]
-        {[3][0..99]; [8][0..99]; [13][0..99]; [18][0..99]; [23][0..99];
-         [28][0..99]}
-         protected by locks[3]
-        {[4][0..99]; [9][0..99]; [14][0..99]; [19][0..99]; [24][0..99];
-         [29][0..99]}
-         protected by locks[4]
-[eva] Detailed shared zones protections
-  matrix[29][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[28][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[27][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[26][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[25][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[24][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[23][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[22][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[21][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[20][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[19][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[18][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[17][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[16][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[15][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[14][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[13][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[12][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[11][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[10][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[9][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[8][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[7][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[6][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[5][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[4][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[3][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[2][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[1][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -1772,128 +1598,6 @@
 [eva] <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:58 main
 [eva] <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:58 main
 [eva] <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:58 main
-[eva] Possible read/write data races:
-  matrix[29][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[28][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[27][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[26][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[25][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[24][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[23][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[22][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[21][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[20][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[19][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[18][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[17][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[16][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[15][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[14][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[13][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[12][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[11][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[10][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[9][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[8][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[7][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[6][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[5][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[4][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[3][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[2][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[1][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[0][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-[eva] Shared memory: matrix[0..29][0..99]
 [eva] Write summary for jobs[0]:
   matrix[0][0..99] ∈ [--..--]
         [5][0..99] ∈ [--..--]
@@ -1929,53 +1633,6 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
-  matrix{[0][0..99]; [5][0..99]; [10][0..99]; [15][0..99]; [20][0..99];
-         [25][0..99]}
-         protected by locks[0]
-        {[1][0..99]; [6][0..99]; [11][0..99]; [16][0..99]; [21][0..99];
-         [26][0..99]}
-         protected by locks[1]
-        {[2][0..99]; [7][0..99]; [12][0..99]; [17][0..99]; [22][0..99];
-         [27][0..99]}
-         protected by locks[2]
-        {[3][0..99]; [8][0..99]; [13][0..99]; [18][0..99]; [23][0..99];
-         [28][0..99]}
-         protected by locks[3]
-        {[4][0..99]; [9][0..99]; [14][0..99]; [19][0..99]; [24][0..99];
-         [29][0..99]}
-         protected by locks[4]
-[eva] Detailed shared zones protections
-  matrix[29][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[28][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[27][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[26][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[25][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[24][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[23][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[22][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[21][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[20][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[19][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[18][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[17][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[16][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[15][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[14][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[13][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[12][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[11][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[10][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[9][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[8][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[7][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[6][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[5][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  matrix[4][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
-  matrix[3][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
-  matrix[2][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
-  matrix[1][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -2260,128 +1917,6 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] Possible read/write data races:
-  matrix[29][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[28][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[27][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[26][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[25][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[24][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[23][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[22][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[21][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[20][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[19][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[18][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[17][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[16][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[15][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[14][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[13][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[12][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[11][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[10][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[9][0..99]:
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[8][0..99]:
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[7][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[6][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[5][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-  matrix[4][0..99]:
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by jobs[4] at matrix.c:28, protected by locks[4]
-    read by <main> at matrix.c:58, protected by locks[4]
-    write by jobs[4] at matrix.c:28, protected by locks[4]
-  matrix[3][0..99]:
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by jobs[3] at matrix.c:28, protected by locks[3]
-    read by <main> at matrix.c:58, protected by locks[3]
-    write by jobs[3] at matrix.c:28, protected by locks[3]
-  matrix[2][0..99]:
-    read by <main> at matrix.c:58, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    read by jobs[2] at matrix.c:28, protected by locks[2]
-    write by jobs[2] at matrix.c:28, protected by locks[2]
-  matrix[1][0..99]:
-    read by <main> at matrix.c:58, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    read by jobs[1] at matrix.c:28, protected by locks[1]
-    write by jobs[1] at matrix.c:28, protected by locks[1]
-  matrix[0][0..99]:
-    read by <main> at matrix.c:58, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    read by jobs[0] at matrix.c:28, protected by locks[0]
-    write by jobs[0] at matrix.c:28, protected by locks[0]
-[eva] Shared memory: matrix[0..29][0..99]
 [eva] Write summary for jobs[0]:
   matrix[0][0..99] ∈ [--..--]
         [5][0..99] ∈ [--..--]
@@ -2417,7 +1952,10 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: matrix[0..29][0..99]
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   matrix{[0][0..99]; [5][0..99]; [10][0..99]; [15][0..99]; [20][0..99];
          [25][0..99]}
          protected by locks[0]
@@ -2433,7 +1971,8 @@
         {[4][0..99]; [9][0..99]; [14][0..99]; [19][0..99]; [24][0..99];
          [29][0..99]}
          protected by locks[4]
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   matrix[29][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
   matrix[28][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
   matrix[27][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
@@ -2464,4 +2003,125 @@
   matrix[2][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
   matrix[1][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
   matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    matrix[29][0..99]:
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[28][0..99]:
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[27][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[26][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[25][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]
+    matrix[24][0..99]:
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[23][0..99]:
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[22][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[21][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[20][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]
+    matrix[19][0..99]:
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[18][0..99]:
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[17][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[16][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[15][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]
+    matrix[14][0..99]:
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[13][0..99]:
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[12][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[11][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[10][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]
+    matrix[9][0..99]:
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[8][0..99]:
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[7][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[6][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[5][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]
+    matrix[4][0..99]:
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by jobs[4] at matrix.c:28, protected by locks[4]
+      read by <main> at matrix.c:58, protected by locks[4]
+      write by jobs[4] at matrix.c:28, protected by locks[4]
+    matrix[3][0..99]:
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by jobs[3] at matrix.c:28, protected by locks[3]
+      read by <main> at matrix.c:58, protected by locks[3]
+      write by jobs[3] at matrix.c:28, protected by locks[3]
+    matrix[2][0..99]:
+      read by <main> at matrix.c:58, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      read by jobs[2] at matrix.c:28, protected by locks[2]
+      write by jobs[2] at matrix.c:28, protected by locks[2]
+    matrix[1][0..99]:
+      read by <main> at matrix.c:58, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      read by jobs[1] at matrix.c:28, protected by locks[1]
+      write by jobs[1] at matrix.c:28, protected by locks[1]
+    matrix[0][0..99]:
+      read by <main> at matrix.c:58, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      read by jobs[0] at matrix.c:28, protected by locks[0]
+      write by jobs[0] at matrix.c:28, protected by locks[0]

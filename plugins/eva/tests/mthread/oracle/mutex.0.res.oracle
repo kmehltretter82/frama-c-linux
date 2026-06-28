@@ -113,11 +113,6 @@
     \nothing
   vs.
     s1; s2
-[eva] Possible read/write data races:
-  none
-[eva] Shared memory: \nothing
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -229,28 +224,12 @@
 [eva] jobs2 reads  s2 ∈ {0}  // mutex.c:34 f2
 [eva] jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1
 [eva] jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3
-[eva] Possible read/write data races:
-  s2:
-    read by jobs2 at mutex.c:34, protected by m1
-    write by jobs3 at mutex.c:40, unprotected
-  s1:
-    read by jobs2 at mutex.c:33, protected by m1
-    write by jobs1 at mutex.c:25, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s1; s2
 [eva] Write summary for jobs1 (updated): s1 ∈ {1}
 [eva] Write summary for jobs3 (updated): s2 ∈ {3}
-[eva] Mutexes for concurrent accesses:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write unprotected, read protected by m1
-[eva] Detailed shared zones protections
-  s2: Read by jobs2, Write by jobs3: unprotected
-  s1: Read by jobs2, Write by jobs1: protected by m1
-[eva] Statements needing manual synchronisation
-  mutex.c:34 (for s2)
 [eva] *** Computing thread <main>, iteration 3 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -353,24 +332,8 @@
     interferences by location:
     interferences by mutexes:
 [eva] jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34 f2
-[eva] Possible read/write data races:
-  s2:
-    read by jobs2 at mutex.c:34, protected by m1
-    write by jobs3 at mutex.c:40, unprotected
-  s1:
-    read by jobs2 at mutex.c:33, protected by m1
-    write by jobs1 at mutex.c:25, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs1: s1 ∈ {1}
 [eva] Write summary for jobs3: s2 ∈ {3}
-[eva] Mutexes for concurrent accesses:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write unprotected, read protected by m1
-[eva] Detailed shared zones protections
-  s2: Read by jobs2, Write by jobs3: unprotected
-  s1: Read by jobs2, Write by jobs1: protected by m1
-[eva] Statements needing manual synchronisation
-  mutex.c:34 (for s2)
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -393,22 +356,26 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  s2:
-    read by jobs2 at mutex.c:34, protected by m1
-    write by jobs3 at mutex.c:40, unprotected
-  s1:
-    read by jobs2 at mutex.c:33, protected by m1
-    write by jobs1 at mutex.c:25, protected by m1 m2
-[eva] Shared memory: s1; s2
 [eva] Write summary for jobs1: s1 ∈ {1}
 [eva] Write summary for jobs3: s2 ∈ {3}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: s1; s2
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   s1  write protected by m1 m2, read protected by m1
   s2  write unprotected, read protected by m1
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   s2: Read by jobs2, Write by jobs3: unprotected
   s1: Read by jobs2, Write by jobs1: protected by m1
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   mutex.c:34 (for s2)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    s2:
+      read by jobs2 at mutex.c:34, protected by m1
+      write by jobs3 at mutex.c:40, unprotected
+    s1:
+      read by jobs2 at mutex.c:33, protected by m1
+      write by jobs1 at mutex.c:25, protected by m1 m2

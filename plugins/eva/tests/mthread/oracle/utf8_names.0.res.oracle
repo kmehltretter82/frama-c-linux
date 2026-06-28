@@ -74,10 +74,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Possible read/write data races:
-  none
-[eva] Mutexes for concurrent accesses:
-[eva] Detailed shared zones protections
 [eva] *** Computing thread <main>, iteration 2 (new message received and potential
     shared vars changed)
 [eva] Analyzing a complete application starting at main
@@ -228,17 +224,6 @@
    // utf8_names.c:37 f2
 [eva] job / "𐍅" f1 writes  c ∈ {1}  // utf8_names.c:29 f1
 [eva] job / "𐍅" f2 writes  c ∈ {2}  // utf8_names.c:39 f2
-[eva] Possible read/write data races:
-  c:
-    read by <main> at utf8_names.c:59, unprotected
-    write by job / "𐍅" f1 at utf8_names.c:29, protected by mutex / "𐍅"
-    write by job / "𐍅" f2 at utf8_names.c:39, protected by mutex / "𐍅"
-  b:
-    read by job / "𐍅" f1 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f2 at utf8_names.c:37, unprotected
-  a:
-    read by job / "𐍅" f2 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f1 at utf8_names.c:27, unprotected
 [eva] Write summary for job / "𐍅" f1 (updated):
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -249,19 +234,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] Mutexes for concurrent accesses:
-  a  unprotected
-  b  unprotected
-  c  write protected by mutex / "𐍅", read unprotected
-[eva] Detailed shared zones protections
-  c:
-    Read by <main>, Write by job / "𐍅" f2: unprotected
-    Read by <main>, Write by job / "𐍅" f1: unprotected
-  b: Read by job / "𐍅" f1, Write by job / "𐍅" f2: unprotected
-  a: Read by job / "𐍅" f2, Write by job / "𐍅" f1: unprotected
-[eva] Statements needing manual synchronisation
-  utf8_names.c:23 (for a; b)
-  utf8_names.c:59 (for c)
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
 [eva] Analyzing a complete application starting at main
@@ -376,17 +348,6 @@
     (origin: Arithmetic {utf8_names.c:23}) }}
    // utf8_names.c:23 g :: utf8_names.c:27 <- f1
 [eva] <main> reads  c ∈ {0; 1; 2}  // utf8_names.c:59 main
-[eva] Possible read/write data races:
-  c:
-    read by <main> at utf8_names.c:59, unprotected
-    write by job / "𐍅" f1 at utf8_names.c:29, protected by mutex / "𐍅"
-    write by job / "𐍅" f2 at utf8_names.c:39, protected by mutex / "𐍅"
-  b:
-    read by job / "𐍅" f1 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f2 at utf8_names.c:37, unprotected
-  a:
-    read by job / "𐍅" f2 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f1 at utf8_names.c:27, unprotected
 [eva] Write summary for job / "𐍅" f1:
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -397,19 +358,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] Mutexes for concurrent accesses:
-  a  unprotected
-  b  unprotected
-  c  write protected by mutex / "𐍅", read unprotected
-[eva] Detailed shared zones protections
-  c:
-    Read by <main>, Write by job / "𐍅" f2: unprotected
-    Read by <main>, Write by job / "𐍅" f1: unprotected
-  b: Read by job / "𐍅" f1, Write by job / "𐍅" f2: unprotected
-  a: Read by job / "𐍅" f2, Write by job / "𐍅" f1: unprotected
-[eva] Statements needing manual synchronisation
-  utf8_names.c:23 (for a; b)
-  utf8_names.c:59 (for c)
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -466,17 +414,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] Possible read/write data races:
-  c:
-    read by <main> at utf8_names.c:59, unprotected
-    write by job / "𐍅" f2 at utf8_names.c:39, protected by mutex / "𐍅"
-    write by job / "𐍅" f1 at utf8_names.c:29, protected by mutex / "𐍅"
-  b:
-    read by job / "𐍅" f1 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f2 at utf8_names.c:37, unprotected
-  a:
-    read by job / "𐍅" f2 at utf8_names.c:23, unprotected
-    write by job / "𐍅" f1 at utf8_names.c:27, unprotected
 [eva] Write summary for job / "𐍅" f1:
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -487,17 +424,33 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] Mutexes for concurrent accesses:
+[eva] ******* Analysis performed, 4 iterations
+[eva:shared-memory:zone] Shared memory: a; b; c
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
   a  unprotected
   b  unprotected
   c  write protected by mutex / "𐍅", read unprotected
-[eva] Detailed shared zones protections
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections
   c:
     Read by <main>, Write by job / "𐍅" f2: unprotected
     Read by <main>, Write by job / "𐍅" f1: unprotected
   b: Read by job / "𐍅" f1, Write by job / "𐍅" f2: unprotected
   a: Read by job / "𐍅" f2, Write by job / "𐍅" f1: unprotected
-[eva] Statements needing manual synchronisation
+[eva:shared-memory:mutex-details] 
+  Statements needing manual synchronisation
   utf8_names.c:23 (for a; b)
   utf8_names.c:59 (for c)
-[eva] ******* Analysis performed, 4 iterations
+[eva:data-races] 
+  Possible read/write data races:
+    c:
+      read by <main> at utf8_names.c:59, unprotected
+      write by job / "𐍅" f2 at utf8_names.c:39, protected by mutex / "𐍅"
+      write by job / "𐍅" f1 at utf8_names.c:29, protected by mutex / "𐍅"
+    b:
+      read by job / "𐍅" f1 at utf8_names.c:23, unprotected
+      write by job / "𐍅" f2 at utf8_names.c:37, unprotected
+    a:
+      read by job / "𐍅" f2 at utf8_names.c:23, unprotected
+      write by job / "𐍅" f1 at utf8_names.c:27, unprotected
