@@ -100,7 +100,7 @@ let pre_analysis () =
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
-let post_analysis (type t) (engine: t engine) final_state =
+let post_analysis (type t) (engine: t engine) mthread_analysis final_state =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
@@ -120,10 +120,16 @@ let post_analysis (type t) (engine: t engine) final_state =
   (* The above functions may have changed the status of alarms. *)
   Summary.FunctionStats.recompute_all ();
   Red_statuses.report ();
-  (* Print results *)
+  (* Domains [post_analysis]. By default, the cvalue domain prints values
+     inferred at the end of each function.  *)
   let module Engine = (val engine) in
   Engine.Dom.post_analysis final_state;
+  (* Mthread [post_analysis]: prints shared memory protections and possible
+     data-races, exports results to file and computes a concurrency summary. *)
+  Option.iter Mt_main.post_analysis mthread_analysis;
+  (* Print global summary. *)
   Summary.print ();
+  (* Export after summary, as some stats are computed for the summary. *)
   Statistics.export_as_csv ()
 
 
@@ -258,8 +264,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
           ?cvalue_state ?arguments entry_point
     in
     Self.(ComputationState.set Computed);
-    post_analysis (module Engine) final_state;
-    Option.iter Mt_main.post_analysis mt_analysis
+    post_analysis (module Engine) mt_analysis final_state
   with exn ->
     let backtrace = Printexc.get_raw_backtrace () in
     Self.(ComputationState.set Aborted);
