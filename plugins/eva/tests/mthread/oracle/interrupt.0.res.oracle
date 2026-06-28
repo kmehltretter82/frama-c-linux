@@ -3,8 +3,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing interrupt.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main_interrupt_one_shot
 [eva:thread] 
   New thread: <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
@@ -22,8 +22,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 1
     (thread initial memory state changed).
-[eva] Analyzing a complete application starting at main_interrupt_one_shot
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of main_interrupt_one_shot for thread <main>
 [eva:thread] Thread <main>, fun main_interrupt_one_shot
@@ -42,8 +40,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
     iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at interrupt_oneshot
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
 [eva:global-accesses] 
@@ -65,8 +61,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 2
     (potential shared vars changed).
-[eva] Analyzing a complete application starting at main_interrupt_one_shot
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -82,8 +76,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_oneshot
-[eva] Initial state supplied by user
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -121,8 +113,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 3
     (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_one_shot
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva:show] interrupt.c:20: Frama_C_show_each: {1}
@@ -150,8 +140,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
     iteration 3 (interferences changed).
-[eva] Analyzing a complete application starting at interrupt_oneshot
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received:
@@ -194,8 +182,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 4
     (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_one_shot
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:show] interrupt.c:20: Frama_C_show_each: {0; 1}
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}

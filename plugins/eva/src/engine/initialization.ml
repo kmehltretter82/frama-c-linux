@@ -449,7 +449,8 @@ module Make (Engine: Engine_Subset) = struct
     let+ init_state =
       match cvalue_state with
       | Some cvalue_state ->
-        Self.feedback "Initial state supplied by user";
+        if not (Mt_options.Enabled.get ())
+        then Self.feedback "Initial state supplied by user";
         let* state = global_state ~lib_entry in
         supplied_state state cvalue_state
       | None ->

@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing mutex.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] mutex.c:51: Initializing mutex m1
 [eva:mutex] mutex.c:52: Initializing mutex m2
@@ -39,8 +39,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:mutex] mutex.c:23: Lock m1
@@ -68,8 +66,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:mutex] mutex.c:32: Lock m1
@@ -91,8 +87,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:global-accesses] 
@@ -106,8 +100,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:global-accesses] Globals accessed by thread:
@@ -125,8 +117,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] mutex.c:54: Thread jobs1, fun f1, parent <main>, args {0}
 [eva:thread] mutex.c:55: Thread jobs2, fun f2, parent <main>, args {0}
@@ -155,8 +145,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] mutex.c:25: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -187,8 +175,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] mutex.c:33: inject threads interferences at this point
 [eva:interferences] mutex.c:34: inject threads interferences at this point
 [eva:global-accesses] 
@@ -209,8 +195,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:interferences] mutex.c:40: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -230,8 +214,6 @@
                   s2 ∈ {3}
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 2 (interferences changed).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread jobs4
@@ -253,8 +235,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] mutex.c:55: New context for jobs2, fun f2, parent <main>, args {0}
 [eva:thread] mutex.c:56: New context for jobs3, fun f3, parent <main>, args {0}
 [eva:thread] mutex.c:57: New context for jobs4, fun f4, parent <main>, args {0}
@@ -280,8 +260,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 3 (interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by jobs1 at mutex.c:25 <- f1
@@ -311,8 +289,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 3 (shared vars values
     changed, thread initial memory state changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: read by jobs2 at mutex.c:33 <- f2
@@ -331,8 +307,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at mutex.c:40 <- f3
@@ -352,8 +326,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread jobs4
@@ -367,8 +339,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     jobs1:

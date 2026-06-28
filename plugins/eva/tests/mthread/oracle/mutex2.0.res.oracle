@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing mutex2.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] mutex2.c:48: Initializing mutex m1
 [eva:mutex] mutex2.c:49: Initializing mutex m2
@@ -55,8 +55,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:mutex] mutex2.c:20: Lock m1
@@ -77,8 +75,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:mutex] mutex2.c:27: Lock m2
@@ -99,8 +95,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:global-accesses] 
@@ -114,8 +108,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:mutex] mutex2.c:40: Lock m2
@@ -142,8 +134,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] mutex2.c:51: Thread jobs1, fun f1, parent <main>, args {0}
 [eva:thread] mutex2.c:52: Thread jobs2, fun f2, parent <main>, args {0}
@@ -184,8 +174,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] mutex2.c:21: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -211,8 +199,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] mutex2.c:28: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -238,8 +224,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:interferences] mutex2.c:34: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -260,8 +244,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:interferences] mutex2.c:41: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -302,8 +284,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] mutex2.c:52: New context for jobs2, fun f2, parent <main>, args {0}
 [eva:thread] mutex2.c:53: New context for jobs3, fun f3, parent <main>, args {0}
 [eva:thread] mutex2.c:54: New context for jobs4, fun f4, parent <main>, args {0}
@@ -343,8 +323,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 3 (interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by jobs1 at mutex2.c:21 <- f1
@@ -369,8 +347,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by jobs2 at mutex2.c:28 <- f2
@@ -395,8 +371,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at mutex2.c:34 <- f3
@@ -416,8 +390,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs4 at mutex2.c:41 <- f4
@@ -451,8 +423,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: read by <main> at mutex2.c:58 <- main
@@ -487,8 +457,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 4 (interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by jobs1 at mutex2.c:21 <- f1
@@ -512,8 +480,6 @@
                   s2 ∈ {0; 3}
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 4 (interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by jobs2 at mutex2.c:28 <- f2

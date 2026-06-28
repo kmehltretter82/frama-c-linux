@@ -5,8 +5,8 @@
 [kernel] Parsing philo.c (with preprocessing)
 [kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] philo.c:65: Initializing mutex locks[0]
 [eva:mutex] philo.c:65: Initializing mutex locks[1]
@@ -40,8 +40,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] philo.c:38: Lock locks[4]
@@ -77,8 +75,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] philo.c:38: Lock locks[0]
@@ -105,8 +101,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] philo.c:38: Lock locks[1]
@@ -138,8 +132,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] philo.c:38: Lock locks[2]
@@ -171,8 +163,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] philo.c:38: Lock locks[3]
@@ -204,8 +194,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (new message received).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] philo.c:70: Thread jobs[0], fun job, parent <main>, args {0}
 [eva:thread] philo.c:70: Thread jobs[1], fun job, parent <main>, args {1}
@@ -243,8 +231,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: read by <main> at philo.c:72 <- main
@@ -261,8 +247,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] philo.c:43: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -292,8 +276,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     locks[0]:
@@ -315,8 +297,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -345,8 +325,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -375,8 +353,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -423,8 +399,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] philo.c:70: 
   New context for jobs[1], fun job, parent <main>, args {1}
 [eva:thread] philo.c:70: 
@@ -450,8 +424,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 4 (interferences
     changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -480,8 +452,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 4 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     locks[0]:
@@ -503,8 +473,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 4 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -533,8 +501,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 4 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -563,8 +529,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 4 (thread initial memory
     state changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job

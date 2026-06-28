@@ -10,8 +10,8 @@
   int (*)(void *, int )
 [kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [kernel:annot:missing-spec] unhandled_calls.c:30: Warning: 
   Neither code nor specification for function random, generating default

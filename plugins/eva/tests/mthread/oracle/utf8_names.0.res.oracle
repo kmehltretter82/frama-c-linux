@@ -29,8 +29,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job / "𐍅" f1
 [eva:alarm] utf8_names.c:23: Warning: 
@@ -73,8 +71,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
 [eva:queue] 
@@ -117,8 +113,6 @@
     \nothing
   vs.
     a; b; c
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
 [eva:thread] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
@@ -160,8 +154,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [eva:interferences] utf8_names.c:29: inject threads interferences at this point
@@ -218,8 +210,6 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         b ∈ {0}
         c ∈ {1}
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [eva:interferences] utf8_names.c:39: inject threads interferences at this point
 [eva:global-accesses] 
@@ -325,8 +315,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:interferences] utf8_names.c:59: inject threads interferences at this point
 [eva:global-accesses] 
@@ -342,8 +330,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     mutex:
@@ -405,8 +391,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     mutex:
@@ -488,8 +472,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     job2:
@@ -503,8 +485,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     mutex:

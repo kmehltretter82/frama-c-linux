@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing thread_arg.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] thread_arg.c:33: Initializing mutex locks[0]
 [eva:mutex] thread_arg.c:33: Initializing mutex locks[1]
@@ -38,8 +38,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] thread_arg.c:25: Lock locks[0]
@@ -66,8 +64,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] thread_arg.c:25: Lock locks[1]
@@ -99,8 +95,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
 [eva:thread] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
@@ -124,8 +118,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:global-accesses] 
@@ -163,8 +155,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -236,8 +226,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] thread_arg.c:37: 
   New context for jobs[1], fun job, parent <main>, args {1}
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
@@ -261,8 +249,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -300,8 +286,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 3 (shared vars values
     changed, thread initial memory state changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -357,8 +341,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:alarm] thread_arg.c:45: Warning: 
   signed overflow. assert sum + vars[i_2] ≤ 2147483647;
 [eva:global-accesses] 
@@ -381,8 +363,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 4 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -422,8 +402,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 4 (shared vars values
     changed, thread initial memory state changed and interferences changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
   assert vars[i] + tmp ≤ 2147483647;
@@ -485,8 +463,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 5 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     locks[0..1]:
@@ -507,8 +483,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 5 (interferences
     changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -546,8 +520,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 5 (interferences
     changed).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -597,8 +569,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 6 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     locks[0..1]:

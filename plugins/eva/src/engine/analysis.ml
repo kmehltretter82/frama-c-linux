@@ -167,9 +167,6 @@ let compute_from_entry_point  (type t) (engine: t engine)
     ?(thread=Thread.main) ?cvalue_state ?arguments entry_point =
   let module Engine = (val engine) in
   let lib_entry = Kernel.LibEntry.get () in
-  Self.feedback "Analyzing a%scomplete application starting at %a"
-    (if lib_entry then "n in" else " ")
-    Kernel_function.pretty entry_point;
   match Engine.Initialization.initial_state_with_formals
           ?cvalue_state ?arguments ~lib_entry entry_point with
   | `Bottom ->
@@ -247,6 +244,9 @@ let compute_from ?cvalue_state ?arguments entry_point =
   let mt_analysis = Mt_main.pre_analysis () in
   (* Prepare the analysis and build the engine. *)
   let module Engine = (val pre_analysis ()) in
+  Self.feedback "Analyzing a%scomplete application starting at %a"
+    (if Kernel.LibEntry.get () then "n in" else " ")
+    Kernel_function.pretty entry_point;
   try
     Self.ComputationState.set Computing;
     (* Run the analysis. *)

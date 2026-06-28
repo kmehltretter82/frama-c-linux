@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_thread_loop
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:128: 
@@ -36,8 +36,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 1 (first
     iteration).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
@@ -63,8 +61,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joblooped starting at fjoblooped, iteration 1 (first
     iteration).
-[eva] Analyzing a complete application starting at fjoblooped
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
@@ -95,8 +91,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_thread_loop, iteration 2 (potential
     shared vars changed).
-[eva] Analyzing a complete application starting at main_thread_loop
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:128: 
@@ -117,8 +111,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 2 (potential
     shared vars changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
@@ -153,8 +145,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joblooped starting at fjoblooped, iteration 2 (potential
     shared vars changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoblooped
-[eva] Initial state supplied by user
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
@@ -234,8 +224,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_thread_loop, iteration 3 (shared
     vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_thread_loop
-[eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:130: 
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
@@ -255,8 +243,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 3 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
 [eva:global-accesses] 
@@ -288,8 +274,6 @@
   Analyzing thread joblooped starting at fjoblooped, iteration 3 (shared vars
     values changed, thread initial memory state changed and interferences
     changed).
-[eva] Analyzing a complete application starting at fjoblooped
-[eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1}
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
@@ -344,8 +328,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_thread_loop, iteration 4 (shared
     vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_thread_loop
-[eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
@@ -363,8 +345,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 4 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2}
 [eva:show] interferences.c:113: 
@@ -397,8 +377,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joblooped starting at fjoblooped, iteration 4 (thread
     initial memory state changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoblooped
-[eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1; 2}
 [eva:show] interferences.c:121: 
@@ -452,8 +430,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_thread_loop, iteration 5 (shared
     vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_thread_loop
-[eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
@@ -473,8 +449,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 5 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2; 3}
 [eva:show] interferences.c:113: 
@@ -507,8 +481,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joblooped starting at fjoblooped, iteration 5 (thread
     initial memory state changed and interferences changed).
-[eva] Analyzing a complete application starting at fjoblooped
-[eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, [0..2147483647]
 [eva:alarm] interferences.c:119: Warning: 
@@ -573,8 +545,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_thread_loop, iteration 6
     (interferences changed).
-[eva] Analyzing a complete application starting at main_thread_loop
-[eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
@@ -594,8 +564,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 6
     (interferences changed).
-[eva] Analyzing a complete application starting at fjoboneshot
-[eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, [0..2147483647]
 [eva:show] interferences.c:113: 

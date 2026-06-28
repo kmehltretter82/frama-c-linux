@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing philo_nofifo.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] philo_nofifo.c:31: Initializing mutex locks[0]
 [eva:mutex] philo_nofifo.c:31: Initializing mutex locks[1]
@@ -40,8 +40,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] philo_nofifo.c:12: Lock locks[4]
@@ -76,8 +74,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] philo_nofifo.c:12: Lock locks[0]
@@ -112,8 +108,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] philo_nofifo.c:12: Lock locks[1]
@@ -148,8 +142,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] philo_nofifo.c:12: Lock locks[2]
@@ -184,8 +176,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] philo_nofifo.c:12: Lock locks[3]

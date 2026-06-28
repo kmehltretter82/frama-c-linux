@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing null.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:thread] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
 [eva:thread] null.c:24: Start thread tjob0
@@ -23,8 +23,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job0
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
@@ -46,8 +44,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
 [eva:global-accesses] 
@@ -63,8 +59,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job0
-[eva] Initial state supplied by user
 [eva:interferences] null.c:16: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -96,8 +90,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:interferences] null.c:27: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:

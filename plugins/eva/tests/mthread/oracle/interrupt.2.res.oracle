@@ -3,8 +3,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing interrupt.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main_interrupt_cross_incr
 [eva:thread] 
   New thread: <interrupt_handler interrupt_cross_incr1>,
@@ -31,8 +31,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 1
     (thread initial memory state changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
 [eva:thread] Thread <main>, fun main_interrupt_cross_incr
@@ -53,8 +51,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:global-accesses] 
@@ -74,8 +70,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at interrupt_cross_incr2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:global-accesses] 
@@ -100,8 +94,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 2
     (potential shared vars changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0}
 [eva:global-accesses] 
@@ -119,8 +111,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -147,8 +137,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr2
-[eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -204,8 +192,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 3
     (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1}
 [eva:interferences] interrupt.c:59: inject threads interferences at this point
@@ -225,8 +211,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 3 (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -254,8 +238,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 3 (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -307,8 +289,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 4
     (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4}
 [eva:global-accesses] 
@@ -326,8 +306,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 4 (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -355,8 +333,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 4 (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -412,8 +388,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 5
     (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3; 4; 5}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4; 5; 6}
 [eva:global-accesses] 
@@ -431,8 +405,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 5 (interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -460,8 +432,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 5 (shared vars values changed and interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr2
-[eva] Initial state supplied by user
 [eva:alarm] interrupt.c:45: Warning: 
   signed overflow. assert interrupt_received_a + 1 ≤ 2147483647;
 [eva:global-accesses] 
@@ -521,8 +491,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 6
     (interferences changed).
-[eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: [0..2147483647]
 [eva:show] interrupt.c:52: Frama_C_show_each_b: [0..2147483647]
 [eva:global-accesses] 
@@ -540,8 +508,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 6 (interferences changed).
-[eva] Analyzing a complete application starting at interrupt_cross_incr1
-[eva] Initial state supplied by user
 [eva:alarm] interrupt.c:41: Warning: 
   signed overflow. assert interrupt_received_b + 1 ≤ 2147483647;
 [eva:global-accesses] 

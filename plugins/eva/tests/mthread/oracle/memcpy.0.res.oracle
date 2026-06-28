@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing memcpy.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:thread] memcpy.c:39: New thread: tjob0, fun job0, parent <main>, args {0}
 [eva:thread] memcpy.c:39: Start thread tjob0
@@ -47,8 +47,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job0
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
 [eva:global-accesses] Globals accessed by thread:
@@ -60,8 +58,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob1 starting at job1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job1 for thread tjob1
 [eva:global-accesses] 
@@ -76,8 +72,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob2 starting at job2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at job2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job2 for thread tjob2
 [eva:global-accesses] 
@@ -98,8 +92,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] memcpy.c:39: Thread tjob0, fun job0, parent <main>, args {0}
 [eva:thread] memcpy.c:46: Thread tjob1, fun job1, parent <main>, args {0}
@@ -179,8 +171,6 @@
                   d ∈ {0; 3}
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 2 (interferences changed).
-[eva] Analyzing a complete application starting at job0
-[eva] Initial state supplied by user
 [eva:global-accesses] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread tjob0
@@ -191,8 +181,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob1 starting at job1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job1
-[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:27: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -207,8 +195,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob2 starting at job2, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at job2
-[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:32: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -240,8 +226,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob1 starting at job1, iteration 3 (shared vars values
     changed).
-[eva] Analyzing a complete application starting at job1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     a: read by tjob1 at memcpy.c:27 <- job1
@@ -255,8 +239,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob2 starting at job2, iteration 3 (shared vars values
     changed).
-[eva] Analyzing a complete application starting at job2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     b: read by tjob2 at memcpy.c:32 <- job2

@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing simple.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] simple.c:44: Initializing mutex lock
 [eva:thread] simple.c:46: New thread: job1, fun f1, parent <main>, args {{ &b }}
@@ -39,8 +39,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread job1 starting at f1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
 [eva:mutex] simple.c:22: Lock lock
@@ -66,8 +64,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread job2 starting at f2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job2
 [eva:mutex] simple.c:33: Lock lock
@@ -99,8 +95,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:thread] simple.c:46: Thread job1, fun f1, parent <main>, args {{ &b }}
 [eva:thread] simple.c:47: Thread job2, fun f2, parent <main>, args {{ &a }}
@@ -130,8 +124,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread job1 starting at f1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] simple.c:23: inject threads interferences at this point
 [eva:interferences] simple.c:24: inject threads interferences at this point
 [eva:interferences] simple.c:25: inject threads interferences at this point
@@ -186,8 +178,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread job2 starting at f2, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] simple.c:34: inject threads interferences at this point
 [eva:interferences] simple.c:35: inject threads interferences at this point
 [eva:interferences] simple.c:36: inject threads interferences at this point
@@ -271,8 +261,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] simple.c:47: 
   New context for job2, fun f2, parent <main>, args {{ &a }}
 [eva:interferences] simple.c:50: inject threads interferences at this point
@@ -301,8 +289,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread job1 starting at f1, iteration 3 (interferences changed).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     a: write by job1 at simple.c:23 <- f1
@@ -353,8 +339,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread job2 starting at f2, iteration 3 (thread initial memory
     state changed and interferences changed).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     a: write by job2 at simple.c:35 <- f2
@@ -419,8 +403,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     a: read by <main> at simple.c:50 <- main

@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing sharedarray.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:thread] sharedarray.c:55: 
   New thread: jobs1, fun f1, parent <main>, args {0}
@@ -53,8 +53,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:global-accesses] 
@@ -69,8 +67,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:global-accesses] 
@@ -84,8 +80,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f3
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:global-accesses] 
@@ -99,8 +93,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f4
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:global-accesses] 
@@ -114,8 +106,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs5 starting at f5, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f5
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
 [eva:global-accesses] 
@@ -129,8 +119,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs6 starting at f6, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f6
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
 [eva:global-accesses] Globals accessed by thread:

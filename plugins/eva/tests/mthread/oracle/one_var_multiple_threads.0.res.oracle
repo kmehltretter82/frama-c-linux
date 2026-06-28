@@ -6,8 +6,8 @@
 [kernel:CERT:MSC:37] one_var_multiple_threads.c:33: Warning: 
   Body of function g falls-through. Adding a return statement
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] one_var_multiple_threads.c:38: Initializing mutex lock1
 [eva:mutex] one_var_multiple_threads.c:39: Initializing mutex lock2
@@ -63,8 +63,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f for thread jobs
 [eva:mutex] one_var_multiple_threads.c:21: Lock lock1
@@ -90,8 +88,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at g
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of g for thread jobs
 [eva:mutex] one_var_multiple_threads.c:29: Lock lock2
@@ -125,8 +121,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 2 (potential shared vars
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -159,8 +153,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:interferences] one_var_multiple_threads.c:22: 
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:23: 
@@ -201,8 +193,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva] Analyzing a complete application starting at g
-[eva] Initial state supplied by user
 [eva:interferences] one_var_multiple_threads.c:30: 
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:31: 
@@ -281,8 +271,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:interferences] one_var_multiple_threads.c:50: 
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:51: 
@@ -322,8 +310,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 3 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1.data:
@@ -366,8 +352,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 3 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at g
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s2.data:
@@ -440,8 +424,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -473,8 +455,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 4 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1.data:
@@ -517,8 +497,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 4 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at g
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s2.data:
@@ -593,8 +571,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 5 (shared vars values
     changed and interferences changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:alarm] one_var_multiple_threads.c:51: Warning: 
   signed overflow. assert t + s1.data2 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:54: Warning: 
@@ -632,8 +608,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 5 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:alarm] one_var_multiple_threads.c:22: Warning: 
   signed overflow. assert s1.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:23: Warning: 
@@ -682,8 +656,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 5 (thread initial memory state
     changed and interferences changed).
-[eva] Analyzing a complete application starting at g
-[eva] Initial state supplied by user
 [eva:alarm] one_var_multiple_threads.c:30: Warning: 
   signed overflow. assert s2.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:31: Warning: 
@@ -770,8 +742,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 6 (interferences
     changed).
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -802,8 +772,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 6 (interferences changed).
-[eva] Analyzing a complete application starting at f
-[eva] Initial state supplied by user
 [eva:global-accesses] 
   Globals accessed by thread:
     s1.data:

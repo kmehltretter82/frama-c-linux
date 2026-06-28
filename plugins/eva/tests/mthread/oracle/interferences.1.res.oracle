@@ -4,8 +4,8 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_ptr_write
+[eva:thread-fixpoint] First analysis of main thread
 [eva:thread] New thread: <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:101: 
@@ -27,8 +27,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobptr1 starting at fjobptr1, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at fjobptr1
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjobptr1 for thread jobptr1
 [eva:show] interferences.c:75: Frama_C_show_each_fjobptr1_start: {0}, {0}
@@ -57,8 +55,6 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobptr2 starting at fjobptr2, iteration 1 (first iteration).
-[eva] Analyzing a complete application starting at fjobptr2
-[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjobptr2 for thread jobptr2
 [eva:show] interferences.c:87: Frama_C_show_each_fjobptr2_start: {0}, {0}
@@ -93,8 +89,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_ptr_write, iteration 2 (potential
     shared vars changed).
-[eva] Analyzing a complete application starting at main_ptr_write
-[eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:101: 
@@ -115,8 +109,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobptr1 starting at fjobptr1, iteration 2 (potential shared
     vars changed and interferences changed).
-[eva] Analyzing a complete application starting at fjobptr1
-[eva] Initial state supplied by user
 [eva:show] interferences.c:75: Frama_C_show_each_fjobptr1_start: {0}, {0}
 [eva:interferences] interferences.c:76: 
   inject threads interferences at this point
@@ -161,8 +153,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobptr2 starting at fjobptr2, iteration 2 (potential shared
     vars changed and interferences changed).
-[eva] Analyzing a complete application starting at fjobptr2
-[eva] Initial state supplied by user
 [eva:show] interferences.c:87: Frama_C_show_each_fjobptr2_start: {0; 1}, {0; 1}
 [eva:interferences] interferences.c:88: 
   inject threads interferences at this point
@@ -257,8 +247,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_ptr_write, iteration 3 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_ptr_write
-[eva] Initial state supplied by user
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
 [eva:thread] interferences.c:102: 
   New context for jobptr2, fun fjobptr2, parent <main>, args {0}
@@ -276,8 +264,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobptr1 starting at fjobptr1, iteration 3 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at fjobptr1
-[eva] Initial state supplied by user
 [eva:show] interferences.c:75: 
   Frama_C_show_each_fjobptr1_start: {0; 1; 2}, {0; 1; 2}
 [eva:show] interferences.c:82: 
@@ -320,8 +306,6 @@
   Analyzing thread jobptr2 starting at fjobptr2, iteration 3 (shared vars
     values changed, thread initial memory state changed and interferences
     changed).
-[eva] Analyzing a complete application starting at fjobptr2
-[eva] Initial state supplied by user
 [eva:show] interferences.c:87: 
   Frama_C_show_each_fjobptr2_start: {0; 1; 2}, {0; 1; 2}
 [eva:show] interferences.c:94: 
@@ -400,8 +384,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_ptr_write, iteration 4 (shared vars
     values changed and interferences changed).
-[eva] Analyzing a complete application starting at main_ptr_write
-[eva] Initial state supplied by user
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [eva:global-accesses] 
@@ -417,8 +399,6 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobptr2 starting at fjobptr2, iteration 4 (shared vars
     values changed).
-[eva] Analyzing a complete application starting at fjobptr2
-[eva] Initial state supplied by user
 [eva:show] interferences.c:87: 
   Frama_C_show_each_fjobptr2_start: {0; 1; 2}, {0; 1; 2}
 [eva:show] interferences.c:94: 
