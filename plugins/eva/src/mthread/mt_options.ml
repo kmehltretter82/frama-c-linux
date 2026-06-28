@@ -75,13 +75,6 @@ module InterruptHandlers =
                 interrupts."
   end)
 
-let () = Parameter_customize.set_group messages
-module ModerateWarnings =
-  True (struct
-    let option_name = "-mt-moderate-warnings"
-    let help = "Show semi-important warnings during analysis."
-  end)
-
 let () = Parameter_customize.set_group grp_concurrency
 module SkipThreads =
   String_set
@@ -181,6 +174,16 @@ module KeepProjects =
 let () =
   KeepProjects.add_set_hook
     (fun _ _ -> warning "Deprecated option -mt-keep-analyses has no effect.")
+
+let () = Parameter_customize.is_invisible ()
+module ModerateWarnings =
+  True (struct
+    let option_name = "-mt-moderate-warnings"
+    let help = "Deprecated"
+  end)
+let () =
+  ModerateWarnings.add_set_hook
+    (fun _ _ -> warning "Deprecated option -mt-moderate-warnings has no effect.")
 
 let deprecate (module Param: Parameter_sig.S) msg_key_name =
   Param.add_set_hook (fun _ _ ->

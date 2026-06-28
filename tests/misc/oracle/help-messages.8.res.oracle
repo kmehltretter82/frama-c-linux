@@ -233,8 +233,6 @@ Options taking a string as argument should preferably be written
                     warning, error, abort, feedback-once, warning-once,
                     error-once. Defaults to warning. (preferably use
                     -eva-warn-key="k1[=s1][,...,kn[=sn]]")
--mt-moderate-warnings  Show semi-important warnings during analysis. (set by
-                    default, opposite option is -no-mt-moderate-warnings)
 
 *** PRECISION VS. TIME
 

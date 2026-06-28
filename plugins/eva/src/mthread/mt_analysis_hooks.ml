@@ -389,12 +389,11 @@ let hook_thread_creation analysis state : hook_sig = function
       | [], [] -> []
       | _formal :: qf, param :: qp -> param :: trunc_params (qf, qp)
       | [], (_ :: _ as params) ->
-        if Mt_options.ModerateWarnings.get () then
-          warning analysis
-            "During thread creation, mismatch between function \
-             '%s' signature and actual arguments. Ignoring last \
-             %d argument(s) and continuing."
-            (Kernel_function.get_name kf) (List.length params);
+        warning analysis
+          "During thread creation, mismatch between function \
+           '%s' signature and actual arguments. Ignoring last \
+           %d argument(s) and continuing."
+          (Kernel_function.get_name kf) (List.length params);
         []
       | _ :: _, [] ->
         error analysis

@@ -27,9 +27,6 @@ module WriteWriteRaces: Parameter_sig.Bool
 (** behavior of option -mt-interrupts*)
 module InterruptHandlers: Parameter_sig.Kernel_function_set
 
-(** behavior of option -mt-moderate-warning. *)
-module ModerateWarnings: Parameter_sig.Bool
-
 (** behavior of option -mt-skip-threads. *)
 module SkipThreads: Parameter_sig.String_set
 
