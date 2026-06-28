@@ -206,14 +206,12 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] tjob1 reads  a ∈ {3}  // memcpy.c:27 job1
-[eva:shared-memory:values] tjob2 reads  b ∈ {0; 3}  // memcpy.c:32 job2
+[eva:shared-memory:values] tjob1 reads  a ∈ {3}  // memcpy.c:27
+[eva:shared-memory:values] tjob2 reads  b ∈ {0; 3}  // memcpy.c:32
 [eva:shared-memory:values] 
   <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:49
-  memcpy :: memcpy.c:49 <- main
 [eva:shared-memory:values] 
   <main> writes  b# ∈ {0; 3} repeated %8   // memcpy.c:50
-  memcpy :: memcpy.c:50 <- main
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -249,8 +247,7 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] 
-  tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:27 job1
+[eva:shared-memory:values] tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:27
 [eva:shared-memory:values] 
   Write summary for <main>: a# ∈ {0; 3} repeated %8 
                             b# ∈ {0; 3} repeated %8

@@ -122,14 +122,10 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva:shared-memory:values] 
-  jobs2 reads  a ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
-[eva:shared-memory:values] 
-  jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
-[eva:shared-memory:values] 
-  jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
-[eva:shared-memory:values] 
-  jobs2 writes  b ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
+[eva:shared-memory:values] jobs2 reads  a ∈ [--..--]  // assigns.c:25
+[eva:shared-memory:values] jobs1 reads  b ∈ {0}  // assigns.c:20
+[eva:shared-memory:values] jobs1 writes  a ∈ [--..--]  // assigns.c:20
+[eva:shared-memory:values] jobs2 writes  b ∈ [--..--]  // assigns.c:25
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -196,8 +192,7 @@
       {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
-[eva:shared-memory:values] 
-  jobs1 reads  b ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[eva:shared-memory:values] jobs1 reads  b ∈ [--..--]  // assigns.c:20
 [eva:shared-memory:values] Write summary for jobs1: a ∈ [--..--]
 [eva:shared-memory:values] Write summary for jobs2: b ∈ [--..--]
 [eva:thread-fixpoint] 

@@ -785,19 +785,19 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva:shared-memory:values] <main> reads  end ∈ {0}  // recreation.c:68 main
-[eva:shared-memory:values] jobs[0] reads  end ∈ {0}  // recreation.c:28 job
-[eva:shared-memory:values] jobs[1] reads  end ∈ {0}  // recreation.c:28 job
-[eva:shared-memory:values] jobs[2] reads  end ∈ {0}  // recreation.c:28 job
-[eva:shared-memory:values] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
-[eva:shared-memory:values] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
+[eva:shared-memory:values] <main> reads  end ∈ {0}  // recreation.c:68
+[eva:shared-memory:values] jobs[0] reads  end ∈ {0}  // recreation.c:28
+[eva:shared-memory:values] jobs[1] reads  end ∈ {0}  // recreation.c:28
+[eva:shared-memory:values] jobs[2] reads  end ∈ {0}  // recreation.c:28
+[eva:shared-memory:values] jobs[3] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[4] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[5] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[6] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[7] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[8] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[9] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[10] writes  end ∈ {1}  // recreation.c:40
+[eva:shared-memory:values] jobs[11] writes  end ∈ {1}  // recreation.c:40
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -1182,10 +1182,10 @@
     interferences by mutexes:
       { locks[0]; locks[10] }:
         # cvalue: end ∈ {1}
-[eva:shared-memory:values] <main> reads  end ∈ {0; 1}  // recreation.c:68 main
-[eva:shared-memory:values] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva:shared-memory:values] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
-[eva:shared-memory:values] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
+[eva:shared-memory:values] <main> reads  end ∈ {0; 1}  // recreation.c:68
+[eva:shared-memory:values] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28
+[eva:shared-memory:values] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28
+[eva:shared-memory:values] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28
 [eva:shared-memory:values] Write summary for jobs[3]: end ∈ {1}
 [eva:shared-memory:values] Write summary for jobs[4]: end ∈ {1}
 [eva:shared-memory:values] Write summary for jobs[5]: end ∈ {1}

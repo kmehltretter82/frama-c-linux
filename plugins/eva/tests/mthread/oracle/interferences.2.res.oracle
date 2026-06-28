@@ -177,41 +177,41 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1}
 [eva:shared-memory:values] 
-  <main> reads  shared_a ∈ {0}  // interferences.c:135 main_thread_loop
+  <main> reads  shared_a ∈ {0}  // interferences.c:135
 [eva:shared-memory:values] 
-  joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
+  joboneshot reads  shared_a ∈ {0}  // interferences.c:110
 [eva:shared-memory:values] 
-  joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
+  joboneshot reads  shared_a ∈ {0}  // interferences.c:111
 [eva:shared-memory:values] 
-  joboneshot reads  shared_a ∈ {0}  // interferences.c:112 fjoboneshot
+  joboneshot reads  shared_a ∈ {0}  // interferences.c:112
 [eva:shared-memory:values] 
-  joboneshot reads  shared_a ∈ {1}  // interferences.c:113 fjoboneshot
+  joboneshot reads  shared_a ∈ {1}  // interferences.c:113
 [eva:shared-memory:values] 
-  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118 fjoblooped
+  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118
 [eva:shared-memory:values] 
-  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119 fjoblooped
+  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119
 [eva:shared-memory:values] 
-  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121 fjoblooped
+  joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121
 [eva:shared-memory:values] 
-  <main> reads  shared_b ∈ {0}  // interferences.c:135 main_thread_loop
+  <main> reads  shared_b ∈ {0}  // interferences.c:135
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0}  // interferences.c:110 fjoboneshot
+  joboneshot reads  shared_b ∈ {0}  // interferences.c:110
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0}  // interferences.c:111 fjoboneshot
+  joboneshot reads  shared_b ∈ {0}  // interferences.c:111
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0}  // interferences.c:113 fjoboneshot
+  joboneshot reads  shared_b ∈ {0}  // interferences.c:113
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0}  // interferences.c:118 fjoblooped
+  joblooped reads  shared_b ∈ {0}  // interferences.c:118
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0}  // interferences.c:119 fjoblooped
+  joblooped reads  shared_b ∈ {0}  // interferences.c:119
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0}  // interferences.c:120 fjoblooped
+  joblooped reads  shared_b ∈ {0}  // interferences.c:120
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {1}  // interferences.c:121 fjoblooped
+  joblooped reads  shared_b ∈ {1}  // interferences.c:121
 [eva:shared-memory:values] 
-  joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
+  joboneshot writes  shared_a ∈ {1}  // interferences.c:112
 [eva:shared-memory:values] 
-  joblooped writes  shared_b ∈ {1}  // interferences.c:120 fjoblooped
+  joblooped writes  shared_b ∈ {1}  // interferences.c:120
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -303,25 +303,25 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2}
 [eva:shared-memory:values] 
-  <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
+  <main> reads  shared_a ∈ {0; 1}  // interferences.c:135
 [eva:shared-memory:values] 
-  <main> reads  shared_b ∈ {0; 1}  // interferences.c:135 main_thread_loop
+  <main> reads  shared_b ∈ {0; 1}  // interferences.c:135
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:110 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:110
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:111 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:111
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:113 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:113
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:118 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:118
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:119 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:119
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:120 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1}  // interferences.c:120
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {1; 2}  // interferences.c:121 fjoblooped
+  joblooped reads  shared_b ∈ {1; 2}  // interferences.c:121
 [eva:shared-memory:values] 
-  joblooped writes  shared_b ∈ {1; 2}  // interferences.c:120 fjoblooped
+  joblooped writes  shared_b ∈ {1; 2}  // interferences.c:120
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped (updated): shared_b ∈ {1; 2}
@@ -407,23 +407,23 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2; 3}
 [eva:shared-memory:values] 
-  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:135 main_thread_loop
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:135
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:110 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:110
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:111 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:111
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:113 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:113
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:118 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:118
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:119 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:119
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:120 fjoblooped
+  joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:120
 [eva:shared-memory:values] 
-  joblooped reads  shared_b ∈ {1; 2; 3}  // interferences.c:121 fjoblooped
+  joblooped reads  shared_b ∈ {1; 2; 3}  // interferences.c:121
 [eva:shared-memory:values] 
-  joblooped writes  shared_b ∈ {1; 2; 3}  // interferences.c:120 fjoblooped
+  joblooped writes  shared_b ∈ {1; 2; 3}  // interferences.c:120
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped (updated): shared_b ∈ [1..2147483647]
@@ -517,28 +517,22 @@
                   shared_b ∈ [1..2147483647]
 [eva:shared-memory:values] 
   <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
-  main_thread_loop
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:110 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:110
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:111 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:111
 [eva:shared-memory:values] 
-  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:113 fjoboneshot
+  joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:113
 [eva:shared-memory:values] 
   joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:118
-  fjoblooped
 [eva:shared-memory:values] 
   joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:119
-  fjoblooped
 [eva:shared-memory:values] 
   joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:120
-  fjoblooped
 [eva:shared-memory:values] 
   joblooped reads  shared_b ∈ [1..2147483647]  // interferences.c:121
-  fjoblooped
 [eva:shared-memory:values] 
   joblooped writes  shared_b ∈ [1..2147483647]  // interferences.c:120
-  fjoblooped
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped: shared_b ∈ [1..2147483647]
@@ -595,13 +589,10 @@
                   shared_b ∈ [0..2147483647]
 [eva:shared-memory:values] 
   joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:110
-  fjoboneshot
 [eva:shared-memory:values] 
   joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:111
-  fjoboneshot
 [eva:shared-memory:values] 
   joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:113
-  fjoboneshot
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped: shared_b ∈ [1..2147483647]

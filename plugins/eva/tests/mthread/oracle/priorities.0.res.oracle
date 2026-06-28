@@ -258,11 +258,11 @@
       { m2 }:
         # cvalue: s1 ∈ {0; 1}
                   s2 ∈ {3}
-[eva:shared-memory:values] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:23 f1
-[eva:shared-memory:values] <main> reads  s2 ∈ {0}  // priorities.c:65 main
-[eva:shared-memory:values] <main> writes  s1 ∈ {1}  // priorities.c:64 main
-[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // priorities.c:37 f3
-[eva:shared-memory:values] jobs4 writes  s2 ∈ {3}  // priorities.c:45 f4
+[eva:shared-memory:values] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:23
+[eva:shared-memory:values] <main> reads  s2 ∈ {0}  // priorities.c:65
+[eva:shared-memory:values] <main> writes  s1 ∈ {1}  // priorities.c:64
+[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // priorities.c:37
+[eva:shared-memory:values] jobs4 writes  s2 ∈ {3}  // priorities.c:45
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -397,9 +397,9 @@
       { m2 }:
         # cvalue: s1 ∈ {0; 1}
                   s2 ∈ {0; 3}
-[eva:shared-memory:values] <main> reads  s2 ∈ {0; 3}  // priorities.c:65 main
-[eva:shared-memory:values] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:37 f3
-[eva:shared-memory:values] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:45 f4
+[eva:shared-memory:values] <main> reads  s2 ∈ {0; 3}  // priorities.c:65
+[eva:shared-memory:values] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:37
+[eva:shared-memory:values] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:45
 [eva:shared-memory:values] Write summary for <main>: s1 ∈ {1}
 [eva:shared-memory:values] Write summary for jobs3 (updated): s2 ∈ {0; 3}
 [eva:shared-memory:values] Write summary for jobs4 (updated): s2 ∈ {0; 3}

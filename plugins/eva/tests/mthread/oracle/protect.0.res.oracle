@@ -113,10 +113,10 @@
     shared bases: {t}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] tjob reads  t[1] ∈ {0; 1}  // protect.c:12 job
-[eva:shared-memory:values] tjob reads  t[3] ∈ {0; 4}  // protect.c:12 job
-[eva:shared-memory:values] <main> writes  t[1] ∈ {1}  // protect.c:25 main
-[eva:shared-memory:values] <main> writes  t[3] ∈ {4}  // protect.c:29 main
+[eva:shared-memory:values] tjob reads  t[1] ∈ {0; 1}  // protect.c:12
+[eva:shared-memory:values] tjob reads  t[3] ∈ {0; 4}  // protect.c:12
+[eva:shared-memory:values] <main> writes  t[1] ∈ {1}  // protect.c:25
+[eva:shared-memory:values] <main> writes  t[3] ∈ {4}  // protect.c:29
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing

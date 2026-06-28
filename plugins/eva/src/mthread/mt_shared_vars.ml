@@ -673,36 +673,36 @@ module Precise = struct
 
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
-    if Mt_options.DumpSharedVarsValues.get () > 1 then
+    if Self.(is_debug_key_enabled dkey_callstacks) then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, th) base offsm =
-    if Mt_options.DumpSharedVarsValues.get () > 0 then
-      Self.feedback ~dkey:Self.dkey_shared_memory_values ~once:true
-        "@[%a %as @ @[%a%a@]@ %a@]"
-        Thread.pretty th Mt_types.RW.pretty op Base.pretty base
-        (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
-        pp_stack node
+    Self.feedback ~dkey:Self.dkey_shared_memory_values ~once:true
+      "@[%a %as @ @[%a%a@]@ %a@]"
+      Thread.pretty th Mt_types.RW.pretty op Base.pretty base
+      (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
+      pp_stack node
 
 
   let display_shared_vars_value m =
-    fold_location
-      (fun loc s () ->
-         SetNodeIdAccess.fold
-           (fun (op, node, _thid as access) () ->
-              match op with
-              | ReadPos _ | WritePos _ ->
-                Self.not_yet_implemented ~current:true
-                  "Mt_shared_vars.Precise.display_shared_vars_value on positions"
-              | Write _ -> ()
-              | Read ->
-                let state = node.cfgn_value_state.state_before in
-                let shared =  extract_shared_value node op loc state in
-                List.iter (fun (base, offsm) -> pp_access access base offsm) shared)
-           s
-           ())
-      m
-      ()
+    if Self.(is_debug_key_enabled dkey_shared_memory_values) then
+      fold_location
+        (fun loc s () ->
+           SetNodeIdAccess.fold
+             (fun (op, node, _thid as access) () ->
+                match op with
+                | ReadPos _ | WritePos _ ->
+                  Self.not_yet_implemented ~current:true
+                    "Mt_shared_vars.Precise.display_shared_vars_value on positions"
+                | Write _ -> ()
+                | Read ->
+                  let state = node.cfgn_value_state.state_before in
+                  let shared =  extract_shared_value node op loc state in
+                  List.iter (fun (base, offsm) -> pp_access access base offsm) shared)
+             s
+             ())
+        m
+        ()
 
   module WriteSeen =
     Datatype.Triple_with_collections (CfgNode) (Thread) (Locations)

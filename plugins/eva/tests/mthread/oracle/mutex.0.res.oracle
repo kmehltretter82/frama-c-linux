@@ -221,10 +221,10 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] jobs2 reads  s1 ∈ {0; 1}  // mutex.c:33 f2
-[eva:shared-memory:values] jobs2 reads  s2 ∈ {0}  // mutex.c:34 f2
-[eva:shared-memory:values] jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1
-[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3
+[eva:shared-memory:values] jobs2 reads  s1 ∈ {0; 1}  // mutex.c:33
+[eva:shared-memory:values] jobs2 reads  s2 ∈ {0}  // mutex.c:34
+[eva:shared-memory:values] jobs1 writes  s1 ∈ {1}  // mutex.c:25
+[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // mutex.c:40
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -333,7 +333,7 @@
     shared bases: {s1, s2}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34 f2
+[eva:shared-memory:values] jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34
 [eva:shared-memory:values] Write summary for jobs1: s1 ∈ {1}
 [eva:shared-memory:values] Write summary for jobs3: s2 ∈ {3}
 [eva:thread-fixpoint] 

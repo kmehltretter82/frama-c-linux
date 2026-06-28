@@ -101,15 +101,6 @@ Options taking a string as argument should preferably be written
                     -mt-interrupt-handlers="functions")
 -mt-only-threads <th1,...,thn>  only execute the specified threads
                     (preferably use -mt-only-threads="th1,...,thn")
--mt-shared-accesses-synchronization  more precise inference of which mutexes
-                    protect shared memory (opposite option is
-                    -no-mt-shared-accesses-synchronization)
--mt-shared-values <level>  Show what threads read and write in shared memory
-                    at the end of each iteration
-                    0: values not shown
-                    1: values shown
-                    2: values shown with the stack at which the operation
-                    occurs
 -mt-skip-threads <th1,...,thn>  do not execute the specified threads
                     (preferably use -mt-skip-threads="th1,...,thn")
 -mt-stop-after <i>  Only perform at most i iterations
@@ -244,8 +235,6 @@ Options taking a string as argument should preferably be written
                     -eva-warn-key="k1[=s1][,...,kn[=sn]]")
 -mt-moderate-warnings  Show semi-important warnings during analysis. (set by
                     default, opposite option is -no-mt-moderate-warnings)
--mt-print-callstacks  Print the callstacks at which concurrent events occur
-                    (opposite option is -no-mt-print-callstacks)
 
 *** PRECISION VS. TIME
 

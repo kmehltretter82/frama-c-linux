@@ -378,15 +378,11 @@
     interferences by mutexes:
       { locks[0]; locks[3] }:
         # cvalue: end2 ∈ {1}
-[eva:shared-memory:values] <main> reads  end2 ∈ {0}  // philo.c:72 main
-[eva:shared-memory:values] 
-  jobs[0] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva:shared-memory:values] 
-  jobs[2] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva:shared-memory:values] 
-  jobs[3] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[eva:shared-memory:values] 
-  jobs[4] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
+[eva:shared-memory:values] <main> reads  end2 ∈ {0}  // philo.c:72
+[eva:shared-memory:values] jobs[0] writes  end2 ∈ {1}  // philo.c:43
+[eva:shared-memory:values] jobs[2] writes  end2 ∈ {1}  // philo.c:43
+[eva:shared-memory:values] jobs[3] writes  end2 ∈ {1}  // philo.c:43
+[eva:shared-memory:values] jobs[4] writes  end2 ∈ {1}  // philo.c:43
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -554,7 +550,7 @@
     interferences by mutexes:
       { locks[0]; locks[3] }:
         # cvalue: end2 ∈ {1}
-[eva:shared-memory:values] <main> reads  end2 ∈ {0; 1}  // philo.c:72 main
+[eva:shared-memory:values] <main> reads  end2 ∈ {0; 1}  // philo.c:72
 [eva:shared-memory:values] Write summary for jobs[0]: end2 ∈ {1}
 [eva:shared-memory:values] Write summary for jobs[2]: end2 ∈ {1}
 [eva:shared-memory:values] Write summary for jobs[3]: end2 ∈ {1}

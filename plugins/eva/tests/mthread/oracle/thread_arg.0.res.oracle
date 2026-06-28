@@ -188,28 +188,20 @@
                   vars[0..1] ∈ [0..10]
 [eva:shared-memory:values] 
   jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [eva:shared-memory:values] 
   jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[eva:shared-memory:values] 
-  <main> reads  vars[0] ∈ {0}  // thread_arg.c:45 main
-[eva:shared-memory:values] 
-  jobs[0] reads  vars[0] ∈ {0}  // thread_arg.c:26 job
-[eva:shared-memory:values] 
-  <main> reads  vars[1] ∈ {0}  // thread_arg.c:45 main
-[eva:shared-memory:values] 
-  jobs[1] reads  vars[1] ∈ {0}  // thread_arg.c:26 job
+[eva:shared-memory:values] <main> reads  vars[0] ∈ {0}  // thread_arg.c:45
+[eva:shared-memory:values] jobs[0] reads  vars[0] ∈ {0}  // thread_arg.c:26
+[eva:shared-memory:values] <main> reads  vars[1] ∈ {0}  // thread_arg.c:45
+[eva:shared-memory:values] jobs[1] reads  vars[1] ∈ {0}  // thread_arg.c:26
 [eva:shared-memory:values] 
   jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [eva:shared-memory:values] 
   jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [eva:shared-memory:values] 
-  jobs[0] writes  vars[0] ∈ [0..10]  // thread_arg.c:26 job
+  jobs[0] writes  vars[0] ∈ [0..10]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  jobs[1] writes  vars[1] ∈ [0..10]  // thread_arg.c:26 job
+  jobs[1] writes  vars[1] ∈ [0..10]  // thread_arg.c:26
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -318,18 +310,16 @@
       { locks[1] }:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..20]
+[eva:shared-memory:values] <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45
 [eva:shared-memory:values] 
-  <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45 main
+  jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26
+[eva:shared-memory:values] <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45
 [eva:shared-memory:values] 
-  jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26 job
+  jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45 main
+  jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26 job
-[eva:shared-memory:values] 
-  jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26 job
-[eva:shared-memory:values] 
-  jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26 job
+  jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26
 [eva:shared-memory:values] 
   Write summary for jobs[0] (updated):
   Frama_C_entropy_source ∈ [--..--]
@@ -441,17 +431,17 @@
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
 [eva:shared-memory:values] 
-  <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
+  <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45
 [eva:shared-memory:values] 
-  jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26 job
+  jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
+  <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45
 [eva:shared-memory:values] 
-  jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
+  jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26 job
+  jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
+  jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26
 [eva:shared-memory:values] 
   Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]
@@ -555,9 +545,9 @@
         Frama_C_entropy_source ∈ [--..--]
         vars[0..1] ∈ [0..2147483647]
 [eva:shared-memory:values] 
-  jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
+  jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26
 [eva:shared-memory:values] 
-  jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
+  jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26
 [eva:shared-memory:values] 
   Write summary for jobs[0]:
   Frama_C_entropy_source ∈ [--..--]

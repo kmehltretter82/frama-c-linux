@@ -89,30 +89,10 @@
       {}:
         # cvalue: a ∈ {1}
                   c ∈ {0; 2}
-[eva:shared-memory:values] <main> reads  a ∈ {0}  // memexec.c:33 main
-[eva:shared-memory:values] <main> reads  c ∈ {0}  // memexec.c:33 main
-[eva:shared-memory:values] 
-  th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
-[eva:shared-memory:values] 
-  th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:19 <- f :: memexec.c:27 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:18 <- f :: memexec.c:27 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:16 <- f :: memexec.c:27 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:19 <- f :: memexec.c:25 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:18 <- f :: memexec.c:25 <- t1
-[eva:shared-memory:values] 
-  th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+[eva:shared-memory:values] <main> reads  a ∈ {0}  // memexec.c:33
+[eva:shared-memory:values] <main> reads  c ∈ {0}  // memexec.c:33
+[eva:shared-memory:values] th1 writes  a ∈ {1}  // memexec.c:14
+[eva:shared-memory:values] th1 writes  c ∈ {2}  // memexec.c:10
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -135,8 +115,8 @@
     shared bases: {a, c}
     interferences by location:
     interferences by mutexes:
-[eva:shared-memory:values] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
-[eva:shared-memory:values] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
+[eva:shared-memory:values] <main> reads  a ∈ {0; 1}  // memexec.c:33
+[eva:shared-memory:values] <main> reads  c ∈ {0; 2}  // memexec.c:33
 [eva:shared-memory:values] 
   Write summary for th1: a ∈ {1}
                          c ∈ {2}

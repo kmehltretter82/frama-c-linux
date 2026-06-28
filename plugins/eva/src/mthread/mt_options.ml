@@ -17,20 +17,6 @@ module Enabled =
     let help = "Enable analysis of multi-threaded programs (experimental)"
   end)
 
-let () = Parameter_customize.is_invisible ()
-module KeepProjects =
-  String (struct
-    let option_name = "-mt-keep-analyses"
-    let help = "keep a copy of the analyses done for each thread"
-    let default = "last"
-    let arg_name = "all|last|none"
-  end)
-let () = KeepProjects.set_possible_values ["all"; "last"; "none"]
-let () = KeepProjects.add_set_hook
-    (fun _old _new ->
-       warning "Option -mt-keep-analyses is now deprecated.@ \
-                Thread analyses are no longer run in separate projects.")
-
 let () = Parameter_customize.set_group grp_debug
 module ToDisk =
   False (struct
@@ -81,26 +67,6 @@ module WriteWriteRaces =
   end)
 
 let () = Parameter_customize.set_group grp_concurrency
-module DumpSharedVarsValues =
-  Int (struct
-    let default = 0
-    let option_name = "-mt-shared-values"
-    let help = "Show what threads read and write in shared memory at the end of each iteration\n\
-                0: values not shown\n\
-                1: values shown\n\
-                2: values shown with the stack at which the operation occurs"
-    let arg_name = "level"
-  end)
-let () = DumpSharedVarsValues.set_range ~min:0 ~max:2
-
-let () = Parameter_customize.set_group grp_concurrency
-module CheckProtections =
-  False (struct
-    let help = "more precise inference of which mutexes protect shared memory"
-    let option_name = "-mt-shared-accesses-synchronization"
-  end)
-
-let () = Parameter_customize.set_group grp_concurrency
 module InterruptHandlers =
   Kernel_function_set (struct
     let option_name = "-mt-interrupt-handlers" (* if modified, update name in mt_domain.ml *)
@@ -114,13 +80,6 @@ module ModerateWarnings =
   True (struct
     let option_name = "-mt-moderate-warnings"
     let help = "Show semi-important warnings during analysis."
-  end)
-
-let () = Parameter_customize.set_group messages
-module PrintCallstacks  =
-  False (struct
-    let option_name = "-mt-print-callstacks"
-    let help = "Print the callstacks at which concurrent events occur"
   end)
 
 let () = Parameter_customize.set_group grp_concurrency
@@ -207,6 +166,27 @@ module ShowReturnEdges =
     let help = "Show link between a call an a return instruction as a dotted line"
   end)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated options                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.is_invisible ()
+module KeepProjects =
+  String (struct
+    let option_name = "-mt-keep-analyses"
+    let help = "Deprecated"
+    let default = ""
+    let arg_name = ""
+  end)
+let () =
+  KeepProjects.add_set_hook
+    (fun _ _ -> warning "Deprecated option -mt-keep-analyses has no effect.")
+
+let deprecate (module Param: Parameter_sig.S) msg_key_name =
+  Param.add_set_hook (fun _ _ ->
+      Self.warning "Option %s is deprecated: use %s instead."
+        Param.name msg_key_name)
+
 let () = Parameter_customize.is_invisible ()
 module MtHelp =
   False (struct
@@ -214,9 +194,7 @@ module MtHelp =
     let help = "Deprecated: use -eva-help instead."
   end)
 let () = MtHelp.add_aliases ~visible:false ~deprecated:false ["-mt-h"]
-let () =
-  MtHelp.add_set_hook (fun _ _ ->
-      warning "Option -mt-help is deprecated: use -eva-help instead.")
+let () = deprecate (module MtHelp) "-eva-help"
 
 let () = Parameter_customize.is_invisible ()
 module MtVerbose =
@@ -226,6 +204,30 @@ module MtVerbose =
     let default = 0
     let arg_name = ""
   end)
-let () =
-  MtVerbose.add_set_hook (fun _ _ ->
-      warning "Option -mt-verbose is deprecated: use -eva-verbose instead.")
+let () = deprecate (module MtVerbose) "-eva-verbose"
+
+let () = Parameter_customize.is_invisible ()
+module DumpSharedVarsValues =
+  Int (struct
+    let default = 0
+    let option_name = "-mt-shared-values"
+    let help = "Deprecated: use -eva-msg-key shared-memory:values instead"
+    let arg_name = "level"
+  end)
+let () = deprecate (module DumpSharedVarsValues) "-eva-msg-key shared-memory:values"
+
+let () = Parameter_customize.is_invisible ()
+module CheckProtections =
+  False (struct
+    let option_name = "-mt-shared-accesses-synchronization"
+    let help = "Deprecated: use -eva-msg-key shared-memory:mutex-details instead"
+  end)
+let () = deprecate (module CheckProtections) "-eva-msg-key shared-memory:mutex-details"
+
+let () = Parameter_customize.is_invisible ()
+module PrintCallstacks  =
+  False (struct
+    let option_name = "-mt-print-callstacks"
+    let help = "Deprecated: use -eva-msg-key callstacks instead"
+  end)
+let () = deprecate (module PrintCallstacks) "-eva-msg-key callstacks"

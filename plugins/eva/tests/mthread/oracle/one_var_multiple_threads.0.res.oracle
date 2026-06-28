@@ -234,29 +234,29 @@
                   s2.data ∈ {1}
                     .data2 ∈ {0; 3}
 [eva:shared-memory:values] 
-  <main> reads  s1.data ∈ {0}  // one_var_multiple_threads.c:50 main
+  <main> reads  s1.data ∈ {0}  // one_var_multiple_threads.c:50
 [eva:shared-memory:values] 
-  jobs reads  s1.data ∈ {0}  // one_var_multiple_threads.c:22 f
+  jobs reads  s1.data ∈ {0}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  <main> reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:51 main
+  <main> reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:51
 [eva:shared-memory:values] 
-  jobs reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:23 f
+  jobs reads  s1.data2 ∈ {0}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  <main> reads  s2.data ∈ {0}  // one_var_multiple_threads.c:54 main
+  <main> reads  s2.data ∈ {0}  // one_var_multiple_threads.c:54
 [eva:shared-memory:values] 
-  jobs reads  s2.data ∈ {0}  // one_var_multiple_threads.c:30 g
+  jobs reads  s2.data ∈ {0}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  <main> reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:55 main
+  <main> reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:55
 [eva:shared-memory:values] 
-  jobs reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:31 g
+  jobs reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:31
 [eva:shared-memory:values] 
-  jobs writes  s1.data ∈ {1}  // one_var_multiple_threads.c:22 f
+  jobs writes  s1.data ∈ {1}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23 f
+  jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30 g
+  jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31 g
+  jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -392,29 +392,29 @@
         s2.data ∈ {1; 2}
           .data2 ∈ {0; 3; 6}
 [eva:shared-memory:values] 
-  <main> reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:50 main
+  <main> reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:50
 [eva:shared-memory:values] 
-  jobs reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:22 f
+  jobs reads  s1.data ∈ {0; 1}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  <main> reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:51 main
+  <main> reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:51
 [eva:shared-memory:values] 
-  jobs reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:23 f
+  jobs reads  s1.data2 ∈ {0; 3}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  <main> reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:54 main
+  <main> reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:54
 [eva:shared-memory:values] 
-  jobs reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30 g
+  jobs reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  <main> reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:55 main
+  <main> reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:55
 [eva:shared-memory:values] 
-  jobs reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31 g
+  jobs reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31
 [eva:shared-memory:values] 
-  jobs writes  s1.data ∈ {1; 2}  // one_var_multiple_threads.c:22 f
+  jobs writes  s1.data ∈ {1; 2}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23 f
+  jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30 g
+  jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31 g
+  jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31
 [eva:shared-memory:values] 
   Write summary for jobs (updated): s1.data ∈ {1; 2}
                                       .data2 ∈ {3; 6}
@@ -537,29 +537,29 @@
         s2.data ∈ {1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
 [eva:shared-memory:values] 
-  <main> reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:50 main
+  <main> reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:50
 [eva:shared-memory:values] 
-  jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
+  jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51 main
+  <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51
 [eva:shared-memory:values] 
-  jobs reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23 f
+  jobs reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  <main> reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:54 main
+  <main> reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:54
 [eva:shared-memory:values] 
-  jobs reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30 g
+  jobs reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  <main> reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:55 main
+  <main> reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:55
 [eva:shared-memory:values] 
-  jobs reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31 g
+  jobs reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31
 [eva:shared-memory:values] 
-  jobs writes  s1.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:22 f
+  jobs writes  s1.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
-  jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23 f
+  jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23
 [eva:shared-memory:values] 
-  jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30 g
+  jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
-  jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31 g
+  jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31
 [eva:shared-memory:values] 
   Write summary for jobs (updated):
   s1.data ∈ [1..2147483647]
@@ -703,36 +703,30 @@
           .data2 ∈ [0..2147483646],0%3
 [eva:shared-memory:values] 
   <main> reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:50
-  main
 [eva:shared-memory:values] 
-  jobs reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
+  jobs reads  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
   <main> reads  s1.data2 ∈ [0..2147483646],0%3 
-  // one_var_multiple_threads.c:51 main
+  // one_var_multiple_threads.c:51
 [eva:shared-memory:values] 
   jobs reads  s1.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:23
-  f
 [eva:shared-memory:values] 
   <main> reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:54
-  main
 [eva:shared-memory:values] 
-  jobs reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
+  jobs reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
   <main> reads  s2.data2 ∈ [0..2147483646],0%3 
-  // one_var_multiple_threads.c:55 main
+  // one_var_multiple_threads.c:55
 [eva:shared-memory:values] 
   jobs reads  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
-  g
 [eva:shared-memory:values] 
-  jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22 f
+  jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22
 [eva:shared-memory:values] 
   jobs writes  s1.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:23
-  f
 [eva:shared-memory:values] 
-  jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
+  jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30
 [eva:shared-memory:values] 
   jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
-  g
 [eva:shared-memory:values] 
   Write summary for jobs: s1.data ∈ [1..2147483647]
                             .data2 ∈ [3..2147483646],0%3

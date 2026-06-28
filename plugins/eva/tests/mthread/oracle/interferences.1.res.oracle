@@ -193,45 +193,41 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [eva:shared-memory:values] 
-  <main> reads  shared_a ∈ {0}  // interferences.c:106 main_ptr_write
+  <main> reads  shared_a ∈ {0}  // interferences.c:106
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0}  // interferences.c:75 fjobptr1
+  jobptr1 reads  shared_a ∈ {0}  // interferences.c:75
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0}  // interferences.c:76 fjobptr1
+  jobptr1 reads  shared_a ∈ {0}  // interferences.c:76
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0; 1}  // interferences.c:82 fjobptr1
+  jobptr1 reads  shared_a ∈ {0; 1}  // interferences.c:82
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_a ∈ {0; 1}  // interferences.c:87 fjobptr2
+  jobptr2 reads  shared_a ∈ {0; 1}  // interferences.c:87
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_a ∈ {0; 1}  // interferences.c:88 fjobptr2
+  jobptr2 reads  shared_a ∈ {0; 1}  // interferences.c:88
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
+  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:94
 [eva:shared-memory:values] 
-  <main> reads  shared_b ∈ {0}  // interferences.c:106 main_ptr_write
+  <main> reads  shared_b ∈ {0}  // interferences.c:106
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0}  // interferences.c:75 fjobptr1
+  jobptr1 reads  shared_b ∈ {0}  // interferences.c:75
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0}  // interferences.c:76 fjobptr1
+  jobptr1 reads  shared_b ∈ {0}  // interferences.c:76
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0; 1}  // interferences.c:82 fjobptr1
+  jobptr1 reads  shared_b ∈ {0; 1}  // interferences.c:82
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_b ∈ {0; 1}  // interferences.c:87 fjobptr2
+  jobptr2 reads  shared_b ∈ {0; 1}  // interferences.c:87
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_b ∈ {0; 1}  // interferences.c:88 fjobptr2
+  jobptr2 reads  shared_b ∈ {0; 1}  // interferences.c:88
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
+  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:94
 [eva:shared-memory:values] 
   jobptr1 writes  shared_a ∈ {1}  // interferences.c:71
-  write :: interferences.c:78 <- fjobptr1
 [eva:shared-memory:values] 
   jobptr2 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:92 <- fjobptr2
 [eva:shared-memory:values] 
   jobptr1 writes  shared_b ∈ {1}  // interferences.c:71
-  write :: interferences.c:80 <- fjobptr1
 [eva:shared-memory:values] 
   jobptr2 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:90 <- fjobptr2
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -345,35 +341,33 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [eva:shared-memory:values] 
-  <main> reads  shared_a ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
+  <main> reads  shared_a ∈ {0; 1; 2}  // interferences.c:106
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
+  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:75
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
+  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:76
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
+  jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:82
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
+  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:87
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
+  jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:88
 [eva:shared-memory:values] 
-  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
+  <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:106
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
+  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:75
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
+  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:76
 [eva:shared-memory:values] 
-  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
+  jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:82
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
+  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:87
 [eva:shared-memory:values] 
-  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
+  jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:88
 [eva:shared-memory:values] 
   jobptr1 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:78 <- fjobptr1
 [eva:shared-memory:values] 
   jobptr1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:80 <- fjobptr1
 [eva:shared-memory:values] 
   Write summary for jobptr1 (updated):
   shared_a ∈ {0; 1; 2}

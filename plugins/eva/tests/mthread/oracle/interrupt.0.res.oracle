@@ -95,13 +95,11 @@
         # cvalue: interrupt_received ∈ {1}
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0}  // interrupt.c:18
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0}  // interrupt.c:19
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {1} 
-  // interrupt.c:9 interrupt_oneshot
+  // interrupt.c:9
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -158,22 +156,17 @@
         # cvalue: interrupt_received ∈ {0; 1}
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:18
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:19
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {1}  // interrupt.c:20
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:22
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <main> writes  interrupt_received ∈ {0; 1}  // interrupt.c:21
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {0; 1} 
-  // interrupt.c:9 interrupt_oneshot
+  // interrupt.c:9
 [eva:shared-memory:values] 
   Write summary for <main> (updated): interrupt_received ∈ {0; 1}
 [eva:shared-memory:values] 
@@ -206,7 +199,6 @@
         # cvalue: interrupt_received ∈ {0; 1}
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:20
-  main_interrupt_one_shot
 [eva:shared-memory:values] 
   Write summary for <main>: interrupt_received ∈ {0; 1}
 [eva:shared-memory:values] 

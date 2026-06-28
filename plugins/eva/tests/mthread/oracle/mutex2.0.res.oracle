@@ -266,12 +266,12 @@
       { m2 }:
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {0; 3}
-[eva:shared-memory:values] <main> reads  s1 ∈ {0}  // mutex2.c:58 main
-[eva:shared-memory:values] <main> reads  s2 ∈ {0}  // mutex2.c:59 main
-[eva:shared-memory:values] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1
-[eva:shared-memory:values] jobs2 writes  s1 ∈ {1; 2}  // mutex2.c:28 f2
-[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3
-[eva:shared-memory:values] jobs4 writes  s2 ∈ {0; 3}  // mutex2.c:41 f4
+[eva:shared-memory:values] <main> reads  s1 ∈ {0}  // mutex2.c:58
+[eva:shared-memory:values] <main> reads  s2 ∈ {0}  // mutex2.c:59
+[eva:shared-memory:values] jobs1 writes  s1 ∈ {1}  // mutex2.c:21
+[eva:shared-memory:values] jobs2 writes  s1 ∈ {1; 2}  // mutex2.c:28
+[eva:shared-memory:values] jobs3 writes  s2 ∈ {3}  // mutex2.c:34
+[eva:shared-memory:values] jobs4 writes  s2 ∈ {0; 3}  // mutex2.c:41
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -411,11 +411,11 @@
       { m2 }:
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {0; 3}
-[eva:shared-memory:values] <main> reads  s1 ∈ {0; 1; 2}  // mutex2.c:58 main
-[eva:shared-memory:values] <main> reads  s2 ∈ {0; 3}  // mutex2.c:59 main
-[eva:shared-memory:values] jobs1 writes  s1 ∈ {0; 1; 2}  // mutex2.c:21 f1
-[eva:shared-memory:values] jobs2 writes  s1 ∈ {0; 1; 2}  // mutex2.c:28 f2
-[eva:shared-memory:values] jobs3 writes  s2 ∈ {0; 3}  // mutex2.c:34 f3
+[eva:shared-memory:values] <main> reads  s1 ∈ {0; 1; 2}  // mutex2.c:58
+[eva:shared-memory:values] <main> reads  s2 ∈ {0; 3}  // mutex2.c:59
+[eva:shared-memory:values] jobs1 writes  s1 ∈ {0; 1; 2}  // mutex2.c:21
+[eva:shared-memory:values] jobs2 writes  s1 ∈ {0; 1; 2}  // mutex2.c:28
+[eva:shared-memory:values] jobs3 writes  s2 ∈ {0; 3}  // mutex2.c:34
 [eva:shared-memory:values] Write summary for jobs1 (updated): s1 ∈ {0; 1; 2}
 [eva:shared-memory:values] Write summary for jobs2 (updated): s1 ∈ {0; 1; 2}
 [eva:shared-memory:values] Write summary for jobs3 (updated): s2 ∈ {0; 3}

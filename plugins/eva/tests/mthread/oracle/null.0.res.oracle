@@ -77,9 +77,9 @@
       {}:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [eva:shared-memory:values] 
-  <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
+  <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27
 [eva:shared-memory:values] 
-  tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
+  tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing

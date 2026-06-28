@@ -563,64 +563,43 @@
         d ∈ {0; 1}
         e ∈ {0; 1}
         f ∈ {0; 1}
-[eva:shared-memory:values] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:19 fjob
-[eva:shared-memory:values] 
-  jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:19 fjob
-[eva:shared-memory:values] <main> reads  a ∈ {1}  // ccfg.c:93 main
-[eva:shared-memory:values] job_f1 reads  a ∈ [--..--]  // ccfg.c:56 f1
-[eva:shared-memory:values] job_f2 reads  a ∈ [--..--]  // ccfg.c:66 f2
-[eva:shared-memory:values] 
-  job_f2 reads  a ∈ [--..--]  // ccfg.c:65 g4 :: ccfg.c:65 <- f2
-[eva:shared-memory:values] <main> reads  b ∈ {1}  // ccfg.c:94 main
-[eva:shared-memory:values] job_f1 reads  b ∈ {0; 1}  // ccfg.c:56 f1
-[eva:shared-memory:values] 
-  job_f1 reads  b ∈ {0; 1}  // ccfg.c:55 g3 :: ccfg.c:55 <- f1
-[eva:shared-memory:values] job_f2 reads  b ∈ [--..--]  // ccfg.c:66 f2
-[eva:shared-memory:values] <main> reads  c ∈ {1}  // ccfg.c:96 main
-[eva:shared-memory:values] 
-  job_f2 reads  c ∈ [--..--]  // ccfg.c:68 g5 :: ccfg.c:68 <- f2
-[eva:shared-memory:values] <main> reads  d ∈ {1}  // ccfg.c:97 main
-[eva:shared-memory:values] 
-  job_f1 reads  d ∈ {0; 1}  // ccfg.c:58 g5 :: ccfg.c:58 <- f1
-[eva:shared-memory:values] <main> reads  e ∈ {1}  // ccfg.c:98 main
-[eva:shared-memory:values] 
-  job_f2 reads  e ∈ {0; 1}  // ccfg.c:50 g6 :: ccfg.c:69 <- f2
-[eva:shared-memory:values] <main> reads  f ∈ {1}  // ccfg.c:99 main
-[eva:shared-memory:values] 
-  job_f1 reads  f ∈ {0; 1}  // ccfg.c:50 g6 :: ccfg.c:59 <- f1
-[eva:shared-memory:values] 
-  <main> writes  global1 ∈ {1}  // ccfg.c:27 g1 :: ccfg.c:82 <- main
-[eva:shared-memory:values] 
-  <main> writes  global2[0] ∈ {1}  // ccfg.c:32 g2 :: ccfg.c:83 <- main
-[eva:shared-memory:values] 
-  <main> writes  global2[1] ∈ {2}  // ccfg.c:34 g2 :: ccfg.c:83 <- main
-[eva:shared-memory:values] 
-  job_f1 writes  a ∈ [--..--]  // ccfg.c:55 g3 :: ccfg.c:55 <- f1
-[eva:shared-memory:values] 
-  job_f2 writes  b ∈ [--..--]  // ccfg.c:65 g4 :: ccfg.c:65 <- f2
-[eva:shared-memory:values] 
-  job_f1 writes  c ∈ [--..--]  // ccfg.c:58 g5 :: ccfg.c:58 <- f1
-[eva:shared-memory:values] 
-  job_f2 writes  d ∈ [--..--]  // ccfg.c:68 g5 :: ccfg.c:68 <- f2
-[eva:shared-memory:values] job_f1 writes  e ∈ {0; 1}  // ccfg.c:59 f1
-[eva:shared-memory:values] job_f2 writes  f ∈ {0; 1}  // ccfg.c:69 f2
+[eva:shared-memory:values] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:19
+[eva:shared-memory:values] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:19
+[eva:shared-memory:values] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:19
+[eva:shared-memory:values] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:19
+[eva:shared-memory:values] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:19
+[eva:shared-memory:values] <main> reads  a ∈ {1}  // ccfg.c:93
+[eva:shared-memory:values] job_f1 reads  a ∈ [--..--]  // ccfg.c:56
+[eva:shared-memory:values] job_f2 reads  a ∈ [--..--]  // ccfg.c:66
+[eva:shared-memory:values] job_f2 reads  a ∈ [--..--]  // ccfg.c:65
+[eva:shared-memory:values] <main> reads  b ∈ {1}  // ccfg.c:94
+[eva:shared-memory:values] job_f1 reads  b ∈ {0; 1}  // ccfg.c:56
+[eva:shared-memory:values] job_f1 reads  b ∈ {0; 1}  // ccfg.c:55
+[eva:shared-memory:values] job_f2 reads  b ∈ [--..--]  // ccfg.c:66
+[eva:shared-memory:values] <main> reads  c ∈ {1}  // ccfg.c:96
+[eva:shared-memory:values] job_f2 reads  c ∈ [--..--]  // ccfg.c:68
+[eva:shared-memory:values] <main> reads  d ∈ {1}  // ccfg.c:97
+[eva:shared-memory:values] job_f1 reads  d ∈ {0; 1}  // ccfg.c:58
+[eva:shared-memory:values] <main> reads  e ∈ {1}  // ccfg.c:98
+[eva:shared-memory:values] job_f2 reads  e ∈ {0; 1}  // ccfg.c:50
+[eva:shared-memory:values] <main> reads  f ∈ {1}  // ccfg.c:99
+[eva:shared-memory:values] job_f1 reads  f ∈ {0; 1}  // ccfg.c:50
+[eva:shared-memory:values] <main> writes  global1 ∈ {1}  // ccfg.c:27
+[eva:shared-memory:values] <main> writes  global2[0] ∈ {1}  // ccfg.c:32
+[eva:shared-memory:values] <main> writes  global2[1] ∈ {2}  // ccfg.c:34
+[eva:shared-memory:values] job_f1 writes  a ∈ [--..--]  // ccfg.c:55
+[eva:shared-memory:values] job_f2 writes  b ∈ [--..--]  // ccfg.c:65
+[eva:shared-memory:values] job_f1 writes  c ∈ [--..--]  // ccfg.c:58
+[eva:shared-memory:values] job_f2 writes  d ∈ [--..--]  // ccfg.c:68
+[eva:shared-memory:values] job_f1 writes  e ∈ {0; 1}  // ccfg.c:59
+[eva:shared-memory:values] job_f2 writes  f ∈ {0; 1}  // ccfg.c:69
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -1035,17 +1014,15 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1}
-[eva:shared-memory:values] <main> reads  a ∈ [--..--]  // ccfg.c:93 main
-[eva:shared-memory:values] <main> reads  b ∈ [--..--]  // ccfg.c:94 main
-[eva:shared-memory:values] job_f1 reads  b ∈ [--..--]  // ccfg.c:56 f1
-[eva:shared-memory:values] 
-  job_f1 reads  b ∈ [--..--]  // ccfg.c:55 g3 :: ccfg.c:55 <- f1
-[eva:shared-memory:values] <main> reads  c ∈ [--..--]  // ccfg.c:96 main
-[eva:shared-memory:values] <main> reads  d ∈ [--..--]  // ccfg.c:97 main
-[eva:shared-memory:values] 
-  job_f1 reads  d ∈ [--..--]  // ccfg.c:58 g5 :: ccfg.c:58 <- f1
-[eva:shared-memory:values] <main> reads  e ∈ {0; 1}  // ccfg.c:98 main
-[eva:shared-memory:values] <main> reads  f ∈ {0; 1}  // ccfg.c:99 main
+[eva:shared-memory:values] <main> reads  a ∈ [--..--]  // ccfg.c:93
+[eva:shared-memory:values] <main> reads  b ∈ [--..--]  // ccfg.c:94
+[eva:shared-memory:values] job_f1 reads  b ∈ [--..--]  // ccfg.c:56
+[eva:shared-memory:values] job_f1 reads  b ∈ [--..--]  // ccfg.c:55
+[eva:shared-memory:values] <main> reads  c ∈ [--..--]  // ccfg.c:96
+[eva:shared-memory:values] <main> reads  d ∈ [--..--]  // ccfg.c:97
+[eva:shared-memory:values] job_f1 reads  d ∈ [--..--]  // ccfg.c:58
+[eva:shared-memory:values] <main> reads  e ∈ {0; 1}  // ccfg.c:98
+[eva:shared-memory:values] <main> reads  f ∈ {0; 1}  // ccfg.c:99
 [eva:shared-memory:values] 
   Write summary for <main>: global1 ∈ {1}
                             global2[0] ∈ {1}

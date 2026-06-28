@@ -189,8 +189,7 @@ let compute_shared_vars analysis =
     let (ww_accesses, rw_accesses), zmap =
       Mt_shared_vars.Precise.concurrent_accesses_all_threads
         (threads analysis) in
-    if Mt_options.DumpSharedVarsValues.get () > 0 then
-      Mt_shared_vars.Precise.display_shared_vars_value zmap;
+    Mt_shared_vars.Precise.display_shared_vars_value zmap;
     let written = Mt_shared_vars.Precise.enumerate_written_vars_value zmap in
     let all_accesses = ww_accesses @ rw_accesses in
     let all_zones = Mt_shared_vars.Precise.all_zones_accessed (ww_accesses @ rw_accesses) in
@@ -230,9 +229,7 @@ let store_written_value analysis lw =
     let changed = not (Cvalue.Model.equal written old_written) in
     if changed then
       recompute_shared_vars_values_changed analysis th old_written written;
-    if Mt_options.DumpSharedVarsValues.get () > 0 &&
-       not (Cvalue.Model.equal Cvalue.Model.empty_map written)
-    then
+    if not Cvalue.Model.(equal Cvalue.Model.empty_map written) then
       Self.feedback ~dkey:Self.dkey_shared_memory_values
         "@[Write summary for %a%t:@ %a@]"
         ThreadState.pretty th

@@ -96,13 +96,13 @@
       {}:
         # cvalue: interrupt_received ∈ [1..2147483647]
 [eva:shared-memory:values] 
-  <main> reads  interrupt_received ∈ {0}  // interrupt.c:33 main_interrupt_incr
+  <main> reads  interrupt_received ∈ {0}  // interrupt.c:33
 [eva:shared-memory:values] 
   <interrupt_handler interrupt_incr> reads 
-  interrupt_received ∈ [0..2147483647]  // interrupt.c:29 interrupt_incr
+  interrupt_received ∈ [0..2147483647]  // interrupt.c:29
 [eva:shared-memory:values] 
   <interrupt_handler interrupt_incr> writes 
-  interrupt_received ∈ [1..2147483647]  // interrupt.c:29 interrupt_incr
+  interrupt_received ∈ [1..2147483647]  // interrupt.c:29
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -126,7 +126,6 @@
     interferences by mutexes:
 [eva:shared-memory:values] 
   <main> reads  interrupt_received ∈ [0..2147483647]  // interrupt.c:33
-  main_interrupt_incr
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_incr>:
   interrupt_received ∈ [1..2147483647]

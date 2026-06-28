@@ -278,26 +278,23 @@
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
-   // utf8_names.c:23 g :: utf8_names.c:37 <- f2
-[eva:shared-memory:values] 
-  job / "𐍅" f1 reads  b ∈ {0}  // utf8_names.c:23 g :: utf8_names.c:27 <- f1
-[eva:shared-memory:values] <main> reads  c ∈ {0}  // utf8_names.c:59 main
+   // utf8_names.c:23
+[eva:shared-memory:values] job / "𐍅" f1 reads  b ∈ {0}  // utf8_names.c:23
+[eva:shared-memory:values] <main> reads  c ∈ {0}  // utf8_names.c:59
 [eva:shared-memory:values] 
   job / "𐍅" f1 writes 
   a ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
-   // utf8_names.c:27 f1
+   // utf8_names.c:27
 [eva:shared-memory:values] 
   job / "𐍅" f2 writes 
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
-   // utf8_names.c:37 f2
-[eva:shared-memory:values] 
-  job / "𐍅" f1 writes  c ∈ {1}  // utf8_names.c:29 f1
-[eva:shared-memory:values] 
-  job / "𐍅" f2 writes  c ∈ {2}  // utf8_names.c:39 f2
+   // utf8_names.c:37
+[eva:shared-memory:values] job / "𐍅" f1 writes  c ∈ {1}  // utf8_names.c:29
+[eva:shared-memory:values] job / "𐍅" f2 writes  c ∈ {2}  // utf8_names.c:39
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -457,9 +454,8 @@
   b ∈
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
-   // utf8_names.c:23 g :: utf8_names.c:27 <- f1
-[eva:shared-memory:values] 
-  <main> reads  c ∈ {0; 1; 2}  // utf8_names.c:59 main
+   // utf8_names.c:23
+[eva:shared-memory:values] <main> reads  c ∈ {0; 1; 2}  // utf8_names.c:59
 [eva:shared-memory:values] 
   Write summary for job / "𐍅" f1:
   a ∈

@@ -89,11 +89,8 @@
     interferences by mutexes:
       {}:
         # cvalue: r ∈ [--..--]
-[eva:shared-memory:values] <main> writes  r ∈ [--..--]  // read_all.c:29 main
-[eva:shared-memory:values] 
-  <main> writes  r ∈ [--..--]  // read_all.c:29 g :: read_all.c:29 <- main
-[eva:shared-memory:values] 
-  jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
+[eva:shared-memory:values] <main> writes  r ∈ [--..--]  // read_all.c:29
+[eva:shared-memory:values] jobs writes  r ∈ [--..--]  // read_all.c:19
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing

@@ -363,14 +363,13 @@
     s4; s6
   vs.
     u3; s4; s5; s6
-[eva:shared-memory:values] jobs4 reads  s4 ∈ {-1; 1}  // sharedvars.c:68 f4
-[eva:shared-memory:values] jobs4 reads  s6 ∈ {0}  // sharedvars.c:71 f4
-[eva:shared-memory:values] jobs6 reads  s6 ∈ {0; 4}  // sharedvars.c:90 f6
-[eva:shared-memory:values] <main> writes  s4 ∈ {1}  // sharedvars.c:115 main
-[eva:shared-memory:values] 
-  jobs4 writes  s4 ∈ {-1; 1; 4}  // sharedvars.c:69 f4
-[eva:shared-memory:values] jobs4 writes  s6 ∈ {4}  // sharedvars.c:72 f4
-[eva:shared-memory:values] jobs6 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:91 f6
+[eva:shared-memory:values] jobs4 reads  s4 ∈ {-1; 1}  // sharedvars.c:68
+[eva:shared-memory:values] jobs4 reads  s6 ∈ {0}  // sharedvars.c:71
+[eva:shared-memory:values] jobs6 reads  s6 ∈ {0; 4}  // sharedvars.c:90
+[eva:shared-memory:values] <main> writes  s4 ∈ {1}  // sharedvars.c:115
+[eva:shared-memory:values] jobs4 writes  s4 ∈ {-1; 1; 4}  // sharedvars.c:69
+[eva:shared-memory:values] jobs4 writes  s6 ∈ {4}  // sharedvars.c:72
+[eva:shared-memory:values] jobs6 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:91
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     \nothing
@@ -645,19 +644,16 @@
         s4 ∈ {-1; 0; 1; 4}
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
+[eva:shared-memory:values] jobs4 reads  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:68
+[eva:shared-memory:values] jobs51 reads  s5 ∈ {0; 5}  // sharedvars.c:77
+[eva:shared-memory:values] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:71
+[eva:shared-memory:values] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:90
+[eva:shared-memory:values] <main> writes  s4 ∈ {-1; 1; 4}  // sharedvars.c:115
 [eva:shared-memory:values] 
-  jobs4 reads  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:68 f4
-[eva:shared-memory:values] jobs51 reads  s5 ∈ {0; 5}  // sharedvars.c:77 f51
-[eva:shared-memory:values] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:71 f4
-[eva:shared-memory:values] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:90 f6
-[eva:shared-memory:values] 
-  <main> writes  s4 ∈ {-1; 1; 4}  // sharedvars.c:115 main
-[eva:shared-memory:values] 
-  jobs4 writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:69 f4
-[eva:shared-memory:values] jobs5 writes  s5 ∈ {5}  // sharedvars.c:84 f5
-[eva:shared-memory:values] 
-  jobs51 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:78 f51
-[eva:shared-memory:values] jobs4 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:72 f4
+  jobs4 writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:69
+[eva:shared-memory:values] jobs5 writes  s5 ∈ {5}  // sharedvars.c:84
+[eva:shared-memory:values] jobs51 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:78
+[eva:shared-memory:values] jobs4 writes  s6 ∈ {0; 4; 6}  // sharedvars.c:72
 [eva:shared-memory:iteration] 
   Concurrent precise var accesses have changed: before
     s4; s6
@@ -935,15 +931,13 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
 [eva:shared-memory:values] 
-  jobs4 reads  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:68 f4
+  jobs4 reads  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:68
+[eva:shared-memory:values] jobs51 reads  s5 ∈ {0; 5; 51}  // sharedvars.c:77
 [eva:shared-memory:values] 
-  jobs51 reads  s5 ∈ {0; 5; 51}  // sharedvars.c:77 f51
+  <main> writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:115
 [eva:shared-memory:values] 
-  <main> writes  s4 ∈ {-1; 0; 1; 4}  // sharedvars.c:115 main
-[eva:shared-memory:values] 
-  jobs4 writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:69 f4
-[eva:shared-memory:values] 
-  jobs5 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:84 f5
+  jobs4 writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:69
+[eva:shared-memory:values] jobs5 writes  s5 ∈ {0; 5; 51}  // sharedvars.c:84
 [eva:shared-memory:values] 
   Write summary for <main> (updated): s4 ∈ {-1; 0; 1; 2; 3; 4}
 [eva:shared-memory:values] 
@@ -1210,7 +1204,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6}
 [eva:shared-memory:values] 
-  <main> writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:115 main
+  <main> writes  s4 ∈ {-1; 0; 1; 2; 3; 4}  // sharedvars.c:115
 [eva:shared-memory:values] Write summary for <main>: s4 ∈ {-1; 0; 1; 2; 3; 4}
 [eva:shared-memory:values] 
   Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}

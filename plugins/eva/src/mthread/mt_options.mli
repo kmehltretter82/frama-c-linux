@@ -9,10 +9,6 @@
 (** behavior of option -mthread. *)
 module Enabled: Parameter_sig.Bool
 
-(** behavior of option -mt-keep-analyses. Three
-    possible values: all, last or none. *)
-module KeepProjects: Parameter_sig.String
-
 (** behavior of option -mt-projects-on-disk *)
 module ToDisk: Parameter_sig.Bool
 
@@ -28,20 +24,11 @@ module ThreadsLib: Parameter_sig.S with type t = Mt_lib.threads_lib
 (** behavior of option -mt-write-races. *)
 module WriteWriteRaces: Parameter_sig.Bool
 
-(** behavior of option -mt-shared-values. From 0 to 2. *)
-module DumpSharedVarsValues: Parameter_sig.Int
-
-(** behavior of option -mt-shared-accesses-synchronization. *)
-module CheckProtections: Parameter_sig.Bool
-
 (** behavior of option -mt-interrupts*)
 module InterruptHandlers: Parameter_sig.Kernel_function_set
 
 (** behavior of option -mt-moderate-warning. *)
 module ModerateWarnings: Parameter_sig.Bool
-
-(** behavior of option -mt-print-callstacks. *)
-module PrintCallstacks: Parameter_sig.Bool
 
 (** behavior of option -mt-skip-threads. *)
 module SkipThreads: Parameter_sig.String_set
