@@ -83,9 +83,10 @@ let post_thread_analysis analysis =
 
 (* We compute a value analysis for the given thread *)
 let pre_thread_analysis analysis th =
-  Mt_self.feedback
-    "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-    ThreadState.pretty th analysis.iteration
+  let entry_point = Thread.entry_point th.th_eva_thread in
+  Self.feedback ~dkey:Self.dkey_thread_fixpoint
+    "@[<hov 2>Analyzing thread %a starting at %a,@ iteration %d@ (%a).@]"
+    ThreadState.pretty th Kernel_function.pretty entry_point analysis.iteration
     SetRecomputeReason.pretty th.th_to_recompute;
 
   Self.debug "Computing Eva analysis for thread %a with arguments %a."
@@ -248,7 +249,7 @@ let save_to_disk analysis =
       Filepath.of_format "%siteration_%d.sav" prefix analysis.iteration
     in
     Project.save filepath;
-    Mt_self.feedback "* Saved iteration %d to file %S" analysis.iteration
+    Self.feedback "Saved iteration %d to file %S" analysis.iteration
       (Filepath.to_string_rel filepath);
   end
 

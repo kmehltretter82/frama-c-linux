@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing simple.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] simple.c:44: Initializing mutex lock
@@ -37,7 +37,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job1, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread job1 starting at f1, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -63,7 +64,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job2, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread job2 starting at f2, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -94,7 +96,7 @@
     \nothing
   vs.
     a; b; c; v
-[eva] ******* Analysis stopped after 1 iterations.
+[eva] Warning: Analysis stopped after 1 iterations.
   Remaining to do:
   Thread <main>, fun main: potential shared vars changed
   Thread job1, fun f1, parent <main>, args {{ &b }}: potential shared vars

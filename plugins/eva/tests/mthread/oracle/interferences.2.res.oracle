@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva:thread] New thread: <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -33,7 +33,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 1 (first
+    iteration).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -58,7 +60,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joblooped, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread joblooped starting at fjoblooped, iteration 1 (first
+    iteration).
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -88,7 +92,9 @@
     \nothing
   vs.
     shared_a; shared_b
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_thread_loop, iteration 2 (potential
+    shared vars changed).
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main_thread_loop
@@ -108,8 +114,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 2 (potential shared vars changed
-    and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 2 (potential
+    shared vars changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
@@ -143,8 +150,9 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0}
-[eva] *** Computing thread joblooped, iteration 2 (potential shared vars changed
-    and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joblooped starting at fjoblooped, iteration 2 (potential
+    shared vars changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
@@ -223,8 +231,9 @@
   Write summary for joboneshot (updated): shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped (updated): shared_b ∈ {1}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_thread_loop, iteration 3 (shared
+    vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -243,8 +252,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 3 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
@@ -274,8 +284,10 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1}
-[eva] *** Computing thread joblooped, iteration 3 (shared vars values changed,
-    thread initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joblooped starting at fjoblooped, iteration 3 (shared vars
+    values changed, thread initial memory state changed and interferences
+    changed).
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
@@ -329,8 +341,9 @@
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped (updated): shared_b ∈ {1; 2}
-[eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_thread_loop, iteration 4 (shared
+    vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -347,8 +360,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 4 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 4 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
@@ -380,8 +394,9 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2}
-[eva] *** Computing thread joblooped, iteration 4 (thread initial memory state
-    changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joblooped starting at fjoblooped, iteration 4 (thread
+    initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
@@ -434,8 +449,9 @@
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped (updated): shared_b ∈ [1..2147483647]
-[eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_thread_loop, iteration 5 (shared
+    vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -454,8 +470,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 5 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 5 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
@@ -487,8 +504,9 @@
       {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
-[eva] *** Computing thread joblooped, iteration 5 (thread initial memory state
-    changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joblooped starting at fjoblooped, iteration 5 (thread
+    initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:show] interferences.c:118: 
@@ -552,7 +570,9 @@
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped: shared_b ∈ [1..2147483647]
-[eva] *** Computing thread <main>, iteration 6 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_thread_loop, iteration 6
+    (interferences changed).
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -571,7 +591,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread joboneshot, iteration 6 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread joboneshot starting at fjoboneshot, iteration 6
+    (interferences changed).
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:show] interferences.c:110: 
@@ -615,7 +637,7 @@
 [eva:shared-memory:values] Write summary for joboneshot: shared_a ∈ {1}
 [eva:shared-memory:values] 
   Write summary for joblooped: shared_b ∈ [1..2147483647]
-[eva] ******* Analysis performed, 6 iterations
+[eva:thread-fixpoint] Analysis performed in 6 iterations
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

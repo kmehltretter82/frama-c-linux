@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing protect.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] protect.c:19: Initializing mutex lock1
@@ -35,7 +35,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -54,7 +55,9 @@
     \nothing
   vs.
     t{[1]; [3]}
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -101,8 +104,9 @@
                    [2] ∈ {0}
                    [3] ∈ {4}
                    [4..9] ∈ {0}
-[eva] *** Computing thread tjob, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
@@ -127,7 +131,9 @@
 [eva:shared-memory:values] 
   Write summary for <main> (updated): t[1] ∈ {1}
                                        [3] ∈ {4}
-[eva] *** Computing thread tjob, iteration 3 (shared vars values changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob starting at job, iteration 3 (shared vars values
+    changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -142,7 +148,7 @@
 [eva:shared-memory:values] 
   Write summary for <main>: t[1] ∈ {1}
                              [3] ∈ {4}
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: t{[1]; [3]}
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

@@ -166,11 +166,11 @@ let print_data_races analysis =
 
 let post_analysis analysis =
   if not (Mt_thread.needs_recomputation analysis) then
-    Mt_self.feedback "******* Analysis performed, %d iterations"
-      analysis.iteration
+    Self.feedback ~dkey:Self.dkey_thread_fixpoint
+      "Analysis performed in %d iterations" analysis.iteration
   else
-    Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
+    Self.warning
+      "@[<hov>Analysis stopped after %d iterations.@ %a@]"
       analysis.iteration
       Mt_thread.pretty_recompute_reasons analysis;
 

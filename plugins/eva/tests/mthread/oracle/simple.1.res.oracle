@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing simple.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] simple.c:44: Initializing mutex lock
@@ -37,7 +37,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job1, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread job1 starting at f1, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -63,7 +64,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job2, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread job2 starting at f2, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -94,7 +96,9 @@
     \nothing
   vs.
     a; b; c; v
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -123,8 +127,9 @@
     shared bases: {a, b, c, v}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job1, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread job1 starting at f1, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] simple.c:23: inject threads interferences at this point
@@ -178,8 +183,9 @@
                   b ∈ {0; 1}
                   c ∈ {0; 1}
                   v ∈ {0; 1}
-[eva] *** Computing thread job2, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread job2 starting at f2, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] simple.c:34: inject threads interferences at this point
@@ -262,8 +268,9 @@
                                     b ∈ {2}
                                     c ∈ {2}
                                     v ∈ {2}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (shared vars values
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] simple.c:47: 
@@ -292,7 +299,8 @@
     shared bases: {a, b, c, v}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job1, iteration 3 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread job1 starting at f1, iteration 3 (interferences changed).
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -342,8 +350,9 @@
                   b ∈ {0; 1; 2}
                   c ∈ {0; 1; 2}
                   v ∈ {0; 1; 2}
-[eva] *** Computing thread job2, iteration 3 (thread initial memory state changed
-    and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread job2 starting at f2, iteration 3 (thread initial memory
+    state changed and interferences changed).
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -407,7 +416,9 @@
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}
-[eva] *** Computing thread <main>, iteration 4 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 4 (interferences
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -443,7 +454,7 @@
                           b ∈ {2}
                           c ∈ {2}
                           v ∈ {2}
-[eva] ******* Analysis performed, 4 iterations
+[eva:thread-fixpoint] Analysis performed in 4 iterations
 [eva:shared-memory:zone] Shared memory: a; b; c; v
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

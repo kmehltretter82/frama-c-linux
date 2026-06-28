@@ -52,6 +52,7 @@ val dkey_progress : category
 val dkey_callstacks : category
 val dkey_include_string_literal: category
 
+val dkey_thread_fixpoint : category
 val dkey_thread : category
 val dkey_mutex : category
 val dkey_queue : category

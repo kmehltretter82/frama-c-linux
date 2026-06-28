@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing memexec.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:thread] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
@@ -19,7 +19,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread th1, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread th1 starting at t1, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -44,7 +45,9 @@
     \nothing
   vs.
     a; c
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -59,8 +62,9 @@
     shared bases: {a, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread th1, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread th1 starting at t1, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:14: inject threads interferences at this point
@@ -123,8 +127,9 @@
 [eva:shared-memory:values] 
   Write summary for th1 (updated): a ∈ {1}
                                    c ∈ {2}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (shared vars values
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:33: inject threads interferences at this point
@@ -143,7 +148,7 @@
 [eva:shared-memory:values] 
   Write summary for th1: a ∈ {1}
                          c ∈ {2}
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: a; c
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

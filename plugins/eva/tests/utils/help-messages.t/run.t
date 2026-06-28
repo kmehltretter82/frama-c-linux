@@ -158,6 +158,7 @@ Help message about message categories.
                                   including coverage and alarm numbers
     thread                      : show each operation on threads interpreted by
                                   the analysis
+    thread-fixpoint             : progress of the analysis fixpoint on threads
     widen-hints                 : debug messages when failing to use widen_hints
                                   annotations
     widening                    : print a message at each point where the
@@ -187,7 +188,7 @@ Help message about message categories.
   [eva] Message categories by verbosity:
      1: summary
      2: show
-     3: malloc:new shared-memory:zone data-races precision-settings
+     3: malloc:new shared-memory:zone data-races thread-fixpoint precision-settings
      4: malloc:automatic-free shared-memory:mutex thread split-return partition
      5: final-states initial-state
      6: imprecision malloc shared-memory:mutex-details

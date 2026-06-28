@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing read_all.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [kernel:annot:missing-spec] read_all.c:25: Warning: 
@@ -31,7 +31,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs starting at f, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -52,7 +53,9 @@
     \nothing
   vs.
     r
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -72,8 +75,9 @@
     interferences by mutexes:
       {}:
         # cvalue: r ∈ [--..--]
-[eva] *** Computing thread jobs, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs starting at f, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] read_all.c:19: inject threads interferences at this point
@@ -103,7 +107,9 @@
     r
 [eva:shared-memory:values] Write summary for <main> (updated): r ∈ [--..--]
 [eva:shared-memory:values] Write summary for jobs (updated): r ∈ [--..--]
-[eva] *** Computing thread <main>, iteration 3 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (interferences
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] read_all.c:29: inject threads interferences at this point
@@ -123,7 +129,7 @@
         # cvalue: r ∈ [--..--]
 [eva:shared-memory:values] Write summary for <main>: r ∈ [--..--]
 [eva:shared-memory:values] Write summary for jobs: r ∈ [--..--]
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: r
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

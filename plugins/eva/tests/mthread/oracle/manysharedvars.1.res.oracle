@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing manysharedvars.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] manysharedvars.c:42: Initializing mutex lock
@@ -71,7 +71,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs starting at f, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -144,7 +145,9 @@
     \nothing
   vs.
     s[0..127]
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -207,8 +210,9 @@
     shared bases: {s}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs starting at f, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] manysharedvars.c:29: 
@@ -2101,8 +2105,9 @@
    [126].data2 ∈ {0; 3}
    [127].data ∈ {0; 1}
    [127].data2 ∈ {0; 3}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (shared vars values
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] manysharedvars.c:47: 
@@ -2687,7 +2692,7 @@
    [126].data2 ∈ {0; 3}
    [127].data ∈ {0; 1}
    [127].data2 ∈ {0; 3}
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: s[0..127]
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

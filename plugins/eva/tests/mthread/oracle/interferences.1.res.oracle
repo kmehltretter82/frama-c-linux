@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva:thread] New thread: <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
@@ -25,7 +25,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobptr1, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr1 starting at fjobptr1, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at fjobptr1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -54,7 +55,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobptr2, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr2 starting at fjobptr2, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -88,7 +90,9 @@
     \nothing
   vs.
     shared_a; shared_b
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_ptr_write, iteration 2 (potential
+    shared vars changed).
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main_ptr_write
@@ -108,8 +112,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobptr1, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr1 starting at fjobptr1, iteration 2 (potential shared
+    vars changed and interferences changed).
 [eva] Analyzing a complete application starting at fjobptr1
 [eva] Initial state supplied by user
 [eva:show] interferences.c:75: Frama_C_show_each_fjobptr1_start: {0}, {0}
@@ -153,8 +158,9 @@
       {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {0; 1}
-[eva] *** Computing thread jobptr2, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr2 starting at fjobptr2, iteration 2 (potential shared
+    vars changed and interferences changed).
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
 [eva:show] interferences.c:87: Frama_C_show_each_fjobptr2_start: {0; 1}, {0; 1}
@@ -248,8 +254,9 @@
   Write summary for jobptr2 (updated):
   shared_a ∈ {0; 1; 2}
   shared_b ∈ {0; 1; 2}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_ptr_write, iteration 3 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
@@ -266,8 +273,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobptr1, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr1 starting at fjobptr1, iteration 3 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at fjobptr1
 [eva] Initial state supplied by user
 [eva:show] interferences.c:75: 
@@ -308,8 +316,10 @@
       {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
-[eva] *** Computing thread jobptr2, iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr2 starting at fjobptr2, iteration 3 (shared vars
+    values changed, thread initial memory state changed and interferences
+    changed).
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
 [eva:show] interferences.c:87: 
@@ -387,8 +397,9 @@
 [eva:shared-memory:values] 
   Write summary for jobptr2: shared_a ∈ {0; 1; 2}
                              shared_b ∈ {0; 1; 2}
-[eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_ptr_write, iteration 4 (shared vars
+    values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
@@ -403,7 +414,9 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobptr2, iteration 4 (shared vars values changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobptr2 starting at fjobptr2, iteration 4 (shared vars
+    values changed).
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
 [eva:show] interferences.c:87: 
@@ -450,7 +463,7 @@
 [eva:shared-memory:values] 
   Write summary for jobptr2: shared_a ∈ {0; 1; 2}
                              shared_b ∈ {0; 1; 2}
-[eva] ******* Analysis performed, 4 iterations
+[eva:thread-fixpoint] Analysis performed in 4 iterations
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

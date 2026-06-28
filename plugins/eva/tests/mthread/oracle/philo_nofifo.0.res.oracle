@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing philo_nofifo.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] philo_nofifo.c:31: Initializing mutex locks[0]
@@ -38,7 +38,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[0], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -73,7 +74,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[1], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -108,7 +110,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[2], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -143,7 +146,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[3], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -178,7 +182,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[4], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -213,7 +218,7 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] ******* Analysis performed, 1 iterations
+[eva:thread-fixpoint] Analysis performed in 1 iterations
 [eva:shared-memory:zone] Shared memory: \nothing
 [eva:shared-memory:mutex] Mutexes protecting access to shared memory:
 [eva:shared-memory:mutex-details] Detailed shared memory protections

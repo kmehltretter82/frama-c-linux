@@ -3,7 +3,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing interrupt.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva:thread] New thread: <main>, fun main_interrupt_one_shot
 [eva:thread] 
@@ -19,8 +19,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <main>, iteration 1 (thread initial memory state
-    changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_one_shot, iteration 1
+    (thread initial memory state changed).
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -38,8 +39,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_oneshot>, iteration 1
-    (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
+    iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -60,7 +62,9 @@
     \nothing
   vs.
     interrupt_received
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_one_shot, iteration 2
+    (potential shared vars changed).
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
@@ -75,8 +79,9 @@
     shared bases: {interrupt_received}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_oneshot>, iteration 2
-    (potential shared vars changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
+    iteration 2 (potential shared vars changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
@@ -113,8 +118,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {1}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_one_shot, iteration 3
+    (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
@@ -141,8 +147,9 @@
     interferences by mutexes:
       {}:
         # cvalue: interrupt_received ∈ {0; 1}
-[eva] *** Computing thread <interrupt_handler interrupt_oneshot>, iteration 3
-    (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
+    iteration 3 (interferences changed).
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -184,8 +191,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_oneshot> (updated):
   interrupt_received ∈ {0; 1}
-[eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_one_shot, iteration 4
+    (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
@@ -218,7 +226,7 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_oneshot>:
   interrupt_received ∈ {0; 1}
-[eva] ******* Analysis performed, 4 iterations
+[eva:thread-fixpoint] Analysis performed in 4 iterations
 [eva:shared-memory:zone] Shared memory: interrupt_received
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing null.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:thread] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
@@ -21,7 +21,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob0, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob0 starting at job0, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -42,7 +43,9 @@
     \nothing
   vs.
     NULL[100..200]
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -57,8 +60,9 @@
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob0, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob0 starting at job0, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] null.c:16: inject threads interferences at this point
@@ -89,8 +93,9 @@
     NULL[100..200]
 [eva:shared-memory:values] 
   Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (shared vars values
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] null.c:27: inject threads interferences at this point
@@ -106,7 +111,7 @@
     interferences by mutexes:
 [eva:shared-memory:values] 
   Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: NULL[100..200]
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

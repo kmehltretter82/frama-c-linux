@@ -297,6 +297,10 @@ let dkey_include_string_literal =
 
 (* ----- Mthread message categories ----------------------------------------- *)
 
+let dkey_thread_fixpoint =
+  register_category "thread-fixpoint" ~level:3
+    ~help:"progress of the analysis fixpoint on threads"
+
 let dkey_thread =
   register_category "thread" ~level:4
     ~help:"show each operation on threads interpreted by the analysis"

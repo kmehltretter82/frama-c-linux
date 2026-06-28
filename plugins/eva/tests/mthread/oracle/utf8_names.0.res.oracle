@@ -6,7 +6,6 @@
 [kernel:typing:int-conversion] utf8_names.c:23: Warning: 
   Conversion from a pointer to an integer without an explicit cast
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] Initializing mutex mutex / "𐍅"
@@ -30,7 +29,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job / "𐍅" f1, iteration 1 (first iteration)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -75,7 +73,6 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job / "𐍅" f2, iteration 1 (first iteration)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -120,8 +117,6 @@
     \nothing
   vs.
     a; b; c
-[eva] *** Computing thread <main>, iteration 2 (new message received and potential
-    shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -165,8 +160,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job / "𐍅" f1, iteration 2 (potential shared vars changed
-    and interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
@@ -225,8 +218,6 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         b ∈ {0}
         c ∈ {1}
-[eva] *** Computing thread job / "𐍅" f2, iteration 2 (potential shared vars changed
-    and interferences changed)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
@@ -334,8 +325,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
@@ -353,8 +342,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job / "𐍅" f1, iteration 3 (shared vars values changed
-    and interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -418,8 +405,6 @@
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
-[eva] *** Computing thread job / "𐍅" f2, iteration 3 (shared vars values changed,
-    thread initial memory state changed and interferences changed)
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -503,7 +488,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] *** Computing thread <main>, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -519,7 +503,6 @@
     shared bases: {a, b, c}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread job / "𐍅" f1, iteration 4 (interferences changed)
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -595,7 +578,6 @@
    {{ garbled mix of &{"\"\360\220\215\205\" /0"}
     (origin: Arithmetic {utf8_names.c:23}) }}
   c ∈ {2}
-[eva] ******* Analysis performed, 4 iterations
 [eva:shared-memory:zone] Shared memory: a; b; c
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

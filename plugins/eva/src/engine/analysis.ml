@@ -213,7 +213,7 @@ let mthread_fixpoint engine analysis =
   let final_states = Thread.Hashtbl.create 1 in
 
   (* We analyse the main thread *)
-  Mt_self.feedback "*** Computing value analysis for main thread";
+  Self.feedback ~dkey:Self.dkey_thread_fixpoint "First analysis of main thread";
   let final_state = compute_thread engine Thread.main in
   Thread.Hashtbl.replace final_states Thread.main final_state;
   Self.debug "First Eva analysis for main thread done." ;

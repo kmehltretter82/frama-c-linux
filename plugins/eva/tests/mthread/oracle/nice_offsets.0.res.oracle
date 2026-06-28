@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing nice_offsets.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] nice_offsets.c:19: Initializing mutex t[0].a1
@@ -18,7 +18,7 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] ******* Analysis performed, 0 iterations
+[eva:thread-fixpoint] Analysis performed in 0 iterations
 [eva:shared-memory:zone] Shared memory: \nothing
 [eva:shared-memory:mutex] Mutexes protecting access to shared memory:
 [eva:shared-memory:mutex-details] Detailed shared memory protections

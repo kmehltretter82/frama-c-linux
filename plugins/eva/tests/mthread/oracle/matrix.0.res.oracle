@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing matrix.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:mutex] matrix.c:37: Initializing mutex locks[0]
@@ -162,7 +162,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[0], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -200,7 +201,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[1], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -234,7 +236,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[2], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -268,7 +271,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[3], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -302,7 +306,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread jobs[4], iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -341,7 +346,9 @@
     \nothing
   vs.
     matrix[0..29][0..99]
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -485,8 +492,9 @@
     interferences by mutexes:
       {}:
         # cvalue: matrix[0..29][0..99] ∈ {0}
-[eva] *** Computing thread jobs[0], iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[0] starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
@@ -621,8 +629,9 @@
               [21..24][0..99] ∈ {0}
               [25][0..99] ∈ [--..--]
               [26..29][0..99] ∈ {0}
-[eva] *** Computing thread jobs[1], iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[1] starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
@@ -756,8 +765,9 @@
               [22..24][0..99] ∈ {0}
               [25..26][0..99] ∈ [--..--]
               [27..29][0..99] ∈ {0}
-[eva] *** Computing thread jobs[2], iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[2] starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
@@ -891,8 +901,9 @@
               [23..24][0..99] ∈ {0}
               [25..27][0..99] ∈ [--..--]
               [28..29][0..99] ∈ {0}
-[eva] *** Computing thread jobs[3], iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[3] starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
@@ -1026,8 +1037,9 @@
               [24][0..99] ∈ {0}
               [25..28][0..99] ∈ [--..--]
               [29][0..99] ∈ {0}
-[eva] *** Computing thread jobs[4], iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[4] starting at job, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
@@ -1252,8 +1264,9 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 3 (shared vars values
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] matrix.c:42: inject threads interferences at this point
@@ -1403,8 +1416,9 @@
     interferences by mutexes:
       {}:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[0], iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[0] starting at job, iteration 3 (shared vars values
+    changed, thread initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
@@ -1454,8 +1468,9 @@
     interferences by mutexes:
       { locks[0] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[1], iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[1] starting at job, iteration 3 (shared vars values
+    changed, thread initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
@@ -1505,8 +1520,9 @@
     interferences by mutexes:
       { locks[1] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[2], iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[2] starting at job, iteration 3 (shared vars values
+    changed, thread initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
@@ -1556,8 +1572,9 @@
     interferences by mutexes:
       { locks[2] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[3], iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[3] starting at job, iteration 3 (shared vars values
+    changed, thread initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
@@ -1607,8 +1624,9 @@
     interferences by mutexes:
       { locks[3] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[4], iteration 3 (shared vars values changed, thread
-    initial memory state changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[4] starting at job, iteration 3 (shared vars values
+    changed, thread initial memory state changed and interferences changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
@@ -1758,7 +1776,9 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] *** Computing thread <main>, iteration 4 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 4 (interferences
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -1896,7 +1916,9 @@
     interferences by mutexes:
       {}:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[0], iteration 4 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[0] starting at job, iteration 4 (interferences
+    changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
@@ -1946,7 +1968,9 @@
     interferences by mutexes:
       { locks[0] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[1], iteration 4 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[1] starting at job, iteration 4 (interferences
+    changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
@@ -1996,7 +2020,9 @@
     interferences by mutexes:
       { locks[1] }:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
-[eva] *** Computing thread jobs[2], iteration 4 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread jobs[2] starting at job, iteration 4 (interferences
+    changed).
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
@@ -2086,7 +2112,7 @@
         [19][0..99] ∈ [--..--]
         [24][0..99] ∈ [--..--]
         [29][0..99] ∈ [--..--]
-[eva] ******* Analysis performed, 4 iterations
+[eva:thread-fixpoint] Analysis performed in 4 iterations
 [eva:shared-memory:zone] Shared memory: matrix[0..29][0..99]
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

@@ -4,7 +4,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing memcpy.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main
 [eva:thread] New thread: <main>, fun main
 [eva:thread] memcpy.c:39: New thread: tjob0, fun job0, parent <main>, args {0}
@@ -45,7 +45,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob0, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob0 starting at job0, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -57,7 +58,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob1, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob1 starting at job1, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -72,7 +74,8 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob2, iteration 1 (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob2 starting at job2, iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -92,7 +95,9 @@
     \nothing
   vs.
     a; b; c; d
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main, iteration 2 (potential shared vars
+    changed).
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:thread] Thread <main>, fun main
@@ -172,7 +177,8 @@
                   b ∈ {0; 3}
                   c ∈ {0; 3}
                   d ∈ {0; 3}
-[eva] *** Computing thread tjob0, iteration 2 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob0 starting at job0, iteration 2 (interferences changed).
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:global-accesses] Globals accessed by thread:
@@ -182,8 +188,9 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob1, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob1 starting at job1, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
 [eva:interferences] memcpy.c:27: inject threads interferences at this point
@@ -197,8 +204,9 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob2, iteration 2 (potential shared vars changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob2 starting at job2, iteration 2 (potential shared vars
+    changed and interferences changed).
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
 [eva:interferences] memcpy.c:32: inject threads interferences at this point
@@ -229,7 +237,9 @@
   Write summary for <main> (updated):
   a# ∈ {0; 3} repeated %8 
   b# ∈ {0; 3} repeated %8
-[eva] *** Computing thread tjob1, iteration 3 (shared vars values changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob1 starting at job1, iteration 3 (shared vars values
+    changed).
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -242,7 +252,9 @@
     shared bases: {a, b, c, d}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread tjob2, iteration 3 (shared vars values changed)
+[eva:thread-fixpoint] 
+  Analyzing thread tjob2 starting at job2, iteration 3 (shared vars values
+    changed).
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -260,7 +272,7 @@
 [eva:shared-memory:values] 
   Write summary for <main>: a# ∈ {0; 3} repeated %8 
                             b# ∈ {0; 3} repeated %8
-[eva] ******* Analysis performed, 3 iterations
+[eva:thread-fixpoint] Analysis performed in 3 iterations
 [eva:shared-memory:zone] Shared memory: a; b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:

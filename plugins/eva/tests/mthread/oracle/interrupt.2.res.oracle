@@ -3,7 +3,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing interrupt.c (with preprocessing)
 [eva] Found concurrency builtins: enabling mthread domain
-[eva] *** Computing value analysis for main thread
+[eva:thread-fixpoint] First analysis of main thread
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva:thread] New thread: <main>, fun main_interrupt_cross_incr
 [eva:thread] 
@@ -28,8 +28,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <main>, iteration 1 (thread initial memory state
-    changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 1
+    (thread initial memory state changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -49,8 +50,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 1
-    (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -69,8 +71,9 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr2>, iteration 1
-    (first iteration)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
+    iteration 1 (first iteration).
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] 
@@ -94,7 +97,9 @@
     \nothing
   vs.
     interrupt_received_a; interrupt_received_b
-[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 2
+    (potential shared vars changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
@@ -111,8 +116,9 @@
     shared bases: {interrupt_received_a, interrupt_received_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 2
-    (potential shared vars changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 2 (potential shared vars changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
@@ -138,8 +144,9 @@
       {}:
         # cvalue: interrupt_received_a ∈ {1}
                   interrupt_received_b ∈ {0}
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr2>, iteration 2
-    (potential shared vars changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
+    iteration 2 (potential shared vars changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
@@ -194,8 +201,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_cross_incr2> (updated):
   interrupt_received_b ∈ {1; 2}
-[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 3
+    (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
@@ -214,8 +222,9 @@
     shared bases: {interrupt_received_a, interrupt_received_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 3
-    (shared vars values changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 3 (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -242,8 +251,9 @@
         # cvalue:
         interrupt_received_a ∈ {1; 2; 3}
         interrupt_received_b ∈ {0; 1; 2}
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr2>, iteration 3
-    (shared vars values changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
+    iteration 3 (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -294,8 +304,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_cross_incr2> (updated):
   interrupt_received_b ∈ [1..2147483647]
-[eva] *** Computing thread <main>, iteration 4 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 4
+    (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3}
@@ -312,8 +323,9 @@
     shared bases: {interrupt_received_a, interrupt_received_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 4
-    (shared vars values changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 4 (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -340,8 +352,9 @@
         # cvalue:
         interrupt_received_a ∈ {1; 2; 3; 4; 5}
         interrupt_received_b ∈ {0; 1; 2; 3; 4}
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr2>, iteration 4
-    (shared vars values changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
+    iteration 4 (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -396,8 +409,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] *** Computing thread <main>, iteration 5 (shared vars values changed and
-    interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 5
+    (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3; 4; 5}
@@ -414,8 +428,9 @@
     shared bases: {interrupt_received_a, interrupt_received_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 5
-    (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 5 (interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:global-accesses] 
@@ -442,8 +457,9 @@
         # cvalue:
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647]
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr2>, iteration 5
-    (shared vars values changed and interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
+    iteration 5 (shared vars values changed and interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:alarm] interrupt.c:45: Warning: 
@@ -502,7 +518,9 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] *** Computing thread <main>, iteration 6 (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 6
+    (interferences changed).
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
 [eva:show] interrupt.c:49: Frama_C_show_each_a: [0..2147483647]
@@ -519,8 +537,9 @@
     shared bases: {interrupt_received_a, interrupt_received_b}
     interferences by location:
     interferences by mutexes:
-[eva] *** Computing thread <interrupt_handler interrupt_cross_incr1>, iteration 6
-    (interferences changed)
+[eva:thread-fixpoint] 
+  Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
+    iteration 6 (interferences changed).
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:alarm] interrupt.c:41: Warning: 
@@ -571,7 +590,7 @@
 [eva:shared-memory:values] 
   Write summary for <interrupt_handler interrupt_cross_incr2>:
   interrupt_received_b ∈ [1..2147483647]
-[eva] ******* Analysis performed, 6 iterations
+[eva:thread-fixpoint] Analysis performed in 6 iterations
 [eva:shared-memory:zone] 
   Shared memory: interrupt_received_a; interrupt_received_b
 [eva:shared-memory:mutex] 
