@@ -317,19 +317,19 @@ void nested_loops(void)
               int __gen_e_acsl_initialized_3;
               __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
                 {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"l",
-                                           0,__gen_e_acsl_l);
-              if (0 <= __gen_e_acsl_l) {
+              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",
+                                           0,__gen_e_acsl_k);
+              if (0 <= __gen_e_acsl_k) {
                 __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                             "l",0,__gen_e_acsl_l);
-                __gen_e_acsl_and_2 = __gen_e_acsl_l < 8;
+                                             "k",0,__gen_e_acsl_k);
+                __gen_e_acsl_and_2 = __gen_e_acsl_k < 4;
               }
               else __gen_e_acsl_and_2 = 0;
-              /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
+              /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
               {
                 __gen_e_acsl_assert_data_5.blocking = 1;
                 __gen_e_acsl_assert_data_5.kind = "RTE";
-                __gen_e_acsl_assert_data_5.pred_txt = "0 <= l < (int)8";
+                __gen_e_acsl_assert_data_5.pred_txt = "0 <= k < (int)4";
                 __gen_e_acsl_assert_data_5.file = "loop.i";
                 __gen_e_acsl_assert_data_5.fct = "nested_loops";
                 __gen_e_acsl_assert_data_5.line = 19;
@@ -340,19 +340,19 @@ void nested_loops(void)
               }
               __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
                 {.values = (void *)0};
-              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",
-                                           0,__gen_e_acsl_k);
-              if (0 <= __gen_e_acsl_k) {
+              __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"l",
+                                           0,__gen_e_acsl_l);
+              if (0 <= __gen_e_acsl_l) {
                 __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                             "k",0,__gen_e_acsl_k);
-                __gen_e_acsl_and_3 = __gen_e_acsl_k < 4;
+                                             "l",0,__gen_e_acsl_l);
+                __gen_e_acsl_and_3 = __gen_e_acsl_l < 8;
               }
               else __gen_e_acsl_and_3 = 0;
-              /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
+              /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
               {
                 __gen_e_acsl_assert_data_6.blocking = 1;
                 __gen_e_acsl_assert_data_6.kind = "RTE";
-                __gen_e_acsl_assert_data_6.pred_txt = "0 <= k < (int)4";
+                __gen_e_acsl_assert_data_6.pred_txt = "0 <= l < (int)8";
                 __gen_e_acsl_assert_data_6.file = "loop.i";
                 __gen_e_acsl_assert_data_6.fct = "nested_loops";
                 __gen_e_acsl_assert_data_6.line = 19;
@@ -627,18 +627,18 @@ void nested_loops(void)
                 __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
                   {.values = (void *)0};
                 __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                             "l",0,__gen_e_acsl_l_2);
-                if (0 <= __gen_e_acsl_l_2) {
+                                             "k",0,__gen_e_acsl_k_2);
+                if (0 <= __gen_e_acsl_k_2) {
                   __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                               "l",0,__gen_e_acsl_l_2);
-                  __gen_e_acsl_and_6 = __gen_e_acsl_l_2 < 8;
+                                               "k",0,__gen_e_acsl_k_2);
+                  __gen_e_acsl_and_6 = __gen_e_acsl_k_2 < 4;
                 }
                 else __gen_e_acsl_and_6 = 0;
-                /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
+                /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
                 {
                   __gen_e_acsl_assert_data_17.blocking = 1;
                   __gen_e_acsl_assert_data_17.kind = "RTE";
-                  __gen_e_acsl_assert_data_17.pred_txt = "0 <= l < (int)8";
+                  __gen_e_acsl_assert_data_17.pred_txt = "0 <= k < (int)4";
                   __gen_e_acsl_assert_data_17.file = "loop.i";
                   __gen_e_acsl_assert_data_17.fct = "nested_loops";
                   __gen_e_acsl_assert_data_17.line = 19;
@@ -650,18 +650,18 @@ void nested_loops(void)
                 __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
                   {.values = (void *)0};
                 __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
-                                             "k",0,__gen_e_acsl_k_2);
-                if (0 <= __gen_e_acsl_k_2) {
+                                             "l",0,__gen_e_acsl_l_2);
+                if (0 <= __gen_e_acsl_l_2) {
                   __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
-                                               "k",0,__gen_e_acsl_k_2);
-                  __gen_e_acsl_and_7 = __gen_e_acsl_k_2 < 4;
+                                               "l",0,__gen_e_acsl_l_2);
+                  __gen_e_acsl_and_7 = __gen_e_acsl_l_2 < 8;
                 }
                 else __gen_e_acsl_and_7 = 0;
-                /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
+                /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
                 {
                   __gen_e_acsl_assert_data_18.blocking = 1;
                   __gen_e_acsl_assert_data_18.kind = "RTE";
-                  __gen_e_acsl_assert_data_18.pred_txt = "0 <= k < (int)4";
+                  __gen_e_acsl_assert_data_18.pred_txt = "0 <= l < (int)8";
                   __gen_e_acsl_assert_data_18.file = "loop.i";
                   __gen_e_acsl_assert_data_18.fct = "nested_loops";
                   __gen_e_acsl_assert_data_18.line = 19;

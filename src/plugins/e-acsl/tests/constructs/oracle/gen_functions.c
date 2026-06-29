@@ -1854,12 +1854,15 @@ int __gen_e_acsl_rf2(int n)
     int __gen_e_acsl_rf2_5;
     int __gen_e_acsl_rf2_7;
     int __gen_e_acsl_rf2_9;
+    __gen_e_acsl_rf2_3 = __gen_e_acsl_rf2(n - 1);
+    __gen_e_acsl_rf2_5 = __gen_e_acsl_rf2(n - 2);
+    __gen_e_acsl_rf2_7 = __gen_e_acsl_rf2(n - 3);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_46 =
       {.values = (void *)0};
-    __gen_e_acsl_rf2_3 = __gen_e_acsl_rf2(n - 3);
+    __gen_e_acsl_rf2_9 = __gen_e_acsl_rf2(n - 3);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_46,"n",0,n);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_46,"rf2(n - 3)",
-                                 0,__gen_e_acsl_rf2_3);
+                                 0,__gen_e_acsl_rf2_9);
     /*@ assert E_ACSL: "division by zero": rf2(n - 3) != 0; */
     {
       __gen_e_acsl_assert_data_46.blocking = 1;
@@ -1869,13 +1872,10 @@ int __gen_e_acsl_rf2(int n)
       __gen_e_acsl_assert_data_46.fct = "rf2";
       __gen_e_acsl_assert_data_46.line = 84;
       __gen_e_acsl_assert_data_46.name = "division by zero";
-      __e_acsl_assert(__gen_e_acsl_rf2_3 != 0,& __gen_e_acsl_assert_data_46);
+      __e_acsl_assert(__gen_e_acsl_rf2_9 != 0,& __gen_e_acsl_assert_data_46);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_46);
     }
-    __gen_e_acsl_rf2_5 = __gen_e_acsl_rf2(n - 1);
-    __gen_e_acsl_rf2_7 = __gen_e_acsl_rf2(n - 2);
-    __gen_e_acsl_rf2_9 = __gen_e_acsl_rf2(n - 3);
-    __gen_e_acsl_if_15 = (__gen_e_acsl_rf2_5 * __gen_e_acsl_rf2_7) / __gen_e_acsl_rf2_9;
+    __gen_e_acsl_if_15 = (__gen_e_acsl_rf2_3 * __gen_e_acsl_rf2_5) / __gen_e_acsl_rf2_7;
   }
   return __gen_e_acsl_if_15;
 }

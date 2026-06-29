@@ -470,27 +470,31 @@ let do_it kf env p =
   | Admit -> env
 
 let rte_guards_to_exp_il t =
-  Rte_analysis.fold_guards_il ~default:(M.return []) t @@ fun p guards ->
+  Rte_analysis.fold_guards ~default:(M.return []) t @@ fun p guards ->
   let* e : IL.rte = M.map (Interlang.Rte.make p) @@ to_exp_il p in
   let* guards = guards in
   M.return (e :: guards)
 
 let rte_guards_to_exp_old ~loc ~kf t env =
-  Rte_analysis.fold_guards_old ~default:env t @@ fun p env ->
-  Assert.push_pending_register_data ();
-  let adata, env = Assert.empty ~loc kf env in
-  let cil, adata, env = to_exp ~adata ~rte:true kf env p in
-  let stmt, env = Assert.runtime_check
-      ~adata
-      ~pred_kind:Assert
-      RTE
-      kf
-      env
-      cil
-      p
+  let env =
+    Rte_analysis.fold_guards ~default:env t @@ fun p env ->
+    Assert.push_pending_register_data ();
+    let adata, env = Assert.empty ~loc kf env in
+    let cil, adata, env = to_exp ~adata ~rte:true kf env p in
+    let stmt, env = Assert.runtime_check
+        ~adata
+        ~pred_kind:Assert
+        RTE
+        kf
+        env
+        cil
+        p
+    in
+    let env = Assert.do_pending_register_data env in
+    let env = Env.add_stmt ~annot:p env stmt in
+    env
   in
-  let env = Assert.do_pending_register_data env in
-  let env = Env.add_stmt ~annot:p env stmt in
+  Rte_analysis.remove t;
   env
 
 let predicate_to_exp_without_rte ~adata kf env p =

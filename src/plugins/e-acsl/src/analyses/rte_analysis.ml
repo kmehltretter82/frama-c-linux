@@ -39,11 +39,6 @@ struct
     | Some guards' -> Terms.replace tbl t (guards @ guards')
     | None -> Terms.add tbl t guards
 
-  let apply ~default t f =
-    match Terms.find_opt tbl t with
-    | Some guards -> f guards
-    | _ -> default
-
   let iter_on_guards t f =
     match Terms.find_opt tbl t with
     | Some guards -> List.iter (fun g -> f g.pred) guards
@@ -60,8 +55,6 @@ struct
     | None -> ()
 
   let remove t = Terms.remove tbl t
-
-  let mem t = Terms.mem tbl t
 
   let mem_guard_kind t kind =
     match Terms.find_opt tbl t with
@@ -420,27 +413,7 @@ let preprocess_predicate p =
 
 let iter_on_guards = Guards.iter_on_guards
 
-let fold_guards_il ~default = Guards.fold_guards ~default
-
-let fold_guards_old ~default t f =
-  (* [collect t] returns the RTE guards associated to [t] and its sub-terms. *)
-  let collect t =
-    let guards = ref [] in
-    let collector =
-      object
-        inherit Visitor.frama_c_inplace
-        method! vterm t =
-          Guards.apply
-            ~default:() t (fun g -> guards := g @ !guards; Guards.remove t);
-          match t.term_node with
-          (* warning: we do not retrieve RTE guards from [Tif] sub-terms *)
-          | Tif _ -> Cil.SkipChildren
-          | _ -> Cil.DoChildren
-      end in
-    if Guards.mem t then ignore @@ Visitor.visitFramacTerm collector t;
-    !guards
-  in
-  List.fold_left Guards.(fun x g -> f g.pred x) default (collect t)
+let fold_guards ~default = Guards.fold_guards ~default
 
 let remove t = Guards.remove t
 

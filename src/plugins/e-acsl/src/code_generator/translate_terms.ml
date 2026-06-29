@@ -430,11 +430,20 @@ and context_insensitive_term_to_exp_il ?inplace t =
     end
   | _ -> M.not_covered Printer.pp_term t
 
-and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
-  let t = Logic_normalizer.get_term t in
+and to_exp_old_with_rtes ~adata ?(inplace=false) kf env t =
+  let (exp, adata, env, strnum, name) =
+    context_insensitive_term_to_exp_old ~adata ~inplace kf env t
+  in
   let loc = t.term_loc in
-  (* translation of all guards associated to [t] in [Guards.table] *)
   let env = Translate_predicates.rte_guards_to_exp_old ~loc ~kf t env in
+  (exp, adata, env, strnum, name)
+
+and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
+  let loc = t.term_loc in
+  let early_rte_guards_to_exp_old =
+    Translate_predicates.rte_guards_to_exp_old ~loc ~kf t
+  in
+  let t = Logic_normalizer.get_term t in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
   let logic_env = Env.Logic_env.get env in
@@ -469,6 +478,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let ty = Typing.get_typ ~logic_env t in
     let e, adata, env = to_exp ~adata kf env t' in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let name, vname = match op with
         | Neg -> "__gmpz_neg", "neg"
         | BNot -> "__gmpz_com", "bnot"
@@ -491,6 +502,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | TUnOp(LNot, t) ->
     let ty = Typing.get_effective_typ ~logic_env t in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_number_ty ~logic_env t in
@@ -523,9 +536,13 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Z.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
@@ -539,6 +556,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let name = Gmp.Z.name_arith_bop bop in
@@ -550,6 +569,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
@@ -596,6 +617,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e2, adata2, env = t2_to_exp adata2 env in
       let adata, env = Assert.merge_right ~loc env adata1 adata in
       let adata, env = Assert.merge_right ~loc env adata2 adata in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       (* If the given term is an lvalue variable or a cast from an lvalue
          variable, retrieve the name of this variable. Otherwise return
          default *)
@@ -806,6 +829,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let mk_stmts _v e =
         let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
@@ -881,7 +906,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let env = Env.add_stmt env stmt in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, ""
-  | TCast (true, _, t) -> context_insensitive_term_to_exp_old ~adata kf env t
+  | TCast (true, _, t) -> to_exp_old_with_rtes ~adata kf env t
   | TCast (false, _,_) -> assert false
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
@@ -1049,7 +1074,7 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
   let rexp, _, _ as result =
     Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
         let e, adata, env, sty, name =
-          context_insensitive_term_to_exp_old ?inplace ~adata kf env t
+          to_exp_old_with_rtes ?inplace ~adata kf env t
         in
         let env =
           if generate_rte then Translate_rtes.exp kf env e else env
