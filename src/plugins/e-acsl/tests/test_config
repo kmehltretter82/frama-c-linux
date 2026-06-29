@@ -4,7 +4,7 @@ MACRO: GLOBAL @MACHDEP@ -keep-unused-functions none -verbose 0 -no-unicode
 
 COMMENT: no more share to set with Dune
 
-MACRO: EACSL -constfold -e-acsl -e-acsl-verbose 1 -e-acsl-debug 1 -e-acsl-msg-key analysis:inductive
+MACRO: EACSL -constfold -e-acsl -e-acsl-verbose 1 -e-acsl-debug 1 -e-acsl-interlang -e-acsl-msg-key analysis:inductive
 MACRO: EVA -eva -eva-no-alloc-returns-null -eva-no-results -eva-warn-key libc:unsupported-spec=inactive,loop-unroll:auto=inactive,assigns:missing=warning
 
 

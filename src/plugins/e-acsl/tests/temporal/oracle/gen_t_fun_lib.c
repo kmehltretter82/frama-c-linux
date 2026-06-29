@@ -289,19 +289,17 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
         __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_9);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
       }
-      __gen_e_acsl_size = 1 * (((4096 - 1) - 0) + 1);
+      __gen_e_acsl_size = 1 * 4096;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"size",0,
                                    __gen_e_acsl_size);
       if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
       else __gen_e_acsl_if = __gen_e_acsl_size;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)(resolved_name + 1 * 0),
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(resolved_name + 0),
                                           (size_t)__gen_e_acsl_if,
                                           (void *)resolved_name,
                                           (void *)(& resolved_name));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                    "resolved_name",(void *)resolved_name);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"size",0,

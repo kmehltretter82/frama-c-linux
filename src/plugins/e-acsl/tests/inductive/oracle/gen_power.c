@@ -233,25 +233,25 @@ void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
     __gmpz_init(__gen_e_acsl_sub_2);
     __gmpz_sub(__gen_e_acsl_sub_2,(__e_acsl_mpz_struct const *)(y),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
-    __gen_e_acsl_power2_fun3(& __gen_e_acsl_power2_fun3_3,x * 1,
+    __gen_e_acsl_power2_fun3(& __gen_e_acsl_power2_fun3_3,x,
                              (__e_acsl_mpz_struct *)__gen_e_acsl_sub_2);
     __gmpz_init_set(__gen_e_acsl_q_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_power2_fun3_3));
     if (x == x) {
-      __e_acsl_mpz_t __gen_e_acsl__7;
+      __e_acsl_mpz_t __gen_e_acsl_x_2;
       __e_acsl_mpz_t __gen_e_acsl_mul_2;
-      __gmpz_init_set_si(__gen_e_acsl__7,(long)(x * 1));
+      __gmpz_init_set_si(__gen_e_acsl_x_2,(long)x);
       __gmpz_init(__gen_e_acsl_mul_2);
       __gmpz_mul(__gen_e_acsl_mul_2,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_q_2),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_2));
       __gmpz_init_set(__gen_e_acsl_if_2,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2));
-      __gmpz_clear(__gen_e_acsl__7);
+      __gmpz_clear(__gen_e_acsl_x_2);
       __gmpz_clear(__gen_e_acsl_mul_2);
     }
     else {
-      __e_acsl_mpz_t __gen_e_acsl__8;
+      __e_acsl_mpz_t __gen_e_acsl__7;
       {
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
@@ -263,10 +263,10 @@ void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
         __gen_e_acsl_assert_data_3.line = 15;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
-      __gmpz_init_set_si(__gen_e_acsl__8,0L);
+      __gmpz_init_set_si(__gen_e_acsl__7,0L);
       __gmpz_init_set(__gen_e_acsl_if_2,
-                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-      __gmpz_clear(__gen_e_acsl__8);
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
+      __gmpz_clear(__gen_e_acsl__7);
     }
     __gmpz_init_set(__gen_e_acsl_if_3,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));

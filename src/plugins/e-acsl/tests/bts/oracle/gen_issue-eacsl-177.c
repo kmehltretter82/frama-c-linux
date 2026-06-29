@@ -86,14 +86,14 @@ void __gen_e_acsl_f(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n)
   int __gen_e_acsl_le;
   int __gen_e_acsl_or;
   __e_acsl_mpz_t __gen_e_acsl_if;
-  __gmpz_init_set_ui(__gen_e_acsl__2,(unsigned long)(2147483647U + 1U));
+  __gmpz_init_set_ui(__gen_e_acsl__2,2147483648UL);
   __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(n),
                                (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
   if (__gen_e_acsl_le <= 0) __gen_e_acsl_or = 1;
   else {
     __e_acsl_mpz_t __gen_e_acsl__3;
     int __gen_e_acsl_ge;
-    __gmpz_init_set_ui(__gen_e_acsl__3,9223372036854775807UL + 1UL);
+    __gmpz_init_set_ui(__gen_e_acsl__3,9223372036854775808UL);
     __gen_e_acsl_ge = __gmpz_cmp((__e_acsl_mpz_struct const *)(n),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gen_e_acsl_or = __gen_e_acsl_ge >= 0;

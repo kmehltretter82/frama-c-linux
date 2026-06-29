@@ -343,7 +343,7 @@ int main(void)
     int __gen_e_acsl_dupl_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
-    __gen_e_acsl_dupl_2 = __gen_e_acsl_dupl(-1,1 / 2 + 1 / 2);
+    __gen_e_acsl_dupl_2 = __gen_e_acsl_dupl(-1,0);
     if (! __gen_e_acsl_dupl_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                  "dupl(-1, 1 / 2 + 1 / 2)",0,

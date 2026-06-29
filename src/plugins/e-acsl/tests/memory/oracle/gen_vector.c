@@ -50,7 +50,7 @@ int *new_inversed(int len, int *v)
       int __gen_e_acsl_aligned_2;
       unsigned long __gen_e_acsl_offset;
       __e_acsl_mpz_t __gen_e_acsl_offset_2;
-      __e_acsl_mpz_t __gen_e_acsl_;
+      __e_acsl_mpz_t __gen_e_acsl_mul;
       __e_acsl_mpz_t __gen_e_acsl_add;
       int __gen_e_acsl_aligned_3;
       unsigned long __gen_e_acsl_block_length;
@@ -78,11 +78,11 @@ int *new_inversed(int len, int *v)
       }
       __gen_e_acsl_offset = __e_acsl_offset((void *)v);
       __gmpz_init_set_ui(__gen_e_acsl_offset_2,__gen_e_acsl_offset);
-      __gmpz_init_set_si(__gen_e_acsl_,len * 4L);
+      __gmpz_init_set_si(__gen_e_acsl_mul,len * 4L);
       __gmpz_init(__gen_e_acsl_add);
       __gmpz_add(__gen_e_acsl_add,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_offset_2),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)v,4UL);
@@ -120,7 +120,7 @@ int *new_inversed(int len, int *v)
                                      __gen_e_acsl_block_length);
       __gen_e_acsl_and = __gen_e_acsl_le <= 0;
       __gmpz_clear(__gen_e_acsl_offset_2);
-      __gmpz_clear(__gen_e_acsl_);
+      __gmpz_clear(__gen_e_acsl_mul);
       __gmpz_clear(__gen_e_acsl_add);
       __gmpz_clear(__gen_e_acsl_block_length_2);
     }
