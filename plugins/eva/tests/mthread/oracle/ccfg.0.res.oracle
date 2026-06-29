@@ -1401,18 +1401,6 @@
       read by job_f2 at ccfg.c:68, unprotected
       read by <main> at ccfg.c:96, unprotected
       write by job_f1 at ccfg.c:58, unprotected
-    b:
-      read by job_f2 at ccfg.c:66, protected by lock
-      read by <main> at ccfg.c:94, protected by lock
-      read by job_f1 at ccfg.c:56, protected by lock
-      read by job_f1 at ccfg.c:55, protected by lock
-      write by job_f2 at ccfg.c:65, protected by lock
-    a:
-      read by job_f2 at ccfg.c:66, protected by lock
-      read by job_f2 at ccfg.c:65, protected by lock
-      read by <main> at ccfg.c:93, protected by lock
-      read by job_f1 at ccfg.c:56, protected by lock
-      write by job_f1 at ccfg.c:55, protected by lock
     global2[1]:
       read by jobs[0] at ccfg.c:19, unprotected
       read by jobs[1] at ccfg.c:19, unprotected

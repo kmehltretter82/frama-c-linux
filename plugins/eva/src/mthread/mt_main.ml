@@ -145,15 +145,33 @@ let print_shared_memory analysis =
         "Statements needing manual synchronisation@.%a"
         (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
 
+(* Does at least one mutex protects all accesses from [access_set]? *)
+let is_protected access_set =
+  let exception Unprotected in
+  (* Computes the intersection of surely locked mutexes for all accesses.
+     If it is empty, then [access_set] is not guaranteed to be protected. *)
+  let inter_locked_mutex (_rw, node, _thread) acc =
+    let mutexes = Mt_cfg_types.(node.cfgn_context.locked_mutexes) in
+    let locked = Mt_types.MutexPresence.only_present mutexes in
+    let acc = Option.fold ~none:locked ~some:(Mutex.Set.inter locked) acc in
+    if Mutex.Set.is_empty acc then raise Unprotected;
+    Some acc
+  in
+  let fold = Mt_cfg_types.SetNodeIdAccess.fold in
+  try ignore (fold inter_locked_mutex access_set None); true
+  with Unprotected -> false
+
 (* List data races detected by the analysis. *)
 let print_data_races analysis =
   let concurrent_accesses = analysis.concurrent_accesses_by_nodes in
+  let is_unprotected (_zone, access_set) = not (is_protected access_set) in
+  let unprotected_accesses = List.filter is_unprotected concurrent_accesses in
   let is_write_only (_zone, access_set) =
     let is_read (rw, _, _) = Mt_types.RW.is_read rw in
     not (Mt_cfg_types.SetNodeIdAccess.exists is_read access_set)
   in
   let ww_accesses, rw_accesses =
-    List.partition is_write_only concurrent_accesses
+    List.partition is_write_only unprotected_accesses
   in
   Self.result ~dkey:Self.dkey_data_races
     "@[<v 2>Possible read/write data races:@ %a@]"

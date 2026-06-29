@@ -515,6 +515,3 @@
       read by <main> at priorities.c:65, protected by m1 m2
       write by jobs4 at priorities.c:45, protected by m2
       write by jobs3 at priorities.c:37, unprotected
-    s1:
-      read by jobs1 at priorities.c:23, protected by m1
-      write by <main> at priorities.c:64, protected by m1 m2

@@ -458,19 +458,4 @@
     Read by <main>, Write by job1: protected by lock
 [eva:data-races] 
   Possible read/write data races:
-    v:
-      read by <main> at simple.c:50, protected by lock
-      write by job1 at simple.c:26, protected by lock
-      write by job2 at simple.c:37, protected by lock
-    c:
-      read by <main> at simple.c:50, protected by lock
-      write by job1 at simple.c:25, protected by lock
-      write by job2 at simple.c:36, protected by lock
-    b:
-      read by <main> at simple.c:50, protected by lock
-      write by job1 at simple.c:24, protected by lock
-      write by job2 at simple.c:34, protected by lock
-    a:
-      read by <main> at simple.c:50, protected by lock
-      write by job1 at simple.c:23, protected by lock
-      write by job2 at simple.c:35, protected by lock
+    none

@@ -379,6 +379,3 @@
     s2:
       read by jobs2 at mutex.c:34, protected by m1
       write by jobs3 at mutex.c:40, unprotected
-    s1:
-      read by jobs2 at mutex.c:33, protected by m1
-      write by jobs1 at mutex.c:25, protected by m1 m2

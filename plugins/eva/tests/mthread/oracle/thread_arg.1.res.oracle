@@ -603,14 +603,6 @@
   thread_arg.c:26 (for Frama_C_entropy_source)
 [eva:data-races] 
   Possible read/write data races:
-    vars[1]:
-      read by jobs[1] at thread_arg.c:26, protected by locks[1]
-      read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-      write by jobs[1] at thread_arg.c:26, protected by locks[1]
-    vars[0]:
-      read by jobs[0] at thread_arg.c:26, protected by locks[0]
-      read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
-      write by jobs[0] at thread_arg.c:26, protected by locks[0]
     Frama_C_entropy_source:
       read by jobs[0] at thread_arg.c:26, protected by locks[0]
       read by jobs[1] at thread_arg.c:26, protected by locks[1]
