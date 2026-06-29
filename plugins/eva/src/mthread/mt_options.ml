@@ -8,18 +8,15 @@
 
 open Self
 
-let grp_models = add_group "Extraction of models"
+let grp_concurrency = add_group "Analysis of concurrent programs"
 let grp_cfg = add_group "Multithreaded control-flow-graph"
-let grp_analysis = add_group "Analysis"
 
 module Enabled =
   False (struct
     let option_name = "-mthread"
-    let help = "enable analysis of multi-threaded programs through the Mthread plugin"
+    let help = "Enable analysis of multi-threaded programs (experimental)"
   end)
-;;
 
-let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.is_invisible ()
 module KeepProjects =
   String (struct
@@ -28,7 +25,6 @@ module KeepProjects =
     let default = "last"
     let arg_name = "all|last|none"
   end)
-;;
 let () = KeepProjects.set_possible_values ["all"; "last"; "none"]
 let () = KeepProjects.add_set_hook
     (fun _old _new ->
@@ -42,16 +38,14 @@ module ToDisk =
     let help = "After each thread analysis, save the current analysis state \
                 in a separate file"
   end)
-;;
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_concurrency
 let () = Parameter_customize.set_negative_option_name "-mt-consider-null"
 module IgnoreNull =
   False (struct
     let option_name = "-mt-ignore-null"
     let help = "Ignore shared accesses to numeric memory (NULL base)"
   end)
-;;
 
 let () = Parameter_customize.set_group grp_debug
 module ToDiskPrefix =
@@ -64,7 +58,7 @@ module ToDiskPrefix =
                   -mt-projects-on-disk (defaults to mthread_)"
     end)
 
-let () = Parameter_customize.set_group grp_analysis
+let () = Parameter_customize.set_group grp_concurrency
 module ThreadsLib =
   Enum
     (struct
@@ -79,14 +73,14 @@ module ThreadsLib =
       ]
     end)
 
-let () = Parameter_customize.set_group grp_analysis
+let () = Parameter_customize.set_group grp_concurrency
 module WriteWriteRaces =
   False (struct
     let option_name = "-mt-write-races"
     let help = "Display memory on which there is a write-only race condition"
   end)
 
-let () = Parameter_customize.set_group grp_analysis
+let () = Parameter_customize.set_group grp_concurrency
 module DumpSharedVarsValues =
   Int (struct
     let default = 0
@@ -99,14 +93,14 @@ module DumpSharedVarsValues =
   end)
 let () = DumpSharedVarsValues.set_range ~min:0 ~max:2
 
-let () = Parameter_customize.set_group grp_analysis
+let () = Parameter_customize.set_group grp_concurrency
 module CheckProtections =
   False (struct
     let help = "more precise inference of which mutexes protect shared memory"
     let option_name = "-mt-shared-accesses-synchronization"
   end)
 
-let () = Parameter_customize.set_group grp_analysis
+let () = Parameter_customize.set_group grp_concurrency
 module InterruptHandlers =
   Kernel_function_set (struct
     let option_name = "-mt-interrupt-handlers" (* if modified, update name in mt_domain.ml *)
@@ -129,7 +123,7 @@ module PrintCallstacks  =
     let help = "Print the callstacks at which concurrent events occur"
   end)
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_concurrency
 module SkipThreads =
   String_set
     (struct
@@ -137,9 +131,8 @@ module SkipThreads =
       let arg_name = "th1,...,thn"
       let help = "do not execute the specified threads"
     end)
-;;
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_concurrency
 module OnlyThreads =
   String_set
     (struct
@@ -147,9 +140,8 @@ module OnlyThreads =
       let arg_name = "th1,...,thn"
       let help = "only execute the specified threads"
     end)
-;;
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_concurrency
 module StopAfter =
   Int (struct
     let default = max_int
@@ -157,9 +149,8 @@ module StopAfter =
     let help = "Only perform at most i iterations"
     let arg_name = "i"
   end)
-;;
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_cfg
 module ConcatDotFilesTo =
   Filepath
     (struct
@@ -171,7 +162,7 @@ module ConcatDotFilesTo =
                   single file."
     end)
 
-let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.set_group grp_cfg
 module KeepDotFiles =
   False
     (struct
@@ -179,7 +170,7 @@ module KeepDotFiles =
       let help = "Keep dot files used to generate SVG for the html output"
     end)
 
-let () = Parameter_customize.set_group grp_models
+let () = Parameter_customize.set_group grp_concurrency
 module ExtractModels =
   String_set
     (struct
@@ -187,7 +178,6 @@ module ExtractModels =
       let arg_name = "[html]"
       let help = "extraction of models"
     end)
-;;
 
 let () = Parameter_customize.set_group grp_cfg
 module FullCfg =
@@ -195,7 +185,6 @@ module FullCfg =
     let option_name = "-mt-full-cfg"
     let help = "Do not simplify cfg and show all statements (can be costly)"
   end)
-;;
 
 let () = Parameter_customize.set_group grp_cfg
 module KeepWhiteNodes =
@@ -203,7 +192,6 @@ module KeepWhiteNodes =
     let option_name = "-mt-non-shared-accesses"
     let help = "Keep accesses to false shared variables in the cfg"
   end)
-;;
 
 let () = Parameter_customize.set_group grp_cfg
 module KeepGreenNodes =
@@ -211,7 +199,6 @@ module KeepGreenNodes =
     let option_name = "-mt-non-concurrent-accesses"
     let help = "Keep non-concurrent accesses to shared variables in the cfg"
   end)
-;;
 
 let () = Parameter_customize.set_group grp_cfg
 module ShowReturnEdges =
@@ -219,4 +206,26 @@ module ShowReturnEdges =
     let option_name = "-mt-return-edges"
     let help = "Show link between a call an a return instruction as a dotted line"
   end)
-;;
+
+let () = Parameter_customize.is_invisible ()
+module MtHelp =
+  False (struct
+    let option_name = "-mt-help"
+    let help = "Deprecated: use -eva-help instead."
+  end)
+let () = MtHelp.add_aliases ~visible:false ~deprecated:false ["-mt-h"]
+let () =
+  MtHelp.add_set_hook (fun _ _ ->
+      warning "Option -mt-help is deprecated: use -eva-help instead.")
+
+let () = Parameter_customize.is_invisible ()
+module MtVerbose =
+  Int (struct
+    let option_name = "-mt-verbose"
+    let help = "Deprecated: use -eva-verbose instead."
+    let default = 0
+    let arg_name = ""
+  end)
+let () =
+  MtVerbose.add_set_hook (fun _ _ ->
+      warning "Option -mt-verbose is deprecated: use -eva-verbose instead.")
