@@ -25,9 +25,6 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
--  E-ACSL     [2026-06-15] "memory access" RTEs handling in annotations now
-                            relies on an internal implementation of E-ACSL
-                            rather than on the RTE plugin
 -  E-ACSL     [2026-06-11] Add optimisation flag for omitting RTE generation
 -  E-ACSL     [2026-06-09] Add optimisation flag for hypothesis gathering
 -  E-ACSL     [2026-06-16] Reduce costs for checking “memory access” RTEs at
