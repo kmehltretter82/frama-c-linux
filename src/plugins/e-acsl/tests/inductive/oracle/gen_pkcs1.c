@@ -407,9 +407,30 @@ int main(void)
   __e_acsl_globals_init();
   {
     __e_acsl_mpz_t __gen_e_acsl_;
+    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid_tlv_here_10;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_str(__gen_e_acsl_,"0",10);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)u1ptr,1UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"u1ptr",
+                                 (void *)u1ptr);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "\"pointer alignment\": \\aligned(u1ptr,1)",
+                                 0,__gen_e_acsl_aligned);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(u1ptr,1); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(u1ptr,1)";
+      __gen_e_acsl_assert_data_2.file = "pkcs1.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 202;
+      __gen_e_acsl_assert_data_2.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gen_e_acsl_valid_tlv_here_10 = __gen_e_acsl_valid_tlv_here(u1ptr,0,0U,
                                                                  (__e_acsl_mpz_struct *)__gen_e_acsl_,
                                                                  0U,1);
@@ -431,30 +452,51 @@ int main(void)
   }
   /*@ assert valid_tlv(u1ptr, 0, 0, 0, 0, \true); */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__25;
+    __e_acsl_mpz_t __gen_e_acsl__26;
+    int __gen_e_acsl_aligned_7;
     int __gen_e_acsl_prim_gh_set_here_10;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
       {.values = (void *)0};
-    __gmpz_init_set_str(__gen_e_acsl__25,"0",10);
+    __gmpz_init_set_str(__gen_e_acsl__26,"0",10);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)u1ptr,1UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"u1ptr",
+                                 (void *)u1ptr);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
+                                 "\"pointer alignment\": \\aligned(u1ptr,1)",
+                                 0,__gen_e_acsl_aligned_7);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(u1ptr,1); */
+    {
+      __gen_e_acsl_assert_data_13.blocking = 1;
+      __gen_e_acsl_assert_data_13.kind = "RTE";
+      __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(u1ptr,1)";
+      __gen_e_acsl_assert_data_13.file = "pkcs1.c";
+      __gen_e_acsl_assert_data_13.fct = "main";
+      __gen_e_acsl_assert_data_13.line = 203;
+      __gen_e_acsl_assert_data_13.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_13);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+    }
     __gen_e_acsl_prim_gh_set_here_10 = __gen_e_acsl_prim_gh_set_here(u1ptr,0,
                                                                     0U,
-                                                                    (__e_acsl_mpz_struct *)__gen_e_acsl__25,
+                                                                    (__e_acsl_mpz_struct *)__gen_e_acsl__26,
                                                                     0U,1);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"u1ptr",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,"u1ptr",
                                  (void *)u1ptr);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                  "prim_gh_set(u1ptr, 0, 0, 0, 0, \\true)",0,
                                  __gen_e_acsl_prim_gh_set_here_10);
-    __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "prim_gh_set(u1ptr, 0, 0, 0, 0, \\true)";
-    __gen_e_acsl_assert_data_11.file = "pkcs1.c";
-    __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 203;
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "prim_gh_set(u1ptr, 0, 0, 0, 0, \\true)";
+    __gen_e_acsl_assert_data_12.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 203;
     __e_acsl_assert(__gen_e_acsl_prim_gh_set_here_10,
-                    & __gen_e_acsl_assert_data_11);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
-    __gmpz_clear(__gen_e_acsl__25);
+                    & __gen_e_acsl_assert_data_12);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+    __gmpz_clear(__gen_e_acsl__26);
   }
   /*@ assert prim_gh_set(u1ptr, 0, 0, 0, 0, \true); */ ;
   __retres = 0;
@@ -491,6 +533,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
   else {
     uint const *__gen_e_acsl_tlv_cur;
     int __gen_e_acsl_and_4;
+    int __gen_e_acsl_aligned_2;
     int __gen_e_acsl_prev_pars;
     __e_acsl_mpz_t __gen_e_acsl__3;
     __e_acsl_mpz_t __gen_e_acsl__4;
@@ -503,27 +546,49 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
     int __gen_e_acsl_and_9;
     int __gen_e_acsl_and_10;
     int __gen_e_acsl_or_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_2,"tlv_id",0,
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_3,"tlv_id",0,
                                   tlv_id);
     if (0U <= tlv_id) {
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_2,"tlv_id",0,
+      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_3,"tlv_id",0,
                                     tlv_id);
       __gen_e_acsl_and_4 = tlv_id < 3U;
     }
     else __gen_e_acsl_and_4 = 0;
     /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
     {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "0 <= tlv_id < (int)3";
-      __gen_e_acsl_assert_data_2.file = "<unknown>";
-      __gen_e_acsl_assert_data_2.fct = "valid_tlv_here";
-      __gen_e_acsl_assert_data_2.line = 0;
-      __gen_e_acsl_assert_data_2.name = "index out of bounds";
-      __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "0 <= tlv_id < (int)3";
+      __gen_e_acsl_assert_data_3.file = "<unknown>";
+      __gen_e_acsl_assert_data_3.fct = "valid_tlv_here";
+      __gen_e_acsl_assert_data_3.line = 0;
+      __gen_e_acsl_assert_data_3.name = "index out of bounds";
+      __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                 "g_tlv_spec[tlv_id]",
+                                 (void *)g_tlv_spec[tlv_id]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                 0,__gen_e_acsl_aligned_2);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+    */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+      __gen_e_acsl_assert_data_4.file = "pkcs1.c";
+      __gen_e_acsl_assert_data_4.fct = "valid_tlv_here";
+      __gen_e_acsl_assert_data_4.line = 101;
+      __gen_e_acsl_assert_data_4.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_tlv_cur = g_tlv_spec[tlv_id];
     __gen_e_acsl_prev_pars = 0;
@@ -580,8 +645,6 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
       __e_acsl_mpz_t __gen_e_acsl_mul;
       __e_acsl_mpz_t __gen_e_acsl_add;
       long __gen_e_acsl__10;
-      int __gen_e_acsl_aligned;
-      int __gen_e_acsl_aligned_2;
       __gmpz_init_set_si(__gen_e_acsl__8,1L);
       __gmpz_init(__gen_e_acsl_sub_4);
       __gmpz_sub(__gen_e_acsl_sub_4,
@@ -597,46 +660,6 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__8),
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
       __gen_e_acsl__10 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur + __gen_e_acsl__10),
-                                              _Alignof(uint const));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                     "alignof(uint const)",0,
-                                     _Alignof(uint const));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                   "__gen_e_acsl_tlv_cur",
-                                   (void *)__gen_e_acsl_tlv_cur);
-      __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_3,
-                                    "__gen_e_acsl__10",0,__gen_e_acsl__10);
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur + __gen_e_acsl__10,alignof(uint const))";
-      __gen_e_acsl_assert_data_3.file = "pkcs1.c";
-      __gen_e_acsl_assert_data_3.fct = "valid_tlv_here";
-      __gen_e_acsl_assert_data_3.line = 108;
-      __gen_e_acsl_assert_data_3.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(start + prev_pars),
-                                                _Alignof(u1));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "alignof(u1)",0,_Alignof(u1));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"start",
-                                   (void *)start);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"prev_pars",
-                                   0,prev_pars);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(start + prev_pars,alignof(u1))";
-      __gen_e_acsl_assert_data_4.file = "pkcs1.c";
-      __gen_e_acsl_assert_data_4.fct = "valid_tlv_here";
-      __gen_e_acsl_assert_data_4.line = 108;
-      __gen_e_acsl_assert_data_4.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       /*@ assert
             Eva: mem_access:
               \valid_read(__gen_e_acsl_tlv_cur + __gen_e_acsl__10);
@@ -650,33 +673,11 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
       __gmpz_clear(__gen_e_acsl_add);
     }
     else __gen_e_acsl_and_7 = 0;
-    if (__gen_e_acsl_and_7) {
-      int __gen_e_acsl_aligned_3;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)(start + (int)(
-                                                         prev_pars + 1L)),
-                                                _Alignof(u1));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "alignof(u1)",0,_Alignof(u1));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"start",
-                                   (void *)start);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"prev_pars",
-                                   0,prev_pars);
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(start + (int)(prev_pars + 1),alignof(u1))";
-      __gen_e_acsl_assert_data_5.file = "pkcs1.c";
-      __gen_e_acsl_assert_data_5.fct = "valid_tlv_here";
-      __gen_e_acsl_assert_data_5.line = 110;
-      __gen_e_acsl_assert_data_5.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    if (__gen_e_acsl_and_7) 
       /*@ assert Eva: mem_access: \valid_read(start + (int)(prev_pars + 1));
       */
       __gen_e_acsl_and_8 = size_pars == (unsigned int)((prev_pars + 2) + *(
                                                        start + (prev_pars + 1)));
-    }
     else __gen_e_acsl_and_8 = 0;
     if (__gen_e_acsl_and_8) {
       __e_acsl_mpz_t __gen_e_acsl__11;
@@ -706,32 +707,56 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
     else {
       uint const *__gen_e_acsl_tlv_cur_2;
       int __gen_e_acsl_and_11;
+      int __gen_e_acsl_aligned_3;
       __e_acsl_mpz_t __gen_e_acsl__12;
       int __gen_e_acsl_le_2;
       int __gen_e_acsl_and_12;
       int __gen_e_acsl_and_13;
       int __gen_e_acsl_and_14;
       int __gen_e_acsl_or;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_6,"tlv_id",0,
+      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_5,"tlv_id",0,
                                     tlv_id);
       if (0U <= tlv_id) {
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_6,"tlv_id",
+        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_5,"tlv_id",
                                       0,tlv_id);
         __gen_e_acsl_and_11 = tlv_id < 3U;
       }
       else __gen_e_acsl_and_11 = 0;
       /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
       {
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.pred_txt = "0 <= tlv_id < (int)3";
+        __gen_e_acsl_assert_data_5.file = "<unknown>";
+        __gen_e_acsl_assert_data_5.fct = "valid_tlv_here";
+        __gen_e_acsl_assert_data_5.line = 0;
+        __gen_e_acsl_assert_data_5.name = "index out of bounds";
+        __e_acsl_assert(__gen_e_acsl_and_11,& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      }
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],
+                                                4UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+                                   "g_tlv_spec[tlv_id]",
+                                   (void *)g_tlv_spec[tlv_id]);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                   0,__gen_e_acsl_aligned_3);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+      */
+      {
         __gen_e_acsl_assert_data_6.blocking = 1;
         __gen_e_acsl_assert_data_6.kind = "RTE";
-        __gen_e_acsl_assert_data_6.pred_txt = "0 <= tlv_id < (int)3";
-        __gen_e_acsl_assert_data_6.file = "<unknown>";
+        __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+        __gen_e_acsl_assert_data_6.file = "pkcs1.c";
         __gen_e_acsl_assert_data_6.fct = "valid_tlv_here";
-        __gen_e_acsl_assert_data_6.line = 0;
-        __gen_e_acsl_assert_data_6.name = "index out of bounds";
-        __e_acsl_assert(__gen_e_acsl_and_11,& __gen_e_acsl_assert_data_6);
+        __gen_e_acsl_assert_data_6.line = 116;
+        __gen_e_acsl_assert_data_6.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       }
       __gen_e_acsl_tlv_cur_2 = g_tlv_spec[tlv_id];
@@ -756,7 +781,6 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
         __e_acsl_mpz_t __gen_e_acsl_mul_2;
         __e_acsl_mpz_t __gen_e_acsl_add_3;
         long __gen_e_acsl__16;
-        int __gen_e_acsl_aligned_4;
         __gmpz_init_set_si(__gen_e_acsl__13,2L);
         __gmpz_init_set_si(__gen_e_acsl__14,1L);
         __gmpz_init(__gen_e_acsl_sub_6);
@@ -773,27 +797,6 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__13),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2));
         __gen_e_acsl__16 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3));
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl__16),
-                                                  _Alignof(uint const));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                       "alignof(uint const)",0,
-                                       _Alignof(uint const));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                     "__gen_e_acsl_tlv_cur_2",
-                                     (void *)__gen_e_acsl_tlv_cur_2);
-        __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_7,
-                                      "__gen_e_acsl__16",0,__gen_e_acsl__16);
-        __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl__16,alignof(uint const))";
-        __gen_e_acsl_assert_data_7.file = "pkcs1.c";
-        __gen_e_acsl_assert_data_7.fct = "valid_tlv_here";
-        __gen_e_acsl_assert_data_7.line = 119;
-        __gen_e_acsl_assert_data_7.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_7);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         /*@ assert
               Eva: mem_access:
                 \valid_read(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl__16);
@@ -813,45 +816,96 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
       else {
         uint const *__gen_e_acsl_tlv_cur_3;
         int __gen_e_acsl_and_15;
+        int __gen_e_acsl_aligned_4;
         unsigned int __gen_e_acsl_tlv_link;
+        int __gen_e_acsl_aligned_5;
         __e_acsl_mpz_t __gen_e_acsl__17;
         __e_acsl_mpz_t __gen_e_acsl__18;
         __e_acsl_mpz_t __gen_e_acsl_sub_7;
         __e_acsl_mpz_t __gen_e_acsl_mul_3;
         __e_acsl_mpz_t __gen_e_acsl_add_4;
         long __gen_e_acsl__19;
-        int __gen_e_acsl_valid_read;
+        int __gen_e_acsl_aligned_6;
         long __gen_e_acsl__20;
+        int __gen_e_acsl_valid_read;
+        long __gen_e_acsl__21;
         int __gen_e_acsl_nest_prev_pars;
         int __gen_e_acsl_le_3;
         int __gen_e_acsl_and_16;
         int __gen_e_acsl_and_17;
         int __gen_e_acsl_and_18;
         int __gen_e_acsl_and_19;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
           {.values = (void *)0};
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_8,"tlv_id",
+        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_7,"tlv_id",
                                       0,tlv_id);
         if (0U <= tlv_id) {
-          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_8,
+          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_7,
                                         "tlv_id",0,tlv_id);
           __gen_e_acsl_and_15 = tlv_id < 3U;
         }
         else __gen_e_acsl_and_15 = 0;
         /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
         {
+          __gen_e_acsl_assert_data_7.blocking = 1;
+          __gen_e_acsl_assert_data_7.kind = "RTE";
+          __gen_e_acsl_assert_data_7.pred_txt = "0 <= tlv_id < (int)3";
+          __gen_e_acsl_assert_data_7.file = "<unknown>";
+          __gen_e_acsl_assert_data_7.fct = "valid_tlv_here";
+          __gen_e_acsl_assert_data_7.line = 0;
+          __gen_e_acsl_assert_data_7.name = "index out of bounds";
+          __e_acsl_assert(__gen_e_acsl_and_15,& __gen_e_acsl_assert_data_7);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],
+                                                  4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+                                     "g_tlv_spec[tlv_id]",
+                                     (void *)g_tlv_spec[tlv_id]);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                     "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                     0,__gen_e_acsl_aligned_4);
+        /*@ assert
+              E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+        */
+        {
           __gen_e_acsl_assert_data_8.blocking = 1;
           __gen_e_acsl_assert_data_8.kind = "RTE";
-          __gen_e_acsl_assert_data_8.pred_txt = "0 <= tlv_id < (int)3";
-          __gen_e_acsl_assert_data_8.file = "<unknown>";
+          __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+          __gen_e_acsl_assert_data_8.file = "pkcs1.c";
           __gen_e_acsl_assert_data_8.fct = "valid_tlv_here";
-          __gen_e_acsl_assert_data_8.line = 0;
-          __gen_e_acsl_assert_data_8.name = "index out of bounds";
-          __e_acsl_assert(__gen_e_acsl_and_15,& __gen_e_acsl_assert_data_8);
+          __gen_e_acsl_assert_data_8.line = 126;
+          __gen_e_acsl_assert_data_8.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_4,
+                          & __gen_e_acsl_assert_data_8);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         }
         __gen_e_acsl_tlv_cur_3 = g_tlv_spec[tlv_id];
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)__gen_e_acsl_tlv_cur_3,
+                                                  4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"tlv_cur",
+                                     (void *)__gen_e_acsl_tlv_cur_3);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                     "\"pointer alignment\": \\aligned(tlv_cur,4)",
+                                     0,__gen_e_acsl_aligned_5);
+        /*@ assert E_ACSL: "pointer alignment": \aligned(tlv_cur,4); */
+        {
+          __gen_e_acsl_assert_data_9.blocking = 1;
+          __gen_e_acsl_assert_data_9.kind = "RTE";
+          __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(tlv_cur,4)";
+          __gen_e_acsl_assert_data_9.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_9.fct = "valid_tlv_here";
+          __gen_e_acsl_assert_data_9.line = 127;
+          __gen_e_acsl_assert_data_9.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_5,
+                          & __gen_e_acsl_assert_data_9);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
           {.values = (void *)0};
         __gmpz_init_set_si(__gen_e_acsl__17,3L);
         __gmpz_init_set_si(__gen_e_acsl__18,1L);
@@ -868,19 +922,48 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__17),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_3));
         __gen_e_acsl__19 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__19),
+        __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__19),
+                                                  4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"tlv_cur",
+                                     (void *)__gen_e_acsl_tlv_cur_3);
+        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_10,
+                                     "tlv_num_pars",0,
+                                     (__e_acsl_mpz_struct const *)(tlv_num_pars));
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                     "\"pointer alignment\": \\aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4)",
+                                     0,__gen_e_acsl_aligned_6);
+        /*@ assert
+              E_ACSL: "pointer alignment":
+                \aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4);
+        */
+        {
+          __gen_e_acsl_assert_data_10.blocking = 1;
+          __gen_e_acsl_assert_data_10.kind = "RTE";
+          __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4)";
+          __gen_e_acsl_assert_data_10.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_10.fct = "valid_tlv_here";
+          __gen_e_acsl_assert_data_10.line = 127;
+          __gen_e_acsl_assert_data_10.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_6,
+                          & __gen_e_acsl_assert_data_10);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+          {.values = (void *)0};
+        __gen_e_acsl__20 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__20),
                                                       sizeof(uint const),
                                                       (void *)__gen_e_acsl_tlv_cur_3,
                                                       (void *)(& __gen_e_acsl_tlv_cur_3));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"tlv_cur",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"tlv_cur",
                                      (void *)__gen_e_acsl_tlv_cur_3);
-        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_9,
+        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_11,
                                      "tlv_num_pars",0,
                                      (__e_acsl_mpz_struct const *)(tlv_num_pars));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
                                        "sizeof(uint const)",0,
                                        sizeof(uint const));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                      "\"memory access\": \\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))",
                                      0,__gen_e_acsl_valid_read);
         /*@ assert
@@ -888,23 +971,23 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                 \valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3));
         */
         {
-          __gen_e_acsl_assert_data_9.blocking = 1;
-          __gen_e_acsl_assert_data_9.kind = "RTE";
-          __gen_e_acsl_assert_data_9.pred_txt = "\\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))";
-          __gen_e_acsl_assert_data_9.file = "pkcs1.c";
-          __gen_e_acsl_assert_data_9.fct = "valid_tlv_here";
-          __gen_e_acsl_assert_data_9.line = 127;
-          __gen_e_acsl_assert_data_9.name = "memory access";
+          __gen_e_acsl_assert_data_11.blocking = 1;
+          __gen_e_acsl_assert_data_11.kind = "RTE";
+          __gen_e_acsl_assert_data_11.pred_txt = "\\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))";
+          __gen_e_acsl_assert_data_11.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_11.fct = "valid_tlv_here";
+          __gen_e_acsl_assert_data_11.line = 127;
+          __gen_e_acsl_assert_data_11.name = "memory access";
           __e_acsl_assert(__gen_e_acsl_valid_read,
-                          & __gen_e_acsl_assert_data_9);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+                          & __gen_e_acsl_assert_data_11);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
         }
-        __gen_e_acsl__20 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
+        __gen_e_acsl__21 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
         /*@ assert
               Eva: mem_access:
-                \valid_read(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__20);
+                \valid_read(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__21);
         */
-        __gen_e_acsl_tlv_link = *(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__20);
+        __gen_e_acsl_tlv_link = *(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__21);
         __gen_e_acsl_nest_prev_pars = 0;
         __gen_e_acsl_le_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__18),
                                        (__e_acsl_mpz_struct const *)(tlv_num_pars));
@@ -916,62 +999,38 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
         }
         else __gen_e_acsl_and_16 = 0;
         if (__gen_e_acsl_and_16) {
-          __e_acsl_mpz_t __gen_e_acsl__21;
           __e_acsl_mpz_t __gen_e_acsl__22;
-          __e_acsl_mpz_t __gen_e_acsl_sub_8;
           __e_acsl_mpz_t __gen_e_acsl__23;
+          __e_acsl_mpz_t __gen_e_acsl_sub_8;
+          __e_acsl_mpz_t __gen_e_acsl__24;
           __e_acsl_mpz_t __gen_e_acsl_mul_4;
           __e_acsl_mpz_t __gen_e_acsl_add_5;
-          long __gen_e_acsl__24;
-          int __gen_e_acsl_aligned_5;
-          __gmpz_init_set_si(__gen_e_acsl__21,2L);
-          __gmpz_init_set_si(__gen_e_acsl__22,1L);
+          long __gen_e_acsl__25;
+          __gmpz_init_set_si(__gen_e_acsl__22,2L);
+          __gmpz_init_set_si(__gen_e_acsl__23,1L);
           __gmpz_init(__gen_e_acsl_sub_8);
           __gmpz_sub(__gen_e_acsl_sub_8,
                      (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__22));
-          __gmpz_init_set_si(__gen_e_acsl__23,3L);
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__23));
+          __gmpz_init_set_si(__gen_e_acsl__24,3L);
           __gmpz_init(__gen_e_acsl_mul_4);
           __gmpz_mul(__gen_e_acsl_mul_4,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_8),
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__23));
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__24));
           __gmpz_init(__gen_e_acsl_add_5);
           __gmpz_add(__gen_e_acsl_add_5,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__21),
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__22),
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_4));
-          __gen_e_acsl__24 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5));
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-            {.values = (void *)0};
-          __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__24),
-                                                    _Alignof(uint const));
-          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
-                                         "alignof(uint const)",0,
-                                         _Alignof(uint const));
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
-                                       "__gen_e_acsl_tlv_cur_3",
-                                       (void *)__gen_e_acsl_tlv_cur_3);
-          __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_10,
-                                        "__gen_e_acsl__24",0,
-                                        __gen_e_acsl__24);
-          __gen_e_acsl_assert_data_10.blocking = 1;
-          __gen_e_acsl_assert_data_10.kind = "RTE";
-          __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__24,alignof(uint const))";
-          __gen_e_acsl_assert_data_10.file = "pkcs1.c";
-          __gen_e_acsl_assert_data_10.fct = "valid_tlv_here";
-          __gen_e_acsl_assert_data_10.line = 134;
-          __gen_e_acsl_assert_data_10.name = "pointer_alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_5,
-                          & __gen_e_acsl_assert_data_10);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+          __gen_e_acsl__25 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5));
           /*@ assert
                 Eva: mem_access:
-                  \valid_read(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__24);
+                  \valid_read(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__25);
           */
-          __gen_e_acsl_and_17 = (int)((u1)((int)*(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__24))) == 0;
-          __gmpz_clear(__gen_e_acsl__21);
+          __gen_e_acsl_and_17 = (int)((u1)((int)*(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl__25))) == 0;
           __gmpz_clear(__gen_e_acsl__22);
-          __gmpz_clear(__gen_e_acsl_sub_8);
           __gmpz_clear(__gen_e_acsl__23);
+          __gmpz_clear(__gen_e_acsl_sub_8);
+          __gmpz_clear(__gen_e_acsl__24);
           __gmpz_clear(__gen_e_acsl_mul_4);
           __gmpz_clear(__gen_e_acsl_add_5);
         }
@@ -1027,13 +1086,13 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
   if (prev_pars == 0) __gen_e_acsl_and_20 = size_pars == 0U;
   else __gen_e_acsl_and_20 = 0;
   if (__gen_e_acsl_and_20) {
-    __e_acsl_mpz_t __gen_e_acsl__26;
+    __e_acsl_mpz_t __gen_e_acsl__27;
     int __gen_e_acsl_eq_3;
-    __gmpz_init_set_si(__gen_e_acsl__26,0L);
+    __gmpz_init_set_si(__gen_e_acsl__27,0L);
     __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(tlv_num_pars),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__26));
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__27));
     __gen_e_acsl_and_21 = __gen_e_acsl_eq_3 == 0;
-    __gmpz_clear(__gen_e_acsl__26);
+    __gmpz_clear(__gen_e_acsl__27);
   }
   else __gen_e_acsl_and_21 = 0;
   if (__gen_e_acsl_and_21) __gen_e_acsl_and_22 = with_children == 1;
@@ -1042,9 +1101,10 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
   else {
     uint const *__gen_e_acsl_tlv_cur_4;
     int __gen_e_acsl_and_23;
+    int __gen_e_acsl_aligned_8;
     int __gen_e_acsl_prev_pars_2;
-    __e_acsl_mpz_t __gen_e_acsl__27;
     __e_acsl_mpz_t __gen_e_acsl__28;
+    __e_acsl_mpz_t __gen_e_acsl__29;
     __e_acsl_mpz_t __gen_e_acsl_sub_9;
     int __gen_e_acsl_le_4;
     int __gen_e_acsl_and_24;
@@ -1053,121 +1113,121 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
     int __gen_e_acsl_and_27;
     int __gen_e_acsl_and_28;
     int __gen_e_acsl_or_5;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
       {.values = (void *)0};
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_12,"tlv_id",0,
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_14,"tlv_id",0,
                                   tlv_id);
     if (0U <= tlv_id) {
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_12,"tlv_id",0,
+      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_14,"tlv_id",0,
                                     tlv_id);
       __gen_e_acsl_and_23 = tlv_id < 3U;
     }
     else __gen_e_acsl_and_23 = 0;
     /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
     {
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "0 <= tlv_id < (int)3";
-      __gen_e_acsl_assert_data_12.file = "<unknown>";
-      __gen_e_acsl_assert_data_12.fct = "prim_gh_set_here";
-      __gen_e_acsl_assert_data_12.line = 0;
-      __gen_e_acsl_assert_data_12.name = "index out of bounds";
-      __e_acsl_assert(__gen_e_acsl_and_23,& __gen_e_acsl_assert_data_12);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+      __gen_e_acsl_assert_data_14.blocking = 1;
+      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.pred_txt = "0 <= tlv_id < (int)3";
+      __gen_e_acsl_assert_data_14.file = "<unknown>";
+      __gen_e_acsl_assert_data_14.fct = "prim_gh_set_here";
+      __gen_e_acsl_assert_data_14.line = 0;
+      __gen_e_acsl_assert_data_14.name = "index out of bounds";
+      __e_acsl_assert(__gen_e_acsl_and_23,& __gen_e_acsl_assert_data_14);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
+                                 "g_tlv_spec[tlv_id]",
+                                 (void *)g_tlv_spec[tlv_id]);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
+                                 "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                 0,__gen_e_acsl_aligned_8);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+    */
+    {
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+      __gen_e_acsl_assert_data_15.file = "pkcs1.c";
+      __gen_e_acsl_assert_data_15.fct = "prim_gh_set_here";
+      __gen_e_acsl_assert_data_15.line = 159;
+      __gen_e_acsl_assert_data_15.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_15);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
     __gen_e_acsl_tlv_cur_4 = g_tlv_spec[tlv_id];
     __gen_e_acsl_prev_pars_2 = 0;
-    __gmpz_init_set_si(__gen_e_acsl__27,0L);
-    __gmpz_init_set_si(__gen_e_acsl__28,1L);
+    __gmpz_init_set_si(__gen_e_acsl__28,0L);
+    __gmpz_init_set_si(__gen_e_acsl__29,1L);
     __gmpz_init(__gen_e_acsl_sub_9);
     __gmpz_sub(__gen_e_acsl_sub_9,
                (__e_acsl_mpz_struct const *)(tlv_num_pars),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__28));
-    __gen_e_acsl_le_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__27),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__29));
+    __gen_e_acsl_le_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__28),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_9));
     if (__gen_e_acsl_le_4 <= 0) {
-      __e_acsl_mpz_t __gen_e_acsl__29;
-      __e_acsl_mpz_t __gen_e_acsl_sub_10;
       __e_acsl_mpz_t __gen_e_acsl__30;
+      __e_acsl_mpz_t __gen_e_acsl_sub_10;
+      __e_acsl_mpz_t __gen_e_acsl__31;
       int __gen_e_acsl_lt_2;
-      __gmpz_init_set_si(__gen_e_acsl__29,1L);
+      __gmpz_init_set_si(__gen_e_acsl__30,1L);
       __gmpz_init(__gen_e_acsl_sub_10);
       __gmpz_sub(__gen_e_acsl_sub_10,
                  (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__29));
-      __gmpz_init_set_ui(__gen_e_acsl__30,
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__30));
+      __gmpz_init_set_ui(__gen_e_acsl__31,
                          (unsigned long)*(__gen_e_acsl_tlv_cur_4 + 0));
       __gen_e_acsl_lt_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_10),
-                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__30));
+                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__31));
       __gen_e_acsl_and_24 = __gen_e_acsl_lt_2 < 0;
-      __gmpz_clear(__gen_e_acsl__29);
-      __gmpz_clear(__gen_e_acsl_sub_10);
       __gmpz_clear(__gen_e_acsl__30);
+      __gmpz_clear(__gen_e_acsl_sub_10);
+      __gmpz_clear(__gen_e_acsl__31);
     }
     else __gen_e_acsl_and_24 = 0;
     if (__gen_e_acsl_and_24) {
-      __e_acsl_mpz_t __gen_e_acsl__31;
+      __e_acsl_mpz_t __gen_e_acsl__32;
       __e_acsl_mpz_t __gen_e_acsl_sub_11;
       int __gen_e_acsl_prim_gh_set_here_3;
-      __gmpz_init_set_si(__gen_e_acsl__31,1L);
+      __gmpz_init_set_si(__gen_e_acsl__32,1L);
       __gmpz_init(__gen_e_acsl_sub_11);
       __gmpz_sub(__gen_e_acsl_sub_11,
                  (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__31));
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__32));
       __gen_e_acsl_prim_gh_set_here_3 = __gen_e_acsl_prim_gh_set_here
       (start,__gen_e_acsl_prev_pars_2,(unsigned int)prev_pars,
        (__e_acsl_mpz_struct *)__gen_e_acsl_sub_11,tlv_id,1);
       __gen_e_acsl_and_25 = __gen_e_acsl_prim_gh_set_here_3;
-      __gmpz_clear(__gen_e_acsl__31);
+      __gmpz_clear(__gen_e_acsl__32);
       __gmpz_clear(__gen_e_acsl_sub_11);
     }
     else __gen_e_acsl_and_25 = 0;
-    if (__gen_e_acsl_and_25) {
-      int __gen_e_acsl_aligned_6;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)(start + (int)(
-                                                         prev_pars + 1L)),
-                                                _Alignof(u1));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
-                                     "alignof(u1)",0,_Alignof(u1));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"start",
-                                   (void *)start);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"prev_pars",
-                                   0,prev_pars);
-      __gen_e_acsl_assert_data_13.blocking = 1;
-      __gen_e_acsl_assert_data_13.kind = "RTE";
-      __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(start + (int)(prev_pars + 1),alignof(u1))";
-      __gen_e_acsl_assert_data_13.file = "pkcs1.c";
-      __gen_e_acsl_assert_data_13.fct = "prim_gh_set_here";
-      __gen_e_acsl_assert_data_13.line = 167;
-      __gen_e_acsl_assert_data_13.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_6,& __gen_e_acsl_assert_data_13);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+    if (__gen_e_acsl_and_25) 
       /*@ assert Eva: mem_access: \valid_read(start + (int)(prev_pars + 1));
       */
       __gen_e_acsl_and_26 = size_pars == (unsigned int)((prev_pars + 2) + *(
                                                         start + (prev_pars + 1)));
-    }
     else __gen_e_acsl_and_26 = 0;
     if (__gen_e_acsl_and_26) {
-      __e_acsl_mpz_t __gen_e_acsl__32;
+      __e_acsl_mpz_t __gen_e_acsl__33;
       __e_acsl_mpz_t __gen_e_acsl_sub_12;
       __e_acsl_mpz_t __gen_e_acsl_add_6;
       int __gen_e_acsl_eq_4;
-      __gmpz_init_set_si(__gen_e_acsl__32,1L);
+      __gmpz_init_set_si(__gen_e_acsl__33,1L);
       __gmpz_init(__gen_e_acsl_sub_12);
       __gmpz_sub(__gen_e_acsl_sub_12,
                  (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__32));
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__33));
       __gmpz_init(__gen_e_acsl_add_6);
       __gmpz_add(__gen_e_acsl_add_6,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_12),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__32));
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__33));
       __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(tlv_num_pars),
                                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_6));
       __gen_e_acsl_and_27 = __gen_e_acsl_eq_4 == 0;
-      __gmpz_clear(__gen_e_acsl__32);
+      __gmpz_clear(__gen_e_acsl__33);
       __gmpz_clear(__gen_e_acsl_sub_12);
       __gmpz_clear(__gen_e_acsl_add_6);
     }
@@ -1178,37 +1238,61 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
     else {
       uint const *__gen_e_acsl_tlv_cur_5;
       int __gen_e_acsl_and_29;
-      __e_acsl_mpz_t __gen_e_acsl__33;
+      int __gen_e_acsl_aligned_9;
+      __e_acsl_mpz_t __gen_e_acsl__34;
       int __gen_e_acsl_le_5;
       int __gen_e_acsl_and_30;
       int __gen_e_acsl_and_34;
       int __gen_e_acsl_and_35;
       int __gen_e_acsl_or_4;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
         {.values = (void *)0};
-      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_14,"tlv_id",0,
+      __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"tlv_id",0,
                                     tlv_id);
       if (0U <= tlv_id) {
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_14,"tlv_id",
+        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"tlv_id",
                                       0,tlv_id);
         __gen_e_acsl_and_29 = tlv_id < 3U;
       }
       else __gen_e_acsl_and_29 = 0;
       /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
       {
-        __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
-        __gen_e_acsl_assert_data_14.pred_txt = "0 <= tlv_id < (int)3";
-        __gen_e_acsl_assert_data_14.file = "<unknown>";
-        __gen_e_acsl_assert_data_14.fct = "prim_gh_set_here";
-        __gen_e_acsl_assert_data_14.line = 0;
-        __gen_e_acsl_assert_data_14.name = "index out of bounds";
-        __e_acsl_assert(__gen_e_acsl_and_29,& __gen_e_acsl_assert_data_14);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
+        __gen_e_acsl_assert_data_16.blocking = 1;
+        __gen_e_acsl_assert_data_16.kind = "RTE";
+        __gen_e_acsl_assert_data_16.pred_txt = "0 <= tlv_id < (int)3";
+        __gen_e_acsl_assert_data_16.file = "<unknown>";
+        __gen_e_acsl_assert_data_16.fct = "prim_gh_set_here";
+        __gen_e_acsl_assert_data_16.line = 0;
+        __gen_e_acsl_assert_data_16.name = "index out of bounds";
+        __e_acsl_assert(__gen_e_acsl_and_29,& __gen_e_acsl_assert_data_16);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+      }
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],
+                                                4UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
+                                   "g_tlv_spec[tlv_id]",
+                                   (void *)g_tlv_spec[tlv_id]);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
+                                   "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                   0,__gen_e_acsl_aligned_9);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+      */
+      {
+        __gen_e_acsl_assert_data_17.blocking = 1;
+        __gen_e_acsl_assert_data_17.kind = "RTE";
+        __gen_e_acsl_assert_data_17.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+        __gen_e_acsl_assert_data_17.file = "pkcs1.c";
+        __gen_e_acsl_assert_data_17.fct = "prim_gh_set_here";
+        __gen_e_acsl_assert_data_17.line = 173;
+        __gen_e_acsl_assert_data_17.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_9,& __gen_e_acsl_assert_data_17);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
       }
       __gen_e_acsl_tlv_cur_5 = g_tlv_spec[tlv_id];
-      __gmpz_init_set_si(__gen_e_acsl__33,1L);
-      __gen_e_acsl_le_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__33),
+      __gmpz_init_set_si(__gen_e_acsl__34,1L);
+      __gen_e_acsl_le_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__34),
                                      (__e_acsl_mpz_struct const *)(tlv_num_pars));
       if (__gen_e_acsl_le_5 <= 0) {
         int __gen_e_acsl_prim_gh_set_here_5;
@@ -1230,74 +1314,154 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
       else {
         uint const *__gen_e_acsl_tlv_cur_7;
         int __gen_e_acsl_and_36;
+        int __gen_e_acsl_aligned_14;
         unsigned int __gen_e_acsl_tlv_link_2;
-        __e_acsl_mpz_t __gen_e_acsl__40;
+        int __gen_e_acsl_aligned_15;
         __e_acsl_mpz_t __gen_e_acsl__41;
+        __e_acsl_mpz_t __gen_e_acsl__42;
         __e_acsl_mpz_t __gen_e_acsl_sub_15;
         __e_acsl_mpz_t __gen_e_acsl_mul_6;
         __e_acsl_mpz_t __gen_e_acsl_add_8;
-        long __gen_e_acsl__42;
-        int __gen_e_acsl_valid_read_2;
         long __gen_e_acsl__43;
+        int __gen_e_acsl_aligned_16;
+        long __gen_e_acsl__44;
+        int __gen_e_acsl_valid_read_2;
+        long __gen_e_acsl__45;
         int __gen_e_acsl_nest_prev_pars_2;
         int __gen_e_acsl_le_6;
         int __gen_e_acsl_and_37;
         int __gen_e_acsl_and_38;
         int __gen_e_acsl_and_39;
         int __gen_e_acsl_and_40;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
           {.values = (void *)0};
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_20,"tlv_id",
+        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_24,"tlv_id",
                                       0,tlv_id);
         if (0U <= tlv_id) {
-          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_20,
+          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_24,
                                         "tlv_id",0,tlv_id);
           __gen_e_acsl_and_36 = tlv_id < 3U;
         }
         else __gen_e_acsl_and_36 = 0;
         /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_id < (int)3; */
         {
-          __gen_e_acsl_assert_data_20.blocking = 1;
-          __gen_e_acsl_assert_data_20.kind = "RTE";
-          __gen_e_acsl_assert_data_20.pred_txt = "0 <= tlv_id < (int)3";
-          __gen_e_acsl_assert_data_20.file = "<unknown>";
-          __gen_e_acsl_assert_data_20.fct = "prim_gh_set_here";
-          __gen_e_acsl_assert_data_20.line = 0;
-          __gen_e_acsl_assert_data_20.name = "index out of bounds";
-          __e_acsl_assert(__gen_e_acsl_and_36,& __gen_e_acsl_assert_data_20);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
+          __gen_e_acsl_assert_data_24.blocking = 1;
+          __gen_e_acsl_assert_data_24.kind = "RTE";
+          __gen_e_acsl_assert_data_24.pred_txt = "0 <= tlv_id < (int)3";
+          __gen_e_acsl_assert_data_24.file = "<unknown>";
+          __gen_e_acsl_assert_data_24.fct = "prim_gh_set_here";
+          __gen_e_acsl_assert_data_24.line = 0;
+          __gen_e_acsl_assert_data_24.name = "index out of bounds";
+          __e_acsl_assert(__gen_e_acsl_and_36,& __gen_e_acsl_assert_data_24);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_14 = __e_acsl_aligned((void *)g_tlv_spec[tlv_id],
+                                                   4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_25,
+                                     "g_tlv_spec[tlv_id]",
+                                     (void *)g_tlv_spec[tlv_id]);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,
+                                     "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_id],4)",
+                                     0,__gen_e_acsl_aligned_14);
+        /*@ assert
+              E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_id],4);
+        */
+        {
+          __gen_e_acsl_assert_data_25.blocking = 1;
+          __gen_e_acsl_assert_data_25.kind = "RTE";
+          __gen_e_acsl_assert_data_25.pred_txt = "\\aligned(g_tlv_spec[tlv_id],4)";
+          __gen_e_acsl_assert_data_25.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_25.fct = "prim_gh_set_here";
+          __gen_e_acsl_assert_data_25.line = 183;
+          __gen_e_acsl_assert_data_25.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_14,
+                          & __gen_e_acsl_assert_data_25);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
         }
         __gen_e_acsl_tlv_cur_7 = g_tlv_spec[tlv_id];
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
           {.values = (void *)0};
-        __gmpz_init_set_si(__gen_e_acsl__40,3L);
-        __gmpz_init_set_si(__gen_e_acsl__41,1L);
+        __gen_e_acsl_aligned_15 = __e_acsl_aligned((void *)__gen_e_acsl_tlv_cur_7,
+                                                   4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_26,"tlv_cur",
+                                     (void *)__gen_e_acsl_tlv_cur_7);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,
+                                     "\"pointer alignment\": \\aligned(tlv_cur,4)",
+                                     0,__gen_e_acsl_aligned_15);
+        /*@ assert E_ACSL: "pointer alignment": \aligned(tlv_cur,4); */
+        {
+          __gen_e_acsl_assert_data_26.blocking = 1;
+          __gen_e_acsl_assert_data_26.kind = "RTE";
+          __gen_e_acsl_assert_data_26.pred_txt = "\\aligned(tlv_cur,4)";
+          __gen_e_acsl_assert_data_26.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_26.fct = "prim_gh_set_here";
+          __gen_e_acsl_assert_data_26.line = 184;
+          __gen_e_acsl_assert_data_26.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_15,
+                          & __gen_e_acsl_assert_data_26);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
+          {.values = (void *)0};
+        __gmpz_init_set_si(__gen_e_acsl__41,3L);
+        __gmpz_init_set_si(__gen_e_acsl__42,1L);
         __gmpz_init(__gen_e_acsl_sub_15);
         __gmpz_sub(__gen_e_acsl_sub_15,
                    (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__41));
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__42));
         __gmpz_init(__gen_e_acsl_mul_6);
         __gmpz_mul(__gen_e_acsl_mul_6,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_15),
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__40));
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__41));
         __gmpz_init(__gen_e_acsl_add_8);
         __gmpz_add(__gen_e_acsl_add_8,
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__40),
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__41),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_6));
-        __gen_e_acsl__42 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_8));
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__42),
+        __gen_e_acsl__43 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_8));
+        __gen_e_acsl_aligned_16 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__43),
+                                                   4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_27,"tlv_cur",
+                                     (void *)__gen_e_acsl_tlv_cur_7);
+        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_27,
+                                     "tlv_num_pars",0,
+                                     (__e_acsl_mpz_struct const *)(tlv_num_pars));
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
+                                     "\"pointer alignment\": \\aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4)",
+                                     0,__gen_e_acsl_aligned_16);
+        /*@ assert
+              E_ACSL: "pointer alignment":
+                \aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4);
+        */
+        {
+          __gen_e_acsl_assert_data_27.blocking = 1;
+          __gen_e_acsl_assert_data_27.kind = "RTE";
+          __gen_e_acsl_assert_data_27.pred_txt = "\\aligned(tlv_cur + (3 + (tlv_num_pars - 1) * 3),4)";
+          __gen_e_acsl_assert_data_27.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_27.fct = "prim_gh_set_here";
+          __gen_e_acsl_assert_data_27.line = 184;
+          __gen_e_acsl_assert_data_27.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_16,
+                          & __gen_e_acsl_assert_data_27);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
+          {.values = (void *)0};
+        __gen_e_acsl__44 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_8));
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__44),
                                                         sizeof(uint const),
                                                         (void *)__gen_e_acsl_tlv_cur_7,
                                                         (void *)(& __gen_e_acsl_tlv_cur_7));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,"tlv_cur",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_28,"tlv_cur",
                                      (void *)__gen_e_acsl_tlv_cur_7);
-        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_21,
+        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_28,
                                      "tlv_num_pars",0,
                                      (__e_acsl_mpz_struct const *)(tlv_num_pars));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_21,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_28,
                                        "sizeof(uint const)",0,
                                        sizeof(uint const));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,
                                      "\"memory access\": \\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))",
                                      0,__gen_e_acsl_valid_read_2);
         /*@ assert
@@ -1305,25 +1469,25 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
                 \valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3));
         */
         {
-          __gen_e_acsl_assert_data_21.blocking = 1;
-          __gen_e_acsl_assert_data_21.kind = "RTE";
-          __gen_e_acsl_assert_data_21.pred_txt = "\\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))";
-          __gen_e_acsl_assert_data_21.file = "pkcs1.c";
-          __gen_e_acsl_assert_data_21.fct = "prim_gh_set_here";
-          __gen_e_acsl_assert_data_21.line = 184;
-          __gen_e_acsl_assert_data_21.name = "memory access";
+          __gen_e_acsl_assert_data_28.blocking = 1;
+          __gen_e_acsl_assert_data_28.kind = "RTE";
+          __gen_e_acsl_assert_data_28.pred_txt = "\\valid_read(tlv_cur + (3 + (tlv_num_pars - 1) * 3))";
+          __gen_e_acsl_assert_data_28.file = "pkcs1.c";
+          __gen_e_acsl_assert_data_28.fct = "prim_gh_set_here";
+          __gen_e_acsl_assert_data_28.line = 184;
+          __gen_e_acsl_assert_data_28.name = "memory access";
           __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                          & __gen_e_acsl_assert_data_21);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
+                          & __gen_e_acsl_assert_data_28);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_28);
         }
-        __gen_e_acsl__43 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_8));
+        __gen_e_acsl__45 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_8));
         /*@ assert
               Eva: mem_access:
-                \valid_read(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__43);
+                \valid_read(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__45);
         */
-        __gen_e_acsl_tlv_link_2 = *(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__43);
+        __gen_e_acsl_tlv_link_2 = *(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__45);
         __gen_e_acsl_nest_prev_pars_2 = 0;
-        __gen_e_acsl_le_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__41),
+        __gen_e_acsl_le_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__42),
                                        (__e_acsl_mpz_struct const *)(tlv_num_pars));
         if (__gen_e_acsl_le_6 <= 0) {
           int __gen_e_acsl_prim_gh_set_here_7;
@@ -1333,62 +1497,38 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
         }
         else __gen_e_acsl_and_37 = 0;
         if (__gen_e_acsl_and_37) {
-          __e_acsl_mpz_t __gen_e_acsl__44;
-          __e_acsl_mpz_t __gen_e_acsl__45;
-          __e_acsl_mpz_t __gen_e_acsl_sub_16;
           __e_acsl_mpz_t __gen_e_acsl__46;
+          __e_acsl_mpz_t __gen_e_acsl__47;
+          __e_acsl_mpz_t __gen_e_acsl_sub_16;
+          __e_acsl_mpz_t __gen_e_acsl__48;
           __e_acsl_mpz_t __gen_e_acsl_mul_7;
           __e_acsl_mpz_t __gen_e_acsl_add_9;
-          long __gen_e_acsl__47;
-          int __gen_e_acsl_aligned_10;
-          __gmpz_init_set_si(__gen_e_acsl__44,2L);
-          __gmpz_init_set_si(__gen_e_acsl__45,1L);
+          long __gen_e_acsl__49;
+          __gmpz_init_set_si(__gen_e_acsl__46,2L);
+          __gmpz_init_set_si(__gen_e_acsl__47,1L);
           __gmpz_init(__gen_e_acsl_sub_16);
           __gmpz_sub(__gen_e_acsl_sub_16,
                      (__e_acsl_mpz_struct const *)(tlv_num_pars),
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__45));
-          __gmpz_init_set_si(__gen_e_acsl__46,3L);
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__47));
+          __gmpz_init_set_si(__gen_e_acsl__48,3L);
           __gmpz_init(__gen_e_acsl_mul_7);
           __gmpz_mul(__gen_e_acsl_mul_7,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_16),
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__46));
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__48));
           __gmpz_init(__gen_e_acsl_add_9);
           __gmpz_add(__gen_e_acsl_add_9,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__44),
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__46),
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_7));
-          __gen_e_acsl__47 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_9));
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
-            {.values = (void *)0};
-          __gen_e_acsl_aligned_10 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__47),
-                                                     _Alignof(uint const));
-          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_22,
-                                         "alignof(uint const)",0,
-                                         _Alignof(uint const));
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_22,
-                                       "__gen_e_acsl_tlv_cur_7",
-                                       (void *)__gen_e_acsl_tlv_cur_7);
-          __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_22,
-                                        "__gen_e_acsl__47",0,
-                                        __gen_e_acsl__47);
-          __gen_e_acsl_assert_data_22.blocking = 1;
-          __gen_e_acsl_assert_data_22.kind = "RTE";
-          __gen_e_acsl_assert_data_22.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__47,alignof(uint const))";
-          __gen_e_acsl_assert_data_22.file = "pkcs1.c";
-          __gen_e_acsl_assert_data_22.fct = "prim_gh_set_here";
-          __gen_e_acsl_assert_data_22.line = 191;
-          __gen_e_acsl_assert_data_22.name = "pointer_alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_10,
-                          & __gen_e_acsl_assert_data_22);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
+          __gen_e_acsl__49 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_9));
           /*@ assert
                 Eva: mem_access:
-                  \valid_read(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__47);
+                  \valid_read(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__49);
           */
-          __gen_e_acsl_and_38 = (int)((u1)((int)*(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__47))) == 0;
-          __gmpz_clear(__gen_e_acsl__44);
-          __gmpz_clear(__gen_e_acsl__45);
-          __gmpz_clear(__gen_e_acsl_sub_16);
+          __gen_e_acsl_and_38 = (int)((u1)((int)*(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl__49))) == 0;
           __gmpz_clear(__gen_e_acsl__46);
+          __gmpz_clear(__gen_e_acsl__47);
+          __gmpz_clear(__gen_e_acsl_sub_16);
+          __gmpz_clear(__gen_e_acsl__48);
           __gmpz_clear(__gen_e_acsl_mul_7);
           __gmpz_clear(__gen_e_acsl_add_9);
         }
@@ -1414,18 +1554,18 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
         if (__gen_e_acsl_and_39) __gen_e_acsl_and_40 = with_children == 1;
         else __gen_e_acsl_and_40 = 0;
         __gen_e_acsl_or_4 = __gen_e_acsl_and_40;
-        __gmpz_clear(__gen_e_acsl__40);
         __gmpz_clear(__gen_e_acsl__41);
+        __gmpz_clear(__gen_e_acsl__42);
         __gmpz_clear(__gen_e_acsl_sub_15);
         __gmpz_clear(__gen_e_acsl_mul_6);
         __gmpz_clear(__gen_e_acsl_add_8);
       }
       __gen_e_acsl_or_5 = __gen_e_acsl_or_4;
-      __gmpz_clear(__gen_e_acsl__33);
+      __gmpz_clear(__gen_e_acsl__34);
     }
     __gen_e_acsl_or_6 = __gen_e_acsl_or_5;
-    __gmpz_clear(__gen_e_acsl__27);
     __gmpz_clear(__gen_e_acsl__28);
+    __gmpz_clear(__gen_e_acsl__29);
     __gmpz_clear(__gen_e_acsl_sub_9);
   }
   return __gen_e_acsl_or_6;
@@ -1438,163 +1578,189 @@ int __gen_e_acsl_prim_tlv_stored_here(u1 *start,
 {
   uint const *__gen_e_acsl_tlv_cur_6;
   int __gen_e_acsl_and_31;
+  int __gen_e_acsl_aligned_10;
   u1 **__gen_e_acsl_tlv_p_curr;
   int __gen_e_acsl_and_32;
-  __e_acsl_mpz_t __gen_e_acsl__34;
+  int __gen_e_acsl_aligned_11;
+  int __gen_e_acsl_aligned_12;
   __e_acsl_mpz_t __gen_e_acsl__35;
-  __e_acsl_mpz_t __gen_e_acsl_sub_13;
   __e_acsl_mpz_t __gen_e_acsl__36;
+  __e_acsl_mpz_t __gen_e_acsl_sub_13;
+  __e_acsl_mpz_t __gen_e_acsl__37;
   __e_acsl_mpz_t __gen_e_acsl_mul_5;
   __e_acsl_mpz_t __gen_e_acsl_add_7;
-  long __gen_e_acsl__37;
-  int __gen_e_acsl_aligned_7;
+  long __gen_e_acsl__38;
   int __gen_e_acsl_and_33;
-  __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 = {.values = (void *)0};
-  __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_15,"tlv_seq_id",0,
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 = {.values = (void *)0};
+  __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_18,"tlv_seq_id",0,
                                 tlv_seq_id);
   if (0U <= tlv_seq_id) {
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_15,"tlv_seq_id",
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_18,"tlv_seq_id",
                                   0,tlv_seq_id);
     __gen_e_acsl_and_31 = tlv_seq_id < 3U;
   }
   else __gen_e_acsl_and_31 = 0;
   /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_seq_id < (int)3; */
   {
-    __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "RTE";
-    __gen_e_acsl_assert_data_15.pred_txt = "0 <= tlv_seq_id < (int)3";
-    __gen_e_acsl_assert_data_15.file = "pkcs1.c";
-    __gen_e_acsl_assert_data_15.fct = "prim_tlv_stored_here";
-    __gen_e_acsl_assert_data_15.line = 144;
-    __gen_e_acsl_assert_data_15.name = "index out of bounds";
-    __e_acsl_assert(__gen_e_acsl_and_31,& __gen_e_acsl_assert_data_15);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+    __gen_e_acsl_assert_data_18.blocking = 1;
+    __gen_e_acsl_assert_data_18.kind = "RTE";
+    __gen_e_acsl_assert_data_18.pred_txt = "0 <= tlv_seq_id < (int)3";
+    __gen_e_acsl_assert_data_18.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_18.fct = "prim_tlv_stored_here";
+    __gen_e_acsl_assert_data_18.line = 144;
+    __gen_e_acsl_assert_data_18.name = "index out of bounds";
+    __e_acsl_assert(__gen_e_acsl_and_31,& __gen_e_acsl_assert_data_18);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
+  }
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 = {.values = (void *)0};
+  __gen_e_acsl_aligned_10 = __e_acsl_aligned((void *)g_tlv_spec[tlv_seq_id],
+                                             4UL);
+  __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,
+                               "g_tlv_spec[tlv_seq_id]",
+                               (void *)g_tlv_spec[tlv_seq_id]);
+  __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
+                               "\"pointer alignment\": \\aligned(g_tlv_spec[tlv_seq_id],4)",
+                               0,__gen_e_acsl_aligned_10);
+  /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_spec[tlv_seq_id],4);
+  */
+  {
+    __gen_e_acsl_assert_data_19.blocking = 1;
+    __gen_e_acsl_assert_data_19.kind = "RTE";
+    __gen_e_acsl_assert_data_19.pred_txt = "\\aligned(g_tlv_spec[tlv_seq_id],4)";
+    __gen_e_acsl_assert_data_19.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_19.fct = "prim_tlv_stored_here";
+    __gen_e_acsl_assert_data_19.line = 144;
+    __gen_e_acsl_assert_data_19.name = "pointer alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_10,& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
   }
   __gen_e_acsl_tlv_cur_6 = g_tlv_spec[tlv_seq_id];
-  __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 = {.values = (void *)0};
-  __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"tlv_seq_id",0,
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 = {.values = (void *)0};
+  __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_20,"tlv_seq_id",0,
                                 tlv_seq_id);
   if (0U <= tlv_seq_id) {
-    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"tlv_seq_id",
+    __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_20,"tlv_seq_id",
                                   0,tlv_seq_id);
     __gen_e_acsl_and_32 = tlv_seq_id < 3U;
   }
   else __gen_e_acsl_and_32 = 0;
   /*@ assert E_ACSL: "index out of bounds": 0 <= tlv_seq_id < (int)3; */
   {
-    __gen_e_acsl_assert_data_16.blocking = 1;
-    __gen_e_acsl_assert_data_16.kind = "RTE";
-    __gen_e_acsl_assert_data_16.pred_txt = "0 <= tlv_seq_id < (int)3";
-    __gen_e_acsl_assert_data_16.file = "pkcs1.c";
-    __gen_e_acsl_assert_data_16.fct = "prim_tlv_stored_here";
-    __gen_e_acsl_assert_data_16.line = 145;
-    __gen_e_acsl_assert_data_16.name = "index out of bounds";
-    __e_acsl_assert(__gen_e_acsl_and_32,& __gen_e_acsl_assert_data_16);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+    __gen_e_acsl_assert_data_20.blocking = 1;
+    __gen_e_acsl_assert_data_20.kind = "RTE";
+    __gen_e_acsl_assert_data_20.pred_txt = "0 <= tlv_seq_id < (int)3";
+    __gen_e_acsl_assert_data_20.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_20.fct = "prim_tlv_stored_here";
+    __gen_e_acsl_assert_data_20.line = 145;
+    __gen_e_acsl_assert_data_20.name = "index out of bounds";
+    __e_acsl_assert(__gen_e_acsl_and_32,& __gen_e_acsl_assert_data_20);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
+  }
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 = {.values = (void *)0};
+  __gen_e_acsl_aligned_11 = __e_acsl_aligned((void *)g_tlv_p[tlv_seq_id],8UL);
+  __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,
+                               "g_tlv_p[tlv_seq_id]",
+                               (void *)g_tlv_p[tlv_seq_id]);
+  __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
+                               "\"pointer alignment\": \\aligned(g_tlv_p[tlv_seq_id],8)",
+                               0,__gen_e_acsl_aligned_11);
+  /*@ assert E_ACSL: "pointer alignment": \aligned(g_tlv_p[tlv_seq_id],8); */
+  {
+    __gen_e_acsl_assert_data_21.blocking = 1;
+    __gen_e_acsl_assert_data_21.kind = "RTE";
+    __gen_e_acsl_assert_data_21.pred_txt = "\\aligned(g_tlv_p[tlv_seq_id],8)";
+    __gen_e_acsl_assert_data_21.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_21.fct = "prim_tlv_stored_here";
+    __gen_e_acsl_assert_data_21.line = 145;
+    __gen_e_acsl_assert_data_21.name = "pointer alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_11,& __gen_e_acsl_assert_data_21);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
   }
   __gen_e_acsl_tlv_p_curr = g_tlv_p[tlv_seq_id];
-  __gmpz_init_set_si(__gen_e_acsl__34,2L);
-  __gmpz_init_set_si(__gen_e_acsl__35,1L);
+  __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 = {.values = (void *)0};
+  __gen_e_acsl_aligned_12 = __e_acsl_aligned((void *)__gen_e_acsl_tlv_cur_6,
+                                             4UL);
+  __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_22,"tlv_cur",
+                               (void *)__gen_e_acsl_tlv_cur_6);
+  __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,
+                               "\"pointer alignment\": \\aligned(tlv_cur,4)",
+                               0,__gen_e_acsl_aligned_12);
+  /*@ assert E_ACSL: "pointer alignment": \aligned(tlv_cur,4); */
+  {
+    __gen_e_acsl_assert_data_22.blocking = 1;
+    __gen_e_acsl_assert_data_22.kind = "RTE";
+    __gen_e_acsl_assert_data_22.pred_txt = "\\aligned(tlv_cur,4)";
+    __gen_e_acsl_assert_data_22.file = "pkcs1.c";
+    __gen_e_acsl_assert_data_22.fct = "prim_tlv_stored_here";
+    __gen_e_acsl_assert_data_22.line = 146;
+    __gen_e_acsl_assert_data_22.name = "pointer alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_12,& __gen_e_acsl_assert_data_22);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
+  }
+  __gmpz_init_set_si(__gen_e_acsl__35,2L);
+  __gmpz_init_set_si(__gen_e_acsl__36,1L);
   __gmpz_init(__gen_e_acsl_sub_13);
   __gmpz_sub(__gen_e_acsl_sub_13,(__e_acsl_mpz_struct const *)(tlv_id),
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl__35));
-  __gmpz_init_set_si(__gen_e_acsl__36,3L);
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl__36));
+  __gmpz_init_set_si(__gen_e_acsl__37,3L);
   __gmpz_init(__gen_e_acsl_mul_5);
   __gmpz_mul(__gen_e_acsl_mul_5,
              (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_13),
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl__36));
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl__37));
   __gmpz_init(__gen_e_acsl_add_7);
   __gmpz_add(__gen_e_acsl_add_7,
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl__34),
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl__35),
              (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_5));
-  __gen_e_acsl__37 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
-  __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 = {.values = (void *)0};
-  __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__37),
-                                            _Alignof(uint const));
-  __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
-                                 "alignof(uint const)",0,
-                                 _Alignof(uint const));
-  __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
-                               "__gen_e_acsl_tlv_cur_6",
-                               (void *)__gen_e_acsl_tlv_cur_6);
-  __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_17,
-                                "__gen_e_acsl__37",0,__gen_e_acsl__37);
-  __gen_e_acsl_assert_data_17.blocking = 1;
-  __gen_e_acsl_assert_data_17.kind = "RTE";
-  __gen_e_acsl_assert_data_17.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__37,alignof(uint const))";
-  __gen_e_acsl_assert_data_17.file = "pkcs1.c";
-  __gen_e_acsl_assert_data_17.fct = "prim_tlv_stored_here";
-  __gen_e_acsl_assert_data_17.line = 146;
-  __gen_e_acsl_assert_data_17.name = "pointer_alignment";
-  __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_17);
-  __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+  __gen_e_acsl__38 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
   /*@ assert
         Eva: mem_access:
-          \valid_read(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__37);
+          \valid_read(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__38);
   */
-  if ((int)((u1)((int)*(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__37))) == 1) {
-    __e_acsl_mpz_t __gen_e_acsl__38;
+  if ((int)((u1)((int)*(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl__38))) == 1) {
+    int __gen_e_acsl_aligned_13;
+    __e_acsl_mpz_t __gen_e_acsl__39;
     __e_acsl_mpz_t __gen_e_acsl_sub_14;
-    long __gen_e_acsl__39;
-    int __gen_e_acsl_aligned_8;
-    int __gen_e_acsl_aligned_9;
-    __gmpz_init_set_si(__gen_e_acsl__38,1L);
+    long __gen_e_acsl__40;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_13 = __e_acsl_aligned((void *)__gen_e_acsl_tlv_p_curr,
+                                               8UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_23,"tlv_p_curr",
+                                 (void *)__gen_e_acsl_tlv_p_curr);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,
+                                 "\"pointer alignment\": \\aligned(tlv_p_curr,8)",
+                                 0,__gen_e_acsl_aligned_13);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(tlv_p_curr,8); */
+    {
+      __gen_e_acsl_assert_data_23.blocking = 1;
+      __gen_e_acsl_assert_data_23.kind = "RTE";
+      __gen_e_acsl_assert_data_23.pred_txt = "\\aligned(tlv_p_curr,8)";
+      __gen_e_acsl_assert_data_23.file = "pkcs1.c";
+      __gen_e_acsl_assert_data_23.fct = "prim_tlv_stored_here";
+      __gen_e_acsl_assert_data_23.line = 147;
+      __gen_e_acsl_assert_data_23.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_13,& __gen_e_acsl_assert_data_23);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
+    }
+    __gmpz_init_set_si(__gen_e_acsl__39,1L);
     __gmpz_init(__gen_e_acsl_sub_14);
     __gmpz_sub(__gen_e_acsl_sub_14,(__e_acsl_mpz_struct const *)(tlv_id),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__38));
-    __gen_e_acsl__39 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_14));
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39),
-                                              _Alignof(u1 *));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_18,
-                                   "alignof(u1 *)",0,_Alignof(u1 *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
-                                 "__gen_e_acsl_tlv_p_curr",
-                                 (void *)__gen_e_acsl_tlv_p_curr);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_18,
-                                  "__gen_e_acsl__39",0,__gen_e_acsl__39);
-    __gen_e_acsl_assert_data_18.blocking = 1;
-    __gen_e_acsl_assert_data_18.kind = "RTE";
-    __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39,alignof(u1 *))";
-    __gen_e_acsl_assert_data_18.file = "pkcs1.c";
-    __gen_e_acsl_assert_data_18.fct = "prim_tlv_stored_here";
-    __gen_e_acsl_assert_data_18.line = 147;
-    __gen_e_acsl_assert_data_18.name = "pointer_alignment";
-    __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_18);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
-      {.values = (void *)0};
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__39));
+    __gen_e_acsl__40 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_14));
     /*@ assert
           Eva: mem_access:
-            \valid_read(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39);
+            \valid_read(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__40);
     */
-    __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)*(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39),
-                                              _Alignof(u1));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_19,
-                                   "alignof(u1)",0,_Alignof(u1));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,
-                                 "*(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39)",
-                                 (void *)*(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39));
-    __gen_e_acsl_assert_data_19.blocking = 1;
-    __gen_e_acsl_assert_data_19.kind = "RTE";
-    __gen_e_acsl_assert_data_19.pred_txt = "\\aligned(*(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39),alignof(u1))";
-    __gen_e_acsl_assert_data_19.file = "pkcs1.c";
-    __gen_e_acsl_assert_data_19.fct = "prim_tlv_stored_here";
-    __gen_e_acsl_assert_data_19.line = 147;
-    __gen_e_acsl_assert_data_19.name = "pointer_alignment";
-    __e_acsl_assert(__gen_e_acsl_aligned_9,& __gen_e_acsl_assert_data_19);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
-    __gen_e_acsl_and_33 = *(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__39) == 
+    __gen_e_acsl_and_33 = *(__gen_e_acsl_tlv_p_curr + __gen_e_acsl__40) == 
                           start + prev_pars;
-    __gmpz_clear(__gen_e_acsl__38);
+    __gmpz_clear(__gen_e_acsl__39);
     __gmpz_clear(__gen_e_acsl_sub_14);
   }
   else __gen_e_acsl_and_33 = 0;
-  __gmpz_clear(__gen_e_acsl__34);
   __gmpz_clear(__gen_e_acsl__35);
-  __gmpz_clear(__gen_e_acsl_sub_13);
   __gmpz_clear(__gen_e_acsl__36);
+  __gmpz_clear(__gen_e_acsl_sub_13);
+  __gmpz_clear(__gen_e_acsl__37);
   __gmpz_clear(__gen_e_acsl_mul_5);
   __gmpz_clear(__gen_e_acsl_add_7);
   return __gen_e_acsl_and_33;

@@ -112,10 +112,10 @@ struct
   (** [needs_pointer_alignment ()] @return
       - [true] if the option [-warn-unaligned-pointer] is used (default);
       - [false] if the option [-no-warn-unaligned-pointer] is used. *)
-  let needs_pointer_alignment () = false (* test purpose *)
-    (* if Kernel.UnalignedPointer.is_set ()
+  let needs_pointer_alignment () =
+    if Kernel.UnalignedPointer.is_set ()
     then not @@ Kernel.UnalignedPointer.get ()
-    else true *)
+    else true
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
