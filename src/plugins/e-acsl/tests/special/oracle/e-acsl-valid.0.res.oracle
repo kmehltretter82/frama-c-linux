@@ -8,33 +8,7 @@
 [e-acsl] e-acsl-valid.c:26: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] e-acsl-valid.c:22: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:22: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] e-acsl-valid.c:19: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:19: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] e-acsl-valid.c:14: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:14: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:14: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] e-acsl-valid.c:12: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:13: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:17: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] e-acsl-valid.c:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:27: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] e-acsl-valid.c:33: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] e-acsl-valid.c:33: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

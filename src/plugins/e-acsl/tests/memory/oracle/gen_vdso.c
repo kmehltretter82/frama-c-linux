@@ -108,148 +108,65 @@ time_t __gen_e_acsl_time(time_t *timer)
   time_t __retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
-    int __gen_e_acsl_aligned;
-    int __gen_e_acsl_aligned_2;
-    int __gen_e_acsl_aligned_3;
     int __gen_e_acsl_assumes_value;
     int __gen_e_acsl_active_bhvrs;
     __e_acsl_store_block((void *)(& timer),8UL);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)timer,8UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"timer",
-                                 (void *)timer);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\"pointer alignment\": \\aligned(timer,8)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
-    {
-      __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
-      __gen_e_acsl_assert_data.pred_txt = "\\aligned(timer,8)";
-      __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data.fct = "time";
-      __gen_e_acsl_assert_data.line = 111;
-      __gen_e_acsl_assert_data.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    }
     __gen_e_acsl_at = timer;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)timer,8UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"timer",
-                                 (void *)timer);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\"pointer alignment\": \\aligned(timer,8)",
-                                 0,__gen_e_acsl_aligned_2);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(timer,8)";
-      __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_2.fct = "time";
-      __gen_e_acsl_assert_data_2.line = 105;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            timer == (time_t *)0);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)timer,8UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"timer",
-                                 (void *)timer);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "\"pointer alignment\": \\aligned(timer,8)",
-                                 0,__gen_e_acsl_aligned_3);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(timer,8)";
-      __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_3.fct = "time";
-      __gen_e_acsl_assert_data_3.line = 108;
-      __gen_e_acsl_assert_data_3.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            timer != (time_t *)0);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
-      int __gen_e_acsl_aligned_4;
       int __gen_e_acsl_valid;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)timer,8UL);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"timer",
-                                   (void *)timer);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                   "\"pointer alignment\": \\aligned(timer,8)",
-                                   0,__gen_e_acsl_aligned_4);
-      /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
-      {
-        __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
-        __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(timer,8)";
-        __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/time.h";
-        __gen_e_acsl_assert_data_5.fct = "time";
-        __gen_e_acsl_assert_data_5.line = 109;
-        __gen_e_acsl_assert_data_5.name = "pointer alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_5);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-      }
       __gen_e_acsl_valid = __e_acsl_valid((void *)timer,sizeof(time_t),
                                           (void *)timer,(void *)(& timer));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"timer",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"timer",
                                    (void *)timer);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(time_t)",0,sizeof(time_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "not_null: valid_timer: \\valid(timer)",0,
                                    __gen_e_acsl_valid);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "Precondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\valid(timer)";
-      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_4.fct = "time";
-      __gen_e_acsl_assert_data_4.line = 109;
-      __gen_e_acsl_assert_data_4.name = "not_null/valid_timer";
-      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Precondition";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(timer)";
+      __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/time.h";
+      __gen_e_acsl_assert_data.fct = "time";
+      __gen_e_acsl_assert_data.line = 109;
+      __gen_e_acsl_assert_data.name = "not_null/valid_timer";
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     if (__gen_e_acsl_active_bhvrs != 1) {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "Precondition";
-      __gen_e_acsl_assert_data_6.pred_txt = "all behaviors complete";
-      __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_6.fct = "time";
-      __gen_e_acsl_assert_data_6.line = 102;
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Precondition";
+      __gen_e_acsl_assert_data_2.pred_txt = "all behaviors complete";
+      __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/time.h";
+      __gen_e_acsl_assert_data_2.fct = "time";
+      __gen_e_acsl_assert_data_2.line = 102;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,
-                      & __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "Precondition";
-      __gen_e_acsl_assert_data_7.pred_txt = "all behaviors disjoint";
-      __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_7.fct = "time";
-      __gen_e_acsl_assert_data_7.line = 102;
+                      & __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "Precondition";
+      __gen_e_acsl_assert_data_3.pred_txt = "all behaviors disjoint";
+      __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/time.h";
+      __gen_e_acsl_assert_data_3.fct = "time";
+      __gen_e_acsl_assert_data_3.line = 102;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
-                      & __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+                      & __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
   }
   __retres = time(timer);
@@ -259,26 +176,26 @@ time_t __gen_e_acsl_time(time_t *timer)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value_2) {
       int __gen_e_acsl_initialized;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(time_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
                                    "\\old(timer)",(void *)__gen_e_acsl_at);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(time_t)",0,sizeof(time_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "not_null: initialization: timer: \\initialized(\\old(timer))",
                                    0,__gen_e_acsl_initialized);
-      __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "Postcondition";
-      __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(\\old(timer))";
-      __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/time.h";
-      __gen_e_acsl_assert_data_8.fct = "time";
-      __gen_e_acsl_assert_data_8.line = 111;
-      __gen_e_acsl_assert_data_8.name = "not_null/initialization/timer";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_8);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Postcondition";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(\\old(timer))";
+      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/time.h";
+      __gen_e_acsl_assert_data_4.fct = "time";
+      __gen_e_acsl_assert_data_4.line = 111;
+      __gen_e_acsl_assert_data_4.name = "not_null/initialization/timer";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& timer));

@@ -3,15 +3,15 @@
   E-ACSL construct `R to Int' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] rte.c:69: Warning: 
-  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__2;
+  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__3;
 [eva:alarm] rte.c:69: Warning: 
-  signed overflow. assert 1 + __gen_e_acsl__2 <= 2147483647;
+  signed overflow. assert 1 + __gen_e_acsl__3 <= 2147483647;
 [eva:alarm] rte.c:69: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:15: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.c:74: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__4);
+  non-finite double value. assert \is_finite(__gen_e_acsl__5);
 [eva:alarm] rte.c:74: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:76: Warning: 
@@ -49,21 +49,13 @@
   assert \initialized(&a[__gen_e_acsl_i_2]);
 [eva:alarm] rte.c:84: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] rte.c:84: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:85: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] rte.c:85: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] rte.c:96: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:100: Warning: assertion got status unknown.
 [eva:alarm] rte.c:103: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:103: Warning: 
-  signed overflow. assert -9223372036854775808 <= __gen_e_acsl__6 - 1;
-[eva:alarm] rte.c:103: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  signed overflow. assert -9223372036854775808 <= __gen_e_acsl__7 - 1;
 [eva:alarm] rte.c:103: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] rte.c:103: Warning: assertion got status unknown.

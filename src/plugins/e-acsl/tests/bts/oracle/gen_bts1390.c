@@ -70,8 +70,6 @@ char const __fc_lit_string2[5UL] = "tata";
 void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
-  void const *__gen_e_acsl_at_5;
-  void const *__gen_e_acsl_at_4;
   void const *__gen_e_acsl_at_3;
   void const *__gen_e_acsl_at_2;
   int __gen_e_acsl_at;
@@ -86,8 +84,6 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     __gen_e_acsl_at = c;
     __gen_e_acsl_at_2 = buf;
     __gen_e_acsl_at_3 = buf;
-    __gen_e_acsl_at_4 = buf;
-    __gen_e_acsl_at_5 = buf;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_i = 0;
@@ -95,81 +91,87 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       if (__gen_e_acsl_i < (int)((unsigned int)n)) ; else break;
       {
         int __gen_e_acsl_aligned;
-        int __gen_e_acsl_aligned_2;
         int __gen_e_acsl_valid_read;
+        int __gen_e_acsl_aligned_2;
+        int __gen_e_acsl_aligned_3;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
-        __gen_e_acsl_aligned = __e_acsl_aligned((void *)buf,1UL);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"buf",
-                                     (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                     "\"pointer alignment\": \\aligned(buf,1)",
-                                     0,__gen_e_acsl_aligned);
-        /*@ assert E_ACSL: "pointer alignment": \aligned(buf,1); */
-        {
-          __gen_e_acsl_assert_data.blocking = 1;
-          __gen_e_acsl_assert_data.kind = "RTE";
-          __gen_e_acsl_assert_data.pred_txt = "\\aligned(buf,1)";
-          __gen_e_acsl_assert_data.file = "bts1390.c";
-          __gen_e_acsl_assert_data.fct = "memchr";
-          __gen_e_acsl_assert_data.line = 8;
-          __gen_e_acsl_assert_data.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-        }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
-        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_i),
-                                                  1UL);
+        __gen_e_acsl_aligned = __e_acsl_aligned((void *)buf,_Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                       "alignof(char)",0,_Alignof(char));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"buf",
                                      (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,
-                                     __gen_e_acsl_i);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                     "\"pointer alignment\": \\aligned((char *)buf + i,1)",
-                                     0,__gen_e_acsl_aligned_2);
-        /*@ assert E_ACSL: "pointer alignment": \aligned((char *)buf + i,1);
-        */
-        {
-          __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
-          __gen_e_acsl_assert_data_2.pred_txt = "\\aligned((char *)buf + i,1)";
-          __gen_e_acsl_assert_data_2.file = "bts1390.c";
-          __gen_e_acsl_assert_data_2.fct = "memchr";
-          __gen_e_acsl_assert_data_2.line = 8;
-          __gen_e_acsl_assert_data_2.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_2,
-                          & __gen_e_acsl_assert_data_2);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-        }
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-          {.values = (void *)0};
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(buf,alignof(char))";
+        __gen_e_acsl_assert_data_2.file = "bts1390.c";
+        __gen_e_acsl_assert_data_2.fct = "memchr";
+        __gen_e_acsl_assert_data_2.line = 8;
+        __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_i),
                                                       sizeof(char),
                                                       (void *)buf,
                                                       (void *)(& buf));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"buf",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"buf",
                                      (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,
                                      __gen_e_acsl_i);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                        "sizeof(char)",0,sizeof(char));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                      "\"memory access\": \\valid_read((char *)buf + i)",
                                      0,__gen_e_acsl_valid_read);
         /*@ assert E_ACSL: "memory access": \valid_read((char *)buf + i); */
         {
-          __gen_e_acsl_assert_data_3.blocking = 1;
-          __gen_e_acsl_assert_data_3.kind = "RTE";
-          __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read((char *)buf + i)";
-          __gen_e_acsl_assert_data_3.file = "bts1390.c";
-          __gen_e_acsl_assert_data_3.fct = "memchr";
-          __gen_e_acsl_assert_data_3.line = 8;
-          __gen_e_acsl_assert_data_3.name = "memory access";
-          __e_acsl_assert(__gen_e_acsl_valid_read,
-                          & __gen_e_acsl_assert_data_3);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+          __gen_e_acsl_assert_data.blocking = 1;
+          __gen_e_acsl_assert_data.kind = "RTE";
+          __gen_e_acsl_assert_data.pred_txt = "\\valid_read((char *)buf + i)";
+          __gen_e_acsl_assert_data.file = "bts1390.c";
+          __gen_e_acsl_assert_data.fct = "memchr";
+          __gen_e_acsl_assert_data.line = 8;
+          __gen_e_acsl_assert_data.name = "memory access";
+          __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
         }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_i),
+                                                  _Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                       "alignof(char)",0,_Alignof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"buf",
+                                     (void *)buf);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                     "__gen_e_acsl_i",0,__gen_e_acsl_i);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "\\aligned((char *)buf + __gen_e_acsl_i,alignof(char))";
+        __gen_e_acsl_assert_data_3.file = "bts1390.c";
+        __gen_e_acsl_assert_data_3.fct = "memchr";
+        __gen_e_acsl_assert_data_3.line = 8;
+        __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)buf,_Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                       "alignof(char)",0,_Alignof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"buf",
+                                     (void *)buf);
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(buf,alignof(char))";
+        __gen_e_acsl_assert_data_4.file = "bts1390.c";
+        __gen_e_acsl_assert_data_4.fct = "memchr";
+        __gen_e_acsl_assert_data_4.line = 8;
+        __gen_e_acsl_assert_data_4.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_4);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         if (! ((int)*((char *)buf + __gen_e_acsl_i) == c)) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -186,83 +188,89 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     while (1) {
       if (__gen_e_acsl_k < (int)((unsigned int)n)) ; else break;
       {
-        int __gen_e_acsl_aligned_3;
         int __gen_e_acsl_aligned_4;
         int __gen_e_acsl_valid_read_2;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)buf,1UL);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"buf",
-                                     (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                     "\"pointer alignment\": \\aligned(buf,1)",
-                                     0,__gen_e_acsl_aligned_3);
-        /*@ assert E_ACSL: "pointer alignment": \aligned(buf,1); */
-        {
-          __gen_e_acsl_assert_data_4.blocking = 1;
-          __gen_e_acsl_assert_data_4.kind = "RTE";
-          __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(buf,1)";
-          __gen_e_acsl_assert_data_4.file = "bts1390.c";
-          __gen_e_acsl_assert_data_4.fct = "memchr";
-          __gen_e_acsl_assert_data_4.line = 11;
-          __gen_e_acsl_assert_data_4.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_3,
-                          & __gen_e_acsl_assert_data_4);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-        }
+        int __gen_e_acsl_aligned_5;
+        int __gen_e_acsl_aligned_6;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
-        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_k),
-                                                  1UL);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"buf",
-                                     (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,
-                                     __gen_e_acsl_k);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                     "\"pointer alignment\": \\aligned((char *)buf + k,1)",
-                                     0,__gen_e_acsl_aligned_4);
-        /*@ assert E_ACSL: "pointer alignment": \aligned((char *)buf + k,1);
-        */
-        {
-          __gen_e_acsl_assert_data_5.blocking = 1;
-          __gen_e_acsl_assert_data_5.kind = "RTE";
-          __gen_e_acsl_assert_data_5.pred_txt = "\\aligned((char *)buf + k,1)";
-          __gen_e_acsl_assert_data_5.file = "bts1390.c";
-          __gen_e_acsl_assert_data_5.fct = "memchr";
-          __gen_e_acsl_assert_data_5.line = 11;
-          __gen_e_acsl_assert_data_5.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_4,
-                          & __gen_e_acsl_assert_data_5);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-        }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
           {.values = (void *)0};
+        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)buf,_Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                       "alignof(char)",0,_Alignof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"buf",
+                                     (void *)buf);
+        __gen_e_acsl_assert_data_6.blocking = 1;
+        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(buf,alignof(char))";
+        __gen_e_acsl_assert_data_6.file = "bts1390.c";
+        __gen_e_acsl_assert_data_6.fct = "memchr";
+        __gen_e_acsl_assert_data_6.line = 11;
+        __gen_e_acsl_assert_data_6.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_6);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_k),
                                                         sizeof(char),
                                                         (void *)buf,
                                                         (void *)(& buf));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"buf",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"buf",
                                      (void *)buf);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",0,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,
                                      __gen_e_acsl_k);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                        "sizeof(char)",0,sizeof(char));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                      "\"memory access\": \\valid_read((char *)buf + k)",
                                      0,__gen_e_acsl_valid_read_2);
         /*@ assert E_ACSL: "memory access": \valid_read((char *)buf + k); */
         {
-          __gen_e_acsl_assert_data_6.blocking = 1;
-          __gen_e_acsl_assert_data_6.kind = "RTE";
-          __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read((char *)buf + k)";
-          __gen_e_acsl_assert_data_6.file = "bts1390.c";
-          __gen_e_acsl_assert_data_6.fct = "memchr";
-          __gen_e_acsl_assert_data_6.line = 11;
-          __gen_e_acsl_assert_data_6.name = "memory access";
+          __gen_e_acsl_assert_data_5.blocking = 1;
+          __gen_e_acsl_assert_data_5.kind = "RTE";
+          __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read((char *)buf + k)";
+          __gen_e_acsl_assert_data_5.file = "bts1390.c";
+          __gen_e_acsl_assert_data_5.fct = "memchr";
+          __gen_e_acsl_assert_data_5.line = 11;
+          __gen_e_acsl_assert_data_5.name = "memory access";
           __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                          & __gen_e_acsl_assert_data_6);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+                          & __gen_e_acsl_assert_data_5);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
         }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_k),
+                                                  _Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                       "alignof(char)",0,_Alignof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"buf",
+                                     (void *)buf);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                     "__gen_e_acsl_k",0,__gen_e_acsl_k);
+        __gen_e_acsl_assert_data_7.blocking = 1;
+        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\aligned((char *)buf + __gen_e_acsl_k,alignof(char))";
+        __gen_e_acsl_assert_data_7.file = "bts1390.c";
+        __gen_e_acsl_assert_data_7.fct = "memchr";
+        __gen_e_acsl_assert_data_7.line = 11;
+        __gen_e_acsl_assert_data_7.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_5,& __gen_e_acsl_assert_data_7);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)buf,_Alignof(char));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                       "alignof(char)",0,_Alignof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"buf",
+                                     (void *)buf);
+        __gen_e_acsl_assert_data_8.blocking = 1;
+        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(buf,alignof(char))";
+        __gen_e_acsl_assert_data_8.file = "bts1390.c";
+        __gen_e_acsl_assert_data_8.fct = "memchr";
+        __gen_e_acsl_assert_data_8.line = 11;
+        __gen_e_acsl_assert_data_8.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_6,& __gen_e_acsl_assert_data_8);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         if ((int)*((char *)buf + __gen_e_acsl_k) != c) ;
         else {
           __gen_e_acsl_forall = 0;
@@ -283,104 +291,69 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_forall_2;
       unsigned int __gen_e_acsl_j;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
       __gen_e_acsl_forall_2 = 1;
       __gen_e_acsl_j = 0U;
       while (1) {
         {
-          int __gen_e_acsl_aligned_7;
+          int __gen_e_acsl_aligned_10;
           unsigned long __gen_e_acsl_offset;
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
             {.values = (void *)0};
-          __gen_e_acsl_aligned_7 = __e_acsl_aligned(__retres,1UL);
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
-                                       "\\result",__retres);
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
-                                       "\"pointer alignment\": \\aligned(\\result,1)",
-                                       0,__gen_e_acsl_aligned_7);
-          /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
-          {
-            __gen_e_acsl_assert_data_11.blocking = 1;
-            __gen_e_acsl_assert_data_11.kind = "RTE";
-            __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(\\result,1)";
-            __gen_e_acsl_assert_data_11.file = "bts1390.c";
-            __gen_e_acsl_assert_data_11.fct = "memchr";
-            __gen_e_acsl_assert_data_11.line = 9;
-            __gen_e_acsl_assert_data_11.name = "pointer alignment";
-            __e_acsl_assert(__gen_e_acsl_aligned_7,
-                            & __gen_e_acsl_assert_data_11);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
-          }
+          __gen_e_acsl_aligned_10 = __e_acsl_aligned(__retres,_Alignof(char));
+          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
+                                         "alignof(char)",0,_Alignof(char));
+          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
+                                       "__retres",__retres);
+          __gen_e_acsl_assert_data_14.blocking = 1;
+          __gen_e_acsl_assert_data_14.kind = "RTE";
+          __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(__retres,alignof(char))";
+          __gen_e_acsl_assert_data_14.file = "bts1390.c";
+          __gen_e_acsl_assert_data_14.fct = "memchr";
+          __gen_e_acsl_assert_data_14.line = 9;
+          __gen_e_acsl_assert_data_14.name = "pointer_alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_10,
+                          & __gen_e_acsl_assert_data_14);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
           __gen_e_acsl_offset = __e_acsl_offset(__retres);
           if (__gen_e_acsl_j < (unsigned int)((int)((unsigned int)__gen_e_acsl_offset))) 
             ;
           else break;
         }
         {
-          int __gen_e_acsl_aligned_5;
-          int __gen_e_acsl_aligned_6;
+          int __gen_e_acsl_aligned_7;
           int __gen_e_acsl_valid_read_3;
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-            {.values = (void *)0};
-          __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)__gen_e_acsl_at_3,
-                                                    1UL);
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
-                                       "\\old(buf)",
-                                       (void *)__gen_e_acsl_at_3);
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                       "\"pointer alignment\": \\aligned(\\old(buf),1)",
-                                       0,__gen_e_acsl_aligned_5);
-          /*@ assert E_ACSL: "pointer alignment": \aligned(\old(buf),1); */
-          {
-            __gen_e_acsl_assert_data_8.blocking = 1;
-            __gen_e_acsl_assert_data_8.kind = "RTE";
-            __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(\\old(buf),1)";
-            __gen_e_acsl_assert_data_8.file = "bts1390.c";
-            __gen_e_acsl_assert_data_8.fct = "memchr";
-            __gen_e_acsl_assert_data_8.line = 9;
-            __gen_e_acsl_assert_data_8.name = "pointer alignment";
-            __e_acsl_assert(__gen_e_acsl_aligned_5,
-                            & __gen_e_acsl_assert_data_8);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-          }
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
-            {.values = (void *)0};
-          __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)((char *)__gen_e_acsl_at_4 + __gen_e_acsl_j),
-                                                    1UL);
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
-                                       "\\old(buf)",
-                                       (void *)__gen_e_acsl_at_4);
-          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_9,"j",0,
-                                        __gen_e_acsl_j);
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                       "\"pointer alignment\": \\aligned((char *)\\old(buf) + j,1)",
-                                       0,__gen_e_acsl_aligned_6);
-          /*@ assert
-                E_ACSL: "pointer alignment":
-                  \aligned((char *)\old(buf) + j,1);
-          */
-          {
-            __gen_e_acsl_assert_data_9.blocking = 1;
-            __gen_e_acsl_assert_data_9.kind = "RTE";
-            __gen_e_acsl_assert_data_9.pred_txt = "\\aligned((char *)\\old(buf) + j,1)";
-            __gen_e_acsl_assert_data_9.file = "bts1390.c";
-            __gen_e_acsl_assert_data_9.fct = "memchr";
-            __gen_e_acsl_assert_data_9.line = 9;
-            __gen_e_acsl_assert_data_9.name = "pointer alignment";
-            __e_acsl_assert(__gen_e_acsl_aligned_6,
-                            & __gen_e_acsl_assert_data_9);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-          }
+          int __gen_e_acsl_aligned_8;
+          int __gen_e_acsl_aligned_9;
           __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
             {.values = (void *)0};
-          __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at_5 + __gen_e_acsl_j),
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+            {.values = (void *)0};
+          __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)__gen_e_acsl_at_3,
+                                                    _Alignof(char));
+          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
+                                         "alignof(char)",0,_Alignof(char));
+          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
+                                       "__gen_e_acsl_at_3",
+                                       (void *)__gen_e_acsl_at_3);
+          __gen_e_acsl_assert_data_11.blocking = 1;
+          __gen_e_acsl_assert_data_11.kind = "RTE";
+          __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(__gen_e_acsl_at_3,alignof(char))";
+          __gen_e_acsl_assert_data_11.file = "bts1390.c";
+          __gen_e_acsl_assert_data_11.fct = "memchr";
+          __gen_e_acsl_assert_data_11.line = 9;
+          __gen_e_acsl_assert_data_11.name = "pointer_alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_7,
+                          & __gen_e_acsl_assert_data_11);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+          __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at_3 + __gen_e_acsl_j),
                                                           sizeof(char),
-                                                          (void *)__gen_e_acsl_at_5,
-                                                          (void *)(& __gen_e_acsl_at_5));
+                                                          (void *)__gen_e_acsl_at_3,
+                                                          (void *)(& __gen_e_acsl_at_3));
           __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
                                        "\\old(buf)",
-                                       (void *)__gen_e_acsl_at_5);
+                                       (void *)__gen_e_acsl_at_3);
           __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_10,"j",0,
                                         __gen_e_acsl_j);
           __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
@@ -403,6 +376,46 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                             & __gen_e_acsl_assert_data_10);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
           }
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+            {.values = (void *)0};
+          __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j),
+                                                    _Alignof(char));
+          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
+                                         "alignof(char)",0,_Alignof(char));
+          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
+                                       "__gen_e_acsl_at_2",
+                                       (void *)__gen_e_acsl_at_2);
+          __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_12,
+                                        "__gen_e_acsl_j",0,__gen_e_acsl_j);
+          __gen_e_acsl_assert_data_12.blocking = 1;
+          __gen_e_acsl_assert_data_12.kind = "RTE";
+          __gen_e_acsl_assert_data_12.pred_txt = "\\aligned((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j,alignof(char))";
+          __gen_e_acsl_assert_data_12.file = "bts1390.c";
+          __gen_e_acsl_assert_data_12.fct = "memchr";
+          __gen_e_acsl_assert_data_12.line = 9;
+          __gen_e_acsl_assert_data_12.name = "pointer_alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_8,
+                          & __gen_e_acsl_assert_data_12);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+            {.values = (void *)0};
+          __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)__gen_e_acsl_at_2,
+                                                    _Alignof(char));
+          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
+                                         "alignof(char)",0,_Alignof(char));
+          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,
+                                       "__gen_e_acsl_at_2",
+                                       (void *)__gen_e_acsl_at_2);
+          __gen_e_acsl_assert_data_13.blocking = 1;
+          __gen_e_acsl_assert_data_13.kind = "RTE";
+          __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(__gen_e_acsl_at_2,alignof(char))";
+          __gen_e_acsl_assert_data_13.file = "bts1390.c";
+          __gen_e_acsl_assert_data_13.fct = "memchr";
+          __gen_e_acsl_assert_data_13.line = 9;
+          __gen_e_acsl_assert_data_13.name = "pointer_alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_9,
+                          & __gen_e_acsl_assert_data_13);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
           if ((int)*((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j) != __gen_e_acsl_at) 
             ;
           else {
@@ -413,35 +426,35 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         __gen_e_acsl_j ++;
       }
       e_acsl_end_loop3: ;
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                    "exists:\n  \\forall int j;\n    0 <= j < (int)\\offset((char *)\\result) ==>\n    (int)*((char *)\\old(buf) + j) != \\old(c)",
                                    0,__gen_e_acsl_forall_2);
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "Postcondition";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\forall int j;\n  0 <= j < (int)\\offset((char *)\\result) ==>\n  (int)*((char *)\\old(buf) + j) != \\old(c)";
-      __gen_e_acsl_assert_data_7.file = "bts1390.c";
-      __gen_e_acsl_assert_data_7.fct = "memchr";
-      __gen_e_acsl_assert_data_7.line = 9;
-      __gen_e_acsl_assert_data_7.name = "exists";
-      __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "Postcondition";
+      __gen_e_acsl_assert_data_9.pred_txt = "\\forall int j;\n  0 <= j < (int)\\offset((char *)\\result) ==>\n  (int)*((char *)\\old(buf) + j) != \\old(c)";
+      __gen_e_acsl_assert_data_9.file = "bts1390.c";
+      __gen_e_acsl_assert_data_9.fct = "memchr";
+      __gen_e_acsl_assert_data_9.line = 9;
+      __gen_e_acsl_assert_data_9.name = "exists";
+      __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_9);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
         {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,"\\result",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,"\\result",
                                    __retres);
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "Postcondition";
-      __gen_e_acsl_assert_data_12.pred_txt = "\\result == (void *)0";
-      __gen_e_acsl_assert_data_12.file = "bts1390.c";
-      __gen_e_acsl_assert_data_12.fct = "memchr";
-      __gen_e_acsl_assert_data_12.line = 12;
-      __gen_e_acsl_assert_data_12.name = "not_exists";
-      __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_12);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "Postcondition";
+      __gen_e_acsl_assert_data_15.pred_txt = "\\result == (void *)0";
+      __gen_e_acsl_assert_data_15.file = "bts1390.c";
+      __gen_e_acsl_assert_data_15.fct = "memchr";
+      __gen_e_acsl_assert_data_15.line = 12;
+      __gen_e_acsl_assert_data_15.name = "not_exists";
+      __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_15);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& buf));

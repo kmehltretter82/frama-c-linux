@@ -4,56 +4,12 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] bts1307.i:11: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:5: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:6: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:7: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:11: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] bts1307.i:11: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] bts1307.i:11: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] bts1307.i:11: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:26: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] bts1307.i:20: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bts1307.i:22: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] bts1307.i:26: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.

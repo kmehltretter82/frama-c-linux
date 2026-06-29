@@ -1,14 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] struct_initialized.c:26: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] struct_initialized.c:27: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] struct_initialized.c:29: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] struct_initialized.c:30: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] struct_initialized.c:32: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] struct_initialized.c:33: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.

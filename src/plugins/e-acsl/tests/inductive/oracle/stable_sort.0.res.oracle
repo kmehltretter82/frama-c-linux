@@ -34,19 +34,11 @@
   E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] stable_sort.c:47: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] stable_sort.c:45: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:63: Warning: loop invariant got status unknown.
 [eva:alarm] stable_sort.c:77: Warning: loop invariant got status unknown.
 [eva:alarm] stable_sort.c:80: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:73: Warning: loop invariant got status unknown.
-[eva:alarm] stable_sort.c:35: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] stable_sort.c:35: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:35: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:37: Warning: 
@@ -57,6 +49,10 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:70: Warning: loop invariant got status unknown.
 [eva:alarm] stable_sort.c:66: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:32: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] stable_sort.c:32: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] stable_sort.c:47: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

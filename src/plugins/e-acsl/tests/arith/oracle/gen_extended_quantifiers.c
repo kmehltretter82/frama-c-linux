@@ -278,7 +278,7 @@ int main(void)
     int __gen_e_acsl_accumulator_5;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl__5,18446744073709551610UL);
+    __gmpz_init_set_ui(__gen_e_acsl__5,18446744073709551615UL - 5UL);
     __gmpz_init_set_ui(__gen_e_acsl__6,18446744073709551615UL);
     __gmpz_init_set_si(__gen_e_acsl_one_5,1L);
     __gen_e_acsl_cond_5 = 0;
@@ -482,7 +482,7 @@ int main(void)
     __gen_e_acsl_cond_9 = 0;
     __gen_e_acsl_lambda_9 = 0;
     __gen_e_acsl_accumulator_9 = 0;
-    __gen_e_acsl_k_9 = 4294967290UL;
+    __gen_e_acsl_k_9 = 4294967295U - 5U;
     while (1) {
       __gen_e_acsl_cond_9 = __gen_e_acsl_k_9 > 4294967295UL;
       if (__gen_e_acsl_cond_9) break;

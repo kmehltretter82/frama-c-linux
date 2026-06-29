@@ -9,31 +9,10 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 void area_triangle(double (*vertices)[4])
 {
   {
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& vertices),8UL);
     __e_acsl_temporal_pull_parameter((void *)(& vertices),0U,8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)vertices,8UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"vertices",
-                                 (void *)vertices);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\"pointer alignment\": \\aligned(vertices,8)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(vertices,8); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(vertices,8)";
-      __gen_e_acsl_assert_data_2.file = "t_darray.c";
-      __gen_e_acsl_assert_data_2.fct = "area_triangle";
-      __gen_e_acsl_assert_data_2.line = 6;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*(vertices + 0)),
                                                   sizeof(double),
                                                   (void *)(*(vertices + 0)),
@@ -58,51 +37,30 @@ void area_triangle(double (*vertices)[4])
   }
   /*@ assert rte: mem_access: \valid_read(&(*(vertices + 0)[0])); */ ;
   {
-    int __gen_e_acsl_aligned_2;
     int __gen_e_acsl_valid_read_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)vertices,8UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"vertices",
-                                 (void *)vertices);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\"pointer alignment\": \\aligned(vertices,8)",
-                                 0,__gen_e_acsl_aligned_2);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(vertices,8); */
-    {
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(vertices,8)";
-      __gen_e_acsl_assert_data_4.file = "t_darray.c";
-      __gen_e_acsl_assert_data_4.fct = "area_triangle";
-      __gen_e_acsl_assert_data_4.line = 7;
-      __gen_e_acsl_assert_data_4.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    }
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*(vertices + 1)),
                                                     sizeof(double),
                                                     (void *)(*(vertices + 1)),
                                                     (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "&(*(vertices + 1)[0])",
                                  (void *)(*(vertices + 1)));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(double)",0,sizeof(double));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "rte: mem_access: \\valid_read(&(*(vertices + 1)[0]))",
                                  0,__gen_e_acsl_valid_read_2);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(&(*(vertices + 1)[0]))";
-    __gen_e_acsl_assert_data_3.file = "t_darray.c";
-    __gen_e_acsl_assert_data_3.fct = "area_triangle";
-    __gen_e_acsl_assert_data_3.line = 7;
-    __gen_e_acsl_assert_data_3.name = "rte/mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(&(*(vertices + 1)[0]))";
+    __gen_e_acsl_assert_data_2.file = "t_darray.c";
+    __gen_e_acsl_assert_data_2.fct = "area_triangle";
+    __gen_e_acsl_assert_data_2.line = 7;
+    __gen_e_acsl_assert_data_2.name = "rte/mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert rte: mem_access: \valid_read(&(*(vertices + 1)[0])); */ ;
   __e_acsl_delete_block((void *)(& vertices));

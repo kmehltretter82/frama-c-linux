@@ -56,29 +56,8 @@ int *__gen_e_acsl_f(int *x, int *y)
   __e_acsl_store_block((void *)(& x),8UL);
   __retres = f(x,y);
   {
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)__retres,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"\\result",
-                                 (void *)__retres);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\"pointer alignment\": \\aligned(\\result,4)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(\result,4); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\result,4)";
-      __gen_e_acsl_assert_data_2.file = "call.c";
-      __gen_e_acsl_assert_data_2.fct = "f";
-      __gen_e_acsl_assert_data_2.line = 7;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
     __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int),
                                         (void *)__retres,
                                         (void *)(& __retres));

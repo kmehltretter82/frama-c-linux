@@ -6,7 +6,5 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] literal_string.i:27: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] literal_string.i:28: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] literal_string.i:11: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

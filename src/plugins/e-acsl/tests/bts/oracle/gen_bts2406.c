@@ -34,7 +34,6 @@ int main(void)
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_size;
     int __gen_e_acsl_if;
@@ -42,55 +41,38 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)p,1UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",(void *)p);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\"pointer alignment\": \\aligned(p,1)",0,
-                                 __gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(p,1); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(p,1)";
-      __gen_e_acsl_assert_data_2.file = "bts2406.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 10;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
                                                     sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&p",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&p",
                                  (void *)(& p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "uninitialized: \\initialized(&p)",0,
                                  __gen_e_acsl_initialized);
     /*@ assert E_ACSL: uninitialized: \initialized(&p); */
     {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&p)";
-      __gen_e_acsl_assert_data_3.file = "bts2406.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 10;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&p)";
+      __gen_e_acsl_assert_data_2.file = "bts2406.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 10;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
-    __gen_e_acsl_size = 1 * 10;
+    __gen_e_acsl_size = 1 * ((9 - 0) + 1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"size",0,
                                  __gen_e_acsl_size);
     if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
     else __gen_e_acsl_if = __gen_e_acsl_size;
-    __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 0),
+    __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),
                                         (size_t)__gen_e_acsl_if,(void *)p,
                                         (void *)(& p));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",0,
+                                 1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",0,
                                  1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"size",0,
@@ -112,33 +94,35 @@ int main(void)
     int __gen_e_acsl_size_2;
     int __gen_e_acsl_if_2;
     int __gen_e_acsl_valid_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_size_2 = 1 * 10;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"size",0,
+    __gen_e_acsl_size_2 = 1 * ((9 - 0) + 1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"size",0,
                                  __gen_e_acsl_size_2);
     if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
     else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(t + 0),
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(t + 1 * 0),
                                           (size_t)__gen_e_acsl_if_2,
                                           (void *)(t),(void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&(t[0])",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&(t[0])",
                                  (void *)(t));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"sizeof(char)",
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sizeof(char)",
                                  0,1);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"size",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sizeof(char)",
+                                 0,1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"size",0,
                                  __gen_e_acsl_size_2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\valid(&t[0 .. 9])",0,
                                  __gen_e_acsl_valid_2);
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\valid(&t[0 .. 9])";
-    __gen_e_acsl_assert_data_4.file = "bts2406.c";
-    __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 11;
-    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(&t[0 .. 9])";
+    __gen_e_acsl_assert_data_3.file = "bts2406.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 11;
+    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid(&t[0 .. 9]); */ ;
   __retres = 0;

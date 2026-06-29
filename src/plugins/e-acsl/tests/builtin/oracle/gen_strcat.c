@@ -69,15 +69,17 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __gen_e_acsl_size = 1 * 2;
+      __gen_e_acsl_size = 1 * ((1 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"size",0,
                                    __gen_e_acsl_size);
       if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
       else __gen_e_acsl_if = __gen_e_acsl_size;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(dest + 0),
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(dest + 1 * 0),
                                                       (size_t)__gen_e_acsl_if);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(dest[0])",
                                    (void *)(dest));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",
+                                   0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",
                                    0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"size",0,
@@ -101,7 +103,7 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_2;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
-      __gen_e_acsl_size_2 = 1 * 2;
+      __gen_e_acsl_size_2 = 1 * ((3 - 2) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"size",0,
                                    __gen_e_acsl_size_2);
       if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
@@ -136,15 +138,17 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_3;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
-      __gen_e_acsl_size_3 = 1 * 2;
+      __gen_e_acsl_size_3 = 1 * ((1 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"size",0,
                                    __gen_e_acsl_size_3);
       if (__gen_e_acsl_size_3 <= 0) __gen_e_acsl_if_3 = 0;
       else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
-      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(src + 0),
+      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(src + 1 * 0),
                                                         (size_t)__gen_e_acsl_if_3);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&(src[0])",
                                    (void *)(src));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"size",0,
@@ -170,15 +174,17 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_4;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
-      __gen_e_acsl_size_4 = 1 * 3;
+      __gen_e_acsl_size_4 = 1 * ((2 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"size",0,
                                    __gen_e_acsl_size_4);
       if (__gen_e_acsl_size_4 <= 0) __gen_e_acsl_if_4 = 0;
       else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
-      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(dest + 0),
+      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(dest + 1 * 0),
                                                         (size_t)__gen_e_acsl_if_4);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&(dest[0])",
                                    (void *)(dest));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"size",0,
@@ -237,15 +243,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_6;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
-      __gen_e_acsl_size_5 = 1 * 2;
+      __gen_e_acsl_size_5 = 1 * ((1 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"size",0,
                                    __gen_e_acsl_size_5);
       if (__gen_e_acsl_size_5 <= 0) __gen_e_acsl_if_5 = 0;
       else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
-      __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(dest_0 + 0),
+      __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(dest_0 + 
+                                                                 1 * 0),
                                                         (size_t)__gen_e_acsl_if_5);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
                                    "&(dest_0[0])",(void *)(dest_0));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"size",0,
@@ -270,7 +279,7 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_7;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
-      __gen_e_acsl_size_6 = 1 * 2;
+      __gen_e_acsl_size_6 = 1 * ((3 - 2) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"size",0,
                                    __gen_e_acsl_size_6);
       if (__gen_e_acsl_size_6 <= 0) __gen_e_acsl_if_6 = 0;
@@ -306,15 +315,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_8;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
         {.values = (void *)0};
-      __gen_e_acsl_size_7 = 1 * 3;
+      __gen_e_acsl_size_7 = 1 * ((2 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"size",0,
                                    __gen_e_acsl_size_7);
       if (__gen_e_acsl_size_7 <= 0) __gen_e_acsl_if_7 = 0;
       else __gen_e_acsl_if_7 = __gen_e_acsl_size_7;
-      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(src_0 + 0),
+      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(src_0 + 
+                                                                 1 * 0),
                                                         (size_t)__gen_e_acsl_if_7);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
                                    "&(src_0[0])",(void *)(src_0));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"size",0,
@@ -340,15 +352,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_9;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __gen_e_acsl_size_8 = 1 * 3;
+      __gen_e_acsl_size_8 = 1 * ((2 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
                                    __gen_e_acsl_size_8);
       if (__gen_e_acsl_size_8 <= 0) __gen_e_acsl_if_8 = 0;
       else __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
-      __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(dest_0 + 0),
+      __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(dest_0 + 
+                                                                 1 * 0),
                                                         (size_t)__gen_e_acsl_if_8);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
                                    "&(dest_0[0])",(void *)(dest_0));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
@@ -407,15 +422,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_11;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
         {.values = (void *)0};
-      __gen_e_acsl_size_9 = 1 * 2;
+      __gen_e_acsl_size_9 = 1 * ((1 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"size",0,
                                    __gen_e_acsl_size_9);
       if (__gen_e_acsl_size_9 <= 0) __gen_e_acsl_if_9 = 0;
       else __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
-      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(dest_1 + 0),
+      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(dest_1 + 
+                                                                  1 * 0),
                                                          (size_t)__gen_e_acsl_if_9);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
                                    "&(dest_1[0])",(void *)(dest_1));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"size",0,
@@ -440,7 +458,7 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_12;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
         {.values = (void *)0};
-      __gen_e_acsl_size_10 = 1 * 2;
+      __gen_e_acsl_size_10 = 1 * ((3 - 2) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
                                    __gen_e_acsl_size_10);
       if (__gen_e_acsl_size_10 <= 0) __gen_e_acsl_if_10 = 0;
@@ -476,15 +494,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_13;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
         {.values = (void *)0};
-      __gen_e_acsl_size_11 = 1 * 2;
+      __gen_e_acsl_size_11 = 1 * ((1 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
                                    __gen_e_acsl_size_11);
       if (__gen_e_acsl_size_11 <= 0) __gen_e_acsl_if_11 = 0;
       else __gen_e_acsl_if_11 = __gen_e_acsl_size_11;
-      __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(src_1 + 0),
+      __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(src_1 + 
+                                                                  1 * 0),
                                                          (size_t)__gen_e_acsl_if_11);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,
                                    "&(src_1[0])",(void *)(src_1));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
@@ -510,15 +531,18 @@ void test_memory_tracking(void)
       int __gen_e_acsl_initialized_14;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
         {.values = (void *)0};
-      __gen_e_acsl_size_12 = 1 * 3;
+      __gen_e_acsl_size_12 = 1 * ((2 - 0) + 1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"size",0,
                                    __gen_e_acsl_size_12);
       if (__gen_e_acsl_size_12 <= 0) __gen_e_acsl_if_12 = 0;
       else __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
-      __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(dest_1 + 0),
+      __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(dest_1 + 
+                                                                  1 * 0),
                                                          (size_t)__gen_e_acsl_if_12);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
                                    "&(dest_1[0])",(void *)(dest_1));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
+                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"size",0,
@@ -641,144 +665,40 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   int *__gen_e_acsl_at;
   pid_t __retres;
   {
-    int __gen_e_acsl_aligned;
-    int __gen_e_acsl_aligned_2;
-    int __gen_e_acsl_aligned_3;
-    int __gen_e_acsl_aligned_4;
     int __gen_e_acsl_assumes_value;
     __e_acsl_store_block((void *)(& stat_loc),8UL);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)stat_loc,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stat_loc",
-                                 (void *)stat_loc);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\"pointer alignment\": \\aligned(stat_loc,4)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(stat_loc,4); */
-    {
-      __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
-      __gen_e_acsl_assert_data.pred_txt = "\\aligned(stat_loc,4)";
-      __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
-      __gen_e_acsl_assert_data.fct = "waitpid";
-      __gen_e_acsl_assert_data.line = 78;
-      __gen_e_acsl_assert_data.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    }
     __gen_e_acsl_at = stat_loc;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)stat_loc,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"stat_loc",
-                                 (void *)stat_loc);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\"pointer alignment\": \\aligned(stat_loc,4)",
-                                 0,__gen_e_acsl_aligned_2);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(stat_loc,4); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(stat_loc,4)";
-      __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
-      __gen_e_acsl_assert_data_2.fct = "waitpid";
-      __gen_e_acsl_assert_data_2.line = 78;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
     __gen_e_acsl_at_2 = stat_loc;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)stat_loc,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"stat_loc",
-                                 (void *)stat_loc);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "\"pointer alignment\": \\aligned(stat_loc,4)",
-                                 0,__gen_e_acsl_aligned_3);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(stat_loc,4); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(stat_loc,4)";
-      __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
-      __gen_e_acsl_assert_data_3.fct = "waitpid";
-      __gen_e_acsl_assert_data_3.line = 80;
-      __gen_e_acsl_assert_data_3.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            stat_loc == (int *)0);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)stat_loc,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"stat_loc",
-                                 (void *)stat_loc);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\"pointer alignment\": \\aligned(stat_loc,4)",
-                                 0,__gen_e_acsl_aligned_4);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(stat_loc,4); */
-    {
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(stat_loc,4)";
-      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/sys/wait.h";
-      __gen_e_acsl_assert_data_4.fct = "waitpid";
-      __gen_e_acsl_assert_data_4.line = 83;
-      __gen_e_acsl_assert_data_4.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            stat_loc != (int *)0);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
-      int __gen_e_acsl_aligned_5;
       int __gen_e_acsl_valid;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)stat_loc,4UL);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"stat_loc",
-                                   (void *)stat_loc);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                   "\"pointer alignment\": \\aligned(stat_loc,4)",
-                                   0,__gen_e_acsl_aligned_5);
-      /*@ assert E_ACSL: "pointer alignment": \aligned(stat_loc,4); */
-      {
-        __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "RTE";
-        __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(stat_loc,4)";
-        __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/sys/wait.h";
-        __gen_e_acsl_assert_data_6.fct = "waitpid";
-        __gen_e_acsl_assert_data_6.line = 84;
-        __gen_e_acsl_assert_data_6.name = "pointer alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_5,& __gen_e_acsl_assert_data_6);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-      }
       __gen_e_acsl_valid = __e_acsl_valid((void *)stat_loc,sizeof(int),
                                           (void *)stat_loc,
                                           (void *)(& stat_loc));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"stat_loc",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stat_loc",
                                    (void *)stat_loc);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)",
                                    0,__gen_e_acsl_valid);
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "Precondition";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\valid(stat_loc)";
-      __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/sys/wait.h";
-      __gen_e_acsl_assert_data_5.fct = "waitpid";
-      __gen_e_acsl_assert_data_5.line = 84;
-      __gen_e_acsl_assert_data_5.name = "stat_loc_non_null/valid_stat_loc";
-      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Precondition";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(stat_loc)";
+      __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
+      __gen_e_acsl_assert_data.fct = "waitpid";
+      __gen_e_acsl_assert_data.line = 84;
+      __gen_e_acsl_assert_data.name = "stat_loc_non_null/valid_stat_loc";
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
   }
   __retres = waitpid(pid,stat_loc,options);
@@ -786,31 +706,31 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     int __gen_e_acsl_or;
     int __gen_e_acsl_and;
     int __gen_e_acsl_implies;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
                                  __retres);
     if (__retres == -1) __gen_e_acsl_or = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
                                    __retres);
       __gen_e_acsl_or = __retres >= 0;
     }
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "Postcondition";
-    __gen_e_acsl_assert_data_7.pred_txt = "\\result == -1 || \\result >= 0";
-    __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/sys/wait.h";
-    __gen_e_acsl_assert_data_7.fct = "waitpid";
-    __gen_e_acsl_assert_data_7.line = 76;
-    __gen_e_acsl_assert_data_7.name = "result_ok_or_error";
-    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == -1 || \\result >= 0";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
+    __gen_e_acsl_assert_data_2.fct = "waitpid";
+    __gen_e_acsl_assert_data_2.line = 76;
+    __gen_e_acsl_assert_data_2.name = "result_ok_or_error";
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"\\result",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"\\result",0,
                                  __retres);
     if (__retres >= 0) {
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
                                    "\\old(stat_loc)",
                                    (void *)__gen_e_acsl_at_2);
       __gen_e_acsl_and = __gen_e_acsl_at_2 != (int *)0;
@@ -821,24 +741,24 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       int __gen_e_acsl_initialized;
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
                                    "\\old(stat_loc)",(void *)__gen_e_acsl_at);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\initialized(\\old(stat_loc))",0,
                                    __gen_e_acsl_initialized);
       __gen_e_acsl_implies = __gen_e_acsl_initialized;
     }
-    __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "Postcondition";
-    __gen_e_acsl_assert_data_8.pred_txt = "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
-    __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/sys/wait.h";
-    __gen_e_acsl_assert_data_8.fct = "waitpid";
-    __gen_e_acsl_assert_data_8.line = 78;
-    __gen_e_acsl_assert_data_8.name = "initialization/stat_loc_init_on_success";
-    __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_8);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Postcondition";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
+    __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
+    __gen_e_acsl_assert_data_3.fct = "waitpid";
+    __gen_e_acsl_assert_data_3.line = 78;
+    __gen_e_acsl_assert_data_3.name = "initialization/stat_loc_init_on_success";
+    __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& stat_loc));
     return __retres;

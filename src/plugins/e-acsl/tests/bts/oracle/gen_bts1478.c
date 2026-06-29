@@ -46,24 +46,21 @@ void __gen_e_acsl_loop(void)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)global_i_ptr,4UL);
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)global_i_ptr,
+                                            _Alignof(int));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(int)",0,_Alignof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"global_i_ptr",
                                  (void *)global_i_ptr);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "\"pointer alignment\": \\aligned(global_i_ptr,4)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(global_i_ptr,4); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(global_i_ptr,4)";
-      __gen_e_acsl_assert_data_3.file = "bts1478.c";
-      __gen_e_acsl_assert_data_3.fct = "loop";
-      __gen_e_acsl_assert_data_3.line = 10;
-      __gen_e_acsl_assert_data_3.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(global_i_ptr,alignof(int))";
+    __gen_e_acsl_assert_data_3.file = "bts1478.c";
+    __gen_e_acsl_assert_data_3.fct = "loop";
+    __gen_e_acsl_assert_data_3.line = 10;
+    __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
                                         (void *)global_i_ptr,
                                         (void *)(& global_i_ptr));
@@ -86,24 +83,21 @@ void __gen_e_acsl_loop(void)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)global_i_ptr,4UL);
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)global_i_ptr,
+                                              _Alignof(int));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(int)",0,_Alignof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"global_i_ptr",
                                  (void *)global_i_ptr);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "\"pointer alignment\": \\aligned(global_i_ptr,4)",
-                                 0,__gen_e_acsl_aligned_2);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(global_i_ptr,4); */
-    {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(global_i_ptr,4)";
-      __gen_e_acsl_assert_data_5.file = "bts1478.c";
-      __gen_e_acsl_assert_data_5.fct = "loop";
-      __gen_e_acsl_assert_data_5.line = 11;
-      __gen_e_acsl_assert_data_5.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(global_i_ptr,alignof(int))";
+    __gen_e_acsl_assert_data_5.file = "bts1478.c";
+    __gen_e_acsl_assert_data_5.fct = "loop";
+    __gen_e_acsl_assert_data_5.line = 11;
+    __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"global_i_ptr",
                                  (void *)global_i_ptr);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&global_i",

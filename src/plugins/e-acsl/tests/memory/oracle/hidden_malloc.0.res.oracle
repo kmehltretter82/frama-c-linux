@@ -16,18 +16,6 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:1089: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
@@ -53,25 +41,15 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1101: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:1141: Warning: 
   no 'assigns \result \from ...' clause specified for function realpath
 [eva] FRAMAC_SHARE/libc/stdlib.h:1089: Warning: 
   ignoring unsupported allocates clause
 [inout] FRAMAC_SHARE/libc/stdlib.h:1089: Warning: 
   failed to interpret assigns clause '*(\result + (0 .. 4096 - 1))'
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1103: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1104: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1118: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1119: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1131: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1137: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1111: Warning: 
   function __gen_e_acsl_realpath, behavior allocate_resolved_name: postcondition 'allocation' got status unknown.

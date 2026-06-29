@@ -79,11 +79,15 @@ int main(void)
   /*@ assert !even(3); */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__11;
+    __e_acsl_mpz_t __gen_e_acsl_neg;
     int __gen_e_acsl_even_here_10;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gmpz_init_set_str(__gen_e_acsl__11,"-4",10);
-    __gen_e_acsl_even_here_10 = __gen_e_acsl_even_here((__e_acsl_mpz_struct *)__gen_e_acsl__11);
+    __gmpz_init_set_si(__gen_e_acsl__11,4L);
+    __gmpz_init(__gen_e_acsl_neg);
+    __gmpz_neg(__gen_e_acsl_neg,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
+    __gen_e_acsl_even_here_10 = __gen_e_acsl_even_here((__e_acsl_mpz_struct *)__gen_e_acsl_neg);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"even(-4)",0,
                                  __gen_e_acsl_even_here_10);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -95,15 +99,20 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_even_here_10,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gmpz_clear(__gen_e_acsl__11);
+    __gmpz_clear(__gen_e_acsl_neg);
   }
   /*@ assert even(-4); */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__12;
+    __e_acsl_mpz_t __gen_e_acsl_neg_2;
     int __gen_e_acsl_even_here_12;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __gmpz_init_set_str(__gen_e_acsl__12,"-3",10);
-    __gen_e_acsl_even_here_12 = __gen_e_acsl_even_here((__e_acsl_mpz_struct *)__gen_e_acsl__12);
+    __gmpz_init_set_si(__gen_e_acsl__12,3L);
+    __gmpz_init(__gen_e_acsl_neg_2);
+    __gmpz_neg(__gen_e_acsl_neg_2,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
+    __gen_e_acsl_even_here_12 = __gen_e_acsl_even_here((__e_acsl_mpz_struct *)__gen_e_acsl_neg_2);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"even(-3)",0,
                                  __gen_e_acsl_even_here_12);
     __gen_e_acsl_assert_data_4.blocking = 1;
@@ -115,6 +124,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_even_here_12,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gmpz_clear(__gen_e_acsl__12);
+    __gmpz_clear(__gen_e_acsl_neg_2);
   }
   /*@ assert !even(-3); */ ;
   __retres = 0;

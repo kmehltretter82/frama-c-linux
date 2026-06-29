@@ -49,15 +49,22 @@ int main(void)
   }
   /*@ assert 1152921504606846975 == 0xfffffffffffffff; */ ;
   {
+    __e_acsl_mpz_t __gen_e_acsl_;
+    int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
+    __gmpz_init_set_str(__gen_e_acsl_,
+                        "340282366920938463463374607431768211455",10);
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff";
     __gen_e_acsl_assert_data_4.file = "integer_constant.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 11;
-    __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data_4);
+    __gmpz_clear(__gen_e_acsl_);
   }
   /*@
   assert

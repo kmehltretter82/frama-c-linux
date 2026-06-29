@@ -16,7 +16,7 @@ let stmt ?warn:_ kf stmt =
               ~div_mod:false
               ~mem_access:false
               ~initialized:Kernel_function.Set.empty
-              ~pointer_alignment:false
+              (* ~pointer_alignment:false *)
               ())
     kf stmt
 
@@ -26,7 +26,7 @@ let exp ?warn:_ kf stmt e =
               ~div_mod:false
               ~mem_access:false
               ~initialized:Kernel_function.Set.empty
-              ~pointer_alignment:false
+              (* ~pointer_alignment:false *)
               ())
     kf stmt e
 

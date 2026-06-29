@@ -8,14 +8,6 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:37: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:9: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:15: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:10: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] valid.c:10: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:39: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:39: Warning: 
@@ -31,8 +23,6 @@
 [eva:alarm] valid.c:44: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:44: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:45: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:45: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

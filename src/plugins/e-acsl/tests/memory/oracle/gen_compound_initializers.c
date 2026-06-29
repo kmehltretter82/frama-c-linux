@@ -114,24 +114,20 @@ int main(int argc, char **argv)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)_A[0],1UL);
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)_A[0],_Alignof(char));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(char)",0,_Alignof(char));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"_A[0]",
                                  (void *)_A[0]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "\"pointer alignment\": \\aligned(_A[0],1)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(_A[0],1); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(_A[0],1)";
-      __gen_e_acsl_assert_data_3.file = "compound_initializers.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 24;
-      __gen_e_acsl_assert_data_3.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(_A[0],alignof(char))";
+    __gen_e_acsl_assert_data_3.file = "compound_initializers.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 24;
+    __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_A[0],sizeof(char),
                                                   (void *)_A[0],(void *)(_A));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"_A[0]",
@@ -158,24 +154,20 @@ int main(int argc, char **argv)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)_A[1],1UL);
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)_A[1],_Alignof(char));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(char)",0,_Alignof(char));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"_A[1]",
                                  (void *)_A[1]);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "\"pointer alignment\": \\aligned(_A[1],1)",
-                                 0,__gen_e_acsl_aligned_2);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(_A[1],1); */
-    {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(_A[1],1)";
-      __gen_e_acsl_assert_data_5.file = "compound_initializers.c";
-      __gen_e_acsl_assert_data_5.fct = "main";
-      __gen_e_acsl_assert_data_5.line = 25;
-      __gen_e_acsl_assert_data_5.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(_A[1],alignof(char))";
+    __gen_e_acsl_assert_data_5.file = "compound_initializers.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 25;
+    __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)_A[1],
                                                     sizeof(char),
                                                     (void *)_A[1],
@@ -204,24 +196,20 @@ int main(int argc, char **argv)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)_B,1UL);
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)_B,_Alignof(char));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                   "alignof(char)",0,_Alignof(char));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"_B",
                                  (void *)_B);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "\"pointer alignment\": \\aligned(_B,1)",0,
-                                 __gen_e_acsl_aligned_3);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(_B,1); */
-    {
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(_B,1)";
-      __gen_e_acsl_assert_data_7.file = "compound_initializers.c";
-      __gen_e_acsl_assert_data_7.fct = "main";
-      __gen_e_acsl_assert_data_7.line = 26;
-      __gen_e_acsl_assert_data_7.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-    }
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "RTE";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(_B,alignof(char))";
+    __gen_e_acsl_assert_data_7.file = "compound_initializers.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 26;
+    __gen_e_acsl_assert_data_7.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)_B,sizeof(char),
                                                     (void *)_B,
                                                     (void *)(& _B));

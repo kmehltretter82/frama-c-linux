@@ -1,6 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] valid_in_contract.c:15: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.
-[eva:alarm] valid_in_contract.c:18: Warning: 
-  assertion 'E_ACSL,pointer alignment' got status unknown.

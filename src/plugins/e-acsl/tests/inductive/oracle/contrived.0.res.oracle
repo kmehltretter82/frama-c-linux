@@ -34,7 +34,6 @@
 [e-acsl:analysis:inductive] 
   extracting function from dupl with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of dupl might be unsound
-[kernel] Warning: invalid suffix: -1
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] contrived.c:77: Warning: assertion got status unknown.
 [eva:alarm] contrived.c:78: Warning: assertion got status unknown.
