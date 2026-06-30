@@ -5,9 +5,9 @@
   casting function to int *
 [alias] analysing function: f
 [alias] analysing instruction: int *q = (int *)(& f);
-[alias] May-aliases after instruction  int *q = (int *)(& f);  are  <none>
+[alias] May-aliases after instruction int *q = (int *)(& f); are <none>
 [alias] analysing instruction: int *p = (int *)(& f);
-[alias] May-aliases after instruction  int *p = (int *)(& f);  are  { q; p }
+[alias] May-aliases after instruction int *p = (int *)(& f); are { q; p }
 [alias] analysing instruction: p = (int *)(& q);
 [alias:unsafe-cast] reduce_by_valid.c:6: Warning: 
   unsafe cast from int ** to int *; analysis may be unsound
@@ -15,5 +15,5 @@
   loop on vertex 5 (following unsafe cast?); analysis may be unsound
 [alias:incoherent] Warning: 
   cycle during readout of vertex 5, (following unsafe cast?); analysis may be unsound
-[alias] May-aliases after instruction  p = (int *)(& q);  are  { *p; f; q; p }
+[alias] May-aliases after instruction p = (int *)(& q); are { *p; f; q; p }
 [alias] May-aliases at the end of function f: { *p; f; q; p }
