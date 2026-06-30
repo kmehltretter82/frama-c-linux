@@ -17,8 +17,16 @@ int main(void) {
   /*@ assert x/3 == -1; */;
   /*@ assert 0xffffffffffffffffffffff/0xffffffffffffffffffffff == 1; */;
   /*@ assert x % 2 == -1; */;
-  /*@ assert -3 % -2 == -1; */;
-  /*@ assert 3 % -2 == 1; */;
+
+  /* ACSL Manual example on division operators !5821*/
+  /*@ assert 5 / 3 == 1; */;
+  /*@ assert 5 % 3 == 2; */;
+  /*@ assert (-5) / 3 == -1; */;
+  /*@ assert (-5) % 3 == -2; */;
+  /*@ assert 5 / (-3) == -1; */;
+  /*@ assert 5 % (-3) == 2; */;
+  /*@ assert (-5) / (-3) == 1; */;
+  /*@ assert (-5) % (-3) == -2; */;
 
   /*@ assert x * 2 + (3 + y) - 4 + (x - y) == -10; */;
 
