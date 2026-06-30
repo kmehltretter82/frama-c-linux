@@ -116,6 +116,7 @@ module Interlang =
       let () = Parameter_customize.is_invisible ()
       let option_name = "-e-acsl-interlang"
       let help = "try compilation based on intermediate language"
+      let () = Parameter_customize.is_invisible ()
     end)
 
 module Interlang_force =
@@ -124,6 +125,7 @@ module Interlang_force =
       let () = Parameter_customize.is_invisible ()
       let option_name = "-e-acsl-interlang-force"
       let help = "crash if interlang compilation fails"
+      let () = Parameter_customize.is_invisible ()
     end)
 
 module O = Int (struct
