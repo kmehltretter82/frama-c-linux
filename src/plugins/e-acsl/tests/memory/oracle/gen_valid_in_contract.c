@@ -70,65 +70,167 @@ struct list *__gen_e_acsl_f(struct list *l)
   struct list *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
+    int __gen_e_acsl_aligned;
+    int __gen_e_acsl_aligned_2;
+    int __gen_e_acsl_aligned_3;
+    int __gen_e_acsl_aligned_4;
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
     __e_acsl_store_block((void *)(& l),8UL);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)l,8UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"l",(void *)l);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\"pointer alignment\": \\aligned(l,8)",0,
+                                 __gen_e_acsl_aligned);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
+    {
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.pred_txt = "\\aligned(l,8)";
+      __gen_e_acsl_assert_data.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data.fct = "f";
+      __gen_e_acsl_assert_data.line = 18;
+      __gen_e_acsl_assert_data.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    }
     __gen_e_acsl_at = l;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)l,8UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l",(void *)l);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "\"pointer alignment\": \\aligned(l,8)",0,
+                                 __gen_e_acsl_aligned_2);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l,8)";
+      __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_2.fct = "f";
+      __gen_e_acsl_assert_data_2.line = 15;
+      __gen_e_acsl_assert_data_2.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
     __gen_e_acsl_at_2 = l;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)l,8UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"l",(void *)l);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "\"pointer alignment\": \\aligned(l,8)",0,
+                                 __gen_e_acsl_aligned_3);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(l,8)";
+      __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_3.fct = "f";
+      __gen_e_acsl_assert_data_3.line = 14;
+      __gen_e_acsl_assert_data_3.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            l == (struct list *)0);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)l,8UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"l",(void *)l);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "\"pointer alignment\": \\aligned(l,8)",0,
+                                 __gen_e_acsl_aligned_4);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(l,8)";
+      __gen_e_acsl_assert_data_4.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_4.fct = "f";
+      __gen_e_acsl_assert_data_4.line = 17;
+      __gen_e_acsl_assert_data_4.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
     __gen_e_acsl_valid = __e_acsl_valid((void *)l,sizeof(struct list),
                                         (void *)l,(void *)(& l));
     if (! __gen_e_acsl_valid) __gen_e_acsl_or = 1;
     else {
+      int __gen_e_acsl_aligned_5;
+      int __gen_e_acsl_aligned_6;
       int __gen_e_acsl_valid_read;
-      int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_2;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)l,8UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"l",
+                                   (void *)l);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                   "\"pointer alignment\": \\aligned(l,8)",0,
+                                   __gen_e_acsl_aligned_5);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
+      {
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(l,8)";
+        __gen_e_acsl_assert_data_5.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_5.fct = "f";
+        __gen_e_acsl_assert_data_5.line = 17;
+        __gen_e_acsl_assert_data_5.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_5,& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      }
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)l->next,8UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"l->next",
+                                   (void *)l->next);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "\"pointer alignment\": \\aligned(l->next,8)",
+                                   0,__gen_e_acsl_aligned_6);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(l->next,8); */
+      {
+        __gen_e_acsl_assert_data_6.blocking = 1;
+        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(l->next,8)";
+        __gen_e_acsl_assert_data_6.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_6.fct = "f";
+        __gen_e_acsl_assert_data_6.line = 17;
+        __gen_e_acsl_assert_data_6.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_6,& __gen_e_acsl_assert_data_6);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      }
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
                                                     sizeof(struct list *),
                                                     (void *)(& l->next),
                                                     (void *)0);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&l->next",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&l->next",
                                    (void *)(& l->next));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(struct list *)",0,
                                      sizeof(struct list *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "\"memory access\": \\valid_read(&l->next)",
                                    0,__gen_e_acsl_valid_read);
       /*@ assert E_ACSL: "memory access": \valid_read(&l->next); */
       {
-        __gen_e_acsl_assert_data.blocking = 1;
-        __gen_e_acsl_assert_data.kind = "RTE";
-        __gen_e_acsl_assert_data.pred_txt = "\\valid_read(&l->next)";
-        __gen_e_acsl_assert_data.file = "valid_in_contract.c";
-        __gen_e_acsl_assert_data.fct = "f";
-        __gen_e_acsl_assert_data.line = 17;
-        __gen_e_acsl_assert_data.name = "memory access";
-        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+        __gen_e_acsl_assert_data_7.blocking = 1;
+        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(&l->next)";
+        __gen_e_acsl_assert_data_7.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_7.fct = "f";
+        __gen_e_acsl_assert_data_7.line = 17;
+        __gen_e_acsl_assert_data_7.name = "memory access";
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_7);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
       }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
-                                              _Alignof(struct list));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "alignof(struct list)",0,
-                                     _Alignof(struct list));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l->next",
-                                   (void *)l->next);
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l->next,alignof(struct list))";
-      __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
-      __gen_e_acsl_assert_data_2.fct = "f";
-      __gen_e_acsl_assert_data_2.line = 17;
-      __gen_e_acsl_assert_data_2.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
                                             sizeof(struct list),
                                             (void *)l->next,
@@ -144,42 +246,84 @@ struct list *__gen_e_acsl_f(struct list *l)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      int __gen_e_acsl_aligned_7;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
         {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\result",
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)__retres,8UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"\\result",
                                    (void *)__retres);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\old(l)",
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                   "\"pointer alignment\": \\aligned(\\result,8)",
+                                   0,__gen_e_acsl_aligned_7);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(\result,8); */
+      {
+        __gen_e_acsl_assert_data_9.blocking = 1;
+        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(\\result,8)";
+        __gen_e_acsl_assert_data_9.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_9.fct = "f";
+        __gen_e_acsl_assert_data_9.line = 15;
+        __gen_e_acsl_assert_data_9.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_9);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+      }
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"\\result",
+                                   (void *)__retres);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"\\old(l)",
                                    (void *)__gen_e_acsl_at_2);
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\result == \\old(l)";
-      __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
-      __gen_e_acsl_assert_data_3.fct = "f";
-      __gen_e_acsl_assert_data_3.line = 15;
-      __gen_e_acsl_assert_data_3.name = "B1";
+      __gen_e_acsl_assert_data_8.blocking = 1;
+      __gen_e_acsl_assert_data_8.kind = "Postcondition";
+      __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\old(l)";
+      __gen_e_acsl_assert_data_8.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_8.fct = "f";
+      __gen_e_acsl_assert_data_8.line = 15;
+      __gen_e_acsl_assert_data_8.name = "B1";
       __e_acsl_assert(__retres == __gen_e_acsl_at_2,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+                      & __gen_e_acsl_assert_data_8);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      int __gen_e_acsl_aligned_8;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
         {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\result",
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)__retres,8UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"\\result",
                                    (void *)__retres);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\old(l)",
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+                                   "\"pointer alignment\": \\aligned(\\result,8)",
+                                   0,__gen_e_acsl_aligned_8);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(\result,8); */
+      {
+        __gen_e_acsl_assert_data_11.blocking = 1;
+        __gen_e_acsl_assert_data_11.kind = "RTE";
+        __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(\\result,8)";
+        __gen_e_acsl_assert_data_11.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_11.fct = "f";
+        __gen_e_acsl_assert_data_11.line = 18;
+        __gen_e_acsl_assert_data_11.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_11);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+      }
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"\\result",
+                                   (void *)__retres);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"\\old(l)",
                                    (void *)__gen_e_acsl_at);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\old(l)";
-      __gen_e_acsl_assert_data_4.file = "valid_in_contract.c";
-      __gen_e_acsl_assert_data_4.fct = "f";
-      __gen_e_acsl_assert_data_4.line = 18;
-      __gen_e_acsl_assert_data_4.name = "B2";
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "Postcondition";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\result == \\old(l)";
+      __gen_e_acsl_assert_data_10.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_10.fct = "f";
+      __gen_e_acsl_assert_data_10.line = 18;
+      __gen_e_acsl_assert_data_10.name = "B2";
       __e_acsl_assert(__retres == __gen_e_acsl_at,
-                      & __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+                      & __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& l));

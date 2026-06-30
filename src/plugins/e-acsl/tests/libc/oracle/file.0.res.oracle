@@ -29,8 +29,12 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:382: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:382: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:380: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:387: Warning: 
+  assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:387: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:387: Warning: 
@@ -59,5 +63,7 @@
 [eva:alarm] file.c:37: Warning: assertion got status unknown.
 [eva:alarm] file.c:39: Warning: 
   function __gen_e_acsl_fclose: precondition 'valid_stream' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:148: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:148: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

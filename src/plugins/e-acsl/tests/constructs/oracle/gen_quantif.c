@@ -1386,21 +1386,24 @@ int __gen_e_acsl_implicitly_labelled_here(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_40 =
         {.values = (void *)0};
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[__gen_e_acsl_i_15],
-                                              _Alignof(int));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_40,
-                                     "alignof(int)",0,_Alignof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_40,
-                                   "a[__gen_e_acsl_i_15]",
+                                              4UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_40,"a[i]",
                                    (void *)a[__gen_e_acsl_i_15]);
-      __gen_e_acsl_assert_data_40.blocking = 1;
-      __gen_e_acsl_assert_data_40.kind = "RTE";
-      __gen_e_acsl_assert_data_40.pred_txt = "\\aligned(a[__gen_e_acsl_i_15],alignof(int))";
-      __gen_e_acsl_assert_data_40.file = "quantif.i";
-      __gen_e_acsl_assert_data_40.fct = "implicitly_labelled_here";
-      __gen_e_acsl_assert_data_40.line = 18;
-      __gen_e_acsl_assert_data_40.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_40);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_40,
+                                   "\"pointer alignment\": \\aligned(a[i],4)",
+                                   0,__gen_e_acsl_aligned);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(a[i],4); */
+      {
+        __gen_e_acsl_assert_data_40.blocking = 1;
+        __gen_e_acsl_assert_data_40.kind = "RTE";
+        __gen_e_acsl_assert_data_40.pred_txt = "\\aligned(a[i],4)";
+        __gen_e_acsl_assert_data_40.file = "quantif.i";
+        __gen_e_acsl_assert_data_40.fct = "implicitly_labelled_here";
+        __gen_e_acsl_assert_data_40.line = 18;
+        __gen_e_acsl_assert_data_40.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_40);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
+      }
       __gen_e_acsl_valid_5 = __e_acsl_valid((void *)a[__gen_e_acsl_i_15],
                                             sizeof(int),
                                             (void *)a[__gen_e_acsl_i_15],

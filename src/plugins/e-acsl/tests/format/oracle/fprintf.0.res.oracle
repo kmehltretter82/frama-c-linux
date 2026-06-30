@@ -24,5 +24,17 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:78: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:78: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:80: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:83: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:84: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:148: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:148: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.

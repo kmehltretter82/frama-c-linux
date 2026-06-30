@@ -12,6 +12,10 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] t_struct.c:41: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_struct.c:44: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_struct.c:44: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] t_struct.c:47: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] t_struct.c:50: Warning: 
