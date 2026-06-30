@@ -1518,9 +1518,6 @@ double __gen_e_acsl_f2(double x)
   __gmpq_set_str(__gen_e_acsl__7,"1",10);
   __gmpq_init(__gen_e_acsl_x_3);
   __gmpq_set_d(__gen_e_acsl_x_3,x);
-  __gmpq_init(__gen_e_acsl_div);
-  __gmpq_div(__gen_e_acsl_div,(__e_acsl_mpq_struct const *)(__gen_e_acsl__7),
-             (__e_acsl_mpq_struct const *)(__gen_e_acsl_x_3));
   __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 = {.values = (void *)0};
   __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_26,"x",x);
   /*@ assert E_ACSL: "division by zero": x != 0; */
@@ -1535,6 +1532,9 @@ double __gen_e_acsl_f2(double x)
     __e_acsl_assert(x != 0.,& __gen_e_acsl_assert_data_26);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
   }
+  __gmpq_init(__gen_e_acsl_div);
+  __gmpq_div(__gen_e_acsl_div,(__e_acsl_mpq_struct const *)(__gen_e_acsl__7),
+             (__e_acsl_mpq_struct const *)(__gen_e_acsl_x_3));
   __gen_e_acsl_div_2 = __gmpq_get_d((__e_acsl_mpq_struct const *)(__gen_e_acsl_div));
   __gmpq_clear(__gen_e_acsl__7);
   __gmpq_clear(__gen_e_acsl_x_3);
@@ -1580,10 +1580,6 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b)
   __gmpq_set_d(__gen_e_acsl_a,a);
   __gmpq_init(__gen_e_acsl_b);
   __gmpq_set_d(__gen_e_acsl_b,b);
-  __gmpq_init(__gen_e_acsl_div_5);
-  __gmpq_div(__gen_e_acsl_div_5,
-             (__e_acsl_mpq_struct const *)(__gen_e_acsl_a),
-             (__e_acsl_mpq_struct const *)(__gen_e_acsl_b));
   __e_acsl_assert_data_t __gen_e_acsl_assert_data_30 = {.values = (void *)0};
   __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_30,"b",b);
   /*@ assert E_ACSL: "division by zero": b != 0; */
@@ -1598,6 +1594,10 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b)
     __e_acsl_assert(b != 0.,& __gen_e_acsl_assert_data_30);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_30);
   }
+  __gmpq_init(__gen_e_acsl_div_5);
+  __gmpq_div(__gen_e_acsl_div_5,
+             (__e_acsl_mpq_struct const *)(__gen_e_acsl_a),
+             (__e_acsl_mpq_struct const *)(__gen_e_acsl_b));
   __gmpq_init(*__retres_arg);
   __gmpq_set(*__retres_arg,(__e_acsl_mpq_struct const *)(__gen_e_acsl_div_5));
   __gmpq_clear(__gen_e_acsl_a);

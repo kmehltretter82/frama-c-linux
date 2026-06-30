@@ -21,20 +21,20 @@ module Conf = struct
   (* The Reader variable of M. See Monad_rws.Conf.env *)
   type env = {kf : Cil_types.kernel_function;
               loc : Fileloc.t;
-              adata_register : bool}
+              adata_register : bool;
+              rtes : rte list}
 
   (* The State variable of M. The monad generates Cil expressions, all the
      while making modifications to the current environment (of type Env.t) and
      the recorded assertion data (of type Assert.t). *)
   type state = {env : Env.t; adata : Assert.t}
 
-  (** The out variable of {!M} contains a list of RTE guards which is enriched
-      with new elements during the translation from Interlang to Cil. Using
-      [bind], [update] and [flush], the list can be initialized, merged with
-      another one and finally retrieved and cleared. *)
-  type out = rte list (* The Writer variable of M. *)
-  let merge_out l1 l2 = l2 @ l1
-  let empty_out () = []
+  (** The out variable of {!M} contains a [bool] which specifies if the RTE list
+      of the current expression has been compiled during its compilation or
+      if it needs to be compiled after its compilation. *)
+  type out = bool (* The Writer variable of M. *)
+  let merge_out o1 o2 = o1 || o2
+  let empty_out () = false
 end
 
 (** The intermediate language translation monad. It is used for translating
@@ -47,6 +47,9 @@ module M = struct
 
   let without_registering_adata m =
     with_env (fun env -> {env with adata_register = false}) m
+
+  let with_rtes rtes m =
+    with_env (fun env -> {env with rtes = rtes}) m
 
   let with_loc loc m = with_env (fun env -> {env with loc}) m
 
@@ -95,8 +98,8 @@ let assert_register_term ~loc ?force e t =
   M.modify_adata @@ fun a ->
   Assert.register_term ~loc ?force t e a
 
-let rec compile ?(flush_rtes=false) exp =
-  let* e, coerce, cast_info = compile_with_rtes ~flush_rtes exp in
+let rec compile exp =
+  let* e, coerce, cast_info = compile_with_rtes exp in
   match cast_info with (* [cast_info] specifies type type we cast from. *)
   | Some (strnum, name) ->
     let name = if name = "" then None else Some name in
@@ -113,19 +116,31 @@ let rec compile ?(flush_rtes=false) exp =
           e)
   | None -> M.return e (* no cast required *)
 
-and compile_with_rtes ?(flush_rtes=false) exp =
-  let res = M.update exp.rtes @@ compile_context_insensitive exp in
-  if flush_rtes then compile_rte_guards res else res
+and compile_with_rtes exp =
+  let cil = M.with_rtes exp.rtes @@ compile_context_insensitive exp in
+  let* (cil,early) = M.flush cil in
+  let+ () =
+    if not early then M.List.iter compile_rte_guard exp.rtes else M.return ()
+  in
+  cil
+
+(** [let* () = force_rtes () in] forces the early compilation of the
+    current environment's RTEs. This can be used if for instance the
+    compilation of a term will produce intermediary computations and
+    we want to compile RTEs before those intermediary computations. *)
+and force_rtes () =
+  let* {rtes} = M.read in
+  M.update true @@ M.List.iter compile_rte_guard rtes
 
 and compile_conditional ~ity ~origin ?(name = "if") op1 op2 op3 =
   let* {kf; loc} = M.read in
   let ty = Typing.typ_of_number_ty ity in
-  let* e1 = M.with_generating_adata @@ compile ~flush_rtes:true op1 in
+  let* e1 = M.with_generating_adata @@ compile op1 in
   let* () = M.push_env () in
-  let* e2 = M.with_generating_adata @@ compile ~flush_rtes:true op2 in
+  let* e2 = M.with_generating_adata @@ compile op2 in
   let* {env = env2} = M.get in
   let* () = M.push_env () in
-  let* e3 = M.with_generating_adata @@ compile ~flush_rtes:true op3 in
+  let* e3 = M.with_generating_adata @@ compile op3 in
   let* {env = env3} = M.get in
   M.modifying_env @@ fun env ->
   let env = Env.pop (Env.pop env) in
@@ -187,8 +202,8 @@ and compile_context_insensitive {Interlang.enode; origin} =
     M.return (e, None, Some (strnum, ""))
   | BinOp {ity; binop = Lt | Gt | Le | Ge | Eq | Ne as binop; op1; op2} ->
     let binop = compile_binop binop in
-    let* e1 = compile ~flush_rtes:true op1 in
-    let* e2 = compile ~flush_rtes:true op2 in
+    let* e1 = compile op1 in
+    let* e2 = compile op2 in
     let name = Misc.name_of_binop binop in
     let* e = M.modifying_env @@ fun env -> Translate_utils.comparison_to_exp
         ~loc
@@ -203,10 +218,11 @@ and compile_context_insensitive {Interlang.enode; origin} =
     in
     M.return (e, None, Some (Analyses_types.C_number, name))
   | UnOp {ity; unop = Neg as uop; op} ->
-    let* e = compile op in
     let unop = compile_unop uop in
+    let* e = compile op in
     begin match ity with
       | Gmpz ->
+        let* () = force_rtes () in
         let+ e = M.modifying_env @@ fun env ->
           Gmp.Z.new_var
             ~loc
@@ -236,9 +252,11 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e2 = compile op2 in
     let* e = match ity with
       | Gmpz ->
+        let* () = force_rtes () in
         M.modifying_env @@ fun env ->
         Gmp.Z.binop ~loc origin binop env kf e1 e2
       | Rational ->
+        let* () = force_rtes () in
         M.modifying_env @@ fun env ->
         Gmp.Q.binop ~loc origin binop env kf e1 e2
       | Analyses_types.C_integer _
@@ -345,34 +363,29 @@ and compile_lval (host, offset) =
   let* offset = compile_offset offset in
   M.return ((host, offset), name)
 
-and compile_rte_guards cil =
+and compile_rte_guard rte =
   let* ({loc; kf}) = M.read in
-  let compile_rte_guard rte =
-    let* orig_state = M.get in
-    let* () = M.modify @@ fun { env } ->
-      Assert.push_pending_register_data ();
-      let adata, env = Assert.empty ~loc kf env in
-      Conf.{adata; env}
-    in
-    let* cil = compile @@ Interlang.Exp.rte rte in
-    M.modify @@ fun {adata;env} ->
-    let stmt, env =
-      Assert.runtime_check
-        ~adata
-        ~pred_kind:Assert
-        RTE
-        kf
-        env
-        cil
-        rte.rorigin
-    in
-    let env = Assert.do_pending_register_data env in
-    let env = Env.add_stmt ~annot:rte.rorigin env stmt in
-    {orig_state with env}
+  let* orig_state = M.get in
+  let* () = M.modify @@ fun { env } ->
+    Assert.push_pending_register_data ();
+    let adata, env = Assert.empty ~loc kf env in
+    Conf.{adata; env}
   in
-  let* (cil,rtes) = M.flush cil in
-  let* () = M.List.iter compile_rte_guard rtes in
-  M.return cil
+  let* cil = compile @@ Interlang.Exp.rte rte in
+  M.modify @@ fun {adata;env} ->
+  let stmt, env =
+    Assert.runtime_check
+      ~adata
+      ~pred_kind:Assert
+      RTE
+      kf
+      env
+      cil
+      rte.rorigin
+  in
+  let env = Assert.do_pending_register_data env in
+  let env = Env.add_stmt ~annot:rte.rorigin env stmt in
+  {orig_state with env}
 
 let generate_and_compile ~loc ~adata ~env ~kf m source =
   let interlang, _, _ =
@@ -384,8 +397,10 @@ let generate_and_compile ~loc ~adata ~env ~kf m source =
   Options.debug ~dkey ~level:3
     "@[interlang:@ @[%a@]@]" Interlang.Pretty.pp_exp interlang;
   let cil, _, Conf.{env; adata} =
-    M.run ~env:{Conf.kf; loc; adata_register = true} ~state:Conf.{env; adata} @@
-    compile ~flush_rtes:true interlang
+    M.run
+      ~env:{Conf.kf; loc; adata_register = true; rtes = interlang.rtes}
+      ~state:Conf.{env; adata} @@
+    compile interlang
   in
   Options.debug ~dkey ~level:4
     "@[Cil output:@ @[%a@]@]" Printer.pp_exp cil;
