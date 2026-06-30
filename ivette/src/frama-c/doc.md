@@ -68,6 +68,26 @@ titlebar, allows filtering these properties according to many criteria.
 The number of displayed properties and the total number of properties
 are shown in the component titlebar.
 
+## Pivot Table {#framac-pivot-table}
+
+A Pivot Table provides customizable aggregate information about both syntactic
+and semantic elements, such as number of statements per function,
+or number of alarms per file.
+
+The table must be computed once by clicking the 'Compute' button. You can then
+use the [icon-tunings] button (_Select Preset_) in the top right to choose one
+of the available presets, or drag and drop the headings (rounded rectangles)
+to group either by row, or by column. Note that the order of selected headings
+affects the way they are grouped. You can reorder them via drag and drop.
+
+The 'down arrow' at the right of each heading allows to apply filters to that
+heading.
+
+The top left drop down component ('Table') allows adding heatmap colors to the
+pivot table cells. The drop down component below it ('Count') allows using
+different aggregation functions. The small arrows to its right allow sorting
+the table cells.
+
 ## Locations {#framac-locations}
 
 Some user actions may select several AST elements at once, for instance
