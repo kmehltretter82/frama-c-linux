@@ -73,7 +73,7 @@ struct
         type key = fieldinfo
         type data = Qed.Symbol.field
         let name = Printf.sprintf "CValues.%s.F" K.name
-        let compile _ = assert false
+        let compile _ = assert false (* done via set_field below *)
       end)
   let set_field fd fs = F.set fd fs ; FS.add revfs fs fd
   module C = WpContext.Generator(Cil_datatype.Compinfo)
