@@ -16,14 +16,6 @@ all: wp.pdf
 
 include ../MakeDoc
 
-IMAGES= \
-	wp-complete.png \
-	wp-gui-run.png \
-	wp-unknown.png \
-	wp-gui-main.png \
-	wp-invalid.png \
-	wp-valid.png \
-
 TEX= \
 	wp.tex \
 	wp_intro.tex \
@@ -69,7 +61,7 @@ clean::
 logs: $(LOGS)
 	rm -f $(LOGS) wp.pdf
 
-wp.pdf: $(FRAMAC_DOC) $(TEX) $(LOGS) $(IMAGES) $(EXAMPLES)
+wp.pdf: $(FRAMAC_DOC) $(TEX) $(LOGS) $(EXAMPLES)
 	latexmk -pdf wp
 
 INSTALL_TO=$(FRAMAC_TRUNK)/doc/manuals/wp-manual.pdf
