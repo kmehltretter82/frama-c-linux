@@ -12,7 +12,7 @@ using a parametrized memory model to represent pointers and heap
 values. The proof obligations may then be discharged by external
 automated theorem provers such as
 \textsf{Alt-Ergo}~\cite{AltErgo2006},
-\textsf{CVC4}~\cite{CVC4} and
+\textsf{CVC5}~\cite{CVC5} and
 \textsf{Z3}~\cite{Z3}
 or by interactive proof assistants
 like \textsf{Coq}~\cite{Coq84} and more generally, any automated or interactive
@@ -82,41 +82,46 @@ described in section~\ref{wp-cmdline}:
 
 \begin{figure}[p]
 \begin{center}
-\includegraphics[width=\textwidth]{wp-gui-main.png}
+\includegraphics[width=\textwidth]{frama-c-gui-base.png}
 \end{center}
-\caption{\textsf{WP} in the Frama-C GUI}
-\label{wp-gui-panel}
+\caption{The Frama-C GUI}
+\label{fig:gui}
 \end{figure}
 
 \begin{figure}[p]
 \begin{center}
-\includegraphics[width=\textwidth]{wp-gui-run.png}
+\includegraphics[width=\textwidth]{frama-c-gui-wp-start.png}
 \end{center}
-\caption{\textsf{WP} run from the GUI}
+\caption{Start \textsf{WP} from the GUI}
+\label{wp-gui-view}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[width=\textwidth]{frama-c-gui-wp-proof.png}
+\end{center}
+\caption{\textsf{WP} results and parameters}
 \label{wp-gui-run}
 \end{figure}
 
-As we can see in figure~\ref{wp-gui-panel}, the memory model, the
-decision procedure, and some \textsf{WP} options can be tuned from the
-\textsf{WP} side panel. Other options of the \textsf{WP} plug-in are still
-modifiable from the \texttt{Properties} button in the main GUI toolbar.
+The WP view can be selected from the ``View \& Components'' sidebar
+configuration (see ``WP view'' in figure~\ref{fig:gui}). The files and functions
+can be selected in the ``Files'' view.
 
-To prove a property, just select it in the internal source view and
-choose \textsf{WP} from the contextual menu. The \texttt{Console}
-window outputs some information about the
-computation. Figure~\ref{wp-gui-run} displays an example of such a
-session.
-
-If everything succeeds, a green bullet should appear on the left of
-the property. The computation can also be run for a bundle of
+From there, one can start the proof of a property. Just select it in the
+internal source view and choose \textsf{WP} from the contextual menu (see
+figure~\ref{wp-gui-view}). After execution of the proof (see~\ref{wp-gui-run}),
+the ``WP goals'' component contain the list of the goals that have been verified
+(or not),  together with information about the solvers that have been used,
+execution time, etc. The computation can also be run for a bundle of
 properties if the contextual menu is open from a function or behavior
 selection.
 
-The options from the \textsf{WP} side panel correspond to some options
-of the plug-in command-line. Please refer to section~\ref{wp-cmdline}
-for more details. In the graphical user interface, there are also
-specific panels that display more details related to the \textsf{WP} plug-in,
-that we shortly describe below.
+From the WP sidebar (see selector in figure~\ref{wp-gui-run}), one can finely
+tune WP parameters, typically, select provers, time limits, choose the runtime
+errors that should be detected, etc. Please refer to section~\ref{wp-cmdline}
+for more details. It can also be used to run proofs on all functions of the
+project. The help button gives access to the documentation integrated to the GUI.
 
 \paragraph{Source Panel.} On the center of the \textsf{Frama-C} window, the status
 of each code annotation is reported in the left margin. The meaning of
@@ -130,16 +135,17 @@ in the general user's manual of the platform. The status emitted by the \textsf{
     \loadicon{feedback/unknown.png} & The property has not been validated. \\
     \loadicon{feedback/valid_under_hyp.png} & The property is \emph{valid} but has dependencies. \\
     \loadicon{feedback/surely_valid.png} & The property and \emph{all} its dependencies are \emph{valid}. \\
+    \loadicon{feedback/doomed.png} & The property cannot be satisfied. \\
     \hline
   \end{tabular}
 \end{center}
 
 \paragraph{\textsf{WP} Goals Panel.}
 This panel is dedicated to the \textsf{WP} plug-in. It shows the
-generated proof obligations and their status for each prover.
-By clicking on a prover
-column, you can also submit a proof obligation to a prover by
-hand. Right-click provides more options depending on the prover.
+generated proof obligations and their status for each prover. By selecting a
+goal, one can see the dependencies of the property, double-clicking on a goal
+gives access to formula that corresponds to the goal.
+
 
 \paragraph{Interactive Proof Editor.}
 From the Goals Panel view, you can double-click on a row and open the \emph{interactive proof editor} panel as described in section~\ref{wp-proof-editor}.
@@ -215,23 +221,10 @@ Only applicable tactics are displayed, with respect to current term or clause se
 
 \subsection{Term Composer}
 
-Some tactic require one or several terms to be selected.
-In such case, the normal view display the selected term.
-It can be edited by buttons in the view, like a \texttt{RPN} calculator. More buttons appear with respect to already selected terms. Numerical constants can be composed, and combined with selected terms.
+Some tactics require one or several terms to be selected.
+This feature has been lost when migrating from the old GTK based GUI to the new GUI.
+If you are interested in funding this (last missing) feature of the old GUI, please contact us.
 
-Typically, the composer displays a stack of values, like for instance:
-\begin{ccode}
-  A: 45
-  B: a[0]@Pre (int)
-\end{ccode}
-
-In such a case, the user can select the value \texttt{45} with the \texttt{Select A} button, or add the two numbers with the \texttt{Add A+B} button.
-
-Sometimes, like for the Instance tactic, a \emph{range} of numerical values can be selected. In such a case, when two numbers are selected, a special button \texttt{Select A..B} appears.
-
-The list of all available composer buttons is displayed by the \texttt{Help} button.
-
-A composer worth to be mentioned is \texttt{Destruct}, typically available on complex expressions. It allows to decompose a value into its sub-components. For instance, destructuring the value \texttt{B} above will reveal the address \texttt{« a+0 »@Pre} and memory \texttt{µ:Mint@Pre}.
 
 \subsection{Proof Script}
 

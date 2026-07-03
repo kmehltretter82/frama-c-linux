@@ -69,8 +69,8 @@ _bisect
 /doc/*/*.out
 /doc/*/*.idx
 /doc/*/*.fls
-/doc/*/*.fdb_latexmk
-/doc/*/*.synctex.gz
+*.fdb_latexmk
+*.synctex.gz
 
 /doc/acsl/
 
