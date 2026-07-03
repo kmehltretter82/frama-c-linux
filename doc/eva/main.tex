@@ -3802,8 +3802,8 @@ especially for nested loops. This may cause the analyzer to use more time and
 memory.
 
 It is possible to control syntactic unrolling for each loop in the analyzed code
-with the annotation \lstinline|//@loop unfold n;|, placed before the loop.
-You may also specify \lstinline|//@loop unfold "completely", n;| for a loop
+with the annotation \lstinline|//@ loop unfold n;|, placed before the loop.
+You may also specify \lstinline|//@ loop unfold "completely", n;| for a loop
 that shall be completely unrolled after $n$ steps. Although, consider that
 a loop that executes $n$ times before exiting will need $n+1$ unrolling steps,
 since the $n+1$ iteration need to be executed for terminating the loop.
@@ -3833,7 +3833,7 @@ be reached, for a given variable modified inside a loop.
 \subsubsection{Widening hints}
 \label{subsub:widen-hints}
 
-The user may place an annotation \lstinline|//@ widen_hints $v$, $e_1,\ldots,e_m$ ;|
+The user may place an annotation \lstinline|//@  widen_hints $v$, $e_1,\ldots,e_m$ ;|
 to indicate the analyzer should use preferably the values $e_1,\ldots,e_m$
 when widening the sets of values attached to variable $v$.
 
@@ -3851,11 +3851,11 @@ Note that several hints can be added to a single statement, as follows:
 \end{listing-nonumber}
 
 The user may also annotate a loop with
-\lstinline|//@ loop widen_hints $v$, $e_1,\ldots,e_m$ ;|,
+\lstinline|//@  loop widen_hints $v$, $e_1,\ldots,e_m$ ;|,
 in which case $v$ may reference loop iteration variables.
 
 Adding a \lstinline|global| label before the variable name, as in
-\lstinline|//@ loop widen_hints global:n, $e_1,\ldots,e_m$ ;|,
+\lstinline|//@  loop widen_hints global:n, $e_1,\ldots,e_m$ ;|,
 makes the annotation affect all loops in all functions, including
 those from other compilation units. It is useful for referencing variables
 in inner loops whose outer loop is defined in another file.
@@ -3958,7 +3958,8 @@ a function, and can only be extended past the function return if there is enough
 \lstinline|slevel| in the calling function.
 
 
-\subsection{Automatic partitioning on conditional structures}
+\subsection{Partitioning on conditional structures}
+\label{partitioning-conditional-structures}
 
 It sometimes happens that the cases we want to reason on are exactly the
 cases distinguished in the program by an \lstinline|if-then-else| statement or a
@@ -3984,10 +3985,16 @@ analysis time for each increment of its parameter $n$.
 The cost can even be higher on \lstinline|switch| statements.
 However, it can remove false alarms in a fully automatic way. Thus,
 the trade off might often be worth trying.
-
 In practice, \lstinline|-eva-partition-history 1| seems to be sufficient in
 most cases, and a greater value is rarely needed.
 
+Locally, annotation \lstinline|//@  split \cases;| can be used to separate the
+analysis for each branch of the next \lstinline|if-then-else| or
+\lstinline|switch| statement, even after their blocks are closed.
+By default, such case-base reasoning are maintained until the end of the current
+function, or indefinitely with \lstinline|-eva-interprocedural-splits|.
+To avoid slowing down the analysis, one may also cancel any active
+\lstinline|split \cases| with the symmetric annotation \lstinline|merge \cases|.
 
 \subsection{Value partitioning}
 \label{value-partitioning}
@@ -4035,11 +4042,11 @@ user to mitigate the cost of \lstinline|split| annotations.
 
 Two kinds of value partitioning are available:
 \begin{description}
-\item[Static split] with annotation \lstinline|//@ split e;| \\
+\item[Static split] with annotation \lstinline|//@  split e;| \\
   The partitioning is done once at the annotation point: Eva enumerates all
   possible values of the given expression, and continues the analysis separately
   for each of these values, until a merge annotation is encountered.
-\item[Dynamic split] with annotation \lstinline|//@ dynamic_split e;| \\
+\item[Dynamic split] with annotation \lstinline|//@  dynamic_split e;| \\
   The partitioning is maintained at each program point according to the current
   value of the given expression \lstinline|e|. At each assignment of a variable
   on which \lstinline|e| depends, the partitioning is updated to ensure that the
@@ -4688,7 +4695,7 @@ sensitive sources---such as external inputs or secrets---propagate through the
 program and potentially influence its execution.
 
 The initial taint must be specified by the user with \acsl{} annotations
-\lstinline|//@ taint <lvalues>;| on a statement, or a clause
+\lstinline|//@  taint <lvalues>;| on a statement, or a clause
 \lstinline|taints <lvalues>;| in a function contract.
 
 These directives are hypotheses of the taint analysis, and thus have no logical
@@ -5601,41 +5608,51 @@ explains in more details their effect on the analysis.
 \subsection{Directives guiding trace partitioning}
 
 \begin{center}
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}m{6cm}>{\raggedright}m{8cm}c}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}m{5cm}>{\raggedright}m{9cm}c}
     Syntax & Description & Ref
   \tabularnewline
   \midrule
   \midrule
-    \texttt{//@ loop unroll <N>;}
+    \lstinline|//@  loop unroll <N>;|
   & Loop unrolling: analyze separately each of the \texttt{<N>} first
     iterations of the given loop.
   & \ref{loop-unroll}
   \tabularnewline
   \midrule
-    \texttt{//@ split <e>;}~\\
-    \texttt{//@ dynamic\_split <e>;}
+    \lstinline|//@  split <e>;|~\\
+    \lstinline|//@  dynamic_split <e>;|
   & Case-based reasoning: separate the analysis for each possible value of expression \texttt{<e>}.
   & \multirow{2}{*}{\ref{value-partitioning}}
   \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ merge <e>;}
+    \lstinline|//@  merge <e>;|
   & Cancel previous splits on expression \texttt{<e>}.
   & \tabularnewline
   \midrule
-    \texttt{//@ slevel <N>;}
+    \lstinline|//@  split \cases;|
+  & Case-based reasoning: separate the analysis for each branch of the next
+    \lstinline|if-then-else| or \lstinline|switch| statement.
+  & \multirow{2}{*}{\ref{partitioning-conditional-structures}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \lstinline{//@  merge \cases;}
+  & Cancel any active \lstinline|split \cases|.
+  & \tabularnewline
+  \midrule
+    \lstinline|//@  slevel <N>;|
   & Locally set the value of \texttt{-eva-slevel} to \texttt{<N>}.
   & \multirow{4}{*}{\ref{slevel}}
   \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel full;}
+    \lstinline|//@  slevel full;|
   & Locally remove the limit of \texttt{-eva-slevel}.
   & \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel default;}
+    \lstinline|//@  slevel default;|
   & Reset \texttt{-eva-slevel} to its default value.
   & \tabularnewline
   \cmidrule{1-2} \cmidrule{2-2}
-    \texttt{//@ slevel merge;}
+    \lstinline|//@  slevel merge;|
   & Merge all states kept separate by \texttt{-eva-slevel}.
   & \tabularnewline
   \bottomrule
