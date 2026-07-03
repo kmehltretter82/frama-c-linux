@@ -1978,9 +1978,10 @@ and \lstinline|int *| are \emph{not} compatible).
 
 This section categorizes the non-alarms related messages displayed by \Eva{}
 in \lstinline|frama-c|, the batch version of the analyzer.
-When using \lstinline|frama-c-gui| (the graphical interface), the messages
-are directed to different panels in the bottom right of the main window
-for easier access.
+When using \lstinline|frama-c-gui| (the graphical interface), all
+messages are shown in the dedicated \emph{Messages} component.
+Section \ref{verbosity} explains how to configure \Eva{} verbosity to hide or
+show such messages.
 
 \subsection{Results}
 
@@ -3074,23 +3075,38 @@ frama-c-gui -load result.sav
   parsing, the latter to be given after loading it.
 \end{important}
 
-\subsection{Controlling  the output}
+\subsection{Controlling the verbosity}
+\label{verbosity}
 
-By default, \Eva{} emits all the alarms it finds (section
-\ref{obligations}) as both ACSL assertions and textual messages in the
-log. For big analyses, the log can become quite large. Since ACSL
-assertions are stored by the Frama-C kernel, and can be output using
-plugins such as Report, the textual output is partly redundant. Warning
-category\footnote{See Frama-C User Manual~\cite{FCUserMan}.}
+The \texttt{-eva-verbose} parameter controls the verbosity of the analysis,
+from 0 (no message is printed) to 11 (all possible messages are printed).
+The default verbosity is 5, which is best suited for understanding the analysis
+results on small examples, but is usually too verbose on larger case studies.
+
+Most \Eva{} messages are associated with a message category (or message key),
+which appears as prefix of the message. For instance, the analysis summary
+starts with \texttt{[eva:summary]}, as it is emitted by \Eva{} with the
+\texttt{summary} category.
+\texttt{-eva-verbose N} automatically sets up message categories according to
+the specified level \texttt{N}. The \texttt{-eva-msg-key} parameter can also be
+used to enable or disable some message categories, and takes precedence over
+\texttt{-eva-verbose}, allowing for a finer verbosity configuration.
+See \texttt{-eva-msg-key help} for details on \Eva{} message categories,
+and the Frama-C User Manual for explanations on message categories in general.
+
+Finally, \texttt{-eva-verbose} only affects result and feedback messages, but
+not warnings or errors.
+
+In particular, \Eva{} emits all the alarms it finds (see section
+\ref{obligations}) as both ACSL assertions and textual warnings in the
+log. Since ACSL assertions are stored by the Frama-C kernel, and can be
+reviewed in the graphical interface or output by plugins such as Report,
+the textual warnings are partly redundant.
+Warning category\footnote{See Frama-C User Manual~\cite{FCUserMan}.}
 \texttt{alarm} allows to manage how these alarms are reported on the
 textual output. In particular, \texttt{-eva-warn-key alarm=inactive} will
 completely disable their output, and \texttt{-eva-warn-key alarm=feedback}
-will convert them into normal messages instead of warnings
-(equivalent to deprecated option
-\texttt{-eva-no-warn-on-alarms}\footnote{Note that the use of
-  \texttt{-eva-no-warn-on-alarms -eva-msg-key=-alarm} for completely
-  deactivating the output will not work anymore, as \texttt{alarm} is not a
-  debug category anymore.}).
+will convert them into normal messages instead of warnings.
 
 \section{Describing the analysis context}
 \label{context}
