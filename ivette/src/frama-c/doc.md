@@ -1,5 +1,22 @@
 # Frama-C {#framac}
 
+## Files sidebar {#framac-files-sidebar}
+
+The [icon-FOLDER] sidebar allows you to view and navigate between the types,
+functions, global variables and annotations of the analyzed program.
+
+At the top of the sidebar, several buttons configure its behavior:
+- [icon-ITEMS.LIST] shows types/functions/variables/annotations as simple lists.
+- [icon-TREE] shows types/functions/variables/annotations in a file tree.
+- [icon-T] shows or hides types.
+- [icon-F] shows or hides functions.
+- [icon-V] shows or hides global variables.
+- [icon-A] shows or hides global annotations.
+- [icon-FILTER] buttons allow you to filter functions, variables and annotations
+  according to various criteria.
+
+Finally, a text field allows you to perform a search in the displayed elements.
+
 ## AST {#framac-ast}
 
 This component displays the source code as normalized by Frama-C, on which

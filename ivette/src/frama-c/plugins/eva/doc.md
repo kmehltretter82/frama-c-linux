@@ -16,38 +16,46 @@ The _Eva Summary_ default view shows general information about an Eva analysis
 through the components [Summary](#eva-summary), [Coverage](#eva-coverage)
 and [Flamegraph](#eva-flamegraph).
 
-The [icon-apple] Eva sidebar allows the user to change some parameters
+A complete documentation for the Eva plug-in can be found online:
+[https://frama-c.com/download/frama-c-eva-manual.pdf](https://frama-c.com/download/frama-c-eva-manual.pdf)
+
+## Eva Sidebar {#eva-sidebars}
+
+The [icon-apple] sidebar allows the user to change some parameters
 and run the analysis. However, for large code bases, it is recommended to run the
 Eva analysis using the command line, saving the result via the -save parameter,
 and then loading the resulting file in the graphical interface.
 
-Finally, The [icon-applemore] sidebar allows you to filter the data displayed in the
-interface by taint and callstack.
+The [icon-applemore] sidebar allows you to select some taints or callstacks to
+filter all Eva results displayed in the graphical interface.
 
-* Taints: If the `taints` domain is enabled, the sidebar will display a list
-  of taints. If nothing is checked, all taints will be visible, otherwise,
-  the data displayed in the interface will be filtered
-  according to the selection.
+* Taints: if the `taint` domain is enabled, the sidebar displays a list
+  of taints. If nothing is checked, all taints are visible. Otherwise,
+  only the selected taints are visible in the various components that show
+  them (AST, Inspector, properties…).
 
-* Callstacks: Here you can view all the callstacks in a tree structure.
-  The [icon-filter] icon allows you to filter them.
-  For each visible callstack, you can also see its parents and its
-  direct children. You can select one or more callstacks, which will filter
-  the data displayed on the interface according to your selection. If nothing
-  is checked, no data will be filtered.
-  The [icon-tunings] icon allows you to select all.
+* Callstacks: this sidebar lists analyzed callstacks in a tree structure.
+  By default, only the callstacks related to the currently selected function
+  are shown.
 
-A complete documentation for the Eva plug-in can be found online:
-[https://frama-c.com/download/frama-c-eva-manual.pdf](https://frama-c.com/download/frama-c-eva-manual.pdf)
+  By default, no callstack is selected, and all Eva results are shown.
+  You can select one or more callstacks, which filters all Eva results displayed
+  in the interface according to your selection — as if only these callstacks
+  have been reached by the analysis. For instance, statements unreached in these
+  selected callstacks are shown as dead code, and values are only shown for
+  these callstacks in the [Values](#eva-values) table.
+
+  When callstacks are selected, a remainder is shown in the [icon-pin] toolbar
+  button, at the top right of the interface.
+  In the sidebar, the [icon-tunings] icon allows you to reset the selection and
+  show all results, as is the case by default.
+
+  The [icon-filter] button allows you to show only selected callstacks, or to
+  show all analyzed callstacks (but beware that this can be very slow on
+  large code bases).
+
 
 ## Status of the analysis {#eva-status}
-
-If a component or action requires an Eva analysis, you will be notified
-either directly within the component or via a modal window, and you will
-be able to run the analysis. In the case of a modal window, if you wait
-for the analysis to complete, the requested action will be carried out and
-the modal window will close. If you close the modal window, the analysis
-will continue but the action will be cancelled.
 
 All components related to the Eva plug-in show the analysis status in their
 titlebar:
@@ -59,6 +67,15 @@ titlebar:
   or a user interruption: components are active but results are incomplete.
 - [icon-check]: the analysis was successfully completed:
   all features related to Eva are enabled.
+
+If a component or action requires an Eva analysis, you will be notified
+either directly within the component or via a modal window, and you will
+be able to run the analysis. In the case of a modal window, if you wait
+for the analysis to complete, the requested action will be carried out and
+the modal window will close. If you close the modal window, the analysis
+will continue but the action will be cancelled.
+
+You can always stop an ongoing analysis via the [icon-apple] [Eva sidebar](#eva-sidebars).
 
 ## List of alarms emitted by Eva {#eva-alarms}
 
@@ -112,7 +129,7 @@ One can also evaluate an arbitrary expression:
 - first right-click on a statement (or any expression within a statement)
   in the AST component. This will be the program point where the evaluation
   takes place.
-- then click on _...evaluate_.
+- then select _Evaluate..._.
 - write the desired C expression or ACSL term in the text field
   and press _Enter_ or click on _Evaluate_.
 
@@ -173,9 +190,9 @@ lvalue, according to the Eva analysis.
 
 Studia can also be used on arbitrary lvalues:
 - right-click on a statement in the AST component;
-- click on _...studia_;
+- click on _Studia..._;
 - choose _Reads of_ or _Writes to_;
-- enter the desired C lvalues in the text field and press _Enter_
+- enter the desired C lvalues in the text field and press _Enter_,
   or click on _Search_;
 
 The memory location of the lvalue is evaluated at the selected statement:

@@ -31,34 +31,35 @@ Each registered Frama-C plug-in might extend the GUI with additional views,
 laboratory components, sidebar panels, status bar items and menus. Consult
 the associated documentation chapters for more details.
 
-## The Sidebar {#ivette-sidebar}
+## Sidebars {#ivette-sidebar}
 
 Each sidebar can be accessed via its dedicated icon in the leftmost column
-of the interface. The sidebar can be collapsed using the [icon-angle.left]
-button at the bottom of this column or via the shortcut Ctrl+B.
+of the interface. The active sidebar can be collapsed or expanded by clicking
+on its icon, by using the [icon-angle.left] or [icon-angle.right] button at the
+bottom of this column, or via the shortcut Ctrl+B.
 
-Sidebars:
+Available sidebars are:
 
-* The [icon-display] is specifically dedicated to the graphical interface.
-  This sidebar provides access to _all_ the components and
-  views you have saved that can be used in the graphical interface.
+* The [icon-display] sidebar allows you to customize different views
+  of the graphical interface.
+  It provides access to _all_ the components and preset views that you can
+  use in this interface.
 
-* The [icon-DUPLICATE] sidebar allows you to view types, variables,
-  functions and axiomatic definitions.
+* The [icon-DUPLICATE] sidebar allows you to view and navigate between the types,
+  global variables, functions and axiomatic definitions of the analyzed program.
 
-* The [icon-FOLDER] sidebar does the same as the previous sidebar but adds
-  the option to view the file tree.
-  You can filter by type, function, variable and annotation using the
-  buttons at the top. There is also a text field for performing a text search.
+* The [icon-FOLDER] [Files sidebar](#framac-files-sidebar) does the same as the
+  previous one, but provides more features.
 
-* The [icon-PROJECT] sidebar enables you to manage projects.
+* The [icon-PROJECT] sidebar enables you to manage Frama-C projects.
+
+* The [icon-apple] [Eva configuration sidebar](#eva-sidebars)  allows you to
+  quickly change some settings and run an Eva analysis.
+
+* The [icon-applemore] [Eva results sidebar](#eva-sidebars) allows you to select
+  some taint or callstack to filter all Eva results accordingly.
 
 * The [icon-wp] sidebar allows you to change WP settings.
-
-* The [icon-apple] [Eva sidebar](#eva) allows you to change Eva settings.
-
-* The [icon-applemore] [EvaMore sidebar](#eva)  allows you to filter the data displayed in the
-  interface by taint and callstack.
 
 ## The Laboratory {#ivette-laboratory}
 
