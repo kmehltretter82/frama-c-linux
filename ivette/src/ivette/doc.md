@@ -33,11 +33,11 @@ the associated documentation chapters for more details.
 
 ## The Sidebar {#ivette-sidebar}
 
-Each sidebar can be accessed via its dedicated icon in the left-handmost column
+Each sidebar can be accessed via its dedicated icon in the leftmost column
 of the interface. The sidebar can be collapsed using the [icon-angle.left]
 button at the bottom of this column or via the shortcut Ctrl+B.
 
-Sidebars :
+Sidebars:
 
 * The [icon-display] is specifically dedicated to the graphical interface.
   This sidebar provides access to _all_ the components and

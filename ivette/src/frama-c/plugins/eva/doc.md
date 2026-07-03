@@ -109,7 +109,7 @@ Using "Alt+Click" to select an expression in the AST component creates an
 already pinned column.
 
 One can also evaluate an arbitrary expression:
-- first right-click on an statement (or any expression within a statement)
+- first right-click on a statement (or any expression within a statement)
   in the AST component. This will be the program point where the evaluation
   takes place.
 - then click on _...evaluate_.
@@ -172,7 +172,7 @@ This component lists all statements which may read or write the selected
 lvalue, according to the Eva analysis.
 
 Studia can also be used on arbitrary lvalues:
-- right-click on an statement in the AST component;
+- right-click on a statement in the AST component;
 - click on _...studia_;
 - choose _Reads of_ or _Writes to_;
 - enter the desired C lvalues in the text field and press _Enter_
