@@ -103,11 +103,11 @@ let analyse_global_var v initinfo st =
     Printer.pp_initinfo initinfo;
   let result = do_init (Var v, NoOffset) initinfo.init st in
   Options.feedback ~level:3
-    "@[May-aliases after global variable definition@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
+    "@[May-aliases after global variable definition@ @[%a@]@ are@ @[%a@]@]"
     Printer.pp_varinfo v
     (pp_abstract_state_opt ~debug:false) result;
   Options.debug ~level:3
-    "@[May-alias graph after global variable definition@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
+    "@[May-alias graph after global variable definition@ @[%a@]@ is@ @[%a@]@]"
     Printer.pp_varinfo v
     (pp_abstract_state_opt ~debug:true) result;
   result
@@ -183,9 +183,9 @@ let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_stat
 let do_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "@[analysing instruction:@ %a@]" Printer.pp_stmt s;
   let result = analyse_instr s i a in
-  Options.feedback ~level:3 "@[May-aliases after instruction@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
+  Options.feedback ~level:3 "@[May-aliases after instruction@ @[%a@]@ are@ @[%a@]@]"
     Printer.pp_stmt s (pp_abstract_state_opt ~debug:false) result;
-  Options.debug ~level:3 "@[May-alias graph after instruction@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
+  Options.debug ~level:3 "@[May-alias graph after instruction@ @[%a@]@ is@ @[%a@]@]"
     Printer.pp_stmt s (pp_abstract_state_opt ~debug:true) result;
   result
 
@@ -264,7 +264,7 @@ let analyse_function (kf:kernel_function) =
       Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
         Kernel_function.pretty kf
         (Abstract_state.pretty ~debug:false) s;
-      Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
+      Options.debug ~level "May-alias graph at the end of function %a:@ @[%a@]"
         Kernel_function.pretty kf
         (Abstract_state.pretty ~debug:true)s;
     );
