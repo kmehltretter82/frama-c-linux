@@ -14,6 +14,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
+import { PinnedMessages } from 'dome/frame/toolbars';
 import { GlobalDeclarations, GlobalByFiles } from 'frama-c/kernel/Globals';
 import { Projects } from  'frama-c/kernel/Projects';
 import ASTview from 'frama-c/kernel/ASTview';
@@ -23,7 +24,6 @@ import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
 import { RecordingLogs, ServerLogs } from 'frama-c/kernel/ServerLogs';
-import { ButtonOptions } from 'frama-c/options';
 
 import 'frama-c/kernel/style.css';
 
@@ -60,13 +60,13 @@ Ivette.registerSidebar({
 });
 
 Ivette.registerToolbar({
-  id: 'ivette.parameters',
-  children: <ButtonOptions />
+  id: 'ivette.history',
+  children: <History />
 });
 
 Ivette.registerToolbar({
-  id: 'ivette.history',
-  children: <History />
+  id: 'ivette.pinned-messages',
+  children: <PinnedMessages />
 });
 
 Ivette.registerStatusbar({

@@ -811,6 +811,16 @@
 /* --- Pinned  icon                                                       --- */
 /* -------------------------------------------------------------------------- */
 
+.dome-xToolBar-control.dome-xIcon-pinned-messages {
+  background-color: var(--selected-button-img);
+  background-image: none;
+}
+
+.dome-xToolBar-control.dome-xIcon-pinned-messages:hover:not(:disabled) {
+  background-color: var(--selected-button-hover);
+  background-image: none;
+}
+
 .dome-xIcon-pinned-content {
   padding: 5px 10px;
   display: flex;

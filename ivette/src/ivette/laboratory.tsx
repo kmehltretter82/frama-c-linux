@@ -14,6 +14,7 @@ import * as States from 'dome/data/states';
 import * as Settings from 'dome/data/settings';
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Toolbar from 'dome/frame/toolbars';
+import * as DnD from 'dome/dnd';
 import { Icon } from 'dome/controls/icons';
 import { IconButton } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
@@ -341,6 +342,24 @@ function changeTabIndex(
   return newTabs;
 }
 
+function changeTabOrder(
+  tabs: Map<tabKey, TabViewState>,
+  keys: tabKey[],
+): Map<tabKey, TabViewState> {
+  // Build a new map as Map insertion order is the persisted tab order.
+  const newTabs = new Map<tabKey, TabViewState>();
+  // First insert tabs in the exact order reported by the DnD list.
+  keys.forEach((key) => {
+    const tab = tabs.get(key);
+    if (tab) newTabs.set(key, tab);
+  });
+  // Append tabs missing from the DnD order as a defensive fallback.
+  tabs.forEach((tab, key) => {
+    if (!newTabs.has(key)) newTabs.set(key, tab);
+  });
+  return newTabs;
+}
+
 function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number {
   let custom = 0;
   tabs.forEach(tab => {
@@ -458,9 +477,13 @@ function applyTab(key: tabKey): void {
 
 function closeTab(key: tabKey): void {
   const state = LAB.getValue();
-  const tab = previousTab(state.tabs, key);
   const tabs = copyMap(state.tabs);
   tabs.delete(key);
+  if (key !== state.tabKey) {
+    LAB.setValue({ ...state, tabs });
+    return;
+  }
+  const tab = previousTab(state.tabs, key);
   if (tab === undefined) {
     LAB.setValue({
       ...state,
@@ -494,6 +517,16 @@ function restoreDefault(key: tabKey): void {
   } else {
     LAB.setValue({ ...state, tabs });
   }
+}
+
+function reorderTabs(keys: tabKey[]): void {
+  const state = LAB.getValue();
+  // The current map insertion order is the current tab order.
+  const current = Array.from(state.tabs.keys());
+  // Avoid forcing a state update on same order.
+  if (equal(current, keys)) return;
+  const tabs = changeTabOrder(state.tabs, keys);
+  LAB.setValue({ ...state, tabs }, true);
 }
 
 function applyView(view: Ivette.ViewLayoutProps): void {
@@ -682,7 +715,7 @@ Settings.onWindowSettings(() => {
         if (updateDock(newDock, dock)) modified = true;
       });
       if (modified) LAB.setValue({ ...state, tabs: newTabs, docked: newDock });
-      if (!state.tabKey) updateIndex( settings );
+      if (!state.tabKey) updateIndex(settings);
     } finally {
       synchronize = true;
     }
@@ -1245,21 +1278,21 @@ function ViewBar(): JSX.Element {
   const allGroups = groups.concat(Sandbox);
 
   return (<>
-      <Sidebars.SidebarTitle label='Views & Components' />
-      <div className="globals-scrollable-area">
-        <ViewSection key='views' />
-        {groups.map((group) =>
-          <GroupSection
-            key={group.id}
-            filter={inGroup(group)} {...group} />)}
+    <Sidebars.SidebarTitle label='Views & Components' />
+    <div className="globals-scrollable-area">
+      <ViewSection key='views' />
+      {groups.map((group) =>
         <GroupSection
-          key='components'
-          filter={inNoGroup(allGroups)} {...Components} />
-        <GroupSection
-          key='sandbox'
-          filter={inGroup(Sandbox)} {...Sandbox} />
-      </div>
-    </>
+          key={group.id}
+          filter={inGroup(group)} {...group} />)}
+      <GroupSection
+        key='components'
+        filter={inNoGroup(allGroups)} {...Components} />
+      <GroupSection
+        key='sandbox'
+        filter={inGroup(Sandbox)} {...Sandbox} />
+    </div>
+  </>
   );
 }
 
@@ -1407,17 +1440,190 @@ function TabView(props: TabViewProps): JSX.Element | null {
 export function Tabs(): JSX.Element {
   const [{ tabKey, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
-  const items: JSX.Element[] = [];
+  // Shared ordered key list for rendering, resize updates, and DnD control.
+  const tabKeys = React.useMemo(() => Array.from(tabs.keys()), [tabs]);
+
+  // Holds the DOM node whose scrollLeft position is controlled by scroll
+  // buttons.
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  // Holds the DOM node whose width grows with the rendered tab buttons.
+  const tabsRowRef = React.useRef<HTMLDivElement>(null);
+  // Holds the rendered DOM node for each tab, indexed by tab key.
+  const tabRefs = React.useRef(new Map<tabKey, HTMLDivElement>());
+  // Tracks whether the tab row overflows the whole available tab-strip width.
+  const [hasScrollButtons, setHasScrollButtons] = React.useState(false);
+  // Tracks whether the viewport has hidden tab content on its left side.
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  // Tracks whether the viewport has hidden tab content on its right side.
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
+
+  // Register and unregister tab DOM nodes during mounts or unmounts.
+  const setTabRef = React.useCallback(
+    (key: tabKey) => (node: HTMLDivElement | null): void => {
+      if (node) tabRefs.current.set(key, node);
+      else tabRefs.current.delete(key);
+    },
+    [],
+  );
+
+  // Decide whether scroll controls are needed, then keep each control enabled
+  // only when hidden tabs exist in that direction.
+  const updateScrollButtons = React.useCallback((): void => {
+    const viewport = viewportRef.current;
+    const tabsRow = tabsRowRef.current;
+    if (!viewport) return;
+    // Use the full tab-strip width as scroll buttons are absent when this test
+    // decides whether they are needed; use viewport width as fallback.
+    const tabsWidth =
+      viewport.parentElement?.clientWidth ?? viewport.clientWidth;
+    // tabsRow carries the real tab-content width; use viewport scroll width as
+    // fallback.
+    const contentWidth = tabsRow?.scrollWidth ?? viewport.scrollWidth;
+    // The tolerance avoids button flickering on subpixel layout differences.
+    const needButtons = contentWidth > tabsWidth + 1;
+    setHasScrollButtons(needButtons);
+    setCanScrollLeft(needButtons && viewport.scrollLeft > 0);
+    // Maximum useful horizontal scroll distance for the current content width.
+    const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    setCanScrollRight(needButtons && viewport.scrollLeft < max - 1);
+  }, []);
+
+  // Scroll by a viewport-relative distance so the control feels consistent
+  // across narrow and wide toolbar layouts.
+  const scrollTabs = React.useCallback((direction: 'left' | 'right'): void => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const sign = direction === 'left' ? -1 : 1;
+    // Move by 60% of the visible area, but keep a useful minimum step.
+    const distance = Math.max(120, Math.floor(viewport.clientWidth * 0.6));
+    // Negative distances scroll left; positive distances scroll right.
+    viewport.scrollBy({ left: sign * distance, behavior: 'smooth' });
+  }, []);
+
+  // Translate wheel gestures into horizontal tab scrolling. Negative deltas
+  // move left, positive deltas move right; consume the event only while the
+  // tab strip can still move in that direction.
+  const wheelTabs = React.useCallback(
+    (event: React.WheelEvent<HTMLDivElement>): void => {
+      const viewport = viewportRef.current;
+      if (!hasScrollButtons || !viewport) return;
+      // Trackpads often send horizontal deltas, while mouse wheels mostly send
+      // vertical deltas. Use whichever axis carries the user's intent.
+      const delta =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+      // Let the page keep receiving wheel events when the tab strip is already
+      // at the requested edge.
+      const canScroll = delta < 0 ? canScrollLeft : canScrollRight;
+      if (!delta || !canScroll) return;
+      // Consume the event only when it actually scrolls the tab strip;
+      // otherwise it can bubble into surrounding scrollable UI.
+      event.preventDefault();
+      viewport.scrollLeft += delta;
+      updateScrollButtons();
+    },
+    [canScrollLeft, canScrollRight, hasScrollButtons, updateScrollButtons],
+  );
+
+  // Recompute arrow states when either the available viewport size or the tab
+  // content width changes.
+  React.useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    // Initialize button states immediately after the DOM nodes are available.
+    updateScrollButtons();
+    // Window resizing changes how many tabs fit in the viewport.
+    window.addEventListener('resize', updateScrollButtons);
+    // ResizeObserver catches layout and tab-content changes without polling.
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateScrollButtons)
+        : undefined;
+    // Observe viewport size changes.
+    observer?.observe(viewport);
+    const tabsRow = tabsRowRef.current;
+    // Observe tabsrow width changes, such as opening or closing tabs.
+    if (tabsRow) observer?.observe(tabsRow);
+
+    return () => {
+      window.removeEventListener("resize", updateScrollButtons);
+      observer?.disconnect();
+    };
+  }, [tabKeys, updateScrollButtons]);
+
+  // When selection changes, reveal the selected tab if it is clipped by the
+  // horizontal viewport.
+  React.useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const selected = tabRefs.current.get(tabKey);
+    if (!viewport || !selected) return;
+    const viewportRect = viewport.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    // Keep a small visual gap between the selected tab and scroll controls.
+    const margin = 4;
+    if (selectedRect.left < viewportRect.left + margin) {
+      // Selected tab is clipped on the left; move the viewport leftward.
+      viewport.scrollLeft -= viewportRect.left + margin - selectedRect.left;
+      updateScrollButtons();
+    } else if (selectedRect.right > viewportRect.right - margin) {
+      // Selected tab is clipped on the right; move the viewport rightward.
+      viewport.scrollLeft += selectedRect.right - viewportRect.right + margin;
+      updateScrollButtons();
+    }
+  }, [tabKey, tabKeys, updateScrollButtons]);
+
+  const dndTabViews: JSX.Element[] = [];
   tabs.forEach((tab: TabViewState) =>
-    items.push(
-      <TabView
-        key={tab.key}
-        tab={tab}
-        tabKey={tabKey}
-        layout={layout}
-      />
+    dndTabViews.push(
+      <DnD.Item key={tab.key} id={tab.key} className="labview-tab-item">
+        <div ref={setTabRef(tab.key)} className="labview-tab-anchor">
+          <TabView
+            tab={tab}
+            tabKey={tabKey}
+            layout={layout}
+          />
+        </div>
+      </DnD.Item>
     ));
-  return <>{items}</>;
+
+  return (
+    <div className="labview-tabs">
+      {hasScrollButtons &&
+        <IconButton
+          className="labview-tab-scroll"
+          icon="ANGLE.LEFT"
+          title="Scroll tabs left"
+          disabled={!canScrollLeft}
+          onClick={() => scrollTabs('left')}
+        />}
+      <div
+        // The clipped element that actually scrolls horizontally.
+        ref={viewportRef}
+        className={classes(
+          "labview-tabs-viewport",
+          canScrollLeft && "labview-tabs-viewport-scroll-left",
+          canScrollRight && "labview-tabs-viewport-scroll-right",
+        )}
+        onScroll={updateScrollButtons}
+        onWheel={wheelTabs}
+      >
+        <div ref={tabsRowRef} className="labview-tabs-content">
+          <DnD.List items={tabKeys} setItems={reorderTabs}>
+            {dndTabViews}
+          </DnD.List>
+        </div>
+      </div>
+      {hasScrollButtons &&
+        <IconButton
+          className="labview-tab-scroll"
+          icon="ANGLE.RIGHT"
+          title="Scroll tabs right"
+          disabled={!canScrollRight}
+          onClick={() => scrollTabs('right')}
+        />}
+    </div>
+  );
 }
 
 export function switchToView(id: string): void {
