@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-  E-ACSL     [2026-07-15] Rename flag -e-acsl-valid to -e-acsl-O-valid
 -* E-ACSL     [2026-06-30] Fix the lack of 'pointer alignment' RTE guard when
                            aliasing is possible
 -* E-ACSL     [2026-06-22] Hide developers-only command-line flags:

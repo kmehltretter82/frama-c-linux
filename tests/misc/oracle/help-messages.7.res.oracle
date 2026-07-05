@@ -46,8 +46,6 @@ Options taking a string as argument should preferably be written
                     Frama-C)
 -e-acsl-temporal-validity  enable temporal analysis in valid annotations
                     (opposite option is -e-acsl-no-temporal-validity)
--e-acsl-valid       translate annotation which have been proven valid
-                    (opposite option is -e-acsl-no-valid)
 -e-acsl-validate-format-strings  enable runtime validation of stdio.h format
                     functions (opposite option is
                     -e-acsl-no-validate-format-strings)
@@ -76,6 +74,7 @@ Options taking a string as argument should preferably be written
 -e-acsl-O-no-rte    opposite of -e-acsl-O-rte
 -e-acsl-O-no-smart-il  opposite of -e-acsl-O-smart-il
 -e-acsl-O-no-trivial-rte  opposite of -e-acsl-O-trivial-rte (set by default)
+-e-acsl-O-no-valid  opposite of -e-acsl-O-valid (set by default)
 -e-acsl-O-rte       (O ≤ 2) generate RTE guards for specifications (set by
                     default, opposite option is -e-acsl-O-no-rte)
 -e-acsl-O-smart-il  (O ≥ 1) optimises expressions using smart constructors
@@ -83,6 +82,8 @@ Options taking a string as argument should preferably be written
                     -e-acsl-O-no-smart-il)
 -e-acsl-O-trivial-rte  (O = 0) generate trivial RTE guards (opposite option
                     is -e-acsl-O-no-trivial-rte)
+-e-acsl-O-valid     (O = 0) verify annotations which have been proven valid
+                    (opposite option is -e-acsl-O-no-valid)
 
 *** OUTPUT MESSAGES
 

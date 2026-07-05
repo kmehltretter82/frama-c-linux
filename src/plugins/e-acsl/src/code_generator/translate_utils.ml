@@ -48,7 +48,7 @@ let predicate_to_exp ~adata ?name kf ?rte env p =
 (**************************************************************************)
 
 let must_translate ppt =
-  Options.Valid.get ()
+  Options.Optimisations.Verify_valid.get ()
   || match Property_status.get ppt with
   | Never_tried
   | Inconsistent _

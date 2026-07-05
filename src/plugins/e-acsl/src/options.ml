@@ -39,13 +39,6 @@ module Project_name =
       let arg_name = "prj"
     end)
 
-module Valid =
-  False
-    (struct
-      let option_name = "-e-acsl-valid"
-      let help = "translate annotation which have been proven valid"
-    end)
-
 module Gmp_only =
   False
     (struct
@@ -218,6 +211,14 @@ module Optimisations = struct
       let level = Geq 1
       let descr = "optimises expressions using smart constructors"
     end)
+
+  module Verify_valid =
+    Make (struct
+      let name = "valid"
+      let level = Eq 0
+      let descr = "verify annotations which have been proven valid"
+    end)
+
 end
 
 
@@ -267,7 +268,7 @@ module Widening_output =
     end)
 
 let parameter_states =
-  [ Valid.self;
+  [ Optimisations.Verify_valid.self;
     Gmp_only.self;
     Full_mtracking.self;
     Builtins.self;
@@ -289,7 +290,7 @@ let emitter =
                    Validate_format_strings.parameter;
                    Temporal_validity.parameter ]
     ~tuning:[ Gmp_only.parameter;
-              Valid.parameter;
+              Optimisations.Verify_valid.parameter;
               Replace_libc_functions.parameter;
               Full_mtracking.parameter;
               Widening_output_base.parameter;
