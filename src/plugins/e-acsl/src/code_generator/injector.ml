@@ -803,8 +803,8 @@ let inject_global_handler file main =
       file.globals <- file.globals @ globals_func
 
 (** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
-    memory tracking analysis is running or if the option [assert-print-data] is
-    used.
+    memory tracking analysis is running or if the option
+    [-e-acsl-O-print-values] is used.
     [__e_acsl_memory_init] initializes memory storage and potentially records
     program arguments. Parameters to [__e_acsl_memory_init] are addresses of
     program arguments or NULLs if [main] is declared without arguments.
@@ -812,7 +812,7 @@ let inject_global_handler file main =
     [__e_acsl_memory_init]. *)
 let inject_mtracking_handler main =
   if Memory_tracking.use_monitoring () ||
-     Options.Assert_print_data.get () then begin
+     Options.Optimisations.Print_values.get () then begin
     let loc = Options.gen_loc in
     let nulls = [ Smart_exp.null ~loc ; Smart_exp.null ~loc ] in
     let handle_main main =

@@ -84,14 +84,6 @@ module Builtins =
       let help = "C functions which can be used in the E-ACSL specifications"
     end)
 
-module Assert_print_data =
-  True
-    (struct
-      let option_name = "-e-acsl-assert-print-data"
-      let help = "print data contributing to the failed assertion along with \
-                  the runtime error message"
-    end)
-
 module Concurrency =
   False
     (struct
@@ -217,6 +209,14 @@ module Optimisations = struct
       let name = "valid"
       let level = Eq 0
       let descr = "verify annotations which have been proven valid"
+    end)
+
+  module Print_values =
+    Make (struct
+      let name = "print-values"
+      let level = Leq 3
+      let descr = "print values of variables involved in a failed \
+                   verification along with the runtime error message"
     end)
 
 end

@@ -201,7 +201,7 @@ let handle_annotations env kf stmt =
             in
             let adata2, env = Assert.with_data_from ~loc kf env adata1 in
             let adata2, env =
-              if Options.Assert_print_data.get () then
+              if Options.Optimisations.Print_values.get () then
                 (* To be able to display to the user a meaningful message for
                    the old value and the current value, we need to retrieve the
                    expression for the term [t]. *)
