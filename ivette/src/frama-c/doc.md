@@ -1,5 +1,22 @@
 # Frama-C {#framac}
 
+## Files sidebar {#framac-files-sidebar}
+
+The [icon-FOLDER] sidebar allows you to view and navigate between the types,
+functions, global variables and annotations of the analyzed program.
+
+At the top of the sidebar, several buttons configure its behavior:
+- [icon-ITEMS.LIST] shows types/functions/variables/annotations as simple lists.
+- [icon-TREE] shows types/functions/variables/annotations in a file tree.
+- [icon-T] shows or hides types.
+- [icon-F] shows or hides functions.
+- [icon-V] shows or hides global variables.
+- [icon-A] shows or hides global annotations.
+- [icon-FILTER] buttons allow you to filter functions, variables and annotations
+  according to various criteria.
+
+Finally, a text field allows you to perform a search in the displayed elements.
+
 ## AST {#framac-ast}
 
 This component displays the source code as normalized by Frama-C, on which
@@ -67,6 +84,26 @@ titlebar, allows filtering these properties according to many criteria.
 
 The number of displayed properties and the total number of properties
 are shown in the component titlebar.
+
+## Pivot Table {#framac-pivot-table}
+
+A Pivot Table provides customizable aggregate information about both syntactic
+and semantic elements, such as number of statements per function,
+or number of alarms per file.
+
+The table must be computed once by clicking the 'Compute' button. You can then
+use the [icon-tunings] button (_Select Preset_) in the top right to choose one
+of the available presets, or drag and drop the headings (rounded rectangles)
+to group either by row, or by column. Note that the order of selected headings
+affects the way they are grouped. You can reorder them via drag and drop.
+
+The 'down arrow' at the right of each heading allows to apply filters to that
+heading.
+
+The top left drop down component ('Table') allows adding heatmap colors to the
+pivot table cells. The drop down component below it ('Count') allows using
+different aggregation functions. The small arrows to its right allow sorting
+the table cells.
 
 ## Locations {#framac-locations}
 

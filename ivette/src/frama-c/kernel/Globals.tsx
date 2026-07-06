@@ -28,6 +28,7 @@ import { Dropdown } from 'dome/dialogs';
 import { Icon } from 'dome/controls/icons';
 import * as Json from 'dome/data/json';
 import { useWindowSettings } from 'dome/data/settings';
+import { HelpButton } from 'dome/help';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -1276,6 +1277,10 @@ export function GlobalByFiles(): JSX.Element {
             title={'Display in tree'}
             selected={!dispInList}
             onClick={() => flipDispInList()}
+          />
+          <HelpButton
+            id={'framac-files-sidebar'}
+            size={18}
           />
         </Toolbar.ButtonGroup>
       </Hbox>

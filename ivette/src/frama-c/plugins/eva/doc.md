@@ -16,13 +16,44 @@ The _Eva Summary_ default view shows general information about an Eva analysis
 through the components [Summary](#eva-summary), [Coverage](#eva-coverage)
 and [Flamegraph](#eva-flamegraph).
 
-Finally, the [icon-apple] Eva sidebar allows the user to change some parameters
+A complete documentation for the Eva plug-in can be found online:
+[https://frama-c.com/download/frama-c-eva-manual.pdf](https://frama-c.com/download/frama-c-eva-manual.pdf)
+
+## Eva Sidebar {#eva-sidebars}
+
+The [icon-apple] sidebar allows the user to change some parameters
 and run the analysis. However, for large code bases, it is recommended to run the
 Eva analysis using the command line, saving the result via the -save parameter,
 and then loading the resulting file in the graphical interface.
 
-A complete documentation for the Eva plug-in can be found online:
-[https://frama-c.com/download/frama-c-eva-manual.pdf](https://frama-c.com/download/frama-c-eva-manual.pdf)
+The [icon-applemore] sidebar allows you to select some taints or callstacks to
+filter all Eva results displayed in the graphical interface.
+
+* Taints: if the `taint` domain is enabled, the sidebar displays a list
+  of taints. If nothing is checked, all taints are visible. Otherwise,
+  only the selected taints are visible in the various components that show
+  them (AST, Inspector, Properties…).
+
+* Callstacks: this sidebar lists analyzed callstacks in a tree structure.
+  By default, only the callstacks related to the currently selected function
+  are shown.
+
+  By default, no callstack is selected, and all Eva results are shown.
+  You can select one or more callstacks, which filters all Eva results displayed
+  in the interface according to your selection — as if only these callstacks
+  have been reached by the analysis. For instance, statements unreached in these
+  selected callstacks are shown as dead code, and values are only shown for
+  these callstacks in the [Values](#eva-values) table.
+
+  When callstacks are selected, a reminder is shown in the [icon-pin] toolbar
+  button, at the top right of the interface.
+  In the sidebar, the [icon-tunings] icon allows you to reset the selection and
+  show all results, as is the case by default.
+
+  The [icon-filter] button allows you to show only selected callstacks, or to
+  show all analyzed callstacks (but beware that this can be very slow on
+  large code bases).
+
 
 ## Status of the analysis {#eva-status}
 
@@ -36,6 +67,15 @@ titlebar:
   or a user interruption: components are active but results are incomplete.
 - [icon-check]: the analysis was successfully completed:
   all features related to Eva are enabled.
+
+If a component or action requires an Eva analysis, you will be notified
+either directly within the component or via a modal window, and you will
+be able to run the analysis. In the case of a modal window, if you wait
+for the analysis to complete, the requested action will be carried out and
+the modal window will close. If you close the modal window, the analysis
+will continue but the action will be cancelled.
+
+You can always stop an ongoing analysis via the [icon-apple] [Eva sidebar](#eva-sidebars).
 
 ## List of alarms emitted by Eva {#eva-alarms}
 
@@ -86,14 +126,12 @@ Using "Alt+Click" to select an expression in the AST component creates an
 already pinned column.
 
 One can also evaluate an arbitrary expression:
-- first select a statement (or any expression within a statement)
+- first right-click on a statement (or any expression within a statement)
   in the AST component. This will be the program point where the evaluation
   takes place.
-- then use the shortcut "Ctrl+E", or the menu entry _Edit -> Evaluate_,
-  or select _Evaluation_ when clicking on the button of the global toolbar
-  search field.
-- write the desired C expression or ACSL term in the toolbar search field
-  (which should have been selected) and press _Enter_.
+- then select _Evaluate..._.
+- write the desired C expression or ACSL term in the text field
+  and press _Enter_ or click on _Evaluate_.
 
 A new pinned column is added to the table, with the values inferred for the
 given expression at the selected statement.
@@ -151,11 +189,11 @@ This component lists all statements which may read or write the selected
 lvalue, according to the Eva analysis.
 
 Studia can also be used on arbitrary lvalues:
-- select a statement in the AST component;
-- click on the button of the global toolbar search field,
-  and select _Studia: Reads_ or _Studia: Writes_;
-- write the desired C lvalue in the toolbar search field
-  (which should have been selected) and press _Enter_.
+- right-click on a statement in the AST component;
+- click on _Studia..._;
+- choose _Reads of_ or _Writes to_;
+- enter the desired C lvalues in the text field and press _Enter_,
+  or click on _Search_;
 
 The memory location of the lvalue is evaluated at the selected statement:
 for instance, if the lvalue is a pointer access, its memory location depends on

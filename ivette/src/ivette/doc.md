@@ -31,18 +31,35 @@ Each registered Frama-C plug-in might extend the GUI with additional views,
 laboratory components, sidebar panels, status bar items and menus. Consult
 the associated documentation chapters for more details.
 
-## The Sidebar {#ivette-sidebar}
+## Sidebars {#ivette-sidebar}
 
-There are actually _several_ sidebars and you can use the large icons on the
-left-most side of the screen to switch from one sidebar to another. The
-[icon-sidebar] button in the top toolbar allows you to hide/show the
-sidebars. Among them, two sidebars are especially dedicated to the GUI:
+Each sidebar can be accessed via its dedicated icon in the leftmost column
+of the interface. The active sidebar can be collapsed or expanded by clicking
+on its icon, by using the [icon-angle.left] or [icon-angle.right] button at the
+bottom of this column, or via the shortcut Ctrl+B.
 
-- The [icon-display] sidebar provides access to _all_ registered components and
-  views that you can use in the GUI.
+Available sidebars are:
 
-- The [icon-search] sidebar provides navigation to the _source declarations_ of
-  your project currently analyzed by Frama-C.
+* The [icon-display] sidebar allows you to customize different views
+  of the graphical interface.
+  It provides access to _all_ the components and preset views that you can
+  use in this interface.
+
+* The [icon-DUPLICATE] sidebar allows you to view and navigate between the types,
+  global variables, functions and axiomatic definitions of the analyzed program.
+
+* The [icon-FOLDER] [Files sidebar](#framac-files-sidebar) does the same as the
+  previous one, but provides more features.
+
+* The [icon-PROJECT] sidebar enables you to manage Frama-C projects.
+
+* The [icon-apple] [Eva configuration sidebar](#eva-sidebars)  allows you to
+  quickly change some settings and run an Eva analysis.
+
+* The [icon-applemore] [Eva results sidebar](#eva-sidebars) allows you to select
+  some taint or callstack to filter all Eva results accordingly.
+
+* The [icon-wp] sidebar allows you to change WP settings.
 
 ## The Laboratory {#ivette-laboratory}
 

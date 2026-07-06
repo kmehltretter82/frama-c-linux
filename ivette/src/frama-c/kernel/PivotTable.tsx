@@ -243,7 +243,7 @@ export default function PivotTableComponent(): JSX.Element {
 
   return (
     <>
-      <TitleBar label='Pivot Table'>
+      <TitleBar help='framac-pivot-table'>
         <FilterRatio model={model} />
         { Object.entries(state).length > 0 &&
           <IconButton
