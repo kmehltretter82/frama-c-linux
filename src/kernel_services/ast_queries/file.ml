@@ -498,8 +498,8 @@ let build_cpp_cmd = function
           let machdep_dir =
             Machdep.generate_machdep_header ~censored_macros (get_machdep())
           in
-          [(Filepath.to_string_abs machdep_dir);
-           (Filepath.to_string_abs System_config.Share.libc)]
+          [(Filepath.to_string_abs ~quoted:true machdep_dir);
+           (Filepath.to_string_abs ~quoted:true System_config.Share.libc)]
         end
       else []
     in
