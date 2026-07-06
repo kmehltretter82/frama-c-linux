@@ -40,7 +40,7 @@
 , zarith
 , zmq
 # For Python3 tests configuration
-, python310
+, python3
 # Target parameters
 , cover ? true
 , release_mode ? false
@@ -92,7 +92,7 @@ stdenvNoCC.mkDerivation rec {
     zarith
     zmq
     # For other CI targets
-    python310
+    python3
   ];
 
   outputs = [ "out" "build_dir" ];
