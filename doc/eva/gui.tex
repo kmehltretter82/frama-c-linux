@@ -1,6 +1,7 @@
 This chapter provides complementary information about the graphical user
 interface, as seen by an \Eva{} user. Most of the documentation is available
-in the graphical interface itself.
+in the graphical interface itself via the menu
+\emph{Help $\rightarrow$ Documentation}.
 
 \section{A general view of the GUI}
 
@@ -9,14 +10,12 @@ The \FramaC graphical user interface is currently best suited as a
 
 \begin{enumerate}
 \item Run \FramaC in the command line and save the result
-(option \texttt{-save proj.sav}) to a session file;
-\item Open the GUI with \texttt{-load proj.sav} to load the saved session and
+with option \texttt{-save proj.sav} to a session file;
+\item Open the GUI with \texttt{frama-c-gui -load proj.sav} to load the saved session and
 explore the analysis results interactively.
 \end{enumerate}
 
-The \FramaC GUI is not an IDE (e.g.~you cannot edit code with it), and the
-set of available controls in the interface does not include all command-line
-options. It is nevertheless very useful for academic examples and tutorials,
+The \FramaC GUI is not an IDE (e.g.~you cannot edit code with it). It is nevertheless very useful for academic examples and tutorials,
 in which case it can obviate the need for the command line.
 
 For large and industrial analyses, we suggest considering the GUI as a
@@ -27,55 +26,60 @@ reproducibility and helps iterative development.
 \section{Eva-Related Views, Components, and Sidebar}
 
 The \FramaC GUI is very rich and serves several other plug-ins and analyses.
-The following elements are either related directly to \Eva{}, or often useful
-for navigation and code comprehension of \Eva{}-related properties:
+To this end, it provides a wide range of components and a set of configurable
+views; each {\em view} is a predefined arrangement of up to four components.
 
-\subsection{Views}
+The top of the \emph{View and Components} sidebar lists available views;
+clicking on a view opens it in a new tab.
+In the active view, specific documentations can be accessed via the
+\emph{?} button in the top right corner of each component.
 
-A {\em View} is a predefined arrangement of related components.
+\subsection{Views related to Eva}
+
+The following predefined views are either related directly to \Eva{},
+or often useful for navigation and code comprehension of \Eva{}-related properties:
 
 \begin{description}
+\item[Source Code]: this is the main view intended to navigate in the analyzed
+source code, with various synthetic information on any variable, expression,
+type or statement in the \emph{Inspector} panel.
+\item[Properties]: not directly \Eva{}-related, but useful to browse the list
+of alarms found by \Eva{}, and see which user assertions have been proved
+(or not) by the analysis.
 \item[Eva Summary]: useful first stop for getting an overview of the
-analysis. It includes a textual summary, coverage information, list of
-messages, and profiling information (Eva Flamegraph).
-\item[Eva Values]: the bread and butter of inspecting alarms in the GUI:
-AST, Inspector and Eva Values components enable following an alarm from its
-manifestation towards its root causes.
-\item[Eva Mthread]: for inspection of \mthread-related analyses.
-\item[Dive Dataflow]: the Dive plug-in presents graphical illustrations of
-dependencies between memory locations.
-\item[Properties]: not directly \Eva{}-related, but useful to browse the
-list of alarms found by \Eva{}.
+analysis. It includes a textual summary, coverage information, profiling
+information (Eva Flamegraph) and a list of all messages emitted during the analysis
+(by default, only warnings and errors are shown).
+\item[Eva Values]: the bread and butter of inspecting the set of possible values
+inferred by \Eva{} for any variable or expression at any program point. It can
+be very useful to understand the root causes of emitted alarms.
+\item[Dive Dataflow]: the Dive plug-in presents graphs of dependencies
+between memory locations, with various information from the \Eva{} analysis,
+such as values inferred for these locations. It can be used to find the root
+causes of an alarm by following the values of all locations involved from the
+alarm point.
+\item[Eva Mthread]: for inspection of concurrent properties after an analysis
+with option \texttt{-mthread}.
 \end{description}
 
-\subsection{Components}
+\subsection{Sidebars}
 
-The {\em Eva Summary}, {\em Eva Values} and {\em Eva Mthread} components
-are related to the views which contain them.
-{\em Eva Coverage} and {\em Eva Flamegraph} are also included in the
-{\em Eva Summary} view.
+\Eva{} has two dedicated sidebars in the \FramaC GUI.
 
-Other components which are often useful for \Eva{} analyses:
-
-\begin{description}
-\item[Inspector]: presents syntactical information about the current expression
-in the AST.
-\item[Locations]: when triggered by e.g. Studia (Select reads/writes), lists
-relevant locations, for quick navigation.
-\end{description}
-
-\subsection{Sidebar}
-
-\Eva{} has its own sidebar in the \FramaC GUI. It allows running, stopping and
+The first one allows running, stopping and
 restarting an analysis directly from the GUI. The most common analysis
 parameters can be modified from this sidebar. As mentioned before, this is
 especially useful for simple tests and quick comparisons, but for large,
 longer analyses, we recommend using a Makefile or a script to ensure
 reproducibility.
 
-Another sidebar related to \Eva{} is the {\em Taints} sidebar, which is filled
-when the {\em taints} abstract domain (Section~\ref{sec:taint}) is enabled, and
-allows toggling syntactic highlighting of each taint in the analysis.
-
-For \mthread analyses, the {\em Projects} sidebar is also useful, since each
-thread is analyzed in a different project.
+The second one allows selecting:
+\begin{itemize}
+\item a set of taints if the {\em taint} abstract domain (Section~\ref{sec:taint})
+  was enabled. Only the selected taints (if any) are visible in the various
+  components that show them (AST, Inspector, Properties…).
+\item a set of callstacks, which restricts all Eva results displayed in the
+  interface according to your selection — as if only these callstacks have been
+  reached by the analysis. This allows focusing on some specific callstacks
+  when inspecting the results of an analysis.
+\end{itemize}
