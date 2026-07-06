@@ -32,7 +32,7 @@ filter all Eva results displayed in the graphical interface.
 * Taints: if the `taint` domain is enabled, the sidebar displays a list
   of taints. If nothing is checked, all taints are visible. Otherwise,
   only the selected taints are visible in the various components that show
-  them (AST, Inspector, properties…).
+  them (AST, Inspector, Properties…).
 
 * Callstacks: this sidebar lists analyzed callstacks in a tree structure.
   By default, only the callstacks related to the currently selected function
@@ -45,7 +45,7 @@ filter all Eva results displayed in the graphical interface.
   selected callstacks are shown as dead code, and values are only shown for
   these callstacks in the [Values](#eva-values) table.
 
-  When callstacks are selected, a remainder is shown in the [icon-pin] toolbar
+  When callstacks are selected, a reminder is shown in the [icon-pin] toolbar
   button, at the top right of the interface.
   In the sidebar, the [icon-tunings] icon allows you to reset the selection and
   show all results, as is the case by default.
