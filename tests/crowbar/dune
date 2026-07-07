@@ -1,17 +1,49 @@
 (rule
  (alias frama-c-configure)
- (deps (universe))
+ (deps (universe)
+  (alias ../frama-c-configure-tests))
  (action
   (progn
-   (echo "Crowbar Tests:" %{lib-available:crowbar} "\n")
-   (echo "  - Crowbar Utils:" %{lib-available:crowbar_utils} "\n")
-   (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
-   (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n"))))
+   (echo "  - Crowbar Tests:" %{read:tests-crowbar-deps-available} "\n")
+   (echo "    - CROWBAR env var:" %{env:CROWBAR=false} "\n")
+   (echo "    - Crowbar: " %{lib-available:crowbar} "\n")
+   (echo "    - Crowbar Utils:" %{lib-available:crowbar_utils} "\n")
+   (echo "    - Inout:" %{lib-available:frama-c-inout.core} "\n")
+   (echo "    - Eva:" %{lib-available:frama-c-eva.core} "\n")
+   ; If you add some dependencies here, do not forget to add them to the
+   ; crowbar_deps_fake_lib library to update
+   ; tests-crowbar-deps-available
+  ))
+)
+
+; The following library and two rules are printing to a file
+; tests-crowbar-deps-available "true" or "false" depending on the
+; availability of the dependencies for the test.
+(library
+  (name crowbar_deps_fake_lib)
+  (enabled_if
+    (and
+      (<> %{env:CROWBAR=false} "false")
+      %{lib-available:crowbar}
+      %{lib-available:crowbar_utils}
+      %{lib-available:frama-c-inout.core}
+      %{lib-available:frama-c-eva.core}))
+  (modules))
+(rule
+ (deps (universe))
+ (enabled_if %{lib-available:crowbar_deps_fake_lib})
+ (action (with-stdout-to "tests-crowbar-deps-available"
+  (echo "true"))))
+(rule
+ (deps (universe))
+ (enabled_if (not %{lib-available:crowbar_deps_fake_lib}))
+ (action (with-stdout-to "tests-crowbar-deps-available"
+  (echo "false (Crowbar tests are disabled)"))))
 
 (cram
-  (enabled_if (<> %{env:CROWBAR=false} "false"))
-  (deps (package frama-c) (package crowbar_utils))
-)
+  (enabled_if (<> %{env:CROWBAR=false} "false")))
+(cram
+  (deps (package frama-c) (package crowbar_utils)))
 
 (cram
   (applies_to constfold)
