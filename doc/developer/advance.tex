@@ -914,10 +914,6 @@ entirely removed (see~\ref{adv:dune-migration:conf}). Thus, the
 \texttt{Makefile.in} does not exist anymore. A \texttt{Makefile} may be useful
 to provide some shortcuts (see Section~\ref{adv:make}).
 
-If a plugin has a graphical user-interface, it is recommended to put the related
-files into a separate directory in the directory of the plug-in
-(see~\ref{adv:dune-migration:gui}).
-
 It was previously possible to indicate \texttt{.} as a test suite for \ptests.
 In such a case, tests source files were directly in the \texttt{tests} directory.
 This is not possible anymore. If the plug-in tests follow this architecture,
@@ -1011,30 +1007,6 @@ generated from an \ocaml file itself. For example:
  (targets generated-file)
  (action (run ./myconfigurator.exe))
 \end{lstlisting}
-
-\subsection{GUI migration}\label{adv:dune-migration:gui}
-
-Just like there is a \texttt{dune} for the core features of the plug-in, there
-is now a \texttt{dune} file for the GUI, that depends on the core features of
-the plug-in and the \framac GUI. This file is to put in the \texttt{gui}
-subdirectory. Again, if there are additional dependencies, they must be
-indicated in the \texttt{libraries} field:
-\begin{dunecode}
-( library
-  (name myplugin_gui)
-  (public_name frama-c-myplugin.gui)
-  (optional)
-  (flags -open Frama_c_kernel
-         -open Frama_c_gui
-         -open MyPlugin :standard)
-  (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
-)
-
-(plugin (optional)
-  (name myplugin-gui)
-  (libraries frama-c-myplugin.gui)
-  (site (frama-c plugins_gui)))
-\end{dunecode}
 
 \subsection{Build and \texttt{Makefile.in}}
 \lstset{language=shell}
@@ -3072,9 +3044,6 @@ their execution order.
     respected. In particular, the kernel services are linked first,
     \emph{then} the kernel integrated types for plug-ins, and
     \emph{finally} the plug-ins are linked in unspecified order;
-  \item when the GUI\index{Plug-in!GUI} is present, for any plug-in
-    $p$, the non-gui modules of $p$ are always linked \emph{before}
-    the gui modules of $p$;
   \item finally, the module \texttt{Boot}\codeidxdef{Boot} is linked at the
     very end of this stage.
   \end{enumerate}
@@ -4447,47 +4416,6 @@ in module \texttt{Lattice\_type}\codeidx{Lattice\_type}. For
 this purpose, functors of the abstract interpretation toolbox%
 \index{Abstract Interpretation} can help (see in particular module
 \texttt{Abstract\_interp}\codeidx{Abstract\_interp}).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{GUI Extension}\label{adv:gui}\index{GUI|bfit}\index{Plug-in!GUI|bfit}
-
-\begin{prereq}
-  Knowledge of \lablgtk.
-\end{prereq}
-
-Each plug-in can extend the \framac graphical user interface (aka \emph{GUI})
-in order to support its own functionalities in the \framac viewer. For this
-purpose, a plug-in developer has to register a function of type
-\texttt{Design.main\_window\_extension\_points \fl~unit} thanks to
-\texttt{Design.register\_extension}\scodeidx{Design}{register\_extension}. The
-input value of type \texttt{Design.main\_window\_extension\_points} is an
-object corresponding to the main window of the \framac GUI. It provides
-accesses to the main widgets of the \framac GUI and to several plug-in extension
-points. The documentation of the class type
-\texttt{Design.main\_window\_extension\_points}%
-\scodeidxdef{Design}{main\_window\_extension\_points} is accessible through the
-source documentation (see Section~\ref{tut2:doc}).
-
-Besides time-consuming computations have to call the function
-\texttt{Async.yield}\scodeidx{Async}{yield} from time to time in order to keep the GUI reactive.
-
-%Mainly that's all!
-The GUI implementation uses
-\lablgtk~\cite{lablgtk}\index{Lablgtk}: you can use any \lablgtk-compatible
-code in your gui extension. A complete example of a GUI extension may be found in
-the plug-in \texttt{Occurrence}\index{Occurrence} (see file
-\texttt{src/plugins/occurrence/gui/register\_gui.ml}).
-
-\begin{important}
-\paragraph{Potential issues}
-All the GUI plug-in extensions share the same window and same
-widgets\index{Sharing!Widget}. So conflicts can occur, especially if you
-specify some attributes on a predefined object. For example, if a plug-in wants
-to highlight\index{Highlighting} a statement $s$ in yellow and another one
-wants to highlight $s$ in red at the same time, the behavior is not specified
-but it could be quite difficult to understand for an user.
-\end{important}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
