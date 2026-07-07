@@ -177,6 +177,30 @@ _main_ function. A click on a call site selects it in the **AST** component.
 If there is more than one callstack, the first line shows the set of possible
 values for all callstacks.
 
+## AST {#eva-ast}
+
+The AST component contains some information which is relevant for Eva analyses
+displayed in the *gutter*, the left-hand side of the AST component.
+The gutter can display two kinds of information:
+- the leftmost part may contain *status bullets* (colored circles) related to
+  properties; e.g. yellow bullets indicating that Eva was not able to prove a
+  property;
+- the rightmost part (narrow rectangle) changes color according to reachability
+  and non-termination.
+The latter is specially useful to identify cases of non-termination in the
+analysis:
+- a gray rectangle indicates an *unreachable statement*. The code is grayed out
+  and displayed in italics;
+- a red rectangle indicates *non-termination* for the current statement: either
+  function calls that never return, or statements leading to no semantically
+  valid states (e.g. due to an undefined behavior).
+Some non-termination cases are immediately visible in the GUI, while others
+(e.g. inside partially-reachable loop statements) are easier to see via the
+**Nonterm** plug-in, whose warnings are visible in the **Messages** component.
+You can also look for *priority* properties in the **Properties** component:
+they indicate that some contexts lead to *Invalid* statuses, which can cause
+non-termination.
+
 ## Studia {#eva-studia}
 
 To find all statements that may have read or written an lvalue:
