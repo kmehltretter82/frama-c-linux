@@ -42,7 +42,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": \false; */
       {
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\false";
         __gen_e_acsl_assert_data_3.file = "lazy.i";
         __gen_e_acsl_assert_data_3.fct = "main";
@@ -96,7 +96,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": \false; */
       {
         __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_6.pred_txt = "\\false";
         __gen_e_acsl_assert_data_6.file = "lazy.i";
         __gen_e_acsl_assert_data_6.fct = "main";
@@ -149,7 +149,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": \false; */
       {
         __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_9.pred_txt = "\\false";
         __gen_e_acsl_assert_data_9.file = "lazy.i";
         __gen_e_acsl_assert_data_9.fct = "main";

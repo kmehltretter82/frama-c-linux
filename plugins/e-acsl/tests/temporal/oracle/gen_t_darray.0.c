@@ -25,7 +25,7 @@ void area_triangle(double (*vertices)[4])
     /*@ assert E_ACSL: "pointer alignment": \aligned(vertices,8); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(vertices,8)";
       __gen_e_acsl_assert_data_2.file = "t_darray.c";
       __gen_e_acsl_assert_data_2.fct = "area_triangle";
@@ -73,7 +73,7 @@ void area_triangle(double (*vertices)[4])
     /*@ assert E_ACSL: "pointer alignment": \aligned(vertices,8); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(vertices,8)";
       __gen_e_acsl_assert_data_4.file = "t_darray.c";
       __gen_e_acsl_assert_data_4.fct = "area_triangle";

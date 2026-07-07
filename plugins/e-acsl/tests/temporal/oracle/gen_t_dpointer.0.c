@@ -36,7 +36,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
       {
         __gen_e_acsl_assert_data_2.blocking = 1;
-        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(p,8)";
         __gen_e_acsl_assert_data_2.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_2.fct = "main";
@@ -87,7 +87,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
       {
         __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(p,8)";
         __gen_e_acsl_assert_data_4.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_4.fct = "main";
@@ -108,7 +108,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p + i,8); */
       {
         __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p + i,8)";
         __gen_e_acsl_assert_data_5.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_5.fct = "main";
@@ -128,7 +128,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(*(p + i),4); */
       {
         __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(*(p + i),4)";
         __gen_e_acsl_assert_data_6.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_6.fct = "main";
@@ -153,7 +153,7 @@ int main(void)
       /*@ assert E_ACSL: "memory access": \valid_read(p + i); */
       {
         __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(p + i)";
         __gen_e_acsl_assert_data_7.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_7.fct = "main";
@@ -209,7 +209,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(p,8)";
       __gen_e_acsl_assert_data_9.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_9.fct = "main";
@@ -228,7 +228,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p + 2,8); */
     {
       __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(p + 2,8)";
       __gen_e_acsl_assert_data_10.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_10.fct = "main";
@@ -249,7 +249,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(*(p + 2),4); */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(*(p + 2),4)";
       __gen_e_acsl_assert_data_11.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_11.fct = "main";
@@ -272,7 +272,7 @@ int main(void)
     /*@ assert E_ACSL: "memory access": \valid_read(p + 2); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(p + 2)";
       __gen_e_acsl_assert_data_12.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_12.fct = "main";

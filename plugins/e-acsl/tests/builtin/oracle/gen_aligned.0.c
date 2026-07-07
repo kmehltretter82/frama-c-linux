@@ -40,7 +40,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": c != 0; */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "c != 0";
       __gen_e_acsl_assert_data_2.file = "aligned.c";
       __gen_e_acsl_assert_data_2.fct = "main";
@@ -76,7 +76,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": c != 0; */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "c != 0";
       __gen_e_acsl_assert_data_4.file = "aligned.c";
       __gen_e_acsl_assert_data_4.fct = "main";
@@ -127,7 +127,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": 2 * c != 0; */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "2 * c != 0";
       __gen_e_acsl_assert_data_6.file = "aligned.c";
       __gen_e_acsl_assert_data_6.fct = "main";
@@ -169,7 +169,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": 2 * c != 0; */
       {
         __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_7.pred_txt = "2 * c != 0";
         __gen_e_acsl_assert_data_7.file = "aligned.c";
         __gen_e_acsl_assert_data_7.fct = "main";
@@ -233,7 +233,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": 2 * c != 0; */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "2 * c != 0";
       __gen_e_acsl_assert_data_9.file = "aligned.c";
       __gen_e_acsl_assert_data_9.fct = "main";
@@ -275,7 +275,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": 2 * c != 0; */
       {
         __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_10.pred_txt = "2 * c != 0";
         __gen_e_acsl_assert_data_10.file = "aligned.c";
         __gen_e_acsl_assert_data_10.fct = "main";
@@ -331,7 +331,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": 2 - 2 != 0; */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "2 - 2 != 0";
       __gen_e_acsl_assert_data_12.file = "aligned.c";
       __gen_e_acsl_assert_data_12.fct = "main";
@@ -350,7 +350,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(i0,4); */
     {
       __gen_e_acsl_assert_data_13.blocking = 1;
-      __gen_e_acsl_assert_data_13.kind = "RTE";
+      __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(i0,4)";
       __gen_e_acsl_assert_data_13.file = "aligned.c";
       __gen_e_acsl_assert_data_13.fct = "main";

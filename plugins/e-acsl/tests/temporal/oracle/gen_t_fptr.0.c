@@ -51,7 +51,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(q,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(q,4)";
       __gen_e_acsl_assert_data_3.file = "t_fptr.c";
       __gen_e_acsl_assert_data_3.fct = "main";

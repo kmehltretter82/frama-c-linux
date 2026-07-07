@@ -47,7 +47,7 @@ void build_tree(tree_desc *desc)
     /*@ assert E_ACSL: "pointer alignment": \aligned(extra,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(extra,4)";
       __gen_e_acsl_assert_data_2.file = "t_global_init.c";
       __gen_e_acsl_assert_data_2.fct = "build_tree";
@@ -200,7 +200,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(p,8)";
       __gen_e_acsl_assert_data_2.file = "t_global_init.c";
       __gen_e_acsl_assert_data_2.fct = "main";
@@ -243,7 +243,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(p,8)";
       __gen_e_acsl_assert_data_4.file = "t_global_init.c";
       __gen_e_acsl_assert_data_4.fct = "main";
@@ -263,7 +263,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(*p,1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(*p,1)";
       __gen_e_acsl_assert_data_5.file = "t_global_init.c";
       __gen_e_acsl_assert_data_5.fct = "main";
@@ -285,7 +285,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "memory access": \valid_read(p); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(p)";
       __gen_e_acsl_assert_data_6.file = "t_global_init.c";
       __gen_e_acsl_assert_data_6.fct = "main";

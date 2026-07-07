@@ -70,7 +70,7 @@ int *__gen_e_acsl_f(int *x, int *y)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\result,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\result,4)";
       __gen_e_acsl_assert_data_2.file = "call.c";
       __gen_e_acsl_assert_data_2.fct = "f";

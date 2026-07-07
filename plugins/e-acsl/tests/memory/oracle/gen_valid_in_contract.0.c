@@ -86,7 +86,7 @@ struct list *__gen_e_acsl_f(struct list *l)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(l,8)";
       __gen_e_acsl_assert_data.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data.fct = "f";
@@ -106,7 +106,7 @@ struct list *__gen_e_acsl_f(struct list *l)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l,8)";
       __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_2.fct = "f";
@@ -127,7 +127,7 @@ struct list *__gen_e_acsl_f(struct list *l)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(l,8)";
       __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_3.fct = "f";
@@ -148,7 +148,7 @@ struct list *__gen_e_acsl_f(struct list *l)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(l,8)";
       __gen_e_acsl_assert_data_4.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_4.fct = "f";
@@ -176,7 +176,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       /*@ assert E_ACSL: "pointer alignment": \aligned(l,8); */
       {
         __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(l,8)";
         __gen_e_acsl_assert_data_5.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data_5.fct = "f";
@@ -196,7 +196,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       /*@ assert E_ACSL: "pointer alignment": \aligned(l->next,8); */
       {
         __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(l->next,8)";
         __gen_e_acsl_assert_data_6.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data_6.fct = "f";
@@ -222,7 +222,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       /*@ assert E_ACSL: "memory access": \valid_read(&l->next); */
       {
         __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(&l->next)";
         __gen_e_acsl_assert_data_7.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data_7.fct = "f";
@@ -260,7 +260,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,8); */
       {
         __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(\\result,8)";
         __gen_e_acsl_assert_data_9.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data_9.fct = "f";
@@ -301,7 +301,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,8); */
       {
         __gen_e_acsl_assert_data_11.blocking = 1;
-        __gen_e_acsl_assert_data_11.kind = "RTE";
+        __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(\\result,8)";
         __gen_e_acsl_assert_data_11.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data_11.fct = "f";

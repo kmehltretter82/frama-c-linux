@@ -33,7 +33,7 @@ int f(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(S,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(S,1)";
       __gen_e_acsl_assert_data_2.file = "bts1837.i";
       __gen_e_acsl_assert_data_2.fct = "f";
@@ -75,7 +75,7 @@ int f(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s1,1); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(s1,1)";
       __gen_e_acsl_assert_data_4.file = "bts1837.i";
       __gen_e_acsl_assert_data_4.fct = "f";
@@ -120,7 +120,7 @@ int f(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s2,1); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(s2,1)";
       __gen_e_acsl_assert_data_6.file = "bts1837.i";
       __gen_e_acsl_assert_data_6.fct = "f";
@@ -221,7 +221,7 @@ int main(void)
         /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
         {
           __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(s,1)";
           __gen_e_acsl_assert_data_2.file = "bts1837.i";
           __gen_e_acsl_assert_data_2.fct = "main";
@@ -266,7 +266,7 @@ int main(void)
         /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
         {
           __gen_e_acsl_assert_data_4.blocking = 1;
-          __gen_e_acsl_assert_data_4.kind = "RTE";
+          __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(s,1)";
           __gen_e_acsl_assert_data_4.file = "bts1837.i";
           __gen_e_acsl_assert_data_4.fct = "main";

@@ -71,7 +71,7 @@ int main(void)
         }
         else __gen_e_acsl_and_2 = 0;
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "-128 <= u < 128";
         __gen_e_acsl_assert_data_3.file = "issue69.c";
         __gen_e_acsl_assert_data_3.fct = "main";

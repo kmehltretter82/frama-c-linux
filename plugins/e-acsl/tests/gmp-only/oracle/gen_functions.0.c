@@ -685,7 +685,7 @@ void __gen_e_acsl_f2(__e_acsl_mpq_t *__retres_arg, __e_acsl_mpq_struct * x)
   /*@ assert E_ACSL: "division by zero": x != 0; */
   {
     __gen_e_acsl_assert_data_13.blocking = 1;
-    __gen_e_acsl_assert_data_13.kind = "RTE";
+    __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_13.pred_txt = "x != 0";
     __gen_e_acsl_assert_data_13.file = "functions.c";
     __gen_e_acsl_assert_data_13.fct = "f2";

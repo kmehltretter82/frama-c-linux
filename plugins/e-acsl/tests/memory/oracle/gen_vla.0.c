@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         /*@ assert E_ACSL: "pointer alignment": \aligned(arr,4); */
         {
           __gen_e_acsl_assert_data_3.blocking = 1;
-          __gen_e_acsl_assert_data_3.kind = "RTE";
+          __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(arr,4)";
           __gen_e_acsl_assert_data_3.file = "vla.c";
           __gen_e_acsl_assert_data_3.fct = "main";
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
         /*@ assert E_ACSL: "pointer alignment": \aligned(arr,4); */
         {
           __gen_e_acsl_assert_data_5.blocking = 1;
-          __gen_e_acsl_assert_data_5.kind = "RTE";
+          __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(arr,4)";
           __gen_e_acsl_assert_data_5.file = "vla.c";
           __gen_e_acsl_assert_data_5.fct = "main";

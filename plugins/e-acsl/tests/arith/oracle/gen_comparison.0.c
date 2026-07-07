@@ -107,7 +107,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(s,1)";
       __gen_e_acsl_assert_data_6.file = "comparison.i";
       __gen_e_acsl_assert_data_6.fct = "main";
@@ -126,7 +126,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(s,1)";
       __gen_e_acsl_assert_data_7.file = "comparison.i";
       __gen_e_acsl_assert_data_7.fct = "main";

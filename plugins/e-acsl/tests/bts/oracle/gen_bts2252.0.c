@@ -104,7 +104,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(src,1); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(src,1)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data.fct = "strncpy";
@@ -125,7 +125,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_2.fct = "strncpy";
@@ -149,7 +149,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_3.fct = "strncpy";
@@ -170,7 +170,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strncpy";
@@ -194,7 +194,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_8.fct = "strncpy";
@@ -253,7 +253,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_11.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_11.fct = "strncpy";
@@ -282,7 +282,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                                  "sizeof(char)",0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,"n",0,n);
     __gen_e_acsl_assert_data_10.blocking = 1;
-    __gen_e_acsl_assert_data_10.kind = "RTE";
+    __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(dest + (0 .. n - 1))";
     __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_10.fct = "strncpy";
@@ -300,7 +300,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(src,1); */
     {
       __gen_e_acsl_assert_data_13.blocking = 1;
-      __gen_e_acsl_assert_data_13.kind = "RTE";
+      __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(src,1)";
       __gen_e_acsl_assert_data_13.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_13.fct = "strncpy";
@@ -329,7 +329,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                                  "sizeof(char const)",0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,"n",0,n);
     __gen_e_acsl_assert_data_12.blocking = 1;
-    __gen_e_acsl_assert_data_12.kind = "RTE";
+    __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_12.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_12.fct = "strncpy";
@@ -413,7 +413,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(\\result,1)";
       __gen_e_acsl_assert_data_15.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_15.fct = "strncpy";
@@ -548,7 +548,7 @@ int main(void)
         /*@ assert E_ACSL: "pointer alignment": \aligned(srcbuf,1); */
         {
           __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(srcbuf,1)";
           __gen_e_acsl_assert_data_2.file = "bts2252.c";
           __gen_e_acsl_assert_data_2.fct = "main";

@@ -30,7 +30,7 @@ void f(void const *s, int c, unsigned long n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(p,1)";
       __gen_e_acsl_assert_data_2.file = "bts2386.c";
       __gen_e_acsl_assert_data_2.fct = "f";
@@ -49,7 +49,7 @@ void f(void const *s, int c, unsigned long n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(s,1)";
       __gen_e_acsl_assert_data_3.file = "bts2386.c";
       __gen_e_acsl_assert_data_3.fct = "f";
@@ -98,7 +98,7 @@ void f(void const *s, int c, unsigned long n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p,1)";
       __gen_e_acsl_assert_data_5.file = "bts2386.c";
       __gen_e_acsl_assert_data_5.fct = "f";
@@ -117,7 +117,7 @@ void f(void const *s, int c, unsigned long n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(s,1); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(s,1)";
       __gen_e_acsl_assert_data_6.file = "bts2386.c";
       __gen_e_acsl_assert_data_6.fct = "f";

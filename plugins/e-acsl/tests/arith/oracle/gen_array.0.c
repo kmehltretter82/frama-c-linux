@@ -139,7 +139,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_5.file = "array.i";
       __gen_e_acsl_assert_data_5.fct = "arrays";
@@ -158,7 +158,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_6.file = "array.i";
       __gen_e_acsl_assert_data_6.fct = "arrays";
@@ -194,7 +194,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_8.file = "array.i";
       __gen_e_acsl_assert_data_8.fct = "arrays";
@@ -213,7 +213,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_9.file = "array.i";
       __gen_e_acsl_assert_data_9.fct = "arrays";
@@ -249,7 +249,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_11.file = "array.i";
       __gen_e_acsl_assert_data_11.fct = "arrays";
@@ -268,7 +268,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(h,4); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(h,4)";
       __gen_e_acsl_assert_data_12.file = "array.i";
       __gen_e_acsl_assert_data_12.fct = "arrays";
@@ -303,7 +303,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_14.file = "array.i";
       __gen_e_acsl_assert_data_14.fct = "arrays";
@@ -339,7 +339,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_16.blocking = 1;
-      __gen_e_acsl_assert_data_16.kind = "RTE";
+      __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_16.file = "array.i";
       __gen_e_acsl_assert_data_16.fct = "arrays";
@@ -379,7 +379,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
+      __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_18.file = "array.i";
       __gen_e_acsl_assert_data_18.fct = "arrays";
@@ -416,7 +416,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_19.blocking = 1;
-      __gen_e_acsl_assert_data_19.kind = "RTE";
+      __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_19.pred_txt = "\\valid_read(&(*((int (*)[3])g))[0 .. 2])";
       __gen_e_acsl_assert_data_19.file = "array.i";
       __gen_e_acsl_assert_data_19.fct = "arrays";
@@ -490,7 +490,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_21.blocking = 1;
-      __gen_e_acsl_assert_data_21.kind = "RTE";
+      __gen_e_acsl_assert_data_21.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_21.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_21.file = "array.i";
       __gen_e_acsl_assert_data_21.fct = "arrays";
@@ -553,7 +553,7 @@ void arrays(void)
                                  "__gen_e_acsl_if_2",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_assert_data_23.blocking = 1;
-    __gen_e_acsl_assert_data_23.kind = "RTE";
+    __gen_e_acsl_assert_data_23.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_23.pred_txt = "(\\let size =\n   sizeof(int) *\n   ((((\\block_length(*((int (*)[])g)) - \\offset(*((int (*)[])g))) / 4 - 1) -\n     0)\n    + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_23.file = "array.i";
     __gen_e_acsl_assert_data_23.fct = "arrays";
@@ -598,7 +598,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_22.blocking = 1;
-      __gen_e_acsl_assert_data_22.kind = "RTE";
+      __gen_e_acsl_assert_data_22.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_22.pred_txt = "\\valid_read(&(*((int (*)[])g))[0 ..\n                               (\\block_length(*((int (*)[])g)) -\n                                \\offset(*((int (*)[])g)))\n                               / 4 - 1])";
       __gen_e_acsl_assert_data_22.file = "array.i";
       __gen_e_acsl_assert_data_22.fct = "arrays";
@@ -669,7 +669,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_25.blocking = 1;
-      __gen_e_acsl_assert_data_25.kind = "RTE";
+      __gen_e_acsl_assert_data_25.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_25.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_25.file = "array.i";
       __gen_e_acsl_assert_data_25.fct = "arrays";
@@ -706,7 +706,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_26.blocking = 1;
-      __gen_e_acsl_assert_data_26.kind = "RTE";
+      __gen_e_acsl_assert_data_26.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_26.pred_txt = "\\valid_read(&(*((int (*)[3])f))[0 .. 2])";
       __gen_e_acsl_assert_data_26.file = "array.i";
       __gen_e_acsl_assert_data_26.fct = "arrays";
@@ -781,7 +781,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_28.blocking = 1;
-      __gen_e_acsl_assert_data_28.kind = "RTE";
+      __gen_e_acsl_assert_data_28.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_28.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_28.file = "array.i";
       __gen_e_acsl_assert_data_28.fct = "arrays";
@@ -845,7 +845,7 @@ void arrays(void)
                                  "__gen_e_acsl_if_4",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_4));
     __gen_e_acsl_assert_data_30.blocking = 1;
-    __gen_e_acsl_assert_data_30.kind = "RTE";
+    __gen_e_acsl_assert_data_30.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_30.pred_txt = "(\\let size =\n   sizeof(int) *\n   ((((\\block_length(*((int (*)[])f)) - \\offset(*((int (*)[])f))) / 4 - 1) -\n     0)\n    + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_30.file = "array.i";
     __gen_e_acsl_assert_data_30.fct = "arrays";
@@ -890,7 +890,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_29.blocking = 1;
-      __gen_e_acsl_assert_data_29.kind = "RTE";
+      __gen_e_acsl_assert_data_29.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_29.pred_txt = "\\valid_read(&(*((int (*)[])f))[0 ..\n                               (\\block_length(*((int (*)[])f)) -\n                                \\offset(*((int (*)[])f)))\n                               / 4 - 1])";
       __gen_e_acsl_assert_data_29.file = "array.i";
       __gen_e_acsl_assert_data_29.fct = "arrays";
@@ -1076,7 +1076,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_35.blocking = 1;
-      __gen_e_acsl_assert_data_35.kind = "RTE";
+      __gen_e_acsl_assert_data_35.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_35.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_35.file = "array.i";
       __gen_e_acsl_assert_data_35.fct = "arrays";
@@ -1113,7 +1113,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_36.blocking = 1;
-      __gen_e_acsl_assert_data_36.kind = "RTE";
+      __gen_e_acsl_assert_data_36.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_36.pred_txt = "\\valid_read(&(*((int (*)[3])l))[0 .. 2])";
       __gen_e_acsl_assert_data_36.file = "array.i";
       __gen_e_acsl_assert_data_36.fct = "arrays";
@@ -1133,7 +1133,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(m,4); */
     {
       __gen_e_acsl_assert_data_37.blocking = 1;
-      __gen_e_acsl_assert_data_37.kind = "RTE";
+      __gen_e_acsl_assert_data_37.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_37.pred_txt = "\\aligned(m,4)";
       __gen_e_acsl_assert_data_37.file = "array.i";
       __gen_e_acsl_assert_data_37.fct = "arrays";
@@ -1170,7 +1170,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_38.blocking = 1;
-      __gen_e_acsl_assert_data_38.kind = "RTE";
+      __gen_e_acsl_assert_data_38.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_38.pred_txt = "\\valid_read(&(*((int (*)[3])m))[0 .. 2])";
       __gen_e_acsl_assert_data_38.file = "array.i";
       __gen_e_acsl_assert_data_38.fct = "arrays";
@@ -1231,7 +1231,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_40.blocking = 1;
-      __gen_e_acsl_assert_data_40.kind = "RTE";
+      __gen_e_acsl_assert_data_40.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_40.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_40.file = "array.i";
       __gen_e_acsl_assert_data_40.fct = "arrays";
@@ -1268,7 +1268,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_41.blocking = 1;
-      __gen_e_acsl_assert_data_41.kind = "RTE";
+      __gen_e_acsl_assert_data_41.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_41.pred_txt = "\\valid_read(&(*((int (*)[3])l))[0 .. 2])";
       __gen_e_acsl_assert_data_41.file = "array.i";
       __gen_e_acsl_assert_data_41.fct = "arrays";
@@ -1288,7 +1288,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(n,4); */
     {
       __gen_e_acsl_assert_data_42.blocking = 1;
-      __gen_e_acsl_assert_data_42.kind = "RTE";
+      __gen_e_acsl_assert_data_42.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_42.pred_txt = "\\aligned(n,4)";
       __gen_e_acsl_assert_data_42.file = "array.i";
       __gen_e_acsl_assert_data_42.fct = "arrays";
@@ -1325,7 +1325,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_43.blocking = 1;
-      __gen_e_acsl_assert_data_43.kind = "RTE";
+      __gen_e_acsl_assert_data_43.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_43.pred_txt = "\\valid_read(&(*((int (*)[3])n))[0 .. 2])";
       __gen_e_acsl_assert_data_43.file = "array.i";
       __gen_e_acsl_assert_data_43.fct = "arrays";
@@ -1376,7 +1376,7 @@ void arrays(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_46 =
         {.values = (void *)0};
       __gen_e_acsl_assert_data_46.blocking = 1;
-      __gen_e_acsl_assert_data_46.kind = "RTE";
+      __gen_e_acsl_assert_data_46.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_46.pred_txt = "(int)3 <= (int)6";
       __gen_e_acsl_assert_data_46.file = "array.i";
       __gen_e_acsl_assert_data_46.fct = "arrays";
@@ -1384,7 +1384,7 @@ void arrays(void)
       __gen_e_acsl_assert_data_46.name = "array_coercion";
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_46);
       __gen_e_acsl_assert_data_45.blocking = 1;
-      __gen_e_acsl_assert_data_45.kind = "RTE";
+      __gen_e_acsl_assert_data_45.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_45.pred_txt = "(int)3 <= (int)6";
       __gen_e_acsl_assert_data_45.file = "array.i";
       __gen_e_acsl_assert_data_45.fct = "arrays";
@@ -1427,7 +1427,7 @@ void arrays(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_49 =
         {.values = (void *)0};
       __gen_e_acsl_assert_data_49.blocking = 1;
-      __gen_e_acsl_assert_data_49.kind = "RTE";
+      __gen_e_acsl_assert_data_49.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_49.pred_txt = "(int)3 <= (int)6";
       __gen_e_acsl_assert_data_49.file = "array.i";
       __gen_e_acsl_assert_data_49.fct = "arrays";
@@ -1435,7 +1435,7 @@ void arrays(void)
       __gen_e_acsl_assert_data_49.name = "array_coercion";
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_49);
       __gen_e_acsl_assert_data_48.blocking = 1;
-      __gen_e_acsl_assert_data_48.kind = "RTE";
+      __gen_e_acsl_assert_data_48.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_48.pred_txt = "(int)3 <= (int)6";
       __gen_e_acsl_assert_data_48.file = "array.i";
       __gen_e_acsl_assert_data_48.fct = "arrays";
@@ -1488,7 +1488,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_51.blocking = 1;
-      __gen_e_acsl_assert_data_51.kind = "RTE";
+      __gen_e_acsl_assert_data_51.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_51.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_51.file = "array.i";
       __gen_e_acsl_assert_data_51.fct = "arrays";
@@ -1525,7 +1525,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_52.blocking = 1;
-      __gen_e_acsl_assert_data_52.kind = "RTE";
+      __gen_e_acsl_assert_data_52.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_52.pred_txt = "\\valid_read(&(*((int (*)[2])l))[0 .. 1])";
       __gen_e_acsl_assert_data_52.file = "array.i";
       __gen_e_acsl_assert_data_52.fct = "arrays";
@@ -1545,7 +1545,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(m,4); */
     {
       __gen_e_acsl_assert_data_53.blocking = 1;
-      __gen_e_acsl_assert_data_53.kind = "RTE";
+      __gen_e_acsl_assert_data_53.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_53.pred_txt = "\\aligned(m,4)";
       __gen_e_acsl_assert_data_53.file = "array.i";
       __gen_e_acsl_assert_data_53.fct = "arrays";
@@ -1582,7 +1582,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_54.blocking = 1;
-      __gen_e_acsl_assert_data_54.kind = "RTE";
+      __gen_e_acsl_assert_data_54.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_54.pred_txt = "\\valid_read(&(*((int (*)[2])m))[0 .. 1])";
       __gen_e_acsl_assert_data_54.file = "array.i";
       __gen_e_acsl_assert_data_54.fct = "arrays";
@@ -1643,7 +1643,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_56.blocking = 1;
-      __gen_e_acsl_assert_data_56.kind = "RTE";
+      __gen_e_acsl_assert_data_56.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_56.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_56.file = "array.i";
       __gen_e_acsl_assert_data_56.fct = "arrays";
@@ -1680,7 +1680,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_57.blocking = 1;
-      __gen_e_acsl_assert_data_57.kind = "RTE";
+      __gen_e_acsl_assert_data_57.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_57.pred_txt = "\\valid_read(&(*((int (*)[2])l))[0 .. 1])";
       __gen_e_acsl_assert_data_57.file = "array.i";
       __gen_e_acsl_assert_data_57.fct = "arrays";
@@ -1700,7 +1700,7 @@ void arrays(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(n,4); */
     {
       __gen_e_acsl_assert_data_58.blocking = 1;
-      __gen_e_acsl_assert_data_58.kind = "RTE";
+      __gen_e_acsl_assert_data_58.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_58.pred_txt = "\\aligned(n,4)";
       __gen_e_acsl_assert_data_58.file = "array.i";
       __gen_e_acsl_assert_data_58.fct = "arrays";
@@ -1737,7 +1737,7 @@ void arrays(void)
     */
     {
       __gen_e_acsl_assert_data_59.blocking = 1;
-      __gen_e_acsl_assert_data_59.kind = "RTE";
+      __gen_e_acsl_assert_data_59.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_59.pred_txt = "\\valid_read(&(*((int (*)[2])n))[0 .. 1])";
       __gen_e_acsl_assert_data_59.file = "array.i";
       __gen_e_acsl_assert_data_59.fct = "arrays";
@@ -1971,7 +1971,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_5.file = "array.i";
       __gen_e_acsl_assert_data_5.fct = "matrices";
@@ -1990,7 +1990,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_6.file = "array.i";
       __gen_e_acsl_assert_data_6.fct = "matrices";
@@ -2026,7 +2026,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_8.file = "array.i";
       __gen_e_acsl_assert_data_8.fct = "matrices";
@@ -2045,7 +2045,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_9.file = "array.i";
       __gen_e_acsl_assert_data_9.fct = "matrices";
@@ -2081,7 +2081,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_11.file = "array.i";
       __gen_e_acsl_assert_data_11.fct = "matrices";
@@ -2100,7 +2100,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(h,4); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(h,4)";
       __gen_e_acsl_assert_data_12.file = "array.i";
       __gen_e_acsl_assert_data_12.fct = "matrices";
@@ -2135,7 +2135,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_14.file = "array.i";
       __gen_e_acsl_assert_data_14.fct = "matrices";
@@ -2171,7 +2171,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(e,4); */
     {
       __gen_e_acsl_assert_data_16.blocking = 1;
-      __gen_e_acsl_assert_data_16.kind = "RTE";
+      __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(e,4)";
       __gen_e_acsl_assert_data_16.file = "array.i";
       __gen_e_acsl_assert_data_16.fct = "matrices";
@@ -2211,7 +2211,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
+      __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_18.file = "array.i";
       __gen_e_acsl_assert_data_18.fct = "matrices";
@@ -2249,7 +2249,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_19.blocking = 1;
-      __gen_e_acsl_assert_data_19.kind = "RTE";
+      __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_19.pred_txt = "\\valid_read(&(*((int (*)[3][2])g))[0 .. 2][0 .. 1])";
       __gen_e_acsl_assert_data_19.file = "array.i";
       __gen_e_acsl_assert_data_19.fct = "matrices";
@@ -2323,7 +2323,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(g,4); */
     {
       __gen_e_acsl_assert_data_21.blocking = 1;
-      __gen_e_acsl_assert_data_21.kind = "RTE";
+      __gen_e_acsl_assert_data_21.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_21.pred_txt = "\\aligned(g,4)";
       __gen_e_acsl_assert_data_21.file = "array.i";
       __gen_e_acsl_assert_data_21.fct = "matrices";
@@ -2364,7 +2364,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_22.blocking = 1;
-      __gen_e_acsl_assert_data_22.kind = "RTE";
+      __gen_e_acsl_assert_data_22.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_22.pred_txt = "\\valid_read(&(*((int (*)[][2])g))[0 ..\n                                  (\\block_length(*((int (*)[][2])g)) -\n                                   \\offset(*((int (*)[][2])g)))\n                                  / 8 - 1][0 .. 1])";
       __gen_e_acsl_assert_data_22.file = "array.i";
       __gen_e_acsl_assert_data_22.fct = "matrices";
@@ -2439,7 +2439,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_24.blocking = 1;
-      __gen_e_acsl_assert_data_24.kind = "RTE";
+      __gen_e_acsl_assert_data_24.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_24.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_24.file = "array.i";
       __gen_e_acsl_assert_data_24.fct = "matrices";
@@ -2477,7 +2477,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_25.blocking = 1;
-      __gen_e_acsl_assert_data_25.kind = "RTE";
+      __gen_e_acsl_assert_data_25.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_25.pred_txt = "\\valid_read(&(*((int (*)[3][2])f))[0 .. 2][0 .. 1])";
       __gen_e_acsl_assert_data_25.file = "array.i";
       __gen_e_acsl_assert_data_25.fct = "matrices";
@@ -2552,7 +2552,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(f,4); */
     {
       __gen_e_acsl_assert_data_27.blocking = 1;
-      __gen_e_acsl_assert_data_27.kind = "RTE";
+      __gen_e_acsl_assert_data_27.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_27.pred_txt = "\\aligned(f,4)";
       __gen_e_acsl_assert_data_27.file = "array.i";
       __gen_e_acsl_assert_data_27.fct = "matrices";
@@ -2593,7 +2593,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_28.blocking = 1;
-      __gen_e_acsl_assert_data_28.kind = "RTE";
+      __gen_e_acsl_assert_data_28.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_28.pred_txt = "\\valid_read(&(*((int (*)[][2])f))[0 ..\n                                  (\\block_length(*((int (*)[][2])f)) -\n                                   \\offset(*((int (*)[][2])f)))\n                                  / 8 - 1][0 .. 1])";
       __gen_e_acsl_assert_data_28.file = "array.i";
       __gen_e_acsl_assert_data_28.fct = "matrices";
@@ -2831,7 +2831,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_33.blocking = 1;
-      __gen_e_acsl_assert_data_33.kind = "RTE";
+      __gen_e_acsl_assert_data_33.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_33.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_33.file = "array.i";
       __gen_e_acsl_assert_data_33.fct = "matrices";
@@ -2869,7 +2869,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_34.blocking = 1;
-      __gen_e_acsl_assert_data_34.kind = "RTE";
+      __gen_e_acsl_assert_data_34.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_34.pred_txt = "\\valid_read(&(*((int (*)[2][2])l))[0 .. 1][0 .. 1])";
       __gen_e_acsl_assert_data_34.file = "array.i";
       __gen_e_acsl_assert_data_34.fct = "matrices";
@@ -2889,7 +2889,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(m,4); */
     {
       __gen_e_acsl_assert_data_35.blocking = 1;
-      __gen_e_acsl_assert_data_35.kind = "RTE";
+      __gen_e_acsl_assert_data_35.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_35.pred_txt = "\\aligned(m,4)";
       __gen_e_acsl_assert_data_35.file = "array.i";
       __gen_e_acsl_assert_data_35.fct = "matrices";
@@ -2927,7 +2927,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_36.blocking = 1;
-      __gen_e_acsl_assert_data_36.kind = "RTE";
+      __gen_e_acsl_assert_data_36.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_36.pred_txt = "\\valid_read(&(*((int (*)[2][2])m))[0 .. 1][0 .. 1])";
       __gen_e_acsl_assert_data_36.file = "array.i";
       __gen_e_acsl_assert_data_36.fct = "matrices";
@@ -3004,7 +3004,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_38.blocking = 1;
-      __gen_e_acsl_assert_data_38.kind = "RTE";
+      __gen_e_acsl_assert_data_38.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_38.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_38.file = "array.i";
       __gen_e_acsl_assert_data_38.fct = "matrices";
@@ -3042,7 +3042,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_39.blocking = 1;
-      __gen_e_acsl_assert_data_39.kind = "RTE";
+      __gen_e_acsl_assert_data_39.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_39.pred_txt = "\\valid_read(&(*((int (*)[2][2])l))[0 .. 1][0 .. 1])";
       __gen_e_acsl_assert_data_39.file = "array.i";
       __gen_e_acsl_assert_data_39.fct = "matrices";
@@ -3062,7 +3062,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(n,4); */
     {
       __gen_e_acsl_assert_data_40.blocking = 1;
-      __gen_e_acsl_assert_data_40.kind = "RTE";
+      __gen_e_acsl_assert_data_40.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_40.pred_txt = "\\aligned(n,4)";
       __gen_e_acsl_assert_data_40.file = "array.i";
       __gen_e_acsl_assert_data_40.fct = "matrices";
@@ -3100,7 +3100,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_41.blocking = 1;
-      __gen_e_acsl_assert_data_41.kind = "RTE";
+      __gen_e_acsl_assert_data_41.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_41.pred_txt = "\\valid_read(&(*((int (*)[2][2])n))[0 .. 1][0 .. 1])";
       __gen_e_acsl_assert_data_41.file = "array.i";
       __gen_e_acsl_assert_data_41.fct = "matrices";
@@ -3167,7 +3167,7 @@ void matrices(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_44 =
         {.values = (void *)0};
       __gen_e_acsl_assert_data_44.blocking = 1;
-      __gen_e_acsl_assert_data_44.kind = "RTE";
+      __gen_e_acsl_assert_data_44.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_44.pred_txt = "(int)2 <= (int)4";
       __gen_e_acsl_assert_data_44.file = "array.i";
       __gen_e_acsl_assert_data_44.fct = "matrices";
@@ -3175,7 +3175,7 @@ void matrices(void)
       __gen_e_acsl_assert_data_44.name = "array_coercion";
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_44);
       __gen_e_acsl_assert_data_43.blocking = 1;
-      __gen_e_acsl_assert_data_43.kind = "RTE";
+      __gen_e_acsl_assert_data_43.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_43.pred_txt = "(int)2 <= (int)4";
       __gen_e_acsl_assert_data_43.file = "array.i";
       __gen_e_acsl_assert_data_43.fct = "matrices";
@@ -3234,7 +3234,7 @@ void matrices(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_47 =
         {.values = (void *)0};
       __gen_e_acsl_assert_data_47.blocking = 1;
-      __gen_e_acsl_assert_data_47.kind = "RTE";
+      __gen_e_acsl_assert_data_47.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_47.pred_txt = "(int)2 <= (int)4";
       __gen_e_acsl_assert_data_47.file = "array.i";
       __gen_e_acsl_assert_data_47.fct = "matrices";
@@ -3242,7 +3242,7 @@ void matrices(void)
       __gen_e_acsl_assert_data_47.name = "array_coercion";
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_47);
       __gen_e_acsl_assert_data_46.blocking = 1;
-      __gen_e_acsl_assert_data_46.kind = "RTE";
+      __gen_e_acsl_assert_data_46.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_46.pred_txt = "(int)2 <= (int)4";
       __gen_e_acsl_assert_data_46.file = "array.i";
       __gen_e_acsl_assert_data_46.fct = "matrices";
@@ -3311,7 +3311,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_49.blocking = 1;
-      __gen_e_acsl_assert_data_49.kind = "RTE";
+      __gen_e_acsl_assert_data_49.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_49.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_49.file = "array.i";
       __gen_e_acsl_assert_data_49.fct = "matrices";
@@ -3349,7 +3349,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_50.blocking = 1;
-      __gen_e_acsl_assert_data_50.kind = "RTE";
+      __gen_e_acsl_assert_data_50.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_50.pred_txt = "\\valid_read(&(*((int (*)[1][2])l))[0 .. 0][0 .. 1])";
       __gen_e_acsl_assert_data_50.file = "array.i";
       __gen_e_acsl_assert_data_50.fct = "matrices";
@@ -3369,7 +3369,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(m,4); */
     {
       __gen_e_acsl_assert_data_51.blocking = 1;
-      __gen_e_acsl_assert_data_51.kind = "RTE";
+      __gen_e_acsl_assert_data_51.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_51.pred_txt = "\\aligned(m,4)";
       __gen_e_acsl_assert_data_51.file = "array.i";
       __gen_e_acsl_assert_data_51.fct = "matrices";
@@ -3407,7 +3407,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_52.blocking = 1;
-      __gen_e_acsl_assert_data_52.kind = "RTE";
+      __gen_e_acsl_assert_data_52.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_52.pred_txt = "\\valid_read(&(*((int (*)[1][2])m))[0 .. 0][0 .. 1])";
       __gen_e_acsl_assert_data_52.file = "array.i";
       __gen_e_acsl_assert_data_52.fct = "matrices";
@@ -3484,7 +3484,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(l,4); */
     {
       __gen_e_acsl_assert_data_54.blocking = 1;
-      __gen_e_acsl_assert_data_54.kind = "RTE";
+      __gen_e_acsl_assert_data_54.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_54.pred_txt = "\\aligned(l,4)";
       __gen_e_acsl_assert_data_54.file = "array.i";
       __gen_e_acsl_assert_data_54.fct = "matrices";
@@ -3522,7 +3522,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_55.blocking = 1;
-      __gen_e_acsl_assert_data_55.kind = "RTE";
+      __gen_e_acsl_assert_data_55.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_55.pred_txt = "\\valid_read(&(*((int (*)[1][2])l))[0 .. 0][0 .. 1])";
       __gen_e_acsl_assert_data_55.file = "array.i";
       __gen_e_acsl_assert_data_55.fct = "matrices";
@@ -3542,7 +3542,7 @@ void matrices(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(n,4); */
     {
       __gen_e_acsl_assert_data_56.blocking = 1;
-      __gen_e_acsl_assert_data_56.kind = "RTE";
+      __gen_e_acsl_assert_data_56.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_56.pred_txt = "\\aligned(n,4)";
       __gen_e_acsl_assert_data_56.file = "array.i";
       __gen_e_acsl_assert_data_56.fct = "matrices";
@@ -3580,7 +3580,7 @@ void matrices(void)
     */
     {
       __gen_e_acsl_assert_data_57.blocking = 1;
-      __gen_e_acsl_assert_data_57.kind = "RTE";
+      __gen_e_acsl_assert_data_57.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_57.pred_txt = "\\valid_read(&(*((int (*)[1][2])n))[0 .. 0][0 .. 1])";
       __gen_e_acsl_assert_data_57.file = "array.i";
       __gen_e_acsl_assert_data_57.fct = "matrices";

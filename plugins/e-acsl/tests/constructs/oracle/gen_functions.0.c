@@ -1305,7 +1305,7 @@ double __gen_e_acsl_f2(double x)
   /*@ assert E_ACSL: "division by zero": x != 0; */
   {
     __gen_e_acsl_assert_data_14.blocking = 1;
-    __gen_e_acsl_assert_data_14.kind = "RTE";
+    __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_14.pred_txt = "x != 0";
     __gen_e_acsl_assert_data_14.file = "functions.c";
     __gen_e_acsl_assert_data_14.fct = "f2";
@@ -1367,7 +1367,7 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b)
   /*@ assert E_ACSL: "division by zero": b != 0; */
   {
     __gen_e_acsl_assert_data_19.blocking = 1;
-    __gen_e_acsl_assert_data_19.kind = "RTE";
+    __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_19.pred_txt = "b != 0";
     __gen_e_acsl_assert_data_19.file = "functions.c";
     __gen_e_acsl_assert_data_19.fct = "over";
@@ -1682,7 +1682,7 @@ int __gen_e_acsl_rf2(int n)
     /*@ assert E_ACSL: "division by zero": rf2(n - 3) != 0; */
     {
       __gen_e_acsl_assert_data_36.blocking = 1;
-      __gen_e_acsl_assert_data_36.kind = "RTE";
+      __gen_e_acsl_assert_data_36.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_36.pred_txt = "rf2(n - 3) != 0";
       __gen_e_acsl_assert_data_36.file = "functions.c";
       __gen_e_acsl_assert_data_36.fct = "rf2";
@@ -1856,7 +1856,7 @@ int __gen_e_acsl_f4(__e_acsl_mpz_struct * x)
     __gmpz_init_set_si(__gen_e_acsl__8,99L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_5.pred_txt = "0 <= 99 <= 18446744073709551615";
     __gen_e_acsl_assert_data_5.file = "functions.c";
     __gen_e_acsl_assert_data_5.fct = "f4";
@@ -1870,7 +1870,7 @@ int __gen_e_acsl_f4(__e_acsl_mpz_struct * x)
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
     __gmpz_init(__gen_e_acsl_shiftl_2);
     __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "1 >= 0";
     __gen_e_acsl_assert_data_4.file = "functions.c";
     __gen_e_acsl_assert_data_4.fct = "f4";
@@ -1933,7 +1933,7 @@ void __gen_e_acsl_f4_2(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x)
     __gmpz_init_set_si(__gen_e_acsl__6,99L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
     __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "0 <= 99 <= 18446744073709551615";
     __gen_e_acsl_assert_data_3.file = "functions.c";
     __gen_e_acsl_assert_data_3.fct = "f4_2";
@@ -1947,7 +1947,7 @@ void __gen_e_acsl_f4_2(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x)
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gmpz_init(__gen_e_acsl_shiftl);
     __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "1 >= 0";
     __gen_e_acsl_assert_data_2.file = "functions.c";
     __gen_e_acsl_assert_data_2.fct = "f4_2";

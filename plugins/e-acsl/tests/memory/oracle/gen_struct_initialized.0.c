@@ -195,7 +195,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_8.blocking = 1;
-        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_8.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_8.fct = "main";
@@ -240,7 +240,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_10.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_10.fct = "main";
@@ -287,7 +287,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_12.blocking = 1;
-        __gen_e_acsl_assert_data_12.kind = "RTE";
+        __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_12.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_12.fct = "main";
@@ -332,7 +332,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
+        __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_14.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_14.fct = "main";
@@ -379,7 +379,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_16.blocking = 1;
-        __gen_e_acsl_assert_data_16.kind = "RTE";
+        __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_16.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_16.fct = "main";
@@ -424,7 +424,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(heap_pair,4); */
       {
         __gen_e_acsl_assert_data_18.blocking = 1;
-        __gen_e_acsl_assert_data_18.kind = "RTE";
+        __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(heap_pair,4)";
         __gen_e_acsl_assert_data_18.file = "struct_initialized.c";
         __gen_e_acsl_assert_data_18.fct = "main";

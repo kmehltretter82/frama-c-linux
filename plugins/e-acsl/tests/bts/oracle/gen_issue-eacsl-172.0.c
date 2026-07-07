@@ -17,7 +17,7 @@ int main(void)
       {.values = (void *)0};
     __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_2,"d2",d2);
     __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "-2147483649 < d2";
     __gen_e_acsl_assert_data_2.file = "issue-eacsl-172.c";
     __gen_e_acsl_assert_data_2.fct = "main";
@@ -29,7 +29,7 @@ int main(void)
       {.values = (void *)0};
     __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_3,"d2",d2);
     __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "d2 < 2147483648";
     __gen_e_acsl_assert_data_3.file = "issue-eacsl-172.c";
     __gen_e_acsl_assert_data_3.fct = "main";

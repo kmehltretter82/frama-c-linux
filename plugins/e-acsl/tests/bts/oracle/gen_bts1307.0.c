@@ -147,7 +147,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mwmin,4); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(Mwmin,4)";
       __gen_e_acsl_assert_data.file = "bts1307.i";
       __gen_e_acsl_assert_data.fct = "bar";
@@ -167,7 +167,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mwmin),4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\old(Mwmin),4)";
       __gen_e_acsl_assert_data_2.file = "bts1307.i";
       __gen_e_acsl_assert_data_2.fct = "bar";
@@ -190,7 +190,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_in,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(Mtmin_in,4)";
       __gen_e_acsl_assert_data_3.file = "bts1307.i";
       __gen_e_acsl_assert_data_3.fct = "bar";
@@ -210,7 +210,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmin_in),4); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(\\old(Mtmin_in),4)";
       __gen_e_acsl_assert_data_4.file = "bts1307.i";
       __gen_e_acsl_assert_data_4.fct = "bar";
@@ -233,7 +233,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mwmin,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(Mwmin,4)";
       __gen_e_acsl_assert_data_5.file = "bts1307.i";
       __gen_e_acsl_assert_data_5.fct = "bar";
@@ -253,7 +253,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mwmin),4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(\\old(Mwmin),4)";
       __gen_e_acsl_assert_data_6.file = "bts1307.i";
       __gen_e_acsl_assert_data_6.fct = "bar";
@@ -276,7 +276,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_in,4); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(Mtmin_in,4)";
       __gen_e_acsl_assert_data_7.file = "bts1307.i";
       __gen_e_acsl_assert_data_7.fct = "bar";
@@ -296,7 +296,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmin_in),4); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(\\old(Mtmin_in),4)";
       __gen_e_acsl_assert_data_8.file = "bts1307.i";
       __gen_e_acsl_assert_data_8.fct = "bar";
@@ -319,7 +319,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_in,4); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(Mtmin_in,4)";
       __gen_e_acsl_assert_data_9.file = "bts1307.i";
       __gen_e_acsl_assert_data_9.fct = "bar";
@@ -339,7 +339,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmin_in),4); */
     {
       __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(\\old(Mtmin_in),4)";
       __gen_e_acsl_assert_data_10.file = "bts1307.i";
       __gen_e_acsl_assert_data_10.fct = "bar";
@@ -362,7 +362,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_out,4); */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(Mtmin_out,4)";
       __gen_e_acsl_assert_data_11.file = "bts1307.i";
       __gen_e_acsl_assert_data_11.fct = "bar";
@@ -382,7 +382,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmin_out),4); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(\\old(Mtmin_out),4)";
       __gen_e_acsl_assert_data_12.file = "bts1307.i";
       __gen_e_acsl_assert_data_12.fct = "bar";
@@ -408,7 +408,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_in,4); */
     {
       __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(Mtmin_in,4)";
       __gen_e_acsl_assert_data_14.file = "bts1307.i";
       __gen_e_acsl_assert_data_14.fct = "bar";
@@ -447,7 +447,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mwmin,4); */
     {
       __gen_e_acsl_assert_data_16.blocking = 1;
-      __gen_e_acsl_assert_data_16.kind = "RTE";
+      __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(Mwmin,4)";
       __gen_e_acsl_assert_data_16.file = "bts1307.i";
       __gen_e_acsl_assert_data_16.fct = "bar";
@@ -485,7 +485,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmin_out,4); */
     {
       __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
+      __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(Mtmin_out,4)";
       __gen_e_acsl_assert_data_18.file = "bts1307.i";
       __gen_e_acsl_assert_data_18.fct = "bar";
@@ -542,7 +542,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmin_out)); */
       {
         __gen_e_acsl_assert_data_20.blocking = 1;
-        __gen_e_acsl_assert_data_20.kind = "RTE";
+        __gen_e_acsl_assert_data_20.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_20.pred_txt = "\\valid_read(\\old(Mtmin_out))";
         __gen_e_acsl_assert_data_20.file = "bts1307.i";
         __gen_e_acsl_assert_data_20.fct = "bar";
@@ -569,7 +569,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmin_in)); */
       {
         __gen_e_acsl_assert_data_21.blocking = 1;
-        __gen_e_acsl_assert_data_21.kind = "RTE";
+        __gen_e_acsl_assert_data_21.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_21.pred_txt = "\\valid_read(\\old(Mtmin_in))";
         __gen_e_acsl_assert_data_21.file = "bts1307.i";
         __gen_e_acsl_assert_data_21.fct = "bar";
@@ -608,7 +608,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmin_in)); */
         {
           __gen_e_acsl_assert_data_22.blocking = 1;
-          __gen_e_acsl_assert_data_22.kind = "RTE";
+          __gen_e_acsl_assert_data_22.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_22.pred_txt = "\\valid_read(\\old(Mtmin_in))";
           __gen_e_acsl_assert_data_22.file = "bts1307.i";
           __gen_e_acsl_assert_data_22.fct = "bar";
@@ -639,7 +639,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         /*@ assert E_ACSL: "memory access": \valid_read(\old(Mwmin)); */
         {
           __gen_e_acsl_assert_data_23.blocking = 1;
-          __gen_e_acsl_assert_data_23.kind = "RTE";
+          __gen_e_acsl_assert_data_23.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_23.pred_txt = "\\valid_read(\\old(Mwmin))";
           __gen_e_acsl_assert_data_23.file = "bts1307.i";
           __gen_e_acsl_assert_data_23.fct = "bar";
@@ -688,7 +688,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmin_in)); */
         {
           __gen_e_acsl_assert_data_24.blocking = 1;
-          __gen_e_acsl_assert_data_24.kind = "RTE";
+          __gen_e_acsl_assert_data_24.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_24.pred_txt = "\\valid_read(\\old(Mtmin_in))";
           __gen_e_acsl_assert_data_24.file = "bts1307.i";
           __gen_e_acsl_assert_data_24.fct = "bar";
@@ -728,7 +728,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         /*@ assert E_ACSL: "memory access": \valid_read(\old(Mwmin)); */
         {
           __gen_e_acsl_assert_data_25.blocking = 1;
-          __gen_e_acsl_assert_data_25.kind = "RTE";
+          __gen_e_acsl_assert_data_25.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_25.pred_txt = "\\valid_read(\\old(Mwmin))";
           __gen_e_acsl_assert_data_25.file = "bts1307.i";
           __gen_e_acsl_assert_data_25.fct = "bar";
@@ -822,7 +822,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mwmax,4); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(Mwmax,4)";
       __gen_e_acsl_assert_data.file = "bts1307.i";
       __gen_e_acsl_assert_data.fct = "foo";
@@ -842,7 +842,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mwmax),4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\old(Mwmax),4)";
       __gen_e_acsl_assert_data_2.file = "bts1307.i";
       __gen_e_acsl_assert_data_2.fct = "foo";
@@ -865,7 +865,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmax_in,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(Mtmax_in,4)";
       __gen_e_acsl_assert_data_3.file = "bts1307.i";
       __gen_e_acsl_assert_data_3.fct = "foo";
@@ -885,7 +885,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmax_in),4); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(\\old(Mtmax_in),4)";
       __gen_e_acsl_assert_data_4.file = "bts1307.i";
       __gen_e_acsl_assert_data_4.fct = "foo";
@@ -908,7 +908,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmax_out,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(Mtmax_out,4)";
       __gen_e_acsl_assert_data_5.file = "bts1307.i";
       __gen_e_acsl_assert_data_5.fct = "foo";
@@ -928,7 +928,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(Mtmax_out),4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(\\old(Mtmax_out),4)";
       __gen_e_acsl_assert_data_6.file = "bts1307.i";
       __gen_e_acsl_assert_data_6.fct = "foo";
@@ -954,7 +954,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmax_in,4); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(Mtmax_in,4)";
       __gen_e_acsl_assert_data_8.file = "bts1307.i";
       __gen_e_acsl_assert_data_8.fct = "foo";
@@ -993,7 +993,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mwmax,4); */
     {
       __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(Mwmax,4)";
       __gen_e_acsl_assert_data_10.file = "bts1307.i";
       __gen_e_acsl_assert_data_10.fct = "foo";
@@ -1031,7 +1031,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     /*@ assert E_ACSL: "pointer alignment": \aligned(Mtmax_out,4); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(Mtmax_out,4)";
       __gen_e_acsl_assert_data_12.file = "bts1307.i";
       __gen_e_acsl_assert_data_12.fct = "foo";
@@ -1099,7 +1099,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmax_out)); */
       {
         __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
+        __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_14.pred_txt = "\\valid_read(\\old(Mtmax_out))";
         __gen_e_acsl_assert_data_14.file = "bts1307.i";
         __gen_e_acsl_assert_data_14.fct = "foo";
@@ -1128,7 +1128,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       /*@ assert E_ACSL: "memory access": \valid_read(\old(Mtmax_in)); */
       {
         __gen_e_acsl_assert_data_15.blocking = 1;
-        __gen_e_acsl_assert_data_15.kind = "RTE";
+        __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_15.pred_txt = "\\valid_read(\\old(Mtmax_in))";
         __gen_e_acsl_assert_data_15.file = "bts1307.i";
         __gen_e_acsl_assert_data_15.fct = "foo";
@@ -1149,7 +1149,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       /*@ assert E_ACSL: "division by zero": 80.0 != 0; */
       {
         __gen_e_acsl_assert_data_16.blocking = 1;
-        __gen_e_acsl_assert_data_16.kind = "RTE";
+        __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_16.pred_txt = "80.0 != 0";
         __gen_e_acsl_assert_data_16.file = "bts1307.i";
         __gen_e_acsl_assert_data_16.fct = "foo";
@@ -1177,7 +1177,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       /*@ assert E_ACSL: "memory access": \valid_read(\old(Mwmax)); */
       {
         __gen_e_acsl_assert_data_17.blocking = 1;
-        __gen_e_acsl_assert_data_17.kind = "RTE";
+        __gen_e_acsl_assert_data_17.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(\\old(Mwmax))";
         __gen_e_acsl_assert_data_17.file = "bts1307.i";
         __gen_e_acsl_assert_data_17.fct = "foo";

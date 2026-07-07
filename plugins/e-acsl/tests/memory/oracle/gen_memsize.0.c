@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(b,1); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(b,1)";
       __gen_e_acsl_assert_data_12.file = "memsize.c";
       __gen_e_acsl_assert_data_12.fct = "main";
@@ -271,7 +271,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(b,1); */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(b,1)";
       __gen_e_acsl_assert_data_15.file = "memsize.c";
       __gen_e_acsl_assert_data_15.fct = "main";
@@ -324,7 +324,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(b,1); */
     {
       __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
+      __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(b,1)";
       __gen_e_acsl_assert_data_18.file = "memsize.c";
       __gen_e_acsl_assert_data_18.fct = "main";

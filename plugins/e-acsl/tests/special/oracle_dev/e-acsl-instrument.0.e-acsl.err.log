@@ -1,5 +1,5 @@
 e-acsl-instrument.c: In function 'instrument2'
-e-acsl-instrument.c:32: Warning: no sound verdict for RTE (guess: ok).
+e-acsl-instrument.c:32: Warning: no sound verdict for E-ACSL RTE (guess: ok).
 	the considered predicate is:
 	pointer alignment:
 		\aligned(p,4)
@@ -8,7 +8,7 @@ e-acsl-instrument.c:32: Warning: no sound verdict for Precondition (guess: ok).
 	the considered predicate is:
 	\valid(p)
 e-acsl-instrument.c: In function 'uninstrument2'
-e-acsl-instrument.c:16: Warning: no sound verdict for RTE (guess: ok).
+e-acsl-instrument.c:16: Warning: no sound verdict for E-ACSL RTE (guess: ok).
 	the considered predicate is:
 	pointer alignment:
 		\aligned(p,4)

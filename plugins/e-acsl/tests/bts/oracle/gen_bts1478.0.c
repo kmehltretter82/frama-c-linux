@@ -55,7 +55,7 @@ void __gen_e_acsl_loop(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(global_i_ptr,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(global_i_ptr,4)";
       __gen_e_acsl_assert_data_3.file = "bts1478.c";
       __gen_e_acsl_assert_data_3.fct = "loop";
@@ -95,7 +95,7 @@ void __gen_e_acsl_loop(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(global_i_ptr,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(global_i_ptr,4)";
       __gen_e_acsl_assert_data_5.file = "bts1478.c";
       __gen_e_acsl_assert_data_5.fct = "loop";

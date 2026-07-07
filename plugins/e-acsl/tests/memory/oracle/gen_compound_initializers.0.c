@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(_A[0],1); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(_A[0],1)";
       __gen_e_acsl_assert_data_3.file = "compound_initializers.c";
       __gen_e_acsl_assert_data_3.fct = "main";
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(_A[1],1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(_A[1],1)";
       __gen_e_acsl_assert_data_5.file = "compound_initializers.c";
       __gen_e_acsl_assert_data_5.fct = "main";
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(_B,1); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(_B,1)";
       __gen_e_acsl_assert_data_7.file = "compound_initializers.c";
       __gen_e_acsl_assert_data_7.fct = "main";

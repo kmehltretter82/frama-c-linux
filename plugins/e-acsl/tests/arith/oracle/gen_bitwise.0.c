@@ -15,7 +15,7 @@ void f_signed(int a, int b)
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"a",0,a);
     __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "0 <= a";
     __gen_e_acsl_assert_data_2.file = "bitwise.c";
     __gen_e_acsl_assert_data_2.fct = "f_signed";
@@ -43,7 +43,7 @@ void f_signed(int a, int b)
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"b",0,b);
     __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "0 <= b";
     __gen_e_acsl_assert_data_4.file = "bitwise.c";
     __gen_e_acsl_assert_data_4.fct = "f_signed";
@@ -231,7 +231,7 @@ void g_signed(int a, int b)
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
     __gen_e_acsl_assert_data_3.file = "bitwise.c";
     __gen_e_acsl_assert_data_3.fct = "g_signed";
@@ -245,7 +245,7 @@ void g_signed(int a, int b)
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init(__gen_e_acsl_shiftl);
     __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
     __gen_e_acsl_assert_data_2.file = "bitwise.c";
     __gen_e_acsl_assert_data_2.fct = "g_signed";
@@ -302,7 +302,7 @@ void g_signed(int a, int b)
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
     __gen_e_acsl_assert_data_6.file = "bitwise.c";
     __gen_e_acsl_assert_data_6.fct = "g_signed";
@@ -316,7 +316,7 @@ void g_signed(int a, int b)
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_shiftr);
     __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
     __gen_e_acsl_assert_data_5.file = "bitwise.c";
     __gen_e_acsl_assert_data_5.fct = "g_signed";
@@ -366,7 +366,7 @@ void g_signed(int a, int b)
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gen_e_acsl_assert_data_9.blocking = 1;
-    __gen_e_acsl_assert_data_9.kind = "RTE";
+    __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1 <= 18446744073709551615";
     __gen_e_acsl_assert_data_9.file = "bitwise.c";
     __gen_e_acsl_assert_data_9.fct = "g_signed";
@@ -380,7 +380,7 @@ void g_signed(int a, int b)
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_shiftl_2);
     __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1 >= 0";
     __gen_e_acsl_assert_data_8.file = "bitwise.c";
     __gen_e_acsl_assert_data_8.fct = "g_signed";
@@ -424,7 +424,7 @@ void g_signed(int a, int b)
     __gmpz_init_set_si(__gen_e_acsl__7,1L);
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gen_e_acsl_assert_data_12.blocking = 1;
-    __gen_e_acsl_assert_data_12.kind = "RTE";
+    __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1 <= 18446744073709551615";
     __gen_e_acsl_assert_data_12.file = "bitwise.c";
     __gen_e_acsl_assert_data_12.fct = "g_signed";
@@ -438,7 +438,7 @@ void g_signed(int a, int b)
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gmpz_init(__gen_e_acsl_shiftr_2);
     __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "RTE";
+    __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1 >= 0";
     __gen_e_acsl_assert_data_11.file = "bitwise.c";
     __gen_e_acsl_assert_data_11.fct = "g_signed";
@@ -481,7 +481,7 @@ void g_signed(int a, int b)
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "RTE";
+    __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65 <= 18446744073709551615";
     __gen_e_acsl_assert_data_15.file = "bitwise.c";
     __gen_e_acsl_assert_data_15.fct = "g_signed";
@@ -495,7 +495,7 @@ void g_signed(int a, int b)
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __gmpz_init(__gen_e_acsl_shiftl_3);
     __gen_e_acsl_assert_data_14.blocking = 1;
-    __gen_e_acsl_assert_data_14.kind = "RTE";
+    __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_14.pred_txt = "1 >= 0";
     __gen_e_acsl_assert_data_14.file = "bitwise.c";
     __gen_e_acsl_assert_data_14.fct = "g_signed";
@@ -622,7 +622,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "0 <= b <= 18446744073709551615";
     __gen_e_acsl_assert_data_3.file = "bitwise.c";
     __gen_e_acsl_assert_data_3.fct = "g_unsigned";
@@ -636,7 +636,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init(__gen_e_acsl_shiftl);
     __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "a >= 0";
     __gen_e_acsl_assert_data_2.file = "bitwise.c";
     __gen_e_acsl_assert_data_2.fct = "g_unsigned";
@@ -693,7 +693,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_6.pred_txt = "0 <= b <= 18446744073709551615";
     __gen_e_acsl_assert_data_6.file = "bitwise.c";
     __gen_e_acsl_assert_data_6.fct = "g_unsigned";
@@ -707,7 +707,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                              (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_shiftr);
     __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_5.pred_txt = "a >= 0";
     __gen_e_acsl_assert_data_5.file = "bitwise.c";
     __gen_e_acsl_assert_data_5.fct = "g_unsigned";
@@ -757,7 +757,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gen_e_acsl_assert_data_9.blocking = 1;
-    __gen_e_acsl_assert_data_9.kind = "RTE";
+    __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_9.pred_txt = "0 <= 1u <= 18446744073709551615";
     __gen_e_acsl_assert_data_9.file = "bitwise.c";
     __gen_e_acsl_assert_data_9.fct = "g_unsigned";
@@ -771,7 +771,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_shiftl_2);
     __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_8.pred_txt = "18446744073709551615ULL + 1u >= 0";
     __gen_e_acsl_assert_data_8.file = "bitwise.c";
     __gen_e_acsl_assert_data_8.fct = "g_unsigned";
@@ -815,7 +815,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_si(__gen_e_acsl__7,1L);
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gen_e_acsl_assert_data_12.blocking = 1;
-    __gen_e_acsl_assert_data_12.kind = "RTE";
+    __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_12.pred_txt = "0 <= 1u <= 18446744073709551615";
     __gen_e_acsl_assert_data_12.file = "bitwise.c";
     __gen_e_acsl_assert_data_12.fct = "g_unsigned";
@@ -829,7 +829,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                            (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gmpz_init(__gen_e_acsl_shiftr_2);
     __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "RTE";
+    __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_11.pred_txt = "18446744073709551615ULL + 1u >= 0";
     __gen_e_acsl_assert_data_11.file = "bitwise.c";
     __gen_e_acsl_assert_data_11.fct = "g_unsigned";
@@ -872,7 +872,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "RTE";
+    __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_15.pred_txt = "0 <= 65u <= 18446744073709551615";
     __gen_e_acsl_assert_data_15.file = "bitwise.c";
     __gen_e_acsl_assert_data_15.fct = "g_unsigned";
@@ -886,7 +886,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __gmpz_init(__gen_e_acsl_shiftl_3);
     __gen_e_acsl_assert_data_14.blocking = 1;
-    __gen_e_acsl_assert_data_14.kind = "RTE";
+    __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_14.pred_txt = "1u >= 0";
     __gen_e_acsl_assert_data_14.file = "bitwise.c";
     __gen_e_acsl_assert_data_14.fct = "g_unsigned";

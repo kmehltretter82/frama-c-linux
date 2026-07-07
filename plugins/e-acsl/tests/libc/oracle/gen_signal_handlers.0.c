@@ -229,7 +229,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     /*@ assert E_ACSL: "index out of bounds": 0 <= sig < (int)65; */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data.fct = "signal";
@@ -254,7 +254,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     /*@ assert E_ACSL: "index out of bounds": 0 <= sig < (int)65; */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_2.fct = "signal";
@@ -313,7 +313,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     /*@ assert E_ACSL: "index out of bounds": 0 <= sig < (int)65; */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_5.fct = "signal";
@@ -335,7 +335,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     /*@ assert E_ACSL: "index out of bounds": 0 <= sig < (int)65; */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "0 <= sig < (int)65";
       __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_6.fct = "signal";
@@ -408,7 +408,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     /*@ assert E_ACSL: "index out of bounds": 0 <= \old(sig) < (int)65; */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "0 <= \\old(sig) < (int)65";
       __gen_e_acsl_assert_data_11.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_11.fct = "signal";
@@ -439,7 +439,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       /*@ assert E_ACSL: "index out of bounds": 0 <= \old(sig) < (int)65; */
       {
         __gen_e_acsl_assert_data_12.blocking = 1;
-        __gen_e_acsl_assert_data_12.kind = "RTE";
+        __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_12.pred_txt = "0 <= \\old(sig) < (int)65";
         __gen_e_acsl_assert_data_12.file = "FRAMAC_SHARE/libc/signal.h";
         __gen_e_acsl_assert_data_12.fct = "signal";
@@ -487,7 +487,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
       /*@ assert E_ACSL: "index out of bounds": 0 <= \old(sig) < (int)65; */
       {
         __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
+        __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_14.pred_txt = "0 <= \\old(sig) < (int)65";
         __gen_e_acsl_assert_data_14.file = "FRAMAC_SHARE/libc/signal.h";
         __gen_e_acsl_assert_data_14.fct = "signal";

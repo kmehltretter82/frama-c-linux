@@ -34,7 +34,7 @@ struct list *add(struct list *l, int i)
     /*@ assert E_ACSL: "pointer alignment": \aligned(new,8); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(new,8)";
       __gen_e_acsl_assert_data_2.file = "local_var.c";
       __gen_e_acsl_assert_data_2.fct = "add";

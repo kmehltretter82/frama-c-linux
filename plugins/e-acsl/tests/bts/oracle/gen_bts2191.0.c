@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(_G[0].str,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(_G[0].str,1)";
       __gen_e_acsl_assert_data_2.file = "bts2191.c";
       __gen_e_acsl_assert_data_2.fct = "main";

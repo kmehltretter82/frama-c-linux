@@ -315,7 +315,7 @@ void __gen_e_acsl_min_sort(int *t, int n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(t,4)";
       __gen_e_acsl_assert_data.file = "stable_sort.c";
       __gen_e_acsl_assert_data.fct = "min_sort";
@@ -338,7 +338,7 @@ void __gen_e_acsl_min_sort(int *t, int n)
     /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(t,4)";
       __gen_e_acsl_assert_data_3.file = "stable_sort.c";
       __gen_e_acsl_assert_data_3.fct = "min_sort";
@@ -438,7 +438,7 @@ void __gen_e_acsl_swap(int *t, int i, int j)
     /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(t,4)";
       __gen_e_acsl_assert_data_2.file = "stable_sort.c";
       __gen_e_acsl_assert_data_2.fct = "swap";
@@ -469,7 +469,7 @@ void __gen_e_acsl_swap(int *t, int i, int j)
       /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
       {
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(t,4)";
         __gen_e_acsl_assert_data_3.file = "stable_sort.c";
         __gen_e_acsl_assert_data_3.fct = "swap";

@@ -309,7 +309,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": -3 != 0; */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_15.pred_txt = "-3 != 0";
       __gen_e_acsl_assert_data_15.file = "arith.i";
       __gen_e_acsl_assert_data_15.fct = "main";
@@ -334,7 +334,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": -3 != 0; */
     {
       __gen_e_acsl_assert_data_17.blocking = 1;
-      __gen_e_acsl_assert_data_17.kind = "RTE";
+      __gen_e_acsl_assert_data_17.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_17.pred_txt = "-3 != 0";
       __gen_e_acsl_assert_data_17.file = "arith.i";
       __gen_e_acsl_assert_data_17.fct = "main";
@@ -359,7 +359,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": -3 != 0; */
     {
       __gen_e_acsl_assert_data_19.blocking = 1;
-      __gen_e_acsl_assert_data_19.kind = "RTE";
+      __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_19.pred_txt = "-3 != 0";
       __gen_e_acsl_assert_data_19.file = "arith.i";
       __gen_e_acsl_assert_data_19.fct = "main";
@@ -384,7 +384,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": -3 != 0; */
     {
       __gen_e_acsl_assert_data_21.blocking = 1;
-      __gen_e_acsl_assert_data_21.kind = "RTE";
+      __gen_e_acsl_assert_data_21.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_21.pred_txt = "-3 != 0";
       __gen_e_acsl_assert_data_21.file = "arith.i";
       __gen_e_acsl_assert_data_21.fct = "main";
@@ -556,7 +556,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y != 0; */
     {
       __gen_e_acsl_assert_data_29.blocking = 1;
-      __gen_e_acsl_assert_data_29.kind = "RTE";
+      __gen_e_acsl_assert_data_29.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_29.pred_txt = "y != 0";
       __gen_e_acsl_assert_data_29.file = "arith.i";
       __gen_e_acsl_assert_data_29.fct = "main";
@@ -623,7 +623,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y - 123456789123456789 != 0; */
     {
       __gen_e_acsl_assert_data_31.blocking = 1;
-      __gen_e_acsl_assert_data_31.kind = "RTE";
+      __gen_e_acsl_assert_data_31.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_31.pred_txt = "y - 123456789123456789 != 0";
       __gen_e_acsl_assert_data_31.file = "arith.i";
       __gen_e_acsl_assert_data_31.fct = "main";
@@ -796,7 +796,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y - x != 0; */
     {
       __gen_e_acsl_assert_data_35.blocking = 1;
-      __gen_e_acsl_assert_data_35.kind = "RTE";
+      __gen_e_acsl_assert_data_35.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_35.pred_txt = "y - x != 0";
       __gen_e_acsl_assert_data_35.file = "arith.i";
       __gen_e_acsl_assert_data_35.fct = "main";

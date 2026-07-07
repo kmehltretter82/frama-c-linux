@@ -43,7 +43,7 @@ void g(int a, int *b)
     /*@ assert E_ACSL: "pointer alignment": \aligned(b,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(b,4)";
       __gen_e_acsl_assert_data_2.file = "rte.c";
       __gen_e_acsl_assert_data_2.fct = "g";
@@ -62,7 +62,7 @@ void g(int a, int *b)
     /*@ assert E_ACSL: "pointer alignment": \aligned(b + 1,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(b + 1,4)";
       __gen_e_acsl_assert_data_3.file = "rte.c";
       __gen_e_acsl_assert_data_3.fct = "g";
@@ -84,7 +84,7 @@ void g(int a, int *b)
     /*@ assert E_ACSL: uninitialized: \initialized(b + 1); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(b + 1)";
       __gen_e_acsl_assert_data_4.file = "rte.c";
       __gen_e_acsl_assert_data_4.fct = "g";
@@ -107,7 +107,7 @@ void g(int a, int *b)
     /*@ assert E_ACSL: "memory access": \valid_read(b + 1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(b + 1)";
       __gen_e_acsl_assert_data_5.file = "rte.c";
       __gen_e_acsl_assert_data_5.fct = "g";
@@ -123,7 +123,7 @@ void g(int a, int *b)
     /*@ assert E_ACSL: "division by zero": *(b + 1) != 0; */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "*(b + 1) != 0";
       __gen_e_acsl_assert_data_6.file = "rte.c";
       __gen_e_acsl_assert_data_6.fct = "g";
@@ -228,7 +228,7 @@ void simple_loop(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&i); */
       {
         __gen_e_acsl_assert_data_2.blocking = 1;
-        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&i)";
         __gen_e_acsl_assert_data_2.file = "rte.c";
         __gen_e_acsl_assert_data_2.fct = "simple_loop";
@@ -252,7 +252,7 @@ void simple_loop(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&x); */
       {
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&x)";
         __gen_e_acsl_assert_data_3.file = "rte.c";
         __gen_e_acsl_assert_data_3.fct = "simple_loop";
@@ -268,7 +268,7 @@ void simple_loop(void)
       /*@ assert E_ACSL: "division by zero": x != 0; */
       {
         __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_4.pred_txt = "x != 0";
         __gen_e_acsl_assert_data_4.file = "rte.c";
         __gen_e_acsl_assert_data_4.fct = "simple_loop";
@@ -315,7 +315,7 @@ void simple_loop(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&i); */
         {
           __gen_e_acsl_assert_data_6.blocking = 1;
-          __gen_e_acsl_assert_data_6.kind = "RTE";
+          __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&i)";
           __gen_e_acsl_assert_data_6.file = "rte.c";
           __gen_e_acsl_assert_data_6.fct = "simple_loop";
@@ -339,7 +339,7 @@ void simple_loop(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&x); */
         {
           __gen_e_acsl_assert_data_7.blocking = 1;
-          __gen_e_acsl_assert_data_7.kind = "RTE";
+          __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&x)";
           __gen_e_acsl_assert_data_7.file = "rte.c";
           __gen_e_acsl_assert_data_7.fct = "simple_loop";
@@ -355,7 +355,7 @@ void simple_loop(void)
         /*@ assert E_ACSL: "division by zero": x != 0; */
         {
           __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "RTE";
+          __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_8.pred_txt = "x != 0";
           __gen_e_acsl_assert_data_8.file = "rte.c";
           __gen_e_acsl_assert_data_8.fct = "simple_loop";
@@ -423,7 +423,7 @@ void nested_loop(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&k); */
         {
           __gen_e_acsl_assert_data_5.blocking = 1;
-          __gen_e_acsl_assert_data_5.kind = "RTE";
+          __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&k)";
           __gen_e_acsl_assert_data_5.file = "rte.c";
           __gen_e_acsl_assert_data_5.fct = "nested_loop";
@@ -451,7 +451,7 @@ void nested_loop(void)
         /*@ assert E_ACSL: "index out of bounds": 0 <= i < (int)10; */
         {
           __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_2.pred_txt = "0 <= i < (int)10";
           __gen_e_acsl_assert_data_2.file = "rte.c";
           __gen_e_acsl_assert_data_2.fct = "nested_loop";
@@ -474,7 +474,7 @@ void nested_loop(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&a[i]); */
         {
           __gen_e_acsl_assert_data_3.blocking = 1;
-          __gen_e_acsl_assert_data_3.kind = "RTE";
+          __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&a[i])";
           __gen_e_acsl_assert_data_3.file = "rte.c";
           __gen_e_acsl_assert_data_3.fct = "nested_loop";
@@ -491,7 +491,7 @@ void nested_loop(void)
         /*@ assert E_ACSL: "division by zero": i != 0; */
         {
           __gen_e_acsl_assert_data_4.blocking = 1;
-          __gen_e_acsl_assert_data_4.kind = "RTE";
+          __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_4.pred_txt = "i != 0";
           __gen_e_acsl_assert_data_4.file = "rte.c";
           __gen_e_acsl_assert_data_4.fct = "nested_loop";
@@ -536,7 +536,7 @@ void nested_loop(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&k); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&k)";
       __gen_e_acsl_assert_data_7.file = "rte.c";
       __gen_e_acsl_assert_data_7.fct = "nested_loop";
@@ -563,7 +563,7 @@ void nested_loop(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&k); */
       {
         __gen_e_acsl_assert_data_8.blocking = 1;
-        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&k)";
         __gen_e_acsl_assert_data_8.file = "rte.c";
         __gen_e_acsl_assert_data_8.fct = "nested_loop";
@@ -616,7 +616,7 @@ void nested_loop(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&k); */
       {
         __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_10.pred_txt = "\\initialized(&k)";
         __gen_e_acsl_assert_data_10.file = "rte.c";
         __gen_e_acsl_assert_data_10.fct = "nested_loop";
@@ -643,7 +643,7 @@ void nested_loop(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&k); */
         {
           __gen_e_acsl_assert_data_11.blocking = 1;
-          __gen_e_acsl_assert_data_11.kind = "RTE";
+          __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_11.pred_txt = "\\initialized(&k)";
           __gen_e_acsl_assert_data_11.file = "rte.c";
           __gen_e_acsl_assert_data_11.fct = "nested_loop";
@@ -686,7 +686,7 @@ void nested_loop(void)
           /*@ assert E_ACSL: uninitialized: \initialized(&k); */
           {
             __gen_e_acsl_assert_data_16.blocking = 1;
-            __gen_e_acsl_assert_data_16.kind = "RTE";
+            __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_16.pred_txt = "\\initialized(&k)";
             __gen_e_acsl_assert_data_16.file = "rte.c";
             __gen_e_acsl_assert_data_16.fct = "nested_loop";
@@ -714,7 +714,7 @@ void nested_loop(void)
           /*@ assert E_ACSL: "index out of bounds": 0 <= i < (int)10; */
           {
             __gen_e_acsl_assert_data_13.blocking = 1;
-            __gen_e_acsl_assert_data_13.kind = "RTE";
+            __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_13.pred_txt = "0 <= i < (int)10";
             __gen_e_acsl_assert_data_13.file = "rte.c";
             __gen_e_acsl_assert_data_13.fct = "nested_loop";
@@ -737,7 +737,7 @@ void nested_loop(void)
           /*@ assert E_ACSL: uninitialized: \initialized(&a[i]); */
           {
             __gen_e_acsl_assert_data_14.blocking = 1;
-            __gen_e_acsl_assert_data_14.kind = "RTE";
+            __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_14.pred_txt = "\\initialized(&a[i])";
             __gen_e_acsl_assert_data_14.file = "rte.c";
             __gen_e_acsl_assert_data_14.fct = "nested_loop";
@@ -754,7 +754,7 @@ void nested_loop(void)
           /*@ assert E_ACSL: "division by zero": i != 0; */
           {
             __gen_e_acsl_assert_data_15.blocking = 1;
-            __gen_e_acsl_assert_data_15.kind = "RTE";
+            __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_15.pred_txt = "i != 0";
             __gen_e_acsl_assert_data_15.file = "rte.c";
             __gen_e_acsl_assert_data_15.fct = "nested_loop";
@@ -828,7 +828,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
     /*@ assert E_ACSL: "division by zero": a != 0; */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "a != 0";
       __gen_e_acsl_assert_data_2.file = "rte.c";
       __gen_e_acsl_assert_data_2.fct = "test";
@@ -852,7 +852,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
     /*@ assert E_ACSL: "division by zero": c != 0; */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "c != 0";
       __gen_e_acsl_assert_data_3.file = "rte.c";
       __gen_e_acsl_assert_data_3.fct = "test";
@@ -881,7 +881,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
       /*@ assert E_ACSL: "division by zero": d != 0; */
       {
         __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_5.pred_txt = "d != 0";
         __gen_e_acsl_assert_data_5.file = "rte.c";
         __gen_e_acsl_assert_data_5.fct = "test";
@@ -899,7 +899,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
       /*@ assert E_ACSL: "division by zero": f != 0; */
       {
         __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_7.pred_txt = "f != 0";
         __gen_e_acsl_assert_data_7.file = "rte.c";
         __gen_e_acsl_assert_data_7.fct = "test";
@@ -918,7 +918,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
         /*@ assert E_ACSL: "division by zero": g_0 != 0; */
         {
           __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "RTE";
+          __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_8.pred_txt = "g_0 != 0";
           __gen_e_acsl_assert_data_8.file = "rte.c";
           __gen_e_acsl_assert_data_8.fct = "test";
@@ -939,7 +939,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
       /*@ assert E_ACSL: "division by zero": h != 0; */
       {
         __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_10.pred_txt = "h != 0";
         __gen_e_acsl_assert_data_10.file = "rte.c";
         __gen_e_acsl_assert_data_10.fct = "test";
@@ -956,7 +956,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
         /*@ assert E_ACSL: "division by zero": i != 0; */
         {
           __gen_e_acsl_assert_data_11.blocking = 1;
-          __gen_e_acsl_assert_data_11.kind = "RTE";
+          __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_11.pred_txt = "i != 0";
           __gen_e_acsl_assert_data_11.file = "rte.c";
           __gen_e_acsl_assert_data_11.fct = "test";
@@ -978,7 +978,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
       /*@ assert E_ACSL: "division by zero": j != 0; */
       {
         __gen_e_acsl_assert_data_13.blocking = 1;
-        __gen_e_acsl_assert_data_13.kind = "RTE";
+        __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_13.pred_txt = "j != 0";
         __gen_e_acsl_assert_data_13.file = "rte.c";
         __gen_e_acsl_assert_data_13.fct = "test";
@@ -1003,7 +1003,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
           /*@ assert E_ACSL: "division by zero": k != 0; */
           {
             __gen_e_acsl_assert_data_15.blocking = 1;
-            __gen_e_acsl_assert_data_15.kind = "RTE";
+            __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_15.pred_txt = "k != 0";
             __gen_e_acsl_assert_data_15.file = "rte.c";
             __gen_e_acsl_assert_data_15.fct = "test";
@@ -1037,7 +1037,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
           /*@ assert E_ACSL: "division by zero": l != 0; */
           {
             __gen_e_acsl_assert_data_17.blocking = 1;
-            __gen_e_acsl_assert_data_17.kind = "RTE";
+            __gen_e_acsl_assert_data_17.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_17.pred_txt = "l != 0";
             __gen_e_acsl_assert_data_17.file = "rte.c";
             __gen_e_acsl_assert_data_17.fct = "test";
@@ -1127,7 +1127,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
     /*@ assert E_ACSL: "division by zero": \old(b) != 0; */
     {
       __gen_e_acsl_assert_data_19.blocking = 1;
-      __gen_e_acsl_assert_data_19.kind = "RTE";
+      __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_19.pred_txt = "\\old(b) != 0";
       __gen_e_acsl_assert_data_19.file = "rte.c";
       __gen_e_acsl_assert_data_19.fct = "test";
@@ -1158,7 +1158,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g_0,
       /*@ assert E_ACSL: "division by zero": \old(e) != 0; */
       {
         __gen_e_acsl_assert_data_21.blocking = 1;
-        __gen_e_acsl_assert_data_21.kind = "RTE";
+        __gen_e_acsl_assert_data_21.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_21.pred_txt = "\\old(e) != 0";
         __gen_e_acsl_assert_data_21.file = "rte.c";
         __gen_e_acsl_assert_data_21.fct = "test";
@@ -1227,7 +1227,7 @@ int *__gen_e_acsl_func_ptr(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\result,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(\\result,4)";
       __gen_e_acsl_assert_data_2.file = "rte.c";
       __gen_e_acsl_assert_data_2.fct = "func_ptr";
@@ -1250,7 +1250,7 @@ int *__gen_e_acsl_func_ptr(void)
     /*@ assert E_ACSL: uninitialized: \initialized(\result); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(\\result)";
       __gen_e_acsl_assert_data_3.file = "rte.c";
       __gen_e_acsl_assert_data_3.fct = "func_ptr";
@@ -1275,7 +1275,7 @@ int *__gen_e_acsl_func_ptr(void)
     /*@ assert E_ACSL: "memory access": \valid_read(\result); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(\\result)";
       __gen_e_acsl_assert_data_4.file = "rte.c";
       __gen_e_acsl_assert_data_4.fct = "func_ptr";
@@ -1495,7 +1495,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&y); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&y)";
       __gen_e_acsl_assert_data_6.file = "rte.c";
       __gen_e_acsl_assert_data_6.fct = "main";
@@ -1511,7 +1511,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y != 0; */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "y != 0";
       __gen_e_acsl_assert_data_7.file = "rte.c";
       __gen_e_acsl_assert_data_7.fct = "main";
@@ -1538,7 +1538,7 @@ int main(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&w); */
       {
         __gen_e_acsl_assert_data_8.blocking = 1;
-        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&w)";
         __gen_e_acsl_assert_data_8.file = "rte.c";
         __gen_e_acsl_assert_data_8.fct = "main";
@@ -1554,7 +1554,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": w != 0; */
       {
         __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_9.pred_txt = "w != 0";
         __gen_e_acsl_assert_data_9.file = "rte.c";
         __gen_e_acsl_assert_data_9.fct = "main";
@@ -1584,7 +1584,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": (12 + 3) - 6 != 0; */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "RTE";
+      __gen_e_acsl_assert_data_11.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "(12 + 3) - 6 != 0";
       __gen_e_acsl_assert_data_11.file = "rte.c";
       __gen_e_acsl_assert_data_11.fct = "main";
@@ -1626,7 +1626,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&z); */
     {
       __gen_e_acsl_assert_data_13.blocking = 1;
-      __gen_e_acsl_assert_data_13.kind = "RTE";
+      __gen_e_acsl_assert_data_13.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_13.pred_txt = "\\initialized(&z)";
       __gen_e_acsl_assert_data_13.file = "rte.c";
       __gen_e_acsl_assert_data_13.fct = "main";
@@ -1656,7 +1656,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&y); */
     {
       __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\initialized(&y)";
       __gen_e_acsl_assert_data_14.file = "rte.c";
       __gen_e_acsl_assert_data_14.fct = "main";
@@ -1673,7 +1673,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y - 123456789123456789 != 0; */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
+      __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_15.pred_txt = "y - 123456789123456789 != 0";
       __gen_e_acsl_assert_data_15.file = "rte.c";
       __gen_e_acsl_assert_data_15.fct = "main";
@@ -1732,7 +1732,7 @@ int main(void)
         /*@ assert E_ACSL: uninitialized: \initialized(&y); */
         {
           __gen_e_acsl_assert_data_19.blocking = 1;
-          __gen_e_acsl_assert_data_19.kind = "RTE";
+          __gen_e_acsl_assert_data_19.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_19.pred_txt = "\\initialized(&y)";
           __gen_e_acsl_assert_data_19.file = "rte.c";
           __gen_e_acsl_assert_data_19.fct = "main";
@@ -1748,7 +1748,7 @@ int main(void)
         /*@ assert E_ACSL: "division by zero": y != 0; */
         {
           __gen_e_acsl_assert_data_20.blocking = 1;
-          __gen_e_acsl_assert_data_20.kind = "RTE";
+          __gen_e_acsl_assert_data_20.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_20.pred_txt = "y != 0";
           __gen_e_acsl_assert_data_20.file = "rte.c";
           __gen_e_acsl_assert_data_20.fct = "main";
@@ -1777,7 +1777,7 @@ int main(void)
           /*@ assert E_ACSL: uninitialized: \initialized(&y); */
           {
             __gen_e_acsl_assert_data_17.blocking = 1;
-            __gen_e_acsl_assert_data_17.kind = "RTE";
+            __gen_e_acsl_assert_data_17.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_17.pred_txt = "\\initialized(&y)";
             __gen_e_acsl_assert_data_17.file = "rte.c";
             __gen_e_acsl_assert_data_17.fct = "main";
@@ -1793,7 +1793,7 @@ int main(void)
           /*@ assert E_ACSL: "division by zero": y != 0; */
           {
             __gen_e_acsl_assert_data_18.blocking = 1;
-            __gen_e_acsl_assert_data_18.kind = "RTE";
+            __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
             __gen_e_acsl_assert_data_18.pred_txt = "y != 0";
             __gen_e_acsl_assert_data_18.file = "rte.c";
             __gen_e_acsl_assert_data_18.fct = "main";
@@ -1854,7 +1854,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&d); */
     {
       __gen_e_acsl_assert_data_22.blocking = 1;
-      __gen_e_acsl_assert_data_22.kind = "RTE";
+      __gen_e_acsl_assert_data_22.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_22.pred_txt = "\\initialized(&d)";
       __gen_e_acsl_assert_data_22.file = "rte.c";
       __gen_e_acsl_assert_data_22.fct = "main";
@@ -1911,7 +1911,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&v); */
     {
       __gen_e_acsl_assert_data_25.blocking = 1;
-      __gen_e_acsl_assert_data_25.kind = "RTE";
+      __gen_e_acsl_assert_data_25.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_25.pred_txt = "\\initialized(&v)";
       __gen_e_acsl_assert_data_25.file = "rte.c";
       __gen_e_acsl_assert_data_25.fct = "main";
@@ -1927,7 +1927,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": v != 0; */
     {
       __gen_e_acsl_assert_data_26.blocking = 1;
-      __gen_e_acsl_assert_data_26.kind = "RTE";
+      __gen_e_acsl_assert_data_26.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_26.pred_txt = "v != 0";
       __gen_e_acsl_assert_data_26.file = "rte.c";
       __gen_e_acsl_assert_data_26.fct = "main";
@@ -1950,7 +1950,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&x); */
     {
       __gen_e_acsl_assert_data_27.blocking = 1;
-      __gen_e_acsl_assert_data_27.kind = "RTE";
+      __gen_e_acsl_assert_data_27.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_27.pred_txt = "\\initialized(&x)";
       __gen_e_acsl_assert_data_27.file = "rte.c";
       __gen_e_acsl_assert_data_27.fct = "main";
@@ -1970,7 +1970,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(x,1); */
     {
       __gen_e_acsl_assert_data_28.blocking = 1;
-      __gen_e_acsl_assert_data_28.kind = "RTE";
+      __gen_e_acsl_assert_data_28.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_28.pred_txt = "\\aligned(x,1)";
       __gen_e_acsl_assert_data_28.file = "rte.c";
       __gen_e_acsl_assert_data_28.fct = "main";
@@ -2014,7 +2014,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&x); */
     {
       __gen_e_acsl_assert_data_30.blocking = 1;
-      __gen_e_acsl_assert_data_30.kind = "RTE";
+      __gen_e_acsl_assert_data_30.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_30.pred_txt = "\\initialized(&x)";
       __gen_e_acsl_assert_data_30.file = "rte.c";
       __gen_e_acsl_assert_data_30.fct = "main";
@@ -2034,7 +2034,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(x,1); */
     {
       __gen_e_acsl_assert_data_31.blocking = 1;
-      __gen_e_acsl_assert_data_31.kind = "RTE";
+      __gen_e_acsl_assert_data_31.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_31.pred_txt = "\\aligned(x,1)";
       __gen_e_acsl_assert_data_31.file = "rte.c";
       __gen_e_acsl_assert_data_31.fct = "main";
@@ -2081,7 +2081,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&v); */
     {
       __gen_e_acsl_assert_data_33.blocking = 1;
-      __gen_e_acsl_assert_data_33.kind = "RTE";
+      __gen_e_acsl_assert_data_33.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_33.pred_txt = "\\initialized(&v)";
       __gen_e_acsl_assert_data_33.file = "rte.c";
       __gen_e_acsl_assert_data_33.fct = "main";
@@ -2105,7 +2105,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&y); */
     {
       __gen_e_acsl_assert_data_34.blocking = 1;
-      __gen_e_acsl_assert_data_34.kind = "RTE";
+      __gen_e_acsl_assert_data_34.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_34.pred_txt = "\\initialized(&y)";
       __gen_e_acsl_assert_data_34.file = "rte.c";
       __gen_e_acsl_assert_data_34.fct = "main";
@@ -2129,7 +2129,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&z); */
     {
       __gen_e_acsl_assert_data_35.blocking = 1;
-      __gen_e_acsl_assert_data_35.kind = "RTE";
+      __gen_e_acsl_assert_data_35.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_35.pred_txt = "\\initialized(&z)";
       __gen_e_acsl_assert_data_35.file = "rte.c";
       __gen_e_acsl_assert_data_35.fct = "main";
@@ -2145,7 +2145,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": z != 0; */
     {
       __gen_e_acsl_assert_data_36.blocking = 1;
-      __gen_e_acsl_assert_data_36.kind = "RTE";
+      __gen_e_acsl_assert_data_36.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_36.pred_txt = "z != 0";
       __gen_e_acsl_assert_data_36.file = "rte.c";
       __gen_e_acsl_assert_data_36.fct = "main";
@@ -2161,7 +2161,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": y / z != 0; */
     {
       __gen_e_acsl_assert_data_37.blocking = 1;
-      __gen_e_acsl_assert_data_37.kind = "RTE";
+      __gen_e_acsl_assert_data_37.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_37.pred_txt = "y / z != 0";
       __gen_e_acsl_assert_data_37.file = "rte.c";
       __gen_e_acsl_assert_data_37.fct = "main";
@@ -2178,7 +2178,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": v / (y / z) != 0; */
     {
       __gen_e_acsl_assert_data_38.blocking = 1;
-      __gen_e_acsl_assert_data_38.kind = "RTE";
+      __gen_e_acsl_assert_data_38.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_38.pred_txt = "v / (y / z) != 0";
       __gen_e_acsl_assert_data_38.file = "rte.c";
       __gen_e_acsl_assert_data_38.fct = "main";
@@ -2232,7 +2232,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&c); */
     {
       __gen_e_acsl_assert_data_40.blocking = 1;
-      __gen_e_acsl_assert_data_40.kind = "RTE";
+      __gen_e_acsl_assert_data_40.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_40.pred_txt = "\\initialized(&c)";
       __gen_e_acsl_assert_data_40.file = "rte.c";
       __gen_e_acsl_assert_data_40.fct = "main";
@@ -2248,7 +2248,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": c != 0; */
     {
       __gen_e_acsl_assert_data_41.blocking = 1;
-      __gen_e_acsl_assert_data_41.kind = "RTE";
+      __gen_e_acsl_assert_data_41.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_41.pred_txt = "c != 0";
       __gen_e_acsl_assert_data_41.file = "rte.c";
       __gen_e_acsl_assert_data_41.fct = "main";
@@ -2274,7 +2274,7 @@ int main(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&tv); */
       {
         __gen_e_acsl_assert_data_42.blocking = 1;
-        __gen_e_acsl_assert_data_42.kind = "RTE";
+        __gen_e_acsl_assert_data_42.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_42.pred_txt = "\\initialized(&tv)";
         __gen_e_acsl_assert_data_42.file = "rte.c";
         __gen_e_acsl_assert_data_42.fct = "main";
@@ -2290,7 +2290,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": tv != 0; */
       {
         __gen_e_acsl_assert_data_43.blocking = 1;
-        __gen_e_acsl_assert_data_43.kind = "RTE";
+        __gen_e_acsl_assert_data_43.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_43.pred_txt = "tv != 0";
         __gen_e_acsl_assert_data_43.file = "rte.c";
         __gen_e_acsl_assert_data_43.fct = "main";
@@ -2319,7 +2319,7 @@ int main(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&fv); */
       {
         __gen_e_acsl_assert_data_44.blocking = 1;
-        __gen_e_acsl_assert_data_44.kind = "RTE";
+        __gen_e_acsl_assert_data_44.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_44.pred_txt = "\\initialized(&fv)";
         __gen_e_acsl_assert_data_44.file = "rte.c";
         __gen_e_acsl_assert_data_44.fct = "main";
@@ -2343,7 +2343,7 @@ int main(void)
       /*@ assert E_ACSL: uninitialized: \initialized(&ffv); */
       {
         __gen_e_acsl_assert_data_45.blocking = 1;
-        __gen_e_acsl_assert_data_45.kind = "RTE";
+        __gen_e_acsl_assert_data_45.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_45.pred_txt = "\\initialized(&ffv)";
         __gen_e_acsl_assert_data_45.file = "rte.c";
         __gen_e_acsl_assert_data_45.fct = "main";
@@ -2359,7 +2359,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": ffv != 0; */
       {
         __gen_e_acsl_assert_data_46.blocking = 1;
-        __gen_e_acsl_assert_data_46.kind = "RTE";
+        __gen_e_acsl_assert_data_46.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_46.pred_txt = "ffv != 0";
         __gen_e_acsl_assert_data_46.file = "rte.c";
         __gen_e_acsl_assert_data_46.fct = "main";
@@ -2375,7 +2375,7 @@ int main(void)
       /*@ assert E_ACSL: "division by zero": fv / ffv - 1 != 0; */
       {
         __gen_e_acsl_assert_data_47.blocking = 1;
-        __gen_e_acsl_assert_data_47.kind = "RTE";
+        __gen_e_acsl_assert_data_47.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_47.pred_txt = "fv / ffv - 1 != 0";
         __gen_e_acsl_assert_data_47.file = "rte.c";
         __gen_e_acsl_assert_data_47.fct = "main";
@@ -2423,7 +2423,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&n_0); */
     {
       __gen_e_acsl_assert_data_49.blocking = 1;
-      __gen_e_acsl_assert_data_49.kind = "RTE";
+      __gen_e_acsl_assert_data_49.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_49.pred_txt = "\\initialized(&n_0)";
       __gen_e_acsl_assert_data_49.file = "rte.c";
       __gen_e_acsl_assert_data_49.fct = "main";
@@ -2444,7 +2444,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(n_0,4); */
     {
       __gen_e_acsl_assert_data_50.blocking = 1;
-      __gen_e_acsl_assert_data_50.kind = "RTE";
+      __gen_e_acsl_assert_data_50.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_50.pred_txt = "\\aligned(n_0,4)";
       __gen_e_acsl_assert_data_50.file = "rte.c";
       __gen_e_acsl_assert_data_50.fct = "main";
@@ -2467,7 +2467,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(n_0); */
     {
       __gen_e_acsl_assert_data_51.blocking = 1;
-      __gen_e_acsl_assert_data_51.kind = "RTE";
+      __gen_e_acsl_assert_data_51.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_51.pred_txt = "\\initialized(n_0)";
       __gen_e_acsl_assert_data_51.file = "rte.c";
       __gen_e_acsl_assert_data_51.fct = "main";
@@ -2492,7 +2492,7 @@ int main(void)
     /*@ assert E_ACSL: "memory access": \valid_read(n_0); */
     {
       __gen_e_acsl_assert_data_52.blocking = 1;
-      __gen_e_acsl_assert_data_52.kind = "RTE";
+      __gen_e_acsl_assert_data_52.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_52.pred_txt = "\\valid_read(n_0)";
       __gen_e_acsl_assert_data_52.file = "rte.c";
       __gen_e_acsl_assert_data_52.fct = "main";
@@ -2507,7 +2507,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": *n_0 != 0; */
     {
       __gen_e_acsl_assert_data_53.blocking = 1;
-      __gen_e_acsl_assert_data_53.kind = "RTE";
+      __gen_e_acsl_assert_data_53.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_53.pred_txt = "*n_0 != 0";
       __gen_e_acsl_assert_data_53.file = "rte.c";
       __gen_e_acsl_assert_data_53.fct = "main";
@@ -2566,7 +2566,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&t_1[0 .. 2]); */
     {
       __gen_e_acsl_assert_data_55.blocking = 1;
-      __gen_e_acsl_assert_data_55.kind = "RTE";
+      __gen_e_acsl_assert_data_55.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_55.pred_txt = "\\initialized(&t_1[0 .. 2])";
       __gen_e_acsl_assert_data_55.file = "rte.c";
       __gen_e_acsl_assert_data_55.fct = "main";
@@ -2599,7 +2599,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&t_2[0 .. 2]); */
     {
       __gen_e_acsl_assert_data_56.blocking = 1;
-      __gen_e_acsl_assert_data_56.kind = "RTE";
+      __gen_e_acsl_assert_data_56.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_56.pred_txt = "\\initialized(&t_2[0 .. 2])";
       __gen_e_acsl_assert_data_56.file = "rte.c";
       __gen_e_acsl_assert_data_56.fct = "main";
@@ -2701,7 +2701,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&t_1[0 .. 2]); */
     {
       __gen_e_acsl_assert_data_58.blocking = 1;
-      __gen_e_acsl_assert_data_58.kind = "RTE";
+      __gen_e_acsl_assert_data_58.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_58.pred_txt = "\\initialized(&t_1[0 .. 2])";
       __gen_e_acsl_assert_data_58.file = "rte.c";
       __gen_e_acsl_assert_data_58.fct = "main";
@@ -2722,7 +2722,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr_t,4); */
     {
       __gen_e_acsl_assert_data_59.blocking = 1;
-      __gen_e_acsl_assert_data_59.kind = "RTE";
+      __gen_e_acsl_assert_data_59.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_59.pred_txt = "\\aligned(ptr_t,4)";
       __gen_e_acsl_assert_data_59.file = "rte.c";
       __gen_e_acsl_assert_data_59.fct = "main";
@@ -2785,7 +2785,7 @@ int main(void)
                                  "__gen_e_acsl_if_5",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_5));
     __gen_e_acsl_assert_data_61.blocking = 1;
-    __gen_e_acsl_assert_data_61.kind = "RTE";
+    __gen_e_acsl_assert_data_61.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_61.pred_txt = "(\\let size =\n   sizeof(int) *\n   ((((\\block_length(*((int (*)[])ptr_t)) - \\offset(*((int (*)[])ptr_t))) / 4\n      - 1)\n     - 0)\n    + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_61.file = "rte.c";
     __gen_e_acsl_assert_data_61.fct = "main";
@@ -2829,7 +2829,7 @@ int main(void)
     */
     {
       __gen_e_acsl_assert_data_60.blocking = 1;
-      __gen_e_acsl_assert_data_60.kind = "RTE";
+      __gen_e_acsl_assert_data_60.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_60.pred_txt = "\\initialized(&(*((int (*)[])ptr_t))[0 ..\n                                    (\\block_length(*((int (*)[])ptr_t)) -\n                                     \\offset(*((int (*)[])ptr_t)))\n                                    / 4 - 1])";
       __gen_e_acsl_assert_data_60.file = "rte.c";
       __gen_e_acsl_assert_data_60.fct = "main";
@@ -2871,7 +2871,7 @@ int main(void)
                                  "__gen_e_acsl_if_6",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_6));
     __gen_e_acsl_assert_data_63.blocking = 1;
-    __gen_e_acsl_assert_data_63.kind = "RTE";
+    __gen_e_acsl_assert_data_63.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_63.pred_txt = "(\\let size =\n   sizeof(int) *\n   ((((\\block_length(*((int (*)[])ptr_t)) - \\offset(*((int (*)[])ptr_t))) / 4\n      - 1)\n     - 0)\n    + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_63.file = "rte.c";
     __gen_e_acsl_assert_data_63.fct = "main";
@@ -2917,7 +2917,7 @@ int main(void)
     */
     {
       __gen_e_acsl_assert_data_62.blocking = 1;
-      __gen_e_acsl_assert_data_62.kind = "RTE";
+      __gen_e_acsl_assert_data_62.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_62.pred_txt = "\\valid_read(&(*((int (*)[])ptr_t))[0 ..\n                                   (\\block_length(*((int (*)[])ptr_t)) -\n                                    \\offset(*((int (*)[])ptr_t)))\n                                   / 4 - 1])";
       __gen_e_acsl_assert_data_62.file = "rte.c";
       __gen_e_acsl_assert_data_62.fct = "main";
@@ -3027,7 +3027,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&m[0 .. 2][0 .. 1]); */
     {
       __gen_e_acsl_assert_data_65.blocking = 1;
-      __gen_e_acsl_assert_data_65.kind = "RTE";
+      __gen_e_acsl_assert_data_65.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_65.pred_txt = "\\initialized(&m[0 .. 2][0 .. 1])";
       __gen_e_acsl_assert_data_65.file = "rte.c";
       __gen_e_acsl_assert_data_65.fct = "main";
@@ -3080,7 +3080,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&m[0 .. 2][0 .. 1]); */
     {
       __gen_e_acsl_assert_data_66.blocking = 1;
-      __gen_e_acsl_assert_data_66.kind = "RTE";
+      __gen_e_acsl_assert_data_66.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_66.pred_txt = "\\initialized(&m[0 .. 2][0 .. 1])";
       __gen_e_acsl_assert_data_66.file = "rte.c";
       __gen_e_acsl_assert_data_66.fct = "main";
@@ -3173,7 +3173,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&p); */
     {
       __gen_e_acsl_assert_data_70.blocking = 1;
-      __gen_e_acsl_assert_data_70.kind = "RTE";
+      __gen_e_acsl_assert_data_70.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_70.pred_txt = "\\initialized(&p)";
       __gen_e_acsl_assert_data_70.file = "rte.c";
       __gen_e_acsl_assert_data_70.fct = "main";
@@ -3193,7 +3193,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,8); */
     {
       __gen_e_acsl_assert_data_71.blocking = 1;
-      __gen_e_acsl_assert_data_71.kind = "RTE";
+      __gen_e_acsl_assert_data_71.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_71.pred_txt = "\\aligned(p,8)";
       __gen_e_acsl_assert_data_71.file = "rte.c";
       __gen_e_acsl_assert_data_71.fct = "main";
@@ -3215,7 +3215,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(p); */
     {
       __gen_e_acsl_assert_data_72.blocking = 1;
-      __gen_e_acsl_assert_data_72.kind = "RTE";
+      __gen_e_acsl_assert_data_72.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_72.pred_txt = "\\initialized(p)";
       __gen_e_acsl_assert_data_72.file = "rte.c";
       __gen_e_acsl_assert_data_72.fct = "main";
@@ -3236,7 +3236,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(*p,8); */
     {
       __gen_e_acsl_assert_data_73.blocking = 1;
-      __gen_e_acsl_assert_data_73.kind = "RTE";
+      __gen_e_acsl_assert_data_73.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_73.pred_txt = "\\aligned(*p,8)";
       __gen_e_acsl_assert_data_73.file = "rte.c";
       __gen_e_acsl_assert_data_73.fct = "main";
@@ -3258,7 +3258,7 @@ int main(void)
     /*@ assert E_ACSL: "memory access": \valid_read(p); */
     {
       __gen_e_acsl_assert_data_74.blocking = 1;
-      __gen_e_acsl_assert_data_74.kind = "RTE";
+      __gen_e_acsl_assert_data_74.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_74.pred_txt = "\\valid_read(p)";
       __gen_e_acsl_assert_data_74.file = "rte.c";
       __gen_e_acsl_assert_data_74.fct = "main";
@@ -3282,7 +3282,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(*p); */
     {
       __gen_e_acsl_assert_data_75.blocking = 1;
-      __gen_e_acsl_assert_data_75.kind = "RTE";
+      __gen_e_acsl_assert_data_75.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_75.pred_txt = "\\initialized(*p)";
       __gen_e_acsl_assert_data_75.file = "rte.c";
       __gen_e_acsl_assert_data_75.fct = "main";
@@ -3303,7 +3303,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(*(*p),4); */
     {
       __gen_e_acsl_assert_data_76.blocking = 1;
-      __gen_e_acsl_assert_data_76.kind = "RTE";
+      __gen_e_acsl_assert_data_76.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_76.pred_txt = "\\aligned(*(*p),4)";
       __gen_e_acsl_assert_data_76.file = "rte.c";
       __gen_e_acsl_assert_data_76.fct = "main";
@@ -3326,7 +3326,7 @@ int main(void)
     /*@ assert E_ACSL: "memory access": \valid_read(*p); */
     {
       __gen_e_acsl_assert_data_77.blocking = 1;
-      __gen_e_acsl_assert_data_77.kind = "RTE";
+      __gen_e_acsl_assert_data_77.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_77.pred_txt = "\\valid_read(*p)";
       __gen_e_acsl_assert_data_77.file = "rte.c";
       __gen_e_acsl_assert_data_77.fct = "main";
@@ -3350,7 +3350,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(*(*p)); */
     {
       __gen_e_acsl_assert_data_78.blocking = 1;
-      __gen_e_acsl_assert_data_78.kind = "RTE";
+      __gen_e_acsl_assert_data_78.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_78.pred_txt = "\\initialized(*(*p))";
       __gen_e_acsl_assert_data_78.file = "rte.c";
       __gen_e_acsl_assert_data_78.fct = "main";
@@ -3375,7 +3375,7 @@ int main(void)
     /*@ assert E_ACSL: "memory access": \valid_read(*(*p)); */
     {
       __gen_e_acsl_assert_data_79.blocking = 1;
-      __gen_e_acsl_assert_data_79.kind = "RTE";
+      __gen_e_acsl_assert_data_79.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_79.pred_txt = "\\valid_read(*(*p))";
       __gen_e_acsl_assert_data_79.file = "rte.c";
       __gen_e_acsl_assert_data_79.fct = "main";
@@ -3399,7 +3399,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&i); */
     {
       __gen_e_acsl_assert_data_80.blocking = 1;
-      __gen_e_acsl_assert_data_80.kind = "RTE";
+      __gen_e_acsl_assert_data_80.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_80.pred_txt = "\\initialized(&i)";
       __gen_e_acsl_assert_data_80.file = "rte.c";
       __gen_e_acsl_assert_data_80.fct = "main";
@@ -3415,7 +3415,7 @@ int main(void)
     /*@ assert E_ACSL: "division by zero": i != 0; */
     {
       __gen_e_acsl_assert_data_81.blocking = 1;
-      __gen_e_acsl_assert_data_81.kind = "RTE";
+      __gen_e_acsl_assert_data_81.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_81.pred_txt = "i != 0";
       __gen_e_acsl_assert_data_81.file = "rte.c";
       __gen_e_acsl_assert_data_81.fct = "main";
@@ -3461,7 +3461,7 @@ int main(void)
     /*@ assert E_ACSL: uninitialized: \initialized(&struct_s.b); */
     {
       __gen_e_acsl_assert_data_83.blocking = 1;
-      __gen_e_acsl_assert_data_83.kind = "RTE";
+      __gen_e_acsl_assert_data_83.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_83.pred_txt = "\\initialized(&struct_s.b)";
       __gen_e_acsl_assert_data_83.file = "rte.c";
       __gen_e_acsl_assert_data_83.fct = "main";
@@ -3482,7 +3482,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(struct_s.b,4); */
     {
       __gen_e_acsl_assert_data_84.blocking = 1;
-      __gen_e_acsl_assert_data_84.kind = "RTE";
+      __gen_e_acsl_assert_data_84.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_84.pred_txt = "\\aligned(struct_s.b,4)";
       __gen_e_acsl_assert_data_84.file = "rte.c";
       __gen_e_acsl_assert_data_84.fct = "main";
@@ -3563,7 +3563,7 @@ double __gen_e_acsl_f2(double x)
   /*@ assert E_ACSL: "division by zero": x != 0; */
   {
     __gen_e_acsl_assert_data_23.blocking = 1;
-    __gen_e_acsl_assert_data_23.kind = "RTE";
+    __gen_e_acsl_assert_data_23.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_23.pred_txt = "x != 0";
     __gen_e_acsl_assert_data_23.file = "rte.c";
     __gen_e_acsl_assert_data_23.fct = "f2";

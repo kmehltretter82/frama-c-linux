@@ -30,7 +30,7 @@ int *new_inversed(int len, int *v)
     /*@ assert E_ACSL: "pointer alignment": \aligned(v,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(v,4)";
       __gen_e_acsl_assert_data_2.file = "vector.c";
       __gen_e_acsl_assert_data_2.fct = "new_inversed";
@@ -67,7 +67,7 @@ int *new_inversed(int len, int *v)
       /*@ assert E_ACSL: "pointer alignment": \aligned(v,4); */
       {
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(v,4)";
         __gen_e_acsl_assert_data_3.file = "vector.c";
         __gen_e_acsl_assert_data_3.fct = "new_inversed";
@@ -94,7 +94,7 @@ int *new_inversed(int len, int *v)
       /*@ assert E_ACSL: "pointer alignment": \aligned(v,4); */
       {
         __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(v,4)";
         __gen_e_acsl_assert_data_4.file = "vector.c";
         __gen_e_acsl_assert_data_4.fct = "new_inversed";
@@ -224,7 +224,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(v2,4); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(v2,4)";
       __gen_e_acsl_assert_data_4.file = "vector.c";
       __gen_e_acsl_assert_data_4.fct = "main";

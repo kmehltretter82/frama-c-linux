@@ -60,7 +60,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p,4); */
       {
         __gen_e_acsl_assert_data_2.blocking = 1;
-        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(p,4)";
         __gen_e_acsl_assert_data_2.file = "freeable.c";
         __gen_e_acsl_assert_data_2.fct = "main";
@@ -134,7 +134,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p,4); */
       {
         __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p,4)";
         __gen_e_acsl_assert_data_5.file = "freeable.c";
         __gen_e_acsl_assert_data_5.fct = "main";
@@ -177,7 +177,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,4); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(p,4)";
       __gen_e_acsl_assert_data_7.file = "freeable.c";
       __gen_e_acsl_assert_data_7.fct = "main";
@@ -217,7 +217,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,4); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(p,4)";
       __gen_e_acsl_assert_data_9.file = "freeable.c";
       __gen_e_acsl_assert_data_9.fct = "main";

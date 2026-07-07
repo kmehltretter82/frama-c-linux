@@ -114,7 +114,7 @@ void nested_loops(void)
               /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
               {
                 __gen_e_acsl_assert_data_3.blocking = 1;
-                __gen_e_acsl_assert_data_3.kind = "RTE";
+                __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
                 __gen_e_acsl_assert_data_3.pred_txt = "0 <= k < (int)4";
                 __gen_e_acsl_assert_data_3.file = "loop.i";
                 __gen_e_acsl_assert_data_3.fct = "nested_loops";
@@ -137,7 +137,7 @@ void nested_loops(void)
               /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
               {
                 __gen_e_acsl_assert_data_4.blocking = 1;
-                __gen_e_acsl_assert_data_4.kind = "RTE";
+                __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
                 __gen_e_acsl_assert_data_4.pred_txt = "0 <= l < (int)8";
                 __gen_e_acsl_assert_data_4.file = "loop.i";
                 __gen_e_acsl_assert_data_4.fct = "nested_loops";
@@ -242,7 +242,7 @@ void nested_loops(void)
                 /*@ assert E_ACSL: "index out of bounds": 0 <= k < (int)4; */
                 {
                   __gen_e_acsl_assert_data_8.blocking = 1;
-                  __gen_e_acsl_assert_data_8.kind = "RTE";
+                  __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
                   __gen_e_acsl_assert_data_8.pred_txt = "0 <= k < (int)4";
                   __gen_e_acsl_assert_data_8.file = "loop.i";
                   __gen_e_acsl_assert_data_8.fct = "nested_loops";
@@ -265,7 +265,7 @@ void nested_loops(void)
                 /*@ assert E_ACSL: "index out of bounds": 0 <= l < (int)8; */
                 {
                   __gen_e_acsl_assert_data_9.blocking = 1;
-                  __gen_e_acsl_assert_data_9.kind = "RTE";
+                  __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
                   __gen_e_acsl_assert_data_9.pred_txt = "0 <= l < (int)8";
                   __gen_e_acsl_assert_data_9.file = "loop.i";
                   __gen_e_acsl_assert_data_9.fct = "nested_loops";

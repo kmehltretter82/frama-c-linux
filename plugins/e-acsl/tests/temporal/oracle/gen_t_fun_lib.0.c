@@ -186,7 +186,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     /*@ assert E_ACSL: "pointer alignment": \aligned(resolved_name,1); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(resolved_name,1)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data.fct = "realpath";
@@ -207,7 +207,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     /*@ assert E_ACSL: "pointer alignment": \aligned(resolved_name,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(resolved_name,1)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_2.fct = "realpath";
@@ -228,7 +228,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     /*@ assert E_ACSL: "pointer alignment": \aligned(resolved_name,1); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(resolved_name,1)";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_3.fct = "realpath";
@@ -252,7 +252,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     /*@ assert E_ACSL: "pointer alignment": \aligned(resolved_name,1); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(resolved_name,1)";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_8.fct = "realpath";
@@ -280,7 +280,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       /*@ assert E_ACSL: "pointer alignment": \aligned(resolved_name,1); */
       {
         __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(resolved_name,1)";
         __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_9.fct = "realpath";
@@ -331,7 +331,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     /*@ assert E_ACSL: "pointer alignment": \aligned(file_name,1); */
     {
       __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(file_name,1)";
       __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_10.fct = "realpath";
@@ -369,7 +369,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
       {
         __gen_e_acsl_assert_data_16.blocking = 1;
-        __gen_e_acsl_assert_data_16.kind = "RTE";
+        __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(\\result,1)";
         __gen_e_acsl_assert_data_16.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_16.fct = "realpath";
@@ -421,7 +421,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
       {
         __gen_e_acsl_assert_data_20.blocking = 1;
-        __gen_e_acsl_assert_data_20.kind = "RTE";
+        __gen_e_acsl_assert_data_20.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_20.pred_txt = "\\aligned(\\result,1)";
         __gen_e_acsl_assert_data_20.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_20.fct = "realpath";
@@ -473,7 +473,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
       {
         __gen_e_acsl_assert_data_24.blocking = 1;
-        __gen_e_acsl_assert_data_24.kind = "RTE";
+        __gen_e_acsl_assert_data_24.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_24.pred_txt = "\\aligned(\\result,1)";
         __gen_e_acsl_assert_data_24.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_24.fct = "realpath";
@@ -516,7 +516,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       /*@ assert E_ACSL: "pointer alignment": \aligned(\result,1); */
       {
         __gen_e_acsl_assert_data_26.blocking = 1;
-        __gen_e_acsl_assert_data_26.kind = "RTE";
+        __gen_e_acsl_assert_data_26.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_26.pred_txt = "\\aligned(\\result,1)";
         __gen_e_acsl_assert_data_26.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_26.fct = "realpath";
@@ -603,7 +603,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(q,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(q,1)";
       __gen_e_acsl_assert_data_2.file = "t_fun_lib.c";
       __gen_e_acsl_assert_data_2.fct = "main";
@@ -633,7 +633,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(p,1); */
       {
         __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(p,1)";
         __gen_e_acsl_assert_data_3.file = "t_fun_lib.c";
         __gen_e_acsl_assert_data_3.fct = "main";
@@ -693,7 +693,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(path,1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(path,1)";
       __gen_e_acsl_assert_data_5.file = "t_fun_lib.c";
       __gen_e_acsl_assert_data_5.fct = "main";
@@ -744,7 +744,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(p,1); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(p,1)";
       __gen_e_acsl_assert_data_7.file = "t_fun_lib.c";
       __gen_e_acsl_assert_data_7.fct = "main";
@@ -774,7 +774,7 @@ int main(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(path,1); */
       {
         __gen_e_acsl_assert_data_8.blocking = 1;
-        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(path,1)";
         __gen_e_acsl_assert_data_8.file = "t_fun_lib.c";
         __gen_e_acsl_assert_data_8.fct = "main";

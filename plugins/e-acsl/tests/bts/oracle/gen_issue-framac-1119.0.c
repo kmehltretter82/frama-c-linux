@@ -52,7 +52,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "pointer alignment": \aligned(a,4); */
         {
           __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
+          __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(a,4)";
           __gen_e_acsl_assert_data_2.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_2.fct = "find_last_of";
@@ -77,7 +77,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "pointer alignment": \aligned(a + i,4); */
         {
           __gen_e_acsl_assert_data_3.blocking = 1;
-          __gen_e_acsl_assert_data_3.kind = "RTE";
+          __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(a + i,4)";
           __gen_e_acsl_assert_data_3.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_3.fct = "find_last_of";
@@ -107,7 +107,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "memory access": \valid_read(a + i); */
         {
           __gen_e_acsl_assert_data_4.blocking = 1;
-          __gen_e_acsl_assert_data_4.kind = "RTE";
+          __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(a + i)";
           __gen_e_acsl_assert_data_4.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_4.fct = "find_last_of";
@@ -197,7 +197,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "pointer alignment": \aligned(a,4); */
         {
           __gen_e_acsl_assert_data_6.blocking = 1;
-          __gen_e_acsl_assert_data_6.kind = "RTE";
+          __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(a,4)";
           __gen_e_acsl_assert_data_6.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_6.fct = "find_last_of";
@@ -223,7 +223,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "pointer alignment": \aligned(a + i,4); */
         {
           __gen_e_acsl_assert_data_7.blocking = 1;
-          __gen_e_acsl_assert_data_7.kind = "RTE";
+          __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(a + i,4)";
           __gen_e_acsl_assert_data_7.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_7.fct = "find_last_of";
@@ -253,7 +253,7 @@ int find_last_of(int const *a, int len, int value)
         /*@ assert E_ACSL: "memory access": \valid_read(a + i); */
         {
           __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "RTE";
+          __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
           __gen_e_acsl_assert_data_8.pred_txt = "\\valid_read(a + i)";
           __gen_e_acsl_assert_data_8.file = "issue-framac-1119.c";
           __gen_e_acsl_assert_data_8.fct = "find_last_of";

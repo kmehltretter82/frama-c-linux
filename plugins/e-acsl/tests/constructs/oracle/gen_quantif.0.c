@@ -1317,7 +1317,7 @@ int __gen_e_acsl_implicitly_labelled_here(void)
       /*@ assert E_ACSL: "index out of bounds": 0 <= i < (int)2; */
       {
         __gen_e_acsl_assert_data_37.blocking = 1;
-        __gen_e_acsl_assert_data_37.kind = "RTE";
+        __gen_e_acsl_assert_data_37.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_37.pred_txt = "0 <= i < (int)2";
         __gen_e_acsl_assert_data_37.file = "quantif.i";
         __gen_e_acsl_assert_data_37.fct = "implicitly_labelled_here";
@@ -1338,7 +1338,7 @@ int __gen_e_acsl_implicitly_labelled_here(void)
       /*@ assert E_ACSL: "pointer alignment": \aligned(a[i],4); */
       {
         __gen_e_acsl_assert_data_38.blocking = 1;
-        __gen_e_acsl_assert_data_38.kind = "RTE";
+        __gen_e_acsl_assert_data_38.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_38.pred_txt = "\\aligned(a[i],4)";
         __gen_e_acsl_assert_data_38.file = "quantif.i";
         __gen_e_acsl_assert_data_38.fct = "implicitly_labelled_here";

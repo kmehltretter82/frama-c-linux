@@ -69,7 +69,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(ptr,4)";
       __gen_e_acsl_assert_data_2.file = "count.c";
       __gen_e_acsl_assert_data_2.fct = "main";
@@ -119,7 +119,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,4); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(ptr,4)";
       __gen_e_acsl_assert_data_4.file = "count.c";
       __gen_e_acsl_assert_data_4.fct = "main";
@@ -170,7 +170,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(ptr,4)";
       __gen_e_acsl_assert_data_6.file = "count.c";
       __gen_e_acsl_assert_data_6.fct = "main";
