@@ -1245,7 +1245,9 @@ function ViewBar(): JSX.Element {
   const allGroups = groups.concat(Sandbox);
 
   return (<>
-      <Sidebars.SidebarTitle label='Views & Components' />
+      <Sidebars.SidebarTitle label='Views & Components'>
+        <HelpButton id={'ivette-laboratory'} size={13} />
+      </Sidebars.SidebarTitle>
       <div className="globals-scrollable-area">
         <ViewSection key='views' />
         {groups.map((group) =>
