@@ -25,8 +25,8 @@ module Interlang_force: Parameter_sig.Bool
 module O : Parameter_sig.Int
 module Optimisations : sig
   module Hypothesis_gathering : Parameter_sig.Bool
-  module Omit_rte : Parameter_sig.Bool
-  module Omit_trivial_rte : Parameter_sig.Bool
+  module Rte : Parameter_sig.Bool
+  module Trivial_rte : Parameter_sig.Bool
   module Smart_il : Parameter_sig.Bool
 end
 

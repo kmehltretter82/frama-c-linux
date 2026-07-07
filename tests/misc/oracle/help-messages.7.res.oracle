@@ -73,17 +73,16 @@ Options taking a string as argument should preferably be written
                     (set by default, opposite option is
                     -e-acsl-O-no-hyp-gath)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
--e-acsl-O-no-omit-rte  opposite of -e-acsl-O-omit-rte (set by default)
--e-acsl-O-no-omit-trivial-rte  opposite of -e-acsl-O-omit-trivial-rte
+-e-acsl-O-no-rte    opposite of -e-acsl-O-rte
 -e-acsl-O-no-smart-il  opposite of -e-acsl-O-smart-il
--e-acsl-O-omit-rte  (O ≥ 3) omit RTE guard generation for specifications
-                    (opposite option is -e-acsl-O-no-omit-rte)
--e-acsl-O-omit-trivial-rte  (O ≥ 1) omit trivial RTE guard generation for
-                    specifications (set by default, opposite option is
-                    -e-acsl-O-no-omit-trivial-rte)
+-e-acsl-O-no-trivial-rte  opposite of -e-acsl-O-trivial-rte (set by default)
+-e-acsl-O-rte       (O ≤ 2) generate RTE guards for specifications (set by
+                    default, opposite option is -e-acsl-O-no-rte)
 -e-acsl-O-smart-il  (O ≥ 1) optimises expressions using smart constructors
                     (set by default, opposite option is
                     -e-acsl-O-no-smart-il)
+-e-acsl-O-trivial-rte  (O = 0) generate trivial RTE guards (opposite option
+                    is -e-acsl-O-no-trivial-rte)
 
 *** OUTPUT MESSAGES
 
@@ -118,7 +117,8 @@ Options taking a string as argument should preferably be written
                     recursive functions.
 -e-acsl-widening-output <s>  widening strategy for output of recursive
                     functions on a case
-                          by case basis. (preferably use
-                    -e-acsl-widening-output="")
+                                                                             
+                                                           by case basis.
+                    (preferably use -e-acsl-widening-output="")
 -e-acsl-widening-output-base <n>  widening strategy for output of recursive
                     functions.

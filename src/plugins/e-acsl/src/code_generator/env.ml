@@ -166,7 +166,7 @@ let set_rte env b =
 
 let generate_rte env =
   let local_env, _ = top env in
-  if not @@ Options.Optimisations.Omit_rte.get () then local_env.rte else false
+  if Options.Optimisations.Rte.get () then local_env.rte else false
 
 (* ************************************************************************** *)
 (** {2 Kinstr} *)

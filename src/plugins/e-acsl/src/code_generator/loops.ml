@@ -364,7 +364,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       Bound_variables.get_guard_for_small_type logic_x
     in
     let stmts, env = match guard_for_small_type_opt with
-      | Some p when not @@ Options.Optimisations.Omit_rte.get () ->
+      | Some p when Options.Optimisations.Rte.get () ->
         let adata, env = Assert.empty ~loc kf env in
         Typing.preprocess_predicate ~logic_env p;
         let e, adata, env =

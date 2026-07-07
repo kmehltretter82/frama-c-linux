@@ -125,18 +125,21 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
-module Interlang = False (struct
-    let () = Parameter_customize.is_invisible ()
-    let option_name = "-e-acsl-interlang"
-    let help = "try compilation based on intermediate language"
-  end)
+module Interlang =
+  False
+    (struct
+      let () = Parameter_customize.is_invisible ()
+      let option_name = "-e-acsl-interlang"
+      let help = "try compilation based on intermediate language"
+    end)
 
-module Interlang_force = False (struct
-    let () = Parameter_customize.is_invisible ()
-    let option_name = "-e-acsl-interlang-force"
-    let help = "crash if interlang compilation fails"
-  end)
-
+module Interlang_force =
+  False
+    (struct
+      let () = Parameter_customize.is_invisible ()
+      let option_name = "-e-acsl-interlang-force"
+      let help = "crash if interlang compilation fails"
+    end)
 
 module O = Int (struct
     let () = Parameter_customize.set_group Group.optimisation
@@ -153,17 +156,26 @@ module O = Int (struct
   end)
 let () = O.set_range ~min:0 ~max:3
 
-
 module Optimisations = struct
+  type cond = Leq of int | Geq of int | Eq of int
 
   module type Conf = sig
     val name : string
-    val level : int
+    val level : cond
     val descr : string
   end
 
-  module Make (C : Conf) : Parameter_sig.Bool
-  = struct
+  let pp_level fmt = function
+    | Eq l -> Format.fprintf fmt "= %d" l
+    | Leq l -> Format.fprintf fmt "%t %d" Unicode.pp_le l
+    | Geq l -> Format.fprintf fmt "%t %d" Unicode.pp_ge l
+
+  let cmp_level v = function
+    | Eq lvl -> v = lvl
+    | Leq lvl -> v <= lvl
+    | Geq lvl -> v >= lvl
+
+  module Make (C : Conf) : Parameter_sig.Bool = struct
     let () =
       let open Parameter_customize in
       set_group Group.optimisation;
@@ -171,39 +183,39 @@ module Optimisations = struct
       set_negative_option_help ("opposite of -e-acsl-O-" ^ C.name)
     module Res = Bool (struct
         let option_name = "-e-acsl-O-" ^ C.name
-        let help = Format.asprintf "(O %t %d) %s" Unicode.pp_ge C.level C.descr
-        let default = O.get_default () >= C.level
+        let help = Format.asprintf "(O %a) %s" pp_level C.level C.descr
+        let default = cmp_level (O.get_default ()) C.level
       end)
     let () = O.add_update_hook
-        (fun _ o -> if not @@ Res.is_set () then Res.set (o >= C.level))
+        (fun _ o -> if not @@ Res.is_set () then Res.set (cmp_level o C.level))
     include Res
   end
 
   module Hypothesis_gathering =
     Make (struct
       let name = "hyp-gath"
-      let level = 1
+      let level = Geq 1
       let descr = "hypothesis gathering (in inductive extraction)"
     end)
 
-  module Omit_rte =
+  module Rte =
     Make (struct
-      let name = "omit-rte"
-      let level = 3
-      let descr = "omit RTE guard generation for specifications"
+      let name = "rte"
+      let level = Leq 2
+      let descr = "generate RTE guards for specifications"
     end)
 
-  module Omit_trivial_rte =
+  module Trivial_rte =
     Make (struct
-      let name = "omit-trivial-rte"
-      let level = 1
-      let descr = "omit trivial RTE guard generation for specifications"
+      let name = "trivial-rte"
+      let level = Eq 0
+      let descr = "generate trivial RTE guards"
     end)
 
   module Smart_il =
     Make (struct
       let name = "smart-il"
-      let level = 1
+      let level = Geq 1
       let descr = "optimises expressions using smart constructors"
     end)
 end
@@ -251,7 +263,7 @@ module Widening_output =
       let option_name = "-e-acsl-widening-output"
       let arg_name = ""
       let help = "widening strategy for output of recursive functions on a case
-      by case basis."
+                                                                                                 by case basis."
     end)
 
 let parameter_states =

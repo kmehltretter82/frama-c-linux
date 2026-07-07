@@ -12,7 +12,7 @@ open Cil_types
 let dkey = Options.Dkey.translation
 
 let rte_annots pp elt kf env l =
-  if Options.Optimisations.Omit_rte.get ()
+  if not @@ Options.Optimisations.Rte.get ()
   then env
   else
     let old_kind = Env.annotation_kind env in
@@ -43,7 +43,7 @@ let rte_annots pp elt kf env l =
     Env.set_annotation_kind env old_kind
 
 let exp ?filter kf env e =
-  if Options.Optimisations.Omit_rte.get () then env else begin
+  if not @@ Options.Optimisations.Rte.get () then env else begin
     Assert.push_pending_register_data();
     let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
     let l = Rte.exp kf stmt e in

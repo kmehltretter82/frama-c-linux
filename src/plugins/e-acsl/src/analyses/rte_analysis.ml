@@ -328,7 +328,7 @@ let rte_visitor =
         assert (Ast_types.C.is_ptr typ);
         let pointed_typ = Ast_types.C.direct_pointed typ in
         let t = Cil.stripTermCasts t in
-        if not (Options.Optimisations.Omit_trivial_rte.get ()) ||
+        if Options.Optimisations.Trivial_rte.get () ||
            not (self#trivially_aligned t typ pointed_typ)
         then
           Guards.add orig
@@ -392,7 +392,7 @@ let rte_visitor =
   end
 
 let preprocess ast =
-  if not @@ Options.Optimisations.Omit_rte.get ()
+  if Options.Optimisations.Rte.get ()
   then begin
     ignore @@ rte_visitor#visit_file ast;
     Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
@@ -401,7 +401,7 @@ let preprocess ast =
     Options.feedback ~dkey:dkey "Skip the RTE analysis.%!"
 
 let preprocess_predicate p =
-  if not @@ Options.Optimisations.Omit_rte.get ()
+  if Options.Optimisations.Rte.get ()
   then begin
     ignore @@ rte_visitor#visit_predicate p;
     Options.feedback ~dkey "Result of the RTE analysis on %a.%!"
