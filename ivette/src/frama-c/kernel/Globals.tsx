@@ -1250,7 +1250,7 @@ export function GlobalByFiles(): JSX.Element {
 
   return (<>
     <SidebarTitle label='Files'>
-      <Hbox>
+      <Hbox style={{ alignItems: "center" }}>
         <Toolbar.ButtonGroup>
           <Toolbar.Button
             icon="CHEVRON.CONTRACT"
@@ -1278,11 +1278,11 @@ export function GlobalByFiles(): JSX.Element {
             selected={!dispInList}
             onClick={() => flipDispInList()}
           />
-          <HelpButton
-            id={'framac-files-sidebar'}
-            size={18}
-          />
         </Toolbar.ButtonGroup>
+        <HelpButton
+          id={'framac-files-sidebar'}
+          size={13}
+        />
       </Hbox>
     </SidebarTitle>
     <SidebarFilesTools
