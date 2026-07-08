@@ -256,16 +256,15 @@ export abstract class Model<Key, Row> {
    by default.
    @return a number that can be used to memoize other effects
  */
-
 export function useModel<K, R>(model: Model<K, R>, sync = true): number {
   const [age, setAge] = React.useState(0);
+
   React.useEffect(() => {
-    if (sync) {
-      const w = model.link(() => setImmediate(() => setAge(age + 1)));
-      return w.unlink;
-    }
-    return undefined;
-  });
+    if (!sync) return undefined;
+    const w = model.link(() => setImmediate(() => setAge((n) => n + 1)));
+    return () => w.unlink();
+  }, [model, sync]);
+
   return age;
 }
 

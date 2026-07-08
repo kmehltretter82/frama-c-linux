@@ -769,8 +769,8 @@ export function offSignal(id: Signal, callback: () => void): void {
 export function useSignal(id: Signal, callback: () => void): void {
   React.useEffect(() => {
     onSignal(id, callback);
-    return () => { offSignal(id, callback); };
-  });
+    return () => offSignal(id, callback);
+  }, [id, callback]);
 }
 
 // --- Server Synchro
