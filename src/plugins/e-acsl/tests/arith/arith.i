@@ -1,5 +1,11 @@
 /* run.config
    COMMENT: arithmetic operations
+   STDOPT:
+   STDOPT: #"-e-acsl-gmp-only"
+*/
+/* run.config_dev
+   EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --gmp
 */
 
 int main(void) {
@@ -42,6 +48,9 @@ int main(void) {
   /*@ assert 1 + ((z+1) / (y-123456789123456789)) == 1; */
 
   /*@ assert 1 - x == -x + 1; */ // test GIT issue #37
+
+  short a = 1, b = 1;
+  //@ assert a+b > 2.  - 1.; // gitlab eacsl issue #120
 
   //@ check 1 + ((x+z) / (y-x)) == 0; // do x, y and z appear in failure message?
 

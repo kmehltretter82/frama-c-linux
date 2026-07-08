@@ -1,6 +1,13 @@
 /* run.config
    COMMENT: (recursive) logic functions and predicates without labels
    STDOPT: +"-eva-slevel 10 -eva-unroll-recursive-calls 10"
+   COMMENT: Eva analysis is too long when trying to analyze recursive calls with
+   COMMENT: GMP. Use minimum precision for this case.
+   STDOPT: #"-e-acsl-gmp-only" +"-eva-precision 0"
+*/
+/* run.config_dev
+   EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --gmp
 */
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
@@ -77,6 +84,8 @@ int z = 8;
 
 // RECURSIVE FUNCTIONS
 
+/*@ logic integer identity(integer n) = n <= 0 ? n : identity(n-1) + 1; */
+
 /*@ logic integer rf1(integer n) =
     n <= 0 ? 0 : rf1(n - 1) + n; */
 
@@ -128,6 +137,7 @@ int main(void) {
   k(9);
 
   double d = 2.0;
+  /*@ assert 0.499999 < f2(d) < 0.500001; */;
   /*@ assert f2(d) > 0; */;
   //@ assert f6(&d) > 0;
   /*@ assert f_sum (10) == 10; */;
@@ -151,6 +161,7 @@ int main(void) {
   /*@ assert P(-3,8); */
 
   // RECURSIVE FUNCTIONS
+  /*@ assert identity(x) == x; */
   /*@ assert rf1(0) == 0; */;
   /*@ assert rf1(1) == 1; */;
   /*@ assert rf1(9) == 45; */;
