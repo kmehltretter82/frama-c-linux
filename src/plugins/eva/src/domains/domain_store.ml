@@ -64,11 +64,10 @@ module Make (Domain: InputDomain) = struct
   module Save = State_builder.Option_ref (Datatype.Bool) (val info "Save")
 
   (* If the domain is unmarshable, its states cannot be saved on the disk,
-     so this boolean should never be true when reloading a session. Set it to
-     None to not prevent saving states in future analyses. *)
+     so this boolean should be saved as false. *)
   let () =
     if Descr.is_unmarshable Domain.datatype_descr
-    then Save.howto_marshal (fun _ -> ()) (fun () -> ref None)
+    then Save.howto_marshal (fun r -> Option.map (fun _ -> false) !r) (ref)
 
   module Table =
     State_builder.Hashtbl (ControlPoint.Hashtbl) (Domain) (val info "Table")
