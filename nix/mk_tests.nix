@@ -94,6 +94,7 @@ stdenvNoCC.mkDerivation {
 
   preBuild =
     ''
+    set -v
     mkdir home
     export HOME=$(pwd)/home
     export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
@@ -114,17 +115,20 @@ stdenvNoCC.mkDerivation {
      else "");
 
   postBuild =
-    if cover
+    ''set -v
+    '' +
+    (if cover
     then ''
       bisect-ppx-report cobertura --coverage-path=_bisect coverage-$pname.xml
       tar cfJ coverage.tar.xz coverage-$pname.xml
     ''
-    else "" ;
+    else "") ;
 
   # The export NIX_GCC_DONT_MANGLE_PREFIX_MAP is meant to disable the
   # transformation of the path of Frama-C into uppercase when using the
   # __FILE__ macro.
   buildPhase = ''
+    set -v
     runHook preBuild
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
   '' +
@@ -134,12 +138,14 @@ stdenvNoCC.mkDerivation {
 
   # No installation required
   installPhase =
-    if cover
+    ''set -v
+    '' +
+    (if cover
     then ''
       mkdir -p $out
       cp -r coverage.tar.xz $out/$pname.tar.xz
     ''
     else ''
       touch $out
-    '';
+    '');
 }
