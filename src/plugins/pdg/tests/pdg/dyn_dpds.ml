@@ -1,8 +1,8 @@
 (*
-make -s tests/pdg/dyn_dpds.byte ; \
-tests/pdg/dyn_dpds.byte -deps  tests/pdg/dyn_dpds.c; \
-zgrviewer tests/pdg/dyn_dpds_1.dot ; \
-zgrviewer tests/pdg/dyn_dpds_2.dot ;
+make -s src/plugins/pdg/tests/pdg/dyn_dpds.byte ; \
+src/plugins/pdg/tests/pdg/dyn_dpds.byte -deps  src/plugins/pdg/tests/pdg/dyn_dpds.c; \
+zgrviewer src/plugins/pdg/tests/pdg/dyn_dpds_1.dot ; \
+zgrviewer src/plugins/pdg/tests/pdg/dyn_dpds_2.dot ;
 *)
 
 let get_zones str_data (stmt, kf) =

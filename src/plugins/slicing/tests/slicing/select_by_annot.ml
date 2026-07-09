@@ -1,5 +1,5 @@
-(* ledit bin/toplevel.top -deps tests/slicing/select_by_annot.c \
-   < tests/slicing/select_by_annot.ml
+(* ledit bin/toplevel.top -deps src/plugins/slicing/tests/slicing/select_by_annot.c \
+   < src/plugins/slicing/tests/slicing/select_by_annot.ml
 *)
 
 

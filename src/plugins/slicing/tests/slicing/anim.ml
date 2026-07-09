@@ -2,9 +2,9 @@
 * Small example to view graphically the building process of a slicing project.
 * To try it, use the following commands :
 
-  make tests/slicing/anim.byte; \
-  tests/slicing/anim.byte -deps -lib-entry -main g -slicing-level 3 -slice-callers \
-                          tests/slicing/select_return_bis.c
+  make src/plugins/slicing/tests/slicing/anim.byte; \
+  src/plugins/slicing/tests/slicing/anim.byte -deps -lib-entry -main g -slicing-level 3 -slice-callers \
+                          src/plugins/slicing/tests/slicing/select_return_bis.c
 *)
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)

@@ -116,7 +116,7 @@ let () = Boot.Main.extend run_once
    this feature can for instance be used to add dependencies on assertions.
 
    To see an example of how to use it, please have a look at
-   [tests/pdg/dyn_dpds.ml].
+   [src/plugins/pdg/tests/pdg/dyn_dpds.ml].
 
    {2 How to see a PDG ?}
 

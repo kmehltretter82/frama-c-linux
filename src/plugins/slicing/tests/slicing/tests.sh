@@ -2,13 +2,13 @@
 
 BASE=$1
 
-EXE_FILE=tests/slicing/$BASE.byte
-RES_FILE=tests/slicing/result/$BASE.res.log
-ERR_FILE=tests/slicing/result/$BASE.err.log
+EXE_FILE=src/plugins/slicing/tests/slicing/$BASE.byte
+RES_FILE=src/plugins/slicing/tests/slicing/result/$BASE.res.log
+ERR_FILE=src/plugins/slicing/tests/slicing/result/$BASE.err.log
 
 make -s $EXE_FILE
 
-CMD="$EXE_FILE -deps tests/slicing/$BASE.c"
+CMD="$EXE_FILE -deps src/plugins/slicing/tests/slicing/$BASE.c"
 
 echo "$CMD"
 #echo "RES = $RES_FILE"

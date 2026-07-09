@@ -410,7 +410,7 @@ module RKey = struct
       (* Intentionally buggy: ignore the label and consider only the statement.
          There seems to be bug in the pdg, only one 'case :' per statement is
          present. This avoids removing the other 'case' clauses
-         (see tests/slicing/switch.c *)
+         (see src/plugins/slicing/tests/slicing/switch.c *)
       53 * Cil_datatype.Stmt.hash s (* 7 * Cil_datatype.Label.hash l *)
     | _ -> assert false
 

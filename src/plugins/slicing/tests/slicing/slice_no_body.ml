@@ -1,5 +1,5 @@
-(* ledit bin/toplevel.top -deps tests/slicing/slice_no_body.c
-   #use "tests/slicing/select.ml";;
+(* ledit bin/toplevel.top -deps src/plugins/slicing/tests/slicing/slice_no_body.c
+   #use "src/plugins/slicing/tests/slicing/select.ml";;
 *)
 
 include LibSelect;;

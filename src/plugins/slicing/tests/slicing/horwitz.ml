@@ -1,8 +1,8 @@
 (*
-ledit bin/toplevel.top  -deps tests/slicing/horwitz.c
-#use "tests/slicing/select.ml";;
+ledit bin/toplevel.top  -deps src/plugins/slicing/tests/slicing/horwitz.c
+#use "src/plugins/slicing/tests/slicing/select.ml";;
 
-tests/slicing/horwitz.byte -deps tests/slicing/horwitz.c
+src/plugins/slicing/tests/slicing/horwitz.byte -deps src/plugins/slicing/tests/slicing/horwitz.c
 * *)
 
 include LibSelect;;

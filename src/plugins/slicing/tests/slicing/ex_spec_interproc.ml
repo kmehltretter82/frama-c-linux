@@ -1,7 +1,7 @@
-(* ledit bin/toplevel.top -deps tests/slicing/ex_spec_interproc.c
-   #use "tests/slicing/select.ml";;
+(* ledit bin/toplevel.top -deps src/plugins/slicing/tests/slicing/ex_spec_interproc.c
+   #use "src/plugins/slicing/tests/slicing/select.ml";;
    ou
-   #use "tests/slicing/ex_spec_interproc.ml";;
+   #use "src/plugins/slicing/tests/slicing/ex_spec_interproc.ml";;
 
 *)
 

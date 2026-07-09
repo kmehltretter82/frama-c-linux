@@ -1,7 +1,7 @@
-(* ledit bin/toplevel.top -deps tests/slicing/mark_all_slices.c
-   #use "tests/slicing/select.ml";;
+(* ledit bin/toplevel.top -deps src/plugins/slicing/tests/slicing/mark_all_slices.c
+   #use "src/plugins/slicing/tests/slicing/select.ml";;
    ou
-   #use "tests/slicing/mark_all_slices.ml";;
+   #use "src/plugins/slicing/tests/slicing/mark_all_slices.ml";;
 
 *)
 

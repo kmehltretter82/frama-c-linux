@@ -16,7 +16,7 @@ include ../MakeLaTeXModern
 
 DWNLDDIR=../manuals
 DOCNAME=pdg-documentation-fr.pdf
-TEST_DIR=../../tests/pdg
+TEST_DIR=../../src/plugins/pdg/tests/pdg
 
 BIB_FILE = ../slicing/design-fr/bib-slicing.bib
 main.bbl : $(BIB_FILE)
@@ -42,7 +42,7 @@ call-%.dot : $(TEST_DIR)/oracle/call.%.dot
 
 call-%.dot :
 	@echo
-	@echo "ERROR : $@ not found : this file cannot be generated from an oracle of the PDD test 'tests/pdg/call.c'"
+	@echo "ERROR : $@ not found : this file cannot be generated from an oracle of the PDD test 'src/plugins/pdg/tests/pdg/call.c'"
 	@echo
 	exit 1
 

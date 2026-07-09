@@ -1,5 +1,5 @@
-(* ledit bin/toplevel.top -deps tests/slicing/simple_intra_slice.c \
-   < tests/slicing/simple_intra_slice.ml
+(* ledit bin/toplevel.top -deps src/plugins/slicing/tests/slicing/simple_intra_slice.c \
+   < src/plugins/slicing/tests/slicing/simple_intra_slice.ml
 *)
 
 

@@ -1,6 +1,6 @@
 (* To use this in interactive mode :
 
-   #use "tests/slicing/select.ml";;
+   #use "src/plugins/slicing/tests/slicing/select.ml";;
 *)
 
 exception Break
