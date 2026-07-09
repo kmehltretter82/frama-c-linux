@@ -1,5 +1,5 @@
 [kernel] Parsing variadic.c (with preprocessing)
-[kernel] Parsing tests/pdg/variadic.c (with preprocessing)
+[kernel] Parsing PLUGINS/pdg/tests/pdg/variadic.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva:progress] Computing initial state
@@ -8,41 +8,41 @@
   
 [eva:progress] 
   computing for function f1 <- main.
-  Called from tests/pdg/variadic.c:37.
-[kernel:annot:missing-spec] tests/pdg/variadic.c:23: Warning: 
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:37.
+[kernel:annot:missing-spec] PLUGINS/pdg/tests/pdg/variadic.c:23: Warning: 
   Neither code nor specification for function lib_f, generating default
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function lib_f <- f1 <- main.
-  Called from tests/pdg/variadic.c:23.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:23.
 [eva] using specification for function lib_f
 [eva:progress] Done for function lib_f
 [eva:progress] Recording results for f1
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f2 <- main.
-  Called from tests/pdg/variadic.c:38.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:38.
 [eva:progress] 
   computing for function lib_f <- f2 <- main.
-  Called from tests/pdg/variadic.c:27.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:27.
 [eva:progress] Done for function lib_f
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f3 <- main.
-  Called from tests/pdg/variadic.c:39.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:39.
 [eva:progress] 
   computing for function lib_f <- f3 <- main.
-  Called from tests/pdg/variadic.c:31.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:31.
 [eva:progress] Done for function lib_f
 [eva:progress] Recording results for f3
 [eva:progress] Done for function f3
 [eva:progress] 
   computing for function f2 <- main.
-  Called from tests/pdg/variadic.c:40.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:40.
 [eva:progress] 
   computing for function lib_f <- f2 <- main.
-  Called from tests/pdg/variadic.c:27.
+  Called from PLUGINS/pdg/tests/pdg/variadic.c:27.
 [eva:progress] Done for function lib_f
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
