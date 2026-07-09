@@ -3,8 +3,8 @@
    STDOPT: #"-metrics-eva-cover"
    LOG: libc.json
    STDOPT: #"-metrics-libc -metrics-output ./libc.json"
- ENABLED_IF: %{read:../../../python-3.10-available}
- EXECNOW: LOG @PTEST_NAME@_metrics.res LOG @PTEST_NAME@_metrics.err @frama-c@ @PTEST_FILE@ -metrics -metrics-libc -then -metrics-no-libc | %{dep:@PTEST_SUITE_DIR@/../libc/check_some_metrics.py} "> 5" "== 3" "== 0" "> 10" "== 2"  "== 6" "== 0" "== 0" "== 0" "== 4" >@PTEST_NAME@_metrics.res 2>@PTEST_NAME@_metrics.err
+ ENABLED_IF: %{read:@PTEST_SUITE_DIR@/../../../../../python-3.10-available}
+ EXECNOW: LOG @PTEST_NAME@_metrics.res LOG @PTEST_NAME@_metrics.err @frama-c@ @PTEST_FILE@ -metrics -metrics-libc -then -metrics-no-libc | %{dep:@PTEST_SUITE_DIR@/../../../../../tests/libc/check_some_metrics.py} "> 5" "== 3" "== 0" "> 10" "== 2"  "== 6" "== 0" "== 0" "== 0" "== 4" >@PTEST_NAME@_metrics.res 2>@PTEST_NAME@_metrics.err
 */
 #include <ctype.h>
 #include <stdio.h> // defines external variables
