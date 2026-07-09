@@ -1,6 +1,6 @@
 /* run.config
-PLUGIN: @PTEST_PLUGIN@ inout
-STDOPT: +"-occurrence"
+
+
 */
 int x,y;
 
@@ -11,7 +11,7 @@ int x,y;
 */
 int f(int x);
 
-int main () { 
+int main () {
   int y = 0;
   int z = f(y);
   y = f(z);

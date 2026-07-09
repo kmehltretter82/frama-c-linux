@@ -1,2 +1,0 @@
-PLUGIN: eva,scope occurrence
-STDOPT: -"-eva" -"-out" -"-input" -"-deps" +"-occurrence-verbose 1"
