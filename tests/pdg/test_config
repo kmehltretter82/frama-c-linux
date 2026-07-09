@@ -1,2 +1,0 @@
-PLUGIN: @EVA_PLUGINS@ pdg
-OPT: @EVA_OPTIONS@ -pdg-verbose 2
