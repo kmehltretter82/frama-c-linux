@@ -408,9 +408,8 @@ function getPropertiesNodes(tree: Tree): Node[] {
 
   const props = tree.children.map(getPropertiesNodes).flat();
 
-  /* Must be consistent with the id chosen by the Frama-C server for property
-     markers. Ideally, this test should not depend on markers id syntax. */
-  if (tree.marker.startsWith('code:#p')) {
+  const attributes = States.getMarker(tree.marker);
+  if (attributes.kind === 'PROPERTY') {
     props.push(tree);
   }
 
