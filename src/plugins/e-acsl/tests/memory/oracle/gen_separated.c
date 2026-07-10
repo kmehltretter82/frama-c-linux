@@ -305,7 +305,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
                                    __gen_e_acsl_size);
       if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
-      else __gen_e_acsl_if = __gen_e_acsl_size;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
+                                     __gen_e_acsl_size);
+        __gen_e_acsl_if = __gen_e_acsl_size;
+      }
       __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                       (size_t)__gen_e_acsl_if,
                                                       (void *)(array),
@@ -314,8 +318,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
-                                   __gen_e_acsl_size);
       __gen_e_acsl_assert_data_13.blocking = 1;
       __gen_e_acsl_assert_data_13.kind = "RTE";
       __gen_e_acsl_assert_data_13.pred_txt = "\\valid_read(&array[0 .. 9])";
@@ -332,7 +334,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"size",0,
                                    __gen_e_acsl_size_2);
       if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
-      else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"size",0,
+                                     __gen_e_acsl_size_2);
+        __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
+      }
       __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                8 * 10),
                                                       (size_t)__gen_e_acsl_if_2,
@@ -344,8 +350,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"size",0,
-                                   __gen_e_acsl_size_2);
       __gen_e_acsl_assert_data_14.blocking = 1;
       __gen_e_acsl_assert_data_14.kind = "RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\valid_read(&array[10 .. 19])";
@@ -360,12 +364,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
                                    __gen_e_acsl_size_3);
       if (__gen_e_acsl_size_3 <= 0) __gen_e_acsl_if_3 = 0;
-      else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
+                                     __gen_e_acsl_size_3);
+        __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
+      }
       __gen_e_acsl_size_4 = 8 * 10;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
                                    __gen_e_acsl_size_4);
       if (__gen_e_acsl_size_4 <= 0) __gen_e_acsl_if_4 = 0;
-      else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
+                                     __gen_e_acsl_size_4);
+        __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
+      }
       __gen_e_acsl_separated_3 = __e_acsl_separated(2UL,(char *)(array) + 0,
                                                     __gen_e_acsl_if_3,
                                                     (char *)(array) + 8 * 10,
@@ -374,16 +386,12 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
-                                   __gen_e_acsl_size_3);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"size",0,
-                                   __gen_e_acsl_size_4);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                    "\\separated(&array[0 .. 9], &array[10 .. 19])",
                                    0,__gen_e_acsl_separated_3);
@@ -417,7 +425,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"size",0,
                                    __gen_e_acsl_size_5);
       if (__gen_e_acsl_size_5 <= 0) __gen_e_acsl_if_5 = 0;
-      else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"size",0,
+                                     __gen_e_acsl_size_5);
+        __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
+      }
       __gen_e_acsl_valid_read_10 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_5,
                                                        (void *)(array),
@@ -426,8 +438,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"size",0,
-                                   __gen_e_acsl_size_5);
       __gen_e_acsl_assert_data_16.blocking = 1;
       __gen_e_acsl_assert_data_16.kind = "RTE";
       __gen_e_acsl_assert_data_16.pred_txt = "\\valid_read(&array[0 .. 10])";
@@ -444,7 +454,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"size",0,
                                    __gen_e_acsl_size_6);
       if (__gen_e_acsl_size_6 <= 0) __gen_e_acsl_if_6 = 0;
-      else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"size",0,
+                                     __gen_e_acsl_size_6);
+        __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
+      }
       __gen_e_acsl_valid_read_11 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_6,
@@ -456,8 +470,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"size",0,
-                                   __gen_e_acsl_size_6);
       __gen_e_acsl_assert_data_17.blocking = 1;
       __gen_e_acsl_assert_data_17.kind = "RTE";
       __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(&array[5 .. 15])";
@@ -472,12 +484,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
                                    __gen_e_acsl_size_7);
       if (__gen_e_acsl_size_7 <= 0) __gen_e_acsl_if_7 = 0;
-      else __gen_e_acsl_if_7 = __gen_e_acsl_size_7;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
+                                     __gen_e_acsl_size_7);
+        __gen_e_acsl_if_7 = __gen_e_acsl_size_7;
+      }
       __gen_e_acsl_size_8 = 8 * 11;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
                                    __gen_e_acsl_size_8);
       if (__gen_e_acsl_size_8 <= 0) __gen_e_acsl_if_8 = 0;
-      else __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
+                                     __gen_e_acsl_size_8);
+        __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
+      }
       __gen_e_acsl_separated_4 = __e_acsl_separated(2UL,(char *)(array) + 0,
                                                     __gen_e_acsl_if_7,
                                                     (char *)(array) + 8 * 5,
@@ -486,16 +506,12 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
-                                   __gen_e_acsl_size_7);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
-                                   __gen_e_acsl_size_8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                    "\\separated(&array[0 .. 10], &array[5 .. 15])",
                                    0,__gen_e_acsl_separated_4);
@@ -530,7 +546,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"size",0,
                                    __gen_e_acsl_size_9);
       if (__gen_e_acsl_size_9 <= 0) __gen_e_acsl_if_9 = 0;
-      else __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"size",0,
+                                     __gen_e_acsl_size_9);
+        __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
+      }
       __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_9,
                                                        (void *)(array),
@@ -539,8 +559,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,"size",0,
-                                   __gen_e_acsl_size_9);
       __gen_e_acsl_assert_data_19.blocking = 1;
       __gen_e_acsl_assert_data_19.kind = "RTE";
       __gen_e_acsl_assert_data_19.pred_txt = "\\valid_read(&array[0 .. 19])";
@@ -557,7 +575,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"size",0,
                                    __gen_e_acsl_size_10);
       if (__gen_e_acsl_size_10 <= 0) __gen_e_acsl_if_10 = 0;
-      else __gen_e_acsl_if_10 = __gen_e_acsl_size_10;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"size",0,
+                                     __gen_e_acsl_size_10);
+        __gen_e_acsl_if_10 = __gen_e_acsl_size_10;
+      }
       __gen_e_acsl_valid_read_13 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_10,
@@ -569,8 +591,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"size",0,
-                                   __gen_e_acsl_size_10);
       __gen_e_acsl_assert_data_20.blocking = 1;
       __gen_e_acsl_assert_data_20.kind = "RTE";
       __gen_e_acsl_assert_data_20.pred_txt = "\\valid_read(&array[5 .. 15])";
@@ -585,12 +605,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
                                    __gen_e_acsl_size_11);
       if (__gen_e_acsl_size_11 <= 0) __gen_e_acsl_if_11 = 0;
-      else __gen_e_acsl_if_11 = __gen_e_acsl_size_11;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
+                                     __gen_e_acsl_size_11);
+        __gen_e_acsl_if_11 = __gen_e_acsl_size_11;
+      }
       __gen_e_acsl_size_12 = 8 * 11;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
                                    __gen_e_acsl_size_12);
       if (__gen_e_acsl_size_12 <= 0) __gen_e_acsl_if_12 = 0;
-      else __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
+                                     __gen_e_acsl_size_12);
+        __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
+      }
       __gen_e_acsl_separated_5 = __e_acsl_separated(2UL,(char *)(array) + 0,
                                                     __gen_e_acsl_if_11,
                                                     (char *)(array) + 8 * 5,
@@ -599,16 +627,12 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
-                                   __gen_e_acsl_size_11);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
-                                   __gen_e_acsl_size_12);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                    "\\separated(&array[0 .. 19], &array[5 .. 15])",
                                    0,__gen_e_acsl_separated_5);
@@ -713,7 +737,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"size",0,
                                    __gen_e_acsl_size_13);
       if (__gen_e_acsl_size_13 <= 0) __gen_e_acsl_if_13 = 0;
-      else __gen_e_acsl_if_13 = __gen_e_acsl_size_13;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"size",0,
+                                     __gen_e_acsl_size_13);
+        __gen_e_acsl_if_13 = __gen_e_acsl_size_13;
+      }
       __gen_e_acsl_valid_read_16 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_13,
                                                        (void *)(array),
@@ -722,8 +750,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"size",0,
-                                   __gen_e_acsl_size_13);
       __gen_e_acsl_assert_data_25.blocking = 1;
       __gen_e_acsl_assert_data_25.kind = "RTE";
       __gen_e_acsl_assert_data_25.pred_txt = "\\valid_read(&array[0 .. 1])";
@@ -740,7 +766,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"size",0,
                                    __gen_e_acsl_size_14);
       if (__gen_e_acsl_size_14 <= 0) __gen_e_acsl_if_14 = 0;
-      else __gen_e_acsl_if_14 = __gen_e_acsl_size_14;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"size",0,
+                                     __gen_e_acsl_size_14);
+        __gen_e_acsl_if_14 = __gen_e_acsl_size_14;
+      }
       __gen_e_acsl_valid_read_17 = __e_acsl_valid_read((void *)((char *)(array) + 8),
                                                        (size_t)__gen_e_acsl_if_14,
                                                        (void *)(array),
@@ -751,8 +781,6 @@ int main(void)
                                    "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"size",0,
-                                   __gen_e_acsl_size_14);
       __gen_e_acsl_assert_data_26.blocking = 1;
       __gen_e_acsl_assert_data_26.kind = "RTE";
       __gen_e_acsl_assert_data_26.pred_txt = "\\valid_read(&array[1 .. 2])";
@@ -767,12 +795,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
                                    __gen_e_acsl_size_15);
       if (__gen_e_acsl_size_15 <= 0) __gen_e_acsl_if_15 = 0;
-      else __gen_e_acsl_if_15 = __gen_e_acsl_size_15;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
+                                     __gen_e_acsl_size_15);
+        __gen_e_acsl_if_15 = __gen_e_acsl_size_15;
+      }
       __gen_e_acsl_size_16 = 8 * 2;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
                                    __gen_e_acsl_size_16);
       if (__gen_e_acsl_size_16 <= 0) __gen_e_acsl_if_16 = 0;
-      else __gen_e_acsl_if_16 = __gen_e_acsl_size_16;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
+                                     __gen_e_acsl_size_16);
+        __gen_e_acsl_if_16 = __gen_e_acsl_size_16;
+      }
       __gen_e_acsl_separated_7 = __e_acsl_separated(2UL,(char *)(array) + 0,
                                                     __gen_e_acsl_if_15,
                                                     (char *)(array) + 8,
@@ -781,16 +817,12 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
-                                   __gen_e_acsl_size_15);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_24,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
                                    "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"size",0,
-                                   __gen_e_acsl_size_16);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
                                    "\\separated(&array[0 .. 1], &array[1 .. 2])",
                                    0,__gen_e_acsl_separated_7);
@@ -825,7 +857,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,"size",0,
                                    __gen_e_acsl_size_17);
       if (__gen_e_acsl_size_17 <= 0) __gen_e_acsl_if_17 = 0;
-      else __gen_e_acsl_if_17 = __gen_e_acsl_size_17;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,"size",0,
+                                     __gen_e_acsl_size_17);
+        __gen_e_acsl_if_17 = __gen_e_acsl_size_17;
+      }
       __gen_e_acsl_valid_read_18 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 15),
                                                        (size_t)__gen_e_acsl_if_17,
@@ -837,8 +873,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,"size",0,
-                                   __gen_e_acsl_size_17);
       __gen_e_acsl_assert_data_28.blocking = 1;
       __gen_e_acsl_assert_data_28.kind = "RTE";
       __gen_e_acsl_assert_data_28.pred_txt = "\\valid_read(&array[15 .. 5])";
@@ -855,7 +889,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,"size",0,
                                    __gen_e_acsl_size_18);
       if (__gen_e_acsl_size_18 <= 0) __gen_e_acsl_if_18 = 0;
-      else __gen_e_acsl_if_18 = __gen_e_acsl_size_18;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,"size",0,
+                                     __gen_e_acsl_size_18);
+        __gen_e_acsl_if_18 = __gen_e_acsl_size_18;
+      }
       __gen_e_acsl_valid_read_19 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_18,
                                                        (void *)(array),
@@ -864,8 +902,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,"size",0,
-                                   __gen_e_acsl_size_18);
       __gen_e_acsl_assert_data_29.blocking = 1;
       __gen_e_acsl_assert_data_29.kind = "RTE";
       __gen_e_acsl_assert_data_29.pred_txt = "\\valid_read(&array[0 .. 19])";
@@ -880,12 +916,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
                                    __gen_e_acsl_size_19);
       if (__gen_e_acsl_size_19 <= 0) __gen_e_acsl_if_19 = 0;
-      else __gen_e_acsl_if_19 = __gen_e_acsl_size_19;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
+                                     __gen_e_acsl_size_19);
+        __gen_e_acsl_if_19 = __gen_e_acsl_size_19;
+      }
       __gen_e_acsl_size_20 = 8 * 20;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
                                    __gen_e_acsl_size_20);
       if (__gen_e_acsl_size_20 <= 0) __gen_e_acsl_if_20 = 0;
-      else __gen_e_acsl_if_20 = __gen_e_acsl_size_20;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
+                                     __gen_e_acsl_size_20);
+        __gen_e_acsl_if_20 = __gen_e_acsl_size_20;
+      }
       __gen_e_acsl_separated_8 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 15,
                                                     __gen_e_acsl_if_19,
@@ -897,14 +941,10 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
-                                   __gen_e_acsl_size_19);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_27,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"size",0,
-                                   __gen_e_acsl_size_20);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
                                    "\\separated(&array[15 .. 5], &array[0 .. 19])",
                                    0,__gen_e_acsl_separated_8);
@@ -938,7 +978,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,"size",0,
                                    __gen_e_acsl_size_21);
       if (__gen_e_acsl_size_21 <= 0) __gen_e_acsl_if_21 = 0;
-      else __gen_e_acsl_if_21 = __gen_e_acsl_size_21;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,"size",0,
+                                     __gen_e_acsl_size_21);
+        __gen_e_acsl_if_21 = __gen_e_acsl_size_21;
+      }
       __gen_e_acsl_valid_read_20 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_21,
                                                        (void *)(array),
@@ -947,8 +991,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,"size",0,
-                                   __gen_e_acsl_size_21);
       __gen_e_acsl_assert_data_31.blocking = 1;
       __gen_e_acsl_assert_data_31.kind = "RTE";
       __gen_e_acsl_assert_data_31.pred_txt = "\\valid_read(&array[0 .. -3])";
@@ -965,7 +1007,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_32,"size",0,
                                    __gen_e_acsl_size_22);
       if (__gen_e_acsl_size_22 <= 0) __gen_e_acsl_if_22 = 0;
-      else __gen_e_acsl_if_22 = __gen_e_acsl_size_22;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_32,"size",0,
+                                     __gen_e_acsl_size_22);
+        __gen_e_acsl_if_22 = __gen_e_acsl_size_22;
+      }
       __gen_e_acsl_valid_read_21 = __e_acsl_valid_read((void *)((char *)(array) + 0),
                                                        (size_t)__gen_e_acsl_if_22,
                                                        (void *)(array),
@@ -974,8 +1020,6 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_32,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_32,"size",0,
-                                   __gen_e_acsl_size_22);
       __gen_e_acsl_assert_data_32.blocking = 1;
       __gen_e_acsl_assert_data_32.kind = "RTE";
       __gen_e_acsl_assert_data_32.pred_txt = "\\valid_read(&array[0 .. 19])";
@@ -990,12 +1034,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
                                    __gen_e_acsl_size_23);
       if (__gen_e_acsl_size_23 <= 0) __gen_e_acsl_if_23 = 0;
-      else __gen_e_acsl_if_23 = __gen_e_acsl_size_23;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
+                                     __gen_e_acsl_size_23);
+        __gen_e_acsl_if_23 = __gen_e_acsl_size_23;
+      }
       __gen_e_acsl_size_24 = 8 * 20;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
                                    __gen_e_acsl_size_24);
       if (__gen_e_acsl_size_24 <= 0) __gen_e_acsl_if_24 = 0;
-      else __gen_e_acsl_if_24 = __gen_e_acsl_size_24;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
+                                     __gen_e_acsl_size_24);
+        __gen_e_acsl_if_24 = __gen_e_acsl_size_24;
+      }
       __gen_e_acsl_separated_9 = __e_acsl_separated(2UL,(char *)(array) + 0,
                                                     __gen_e_acsl_if_23,
                                                     (char *)(array) + 0,
@@ -1004,14 +1056,10 @@ int main(void)
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
-                                   __gen_e_acsl_size_23);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_30,
                                    "&(array[0])",(void *)(array));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,"size",0,
-                                   __gen_e_acsl_size_24);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_30,
                                    "\\separated(&array[0 .. -3], &array[0 .. 19])",
                                    0,__gen_e_acsl_separated_9);
@@ -1475,7 +1523,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_51,"size",0,
                                    __gen_e_acsl_size_25);
       if (__gen_e_acsl_size_25 <= 0) __gen_e_acsl_if_25 = 0;
-      else __gen_e_acsl_if_25 = __gen_e_acsl_size_25;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_51,"size",0,
+                                     __gen_e_acsl_size_25);
+        __gen_e_acsl_if_25 = __gen_e_acsl_size_25;
+      }
       __gen_e_acsl_valid_read_27 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_25,
                                                        (void *)array_0,
@@ -1484,8 +1536,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_51,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_51,"size",0,
-                                   __gen_e_acsl_size_25);
       __gen_e_acsl_assert_data_51.blocking = 1;
       __gen_e_acsl_assert_data_51.kind = "RTE";
       __gen_e_acsl_assert_data_51.pred_txt = "\\valid_read(array_0 + (0 .. 9))";
@@ -1540,7 +1590,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_54,"size",0,
                                    __gen_e_acsl_size_26);
       if (__gen_e_acsl_size_26 <= 0) __gen_e_acsl_if_26 = 0;
-      else __gen_e_acsl_if_26 = __gen_e_acsl_size_26;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_54,"size",0,
+                                     __gen_e_acsl_size_26);
+        __gen_e_acsl_if_26 = __gen_e_acsl_size_26;
+      }
       __gen_e_acsl_valid_read_28 = __e_acsl_valid_read((void *)((char *)array_0 + 
                                                                 8 * 10),
                                                        (size_t)__gen_e_acsl_if_26,
@@ -1552,8 +1606,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_54,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_54,"size",0,
-                                   __gen_e_acsl_size_26);
       __gen_e_acsl_assert_data_54.blocking = 1;
       __gen_e_acsl_assert_data_54.kind = "RTE";
       __gen_e_acsl_assert_data_54.pred_txt = "\\valid_read(array_0 + (10 .. 19))";
@@ -1568,12 +1620,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
                                    __gen_e_acsl_size_27);
       if (__gen_e_acsl_size_27 <= 0) __gen_e_acsl_if_27 = 0;
-      else __gen_e_acsl_if_27 = __gen_e_acsl_size_27;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
+                                     __gen_e_acsl_size_27);
+        __gen_e_acsl_if_27 = __gen_e_acsl_size_27;
+      }
       __gen_e_acsl_size_28 = 8 * 10;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
                                    __gen_e_acsl_size_28);
       if (__gen_e_acsl_size_28 <= 0) __gen_e_acsl_if_28 = 0;
-      else __gen_e_acsl_if_28 = __gen_e_acsl_size_28;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
+                                     __gen_e_acsl_size_28);
+        __gen_e_acsl_if_28 = __gen_e_acsl_size_28;
+      }
       __gen_e_acsl_separated_12 = __e_acsl_separated(2UL,(char *)array_0 + 0,
                                                      __gen_e_acsl_if_27,
                                                      (char *)array_0 + 8 * 10,
@@ -1582,16 +1642,12 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
-                                   __gen_e_acsl_size_27);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_50,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,"size",0,
-                                   __gen_e_acsl_size_28);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_50,
                                    "\\separated(array_0 + (0 .. 9), array_0 + (10 .. 19))",
                                    0,__gen_e_acsl_separated_12);
@@ -1668,7 +1724,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_58,"size",0,
                                    __gen_e_acsl_size_29);
       if (__gen_e_acsl_size_29 <= 0) __gen_e_acsl_if_29 = 0;
-      else __gen_e_acsl_if_29 = __gen_e_acsl_size_29;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_58,"size",0,
+                                     __gen_e_acsl_size_29);
+        __gen_e_acsl_if_29 = __gen_e_acsl_size_29;
+      }
       __gen_e_acsl_valid_read_29 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_29,
                                                        (void *)array_0,
@@ -1677,8 +1737,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_58,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_58,"size",0,
-                                   __gen_e_acsl_size_29);
       __gen_e_acsl_assert_data_58.blocking = 1;
       __gen_e_acsl_assert_data_58.kind = "RTE";
       __gen_e_acsl_assert_data_58.pred_txt = "\\valid_read(array_0 + (0 .. 10))";
@@ -1734,7 +1792,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_61,"size",0,
                                    __gen_e_acsl_size_30);
       if (__gen_e_acsl_size_30 <= 0) __gen_e_acsl_if_30 = 0;
-      else __gen_e_acsl_if_30 = __gen_e_acsl_size_30;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_61,"size",0,
+                                     __gen_e_acsl_size_30);
+        __gen_e_acsl_if_30 = __gen_e_acsl_size_30;
+      }
       __gen_e_acsl_valid_read_30 = __e_acsl_valid_read((void *)((char *)array_0 + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_30,
@@ -1746,8 +1808,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_61,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_61,"size",0,
-                                   __gen_e_acsl_size_30);
       __gen_e_acsl_assert_data_61.blocking = 1;
       __gen_e_acsl_assert_data_61.kind = "RTE";
       __gen_e_acsl_assert_data_61.pred_txt = "\\valid_read(array_0 + (5 .. 15))";
@@ -1762,12 +1822,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
                                    __gen_e_acsl_size_31);
       if (__gen_e_acsl_size_31 <= 0) __gen_e_acsl_if_31 = 0;
-      else __gen_e_acsl_if_31 = __gen_e_acsl_size_31;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
+                                     __gen_e_acsl_size_31);
+        __gen_e_acsl_if_31 = __gen_e_acsl_size_31;
+      }
       __gen_e_acsl_size_32 = 8 * 11;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
                                    __gen_e_acsl_size_32);
       if (__gen_e_acsl_size_32 <= 0) __gen_e_acsl_if_32 = 0;
-      else __gen_e_acsl_if_32 = __gen_e_acsl_size_32;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
+                                     __gen_e_acsl_size_32);
+        __gen_e_acsl_if_32 = __gen_e_acsl_size_32;
+      }
       __gen_e_acsl_separated_13 = __e_acsl_separated(2UL,(char *)array_0 + 0,
                                                      __gen_e_acsl_if_31,
                                                      (char *)array_0 + 8 * 5,
@@ -1776,16 +1844,12 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
-                                   __gen_e_acsl_size_31);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_57,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,"size",0,
-                                   __gen_e_acsl_size_32);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_57,
                                    "\\separated(array_0 + (0 .. 10), array_0 + (5 .. 15))",
                                    0,__gen_e_acsl_separated_13);
@@ -1863,7 +1927,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_65,"size",0,
                                    __gen_e_acsl_size_33);
       if (__gen_e_acsl_size_33 <= 0) __gen_e_acsl_if_33 = 0;
-      else __gen_e_acsl_if_33 = __gen_e_acsl_size_33;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_65,"size",0,
+                                     __gen_e_acsl_size_33);
+        __gen_e_acsl_if_33 = __gen_e_acsl_size_33;
+      }
       __gen_e_acsl_valid_read_31 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_33,
                                                        (void *)array_0,
@@ -1872,8 +1940,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_65,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_65,"size",0,
-                                   __gen_e_acsl_size_33);
       __gen_e_acsl_assert_data_65.blocking = 1;
       __gen_e_acsl_assert_data_65.kind = "RTE";
       __gen_e_acsl_assert_data_65.pred_txt = "\\valid_read(array_0 + (0 .. 19))";
@@ -1929,7 +1995,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_68,"size",0,
                                    __gen_e_acsl_size_34);
       if (__gen_e_acsl_size_34 <= 0) __gen_e_acsl_if_34 = 0;
-      else __gen_e_acsl_if_34 = __gen_e_acsl_size_34;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_68,"size",0,
+                                     __gen_e_acsl_size_34);
+        __gen_e_acsl_if_34 = __gen_e_acsl_size_34;
+      }
       __gen_e_acsl_valid_read_32 = __e_acsl_valid_read((void *)((char *)array_0 + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_34,
@@ -1941,8 +2011,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_68,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_68,"size",0,
-                                   __gen_e_acsl_size_34);
       __gen_e_acsl_assert_data_68.blocking = 1;
       __gen_e_acsl_assert_data_68.kind = "RTE";
       __gen_e_acsl_assert_data_68.pred_txt = "\\valid_read(array_0 + (5 .. 15))";
@@ -1957,12 +2025,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
                                    __gen_e_acsl_size_35);
       if (__gen_e_acsl_size_35 <= 0) __gen_e_acsl_if_35 = 0;
-      else __gen_e_acsl_if_35 = __gen_e_acsl_size_35;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
+                                     __gen_e_acsl_size_35);
+        __gen_e_acsl_if_35 = __gen_e_acsl_size_35;
+      }
       __gen_e_acsl_size_36 = 8 * 11;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
                                    __gen_e_acsl_size_36);
       if (__gen_e_acsl_size_36 <= 0) __gen_e_acsl_if_36 = 0;
-      else __gen_e_acsl_if_36 = __gen_e_acsl_size_36;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
+                                     __gen_e_acsl_size_36);
+        __gen_e_acsl_if_36 = __gen_e_acsl_size_36;
+      }
       __gen_e_acsl_separated_14 = __e_acsl_separated(2UL,(char *)array_0 + 0,
                                                      __gen_e_acsl_if_35,
                                                      (char *)array_0 + 8 * 5,
@@ -1971,16 +2047,12 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
-                                   __gen_e_acsl_size_35);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_64,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,"size",0,
-                                   __gen_e_acsl_size_36);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_64,
                                    "\\separated(array_0 + (0 .. 19), array_0 + (5 .. 15))",
                                    0,__gen_e_acsl_separated_14);
@@ -2212,7 +2284,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_79,"size",0,
                                    __gen_e_acsl_size_37);
       if (__gen_e_acsl_size_37 <= 0) __gen_e_acsl_if_37 = 0;
-      else __gen_e_acsl_if_37 = __gen_e_acsl_size_37;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_79,"size",0,
+                                     __gen_e_acsl_size_37);
+        __gen_e_acsl_if_37 = __gen_e_acsl_size_37;
+      }
       __gen_e_acsl_valid_read_35 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_37,
                                                        (void *)array_0,
@@ -2221,8 +2297,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_79,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_79,"size",0,
-                                   __gen_e_acsl_size_37);
       __gen_e_acsl_assert_data_79.blocking = 1;
       __gen_e_acsl_assert_data_79.kind = "RTE";
       __gen_e_acsl_assert_data_79.pred_txt = "\\valid_read(array_0 + (0 .. 1))";
@@ -2278,7 +2352,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_82,"size",0,
                                    __gen_e_acsl_size_38);
       if (__gen_e_acsl_size_38 <= 0) __gen_e_acsl_if_38 = 0;
-      else __gen_e_acsl_if_38 = __gen_e_acsl_size_38;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_82,"size",0,
+                                     __gen_e_acsl_size_38);
+        __gen_e_acsl_if_38 = __gen_e_acsl_size_38;
+      }
       __gen_e_acsl_valid_read_36 = __e_acsl_valid_read((void *)((char *)array_0 + 8),
                                                        (size_t)__gen_e_acsl_if_38,
                                                        (void *)array_0,
@@ -2289,8 +2367,6 @@ int main(void)
                                    "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_82,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_82,"size",0,
-                                   __gen_e_acsl_size_38);
       __gen_e_acsl_assert_data_82.blocking = 1;
       __gen_e_acsl_assert_data_82.kind = "RTE";
       __gen_e_acsl_assert_data_82.pred_txt = "\\valid_read(array_0 + (1 .. 2))";
@@ -2305,12 +2381,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
                                    __gen_e_acsl_size_39);
       if (__gen_e_acsl_size_39 <= 0) __gen_e_acsl_if_39 = 0;
-      else __gen_e_acsl_if_39 = __gen_e_acsl_size_39;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
+                                     __gen_e_acsl_size_39);
+        __gen_e_acsl_if_39 = __gen_e_acsl_size_39;
+      }
       __gen_e_acsl_size_40 = 8 * 2;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
                                    __gen_e_acsl_size_40);
       if (__gen_e_acsl_size_40 <= 0) __gen_e_acsl_if_40 = 0;
-      else __gen_e_acsl_if_40 = __gen_e_acsl_size_40;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
+                                     __gen_e_acsl_size_40);
+        __gen_e_acsl_if_40 = __gen_e_acsl_size_40;
+      }
       __gen_e_acsl_separated_16 = __e_acsl_separated(2UL,(char *)array_0 + 0,
                                                      __gen_e_acsl_if_39,
                                                      (char *)array_0 + 8,
@@ -2319,16 +2403,12 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
-                                   __gen_e_acsl_size_39);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_78,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,
                                    "sizeof(double) * 1",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,"size",0,
-                                   __gen_e_acsl_size_40);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_78,
                                    "\\separated(array_0 + (0 .. 1), array_0 + (1 .. 2))",
                                    0,__gen_e_acsl_separated_16);
@@ -2406,7 +2486,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_86,"size",0,
                                    __gen_e_acsl_size_41);
       if (__gen_e_acsl_size_41 <= 0) __gen_e_acsl_if_41 = 0;
-      else __gen_e_acsl_if_41 = __gen_e_acsl_size_41;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_86,"size",0,
+                                     __gen_e_acsl_size_41);
+        __gen_e_acsl_if_41 = __gen_e_acsl_size_41;
+      }
       __gen_e_acsl_valid_read_37 = __e_acsl_valid_read((void *)((char *)array_0 + 
                                                                 8 * 15),
                                                        (size_t)__gen_e_acsl_if_41,
@@ -2418,8 +2502,6 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_86,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_86,"size",0,
-                                   __gen_e_acsl_size_41);
       __gen_e_acsl_assert_data_86.blocking = 1;
       __gen_e_acsl_assert_data_86.kind = "RTE";
       __gen_e_acsl_assert_data_86.pred_txt = "\\valid_read(array_0 + (15 .. 5))";
@@ -2475,7 +2557,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_89,"size",0,
                                    __gen_e_acsl_size_42);
       if (__gen_e_acsl_size_42 <= 0) __gen_e_acsl_if_42 = 0;
-      else __gen_e_acsl_if_42 = __gen_e_acsl_size_42;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_89,"size",0,
+                                     __gen_e_acsl_size_42);
+        __gen_e_acsl_if_42 = __gen_e_acsl_size_42;
+      }
       __gen_e_acsl_valid_read_38 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_42,
                                                        (void *)array_0,
@@ -2484,8 +2570,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_89,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_89,"size",0,
-                                   __gen_e_acsl_size_42);
       __gen_e_acsl_assert_data_89.blocking = 1;
       __gen_e_acsl_assert_data_89.kind = "RTE";
       __gen_e_acsl_assert_data_89.pred_txt = "\\valid_read(array_0 + (0 .. 19))";
@@ -2500,12 +2584,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
                                    __gen_e_acsl_size_43);
       if (__gen_e_acsl_size_43 <= 0) __gen_e_acsl_if_43 = 0;
-      else __gen_e_acsl_if_43 = __gen_e_acsl_size_43;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
+                                     __gen_e_acsl_size_43);
+        __gen_e_acsl_if_43 = __gen_e_acsl_size_43;
+      }
       __gen_e_acsl_size_44 = 8 * 20;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
                                    __gen_e_acsl_size_44);
       if (__gen_e_acsl_size_44 <= 0) __gen_e_acsl_if_44 = 0;
-      else __gen_e_acsl_if_44 = __gen_e_acsl_size_44;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
+                                     __gen_e_acsl_size_44);
+        __gen_e_acsl_if_44 = __gen_e_acsl_size_44;
+      }
       __gen_e_acsl_separated_17 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 15,
                                                      __gen_e_acsl_if_43,
@@ -2517,14 +2609,10 @@ int main(void)
                                    "sizeof(double)",0,8);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
-                                   __gen_e_acsl_size_43);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_85,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,"size",0,
-                                   __gen_e_acsl_size_44);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_85,
                                    "\\separated(array_0 + (15 .. 5), array_0 + (0 .. 19))",
                                    0,__gen_e_acsl_separated_17);
@@ -2602,7 +2690,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_93,"size",0,
                                    __gen_e_acsl_size_45);
       if (__gen_e_acsl_size_45 <= 0) __gen_e_acsl_if_45 = 0;
-      else __gen_e_acsl_if_45 = __gen_e_acsl_size_45;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_93,"size",0,
+                                     __gen_e_acsl_size_45);
+        __gen_e_acsl_if_45 = __gen_e_acsl_size_45;
+      }
       __gen_e_acsl_valid_read_39 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_45,
                                                        (void *)array_0,
@@ -2611,8 +2703,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_93,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_93,"size",0,
-                                   __gen_e_acsl_size_45);
       __gen_e_acsl_assert_data_93.blocking = 1;
       __gen_e_acsl_assert_data_93.kind = "RTE";
       __gen_e_acsl_assert_data_93.pred_txt = "\\valid_read(array_0 + (0 .. -3))";
@@ -2668,7 +2758,11 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_96,"size",0,
                                    __gen_e_acsl_size_46);
       if (__gen_e_acsl_size_46 <= 0) __gen_e_acsl_if_46 = 0;
-      else __gen_e_acsl_if_46 = __gen_e_acsl_size_46;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_96,"size",0,
+                                     __gen_e_acsl_size_46);
+        __gen_e_acsl_if_46 = __gen_e_acsl_size_46;
+      }
       __gen_e_acsl_valid_read_40 = __e_acsl_valid_read((void *)((char *)array_0 + 0),
                                                        (size_t)__gen_e_acsl_if_46,
                                                        (void *)array_0,
@@ -2677,8 +2771,6 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_96,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_96,"size",0,
-                                   __gen_e_acsl_size_46);
       __gen_e_acsl_assert_data_96.blocking = 1;
       __gen_e_acsl_assert_data_96.kind = "RTE";
       __gen_e_acsl_assert_data_96.pred_txt = "\\valid_read(array_0 + (0 .. 19))";
@@ -2693,12 +2785,20 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
                                    __gen_e_acsl_size_47);
       if (__gen_e_acsl_size_47 <= 0) __gen_e_acsl_if_47 = 0;
-      else __gen_e_acsl_if_47 = __gen_e_acsl_size_47;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
+                                     __gen_e_acsl_size_47);
+        __gen_e_acsl_if_47 = __gen_e_acsl_size_47;
+      }
       __gen_e_acsl_size_48 = 8 * 20;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
                                    __gen_e_acsl_size_48);
       if (__gen_e_acsl_size_48 <= 0) __gen_e_acsl_if_48 = 0;
-      else __gen_e_acsl_if_48 = __gen_e_acsl_size_48;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
+                                     __gen_e_acsl_size_48);
+        __gen_e_acsl_if_48 = __gen_e_acsl_size_48;
+      }
       __gen_e_acsl_separated_18 = __e_acsl_separated(2UL,(char *)array_0 + 0,
                                                      __gen_e_acsl_if_47,
                                                      (char *)array_0 + 0,
@@ -2707,14 +2807,10 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
-                                   __gen_e_acsl_size_47);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_92,"array_0",
                                    (void *)array_0);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,
                                    "sizeof(double)",0,8);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,"size",0,
-                                   __gen_e_acsl_size_48);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_92,
                                    "\\separated(array_0 + (0 .. -3), array_0 + (0 .. 19))",
                                    0,__gen_e_acsl_separated_18);

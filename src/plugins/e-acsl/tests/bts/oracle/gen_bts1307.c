@@ -1142,6 +1142,8 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __gmpq_set_d(__gen_e_acsl__2,(double)*__gen_e_acsl_at_4);
       __gmpq_init(__gen_e_acsl__3);
       __gmpq_set_d(__gen_e_acsl__3,5.);
+      __gmpq_init(__gen_e_acsl__4);
+      __gmpq_set_d(__gen_e_acsl__4,80.);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
         {.values = (void *)0};
       /*@ assert E_ACSL: "division by zero": 80.0 != 0; */
@@ -1155,8 +1157,6 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
         __gen_e_acsl_assert_data_16.name = "division by zero";
         __e_acsl_assert(1,& __gen_e_acsl_assert_data_16);
       }
-      __gmpq_init(__gen_e_acsl__4);
-      __gmpq_set_d(__gen_e_acsl__4,80.);
       __gmpq_init(__gen_e_acsl_div);
       __gmpq_div(__gen_e_acsl_div,
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__3),

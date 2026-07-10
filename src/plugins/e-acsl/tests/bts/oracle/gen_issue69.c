@@ -84,7 +84,7 @@ int main(void)
     __gen_e_acsl_forall_2 = 1;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __gen_e_acsl_u = 1 + 1;
+    __gen_e_acsl_u = 2;
     while (1) {
       {
         int __gen_e_acsl_and_2;

@@ -146,8 +146,12 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
       __gmpz_clear(__gen_e_acsl__3);
     }
-    else __gmpz_init_set(__gen_e_acsl_if,
-                         (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2));
+    else {
+      __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,"size",0,
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2));
+      __gmpz_init_set(__gen_e_acsl_if,
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2));
+    }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gmpz_init_set_ui(__gen_e_acsl__4,18446744073709551615UL);
@@ -175,8 +179,6 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"nmemb",0,
                                    nmemb);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"size",0,size);
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,"size",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2));
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,
                                  "__gen_e_acsl_if",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
@@ -377,8 +379,12 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
       __gmpz_clear(__gen_e_acsl__8);
     }
-    else __gmpz_init_set(__gen_e_acsl_if_2,
-                         (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
+    else {
+      __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_8,"size",0,
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
+      __gmpz_init_set(__gen_e_acsl_if_2,
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
+    }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
     __gmpz_init_set_ui(__gen_e_acsl__9,18446744073709551615UL);
@@ -408,8 +414,6 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_8,"\\old(size)",
                                  0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_at));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_8,"size",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_8,
                                  "__gen_e_acsl_if_2",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
@@ -795,7 +799,11 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
                                  __gen_e_acsl_size);
     if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
-    else __gen_e_acsl_if = __gen_e_acsl_size;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
+                                   __gen_e_acsl_size);
+      __gen_e_acsl_if = __gen_e_acsl_size;
+    }
     __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)((char *)(buf2) + 4),
                                                       (size_t)__gen_e_acsl_if);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(buf2[0])",
@@ -804,8 +812,6 @@ int main(void)
                                  "sizeof(int) * 1",0,4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(int)",
                                  0,4);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
-                                 __gen_e_acsl_size);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                  "\\initialized(&buf2[1 .. 4])",0,
                                  __gen_e_acsl_initialized_9);

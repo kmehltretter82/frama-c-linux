@@ -48,7 +48,7 @@ int main(void)
     int __gen_e_acsl_ne;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_n = 9223372036854775807L;
+    __gen_e_acsl_n = 9223372036854775807UL;
     __gmpz_init_set_si(__gen_e_acsl_n_2,__gen_e_acsl_n);
     __gen_e_acsl_f(& __gen_e_acsl_f_6,
                    (__e_acsl_mpz_struct *)__gen_e_acsl_n_2);

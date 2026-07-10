@@ -938,7 +938,7 @@ int __gen_e_acsl_dupl_fun2(int a)
         __gen_e_acsl_assert_data_20.pred_txt = "Incomplete inductive function";
         __gen_e_acsl_assert_data_20.file = "contrived.c";
         __gen_e_acsl_assert_data_20.fct = "dupl_fun2";
-        __gen_e_acsl_assert_data_20.line = 71;
+        __gen_e_acsl_assert_data_20.line = 72;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_20);
       }
       __gen_e_acsl_if_21 = 0;
@@ -993,7 +993,7 @@ unsigned int __gen_e_acsl_dupl_fun2_2(int a)
         __gen_e_acsl_assert_data_18.pred_txt = "Incomplete inductive function";
         __gen_e_acsl_assert_data_18.file = "contrived.c";
         __gen_e_acsl_assert_data_18.fct = "dupl_fun2_2";
-        __gen_e_acsl_assert_data_18.line = 71;
+        __gen_e_acsl_assert_data_18.line = 72;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_18);
       }
       __gen_e_acsl_if_17 = 0;

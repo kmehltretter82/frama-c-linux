@@ -98,7 +98,7 @@ module type S = sig
   val write : out -> unit t (** send a value to the Writer side-channel *)
 
   val update : out -> 'a t -> 'a t
-  (** merge a value to the Writer side-channel *)
+  (**  merge the given value with the current value of the Writer side-channel *)
 
   val flush : 'a t -> ('a * out) t
   (** clear the [out] value and pair it up with the ['a] value *)

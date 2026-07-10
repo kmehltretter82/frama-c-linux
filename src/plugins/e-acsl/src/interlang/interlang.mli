@@ -37,6 +37,12 @@ type binop =
 
 type unop = Neg | Not
 
+type bottom =
+  | InductiveIncompleteFallthrough
+  (** The extraction of an inductive predicate may generate a logic function.
+      Such logic function are "slightly" unsound, in the sense that the
+      no sound verdict is possible when the fallthrough case was reached. *)
+
 type exp = private
   {
     enode : exp_node;
@@ -61,6 +67,9 @@ and exp_node = private
       more complicated conversion operation, e.g. [mpz_get_ui].
       Despite being an exp, a Coerce node will never hold any RTE. This should
       be held as an invariant of the E-ACSL flow.*)
+  | Bottom of bottom
+  (** a special value indicating some unexpected behaviour, leading to program
+      abortion with a specific error message for the user *)
 
 and unop_node = private {ity : number_ty; unop : unop; op : exp}
 and binop_node = private {ity : number_ty; binop : binop; op1 : exp; op2 : exp}
@@ -105,6 +114,8 @@ module Exp : sig
   val conditional : origin:pred_or_term -> number_ty -> exp -> exp -> exp -> exp
 
   val coerce : origin:pred_or_term -> coerce_to:typ -> exp -> exp
+
+  val inductive_incomplete_fallthrough : origin:Analyses_types.pred_or_term -> exp
 end
 
 (** smart constructors for generating [rte] nodes *)

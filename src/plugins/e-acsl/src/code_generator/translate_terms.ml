@@ -54,8 +54,8 @@ module Translate_predicates = struct
     !to_exp_ref ~adata ?inplace ?name kf ?rte env p
 
   let to_exp_il_ref :
-    (rte:bool -> predicate Interlang_trans.il_compiler) ref
-    = ref @@ fun ~rte:_ _p ->
+    (predicate Interlang_trans.il_compiler) ref
+    = ref @@ fun _p ->
     Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_il_ref"
 
   let to_exp_il p = !to_exp_il_ref p
@@ -385,6 +385,9 @@ and context_insensitive_term_to_exp_il ?inplace t =
   ignore inplace; (* will be required for implementing Tat *)
   let t = Logic_normalizer.get_term t in
   match t.term_node with
+  | TCast (true, _, _) when Inductive.is_fallthrough_term t ->
+    (* This node is produced by [Inductive.FunctionExtractor.Extractor.mk_false]. *)
+    M.return @@ Interlang.Exp.inductive_incomplete_fallthrough ~origin:(PoT_term t)
   | TConst c -> constant_to_exp_il t c
   | TLval lv ->
     let* l = tlval_to_lval_il lv in
@@ -392,7 +395,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:(PoT_term t) ty
   | Tif (p, t1, t2) ->
     let* logic_env = M.read_logic_env in
-    let* e1 = Translate_predicates.to_exp_il ~rte:true p in
+    let* e1 = Translate_predicates.to_exp_il p in
     let* e2 = to_exp_il t1 in
     let+ e3 = to_exp_il t2 in
     Interlang.Exp.conditional
@@ -427,11 +430,20 @@ and context_insensitive_term_to_exp_il ?inplace t =
     end
   | _ -> M.not_covered Printer.pp_term t
 
-and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
-  let t = Logic_normalizer.get_term t in
+and to_exp_old_with_rtes ~adata ?(inplace=false) kf env t =
+  let (exp, adata, env, strnum, name) =
+    context_insensitive_term_to_exp_old ~adata ~inplace kf env t
+  in
   let loc = t.term_loc in
-  (* translation of all guards associated to [t] in [Guards.table] *)
   let env = Translate_predicates.rte_guards_to_exp_old ~loc ~kf t env in
+  (exp, adata, env, strnum, name)
+
+and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
+  let loc = t.term_loc in
+  let early_rte_guards_to_exp_old =
+    Translate_predicates.rte_guards_to_exp_old ~loc ~kf t
+  in
+  let t = Logic_normalizer.get_term t in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
   let logic_env = Env.Logic_env.get env in
@@ -466,6 +478,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let ty = Typing.get_typ ~logic_env t in
     let e, adata, env = to_exp ~adata kf env t' in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let name, vname = match op with
         | Neg -> "__gmpz_neg", "neg"
         | BNot -> "__gmpz_com", "bnot"
@@ -488,6 +502,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | TUnOp(LNot, t) ->
     let ty = Typing.get_effective_typ ~logic_env t in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_number_ty ~logic_env t in
@@ -520,9 +536,13 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Z.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
@@ -536,6 +556,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let name = Gmp.Z.name_arith_bop bop in
@@ -547,6 +569,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
@@ -593,6 +617,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e2, adata2, env = t2_to_exp adata2 env in
       let adata, env = Assert.merge_right ~loc env adata1 adata in
       let adata, env = Assert.merge_right ~loc env adata2 adata in
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       (* If the given term is an lvalue variable or a cast from an lvalue
          variable, retrieve the name of this variable. Otherwise return
          default *)
@@ -803,6 +829,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* early translation because [GMP] produces intermediary result. *)
+      let env = early_rte_guards_to_exp_old env in
       let mk_stmts _v e =
         let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
@@ -861,7 +889,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         e
     in
     e, adata, env, Analyses_types.C_number, ""
-  | TCast (true, _, _) when Inductive.is_fallthrough_term t ->
+  | _ when Inductive.is_fallthrough_term t ->
     let e = Cil.zero ~loc in
     let annot_kind = Env.annotation_kind env in
     let stmt, env =
@@ -878,7 +906,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let env = Env.add_stmt env stmt in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, ""
-  | TCast (true, _, t) -> context_insensitive_term_to_exp_old ~adata kf env t
+  | TCast (true, _, t) -> to_exp_old_with_rtes ~adata kf env t
   | TCast (false, _,_) -> assert false
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
@@ -1020,11 +1048,6 @@ and to_exp_il_with_rtes ?inplace t =
 
 and to_exp_il ?inplace t =
   let* {env} = M.read in
-  let* () =
-    if Env.generate_rte env
-    then M.not_covered ~pre:"with RTE" Printer.pp_term t
-    else M.return ()
-  in
   let* e = to_exp_il_with_rtes ?inplace t in
   let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
     | None -> e
@@ -1051,7 +1074,7 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
   let rexp, _, _ as result =
     Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
         let e, adata, env, sty, name =
-          context_insensitive_term_to_exp_old ?inplace ~adata kf env t
+          to_exp_old_with_rtes ?inplace ~adata kf env t
         in
         let env =
           if generate_rte then Translate_rtes.exp kf env e else env

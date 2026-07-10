@@ -260,7 +260,7 @@ void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
         __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
         __gen_e_acsl_assert_data_3.file = "power.c";
         __gen_e_acsl_assert_data_3.fct = "power2_fun3";
-        __gen_e_acsl_assert_data_3.line = 15;
+        __gen_e_acsl_assert_data_3.line = 16;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       __gmpz_init_set_si(__gen_e_acsl__7,0L);

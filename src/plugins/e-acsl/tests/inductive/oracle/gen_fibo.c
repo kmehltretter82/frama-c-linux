@@ -560,7 +560,7 @@ void __gen_e_acsl_fibo2_fun2(__e_acsl_mpz_t *__retres_arg,
             __gen_e_acsl_assert_data_4.pred_txt = "Incomplete inductive function";
             __gen_e_acsl_assert_data_4.file = "fibo.c";
             __gen_e_acsl_assert_data_4.fct = "fibo2_fun2";
-            __gen_e_acsl_assert_data_4.line = 20;
+            __gen_e_acsl_assert_data_4.line = 23;
             __e_acsl_assert(0,& __gen_e_acsl_assert_data_4);
           }
           __gmpz_init_set_si(__gen_e_acsl__11,0L);
