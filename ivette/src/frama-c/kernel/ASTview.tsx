@@ -410,7 +410,7 @@ function getPropertiesNodes(tree: Tree): Node[] {
 
   /* Must be consistent with the id chosen by the Frama-C server for property
      markers. Ideally, this test should not depend on markers id syntax. */
-  if (tree.marker.startsWith('#p')) {
+  if (tree.marker.startsWith('code:#p')) {
     props.push(tree);
   }
 
