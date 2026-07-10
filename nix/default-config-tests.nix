@@ -1,4 +1,4 @@
-{ mk_tests, frama-c-no-cover, alt-ergo } :
+{ mk_tests, frama-c-no-cover } :
 
 let mk_tests_distrib = mk_tests.override {
   frama-c = frama-c-no-cover ;
@@ -10,6 +10,4 @@ mk_tests_distrib {
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
     dune build -j1 @runtest @ptests_config
   '' ;
-  # Need alt-ergo available for some Wp inline tests
-  additional-build-inputs = [ alt-ergo ];
 }

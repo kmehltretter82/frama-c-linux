@@ -575,7 +575,7 @@ let%test "Existing deprecated strategy" =
   Test.equal_alternatives alts expected
 
 let%test "Unexisting provers" =
-  let content = {|\prover("alt-ergo", "fake", "other")|} in
+  let content = {|\prover("qed", "fake", "other")|} in
   let alts = Test.debug content () in
   let unknown_prover name =
     Test.error
@@ -585,7 +585,7 @@ let%test "Unexisting provers" =
   Test.equal_alternatives alts expected
 
 let%test "Existing provers" =
-  let content = {|\prover("alt-ergo")|} in
+  let content = {|\prover("qed")|} in
   let alts = Test.debug content () in
   let ignored = Test.ignored ~reason:"Debugging does not execute provers" in
   let expected = [result [ignored]] in
