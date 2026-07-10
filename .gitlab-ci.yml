@@ -85,25 +85,8 @@ variables:
 ### IVETTE SETUP TEMPLATE
 
 .build_template: &ivette_setup
-  image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   before_script:
-    # Prepare
-    - sudo apt update
-    # TS
-    - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
-    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - . "$NVM_DIR/nvm.sh"
-    - nvm install $NODE
-    - nvm use node $NODE
-    - corepack enable
-    # Opam
-    - opam switch create --empty .
-    - eval $(opam env --switch=. --set-switch)
-    - opam pin . -n -k path
-    - opam depext frama-c
-    - opam install headache
-    - opam install --jobs 2 --deps-only .
     # Build Frama-C API
     - dune build -j2 @install
     - make -C ivette api
@@ -718,11 +701,9 @@ ocaml-versions-nightly:
 
 .build_template: &opam_pin_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  image: 'registry.frama-c.com/frama-c/frama-c:no-deps-$OCAML'
   script:
-    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
-    - opam init --reinit -ni
-    - sudo apt update
+    - apt update
     - opam pin . -n -k path
     - opam install --jobs 2 frama-c $OPAM_OPTS
     - frama-c --plugins
@@ -747,23 +728,19 @@ opam-pin-release:
 
 .build_template: &opam_pin_minimal_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  image: 'registry.frama-c.com/frama-c/frama-c:no-deps-$OCAML'
   variables:
     OPAMDOWNLOADJOBS: "1"
     OPAMERRLOGLEN: "0"
     OPAMSOLVERTIMEOUT: "500"
     OPAMPRECISETRACKING: "1"
   script:
-    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
-    - opam --version
-    - opam init --reinit -ni
-    - sudo apt update
+    - apt update
     - export OPAMCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - export OPAMFIXUPCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - export OPAMUPGRADECRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - opam pin . -n -k path
     - opam update --depexts
-    - opam depext --jobs 2 frama-c
     - export OPAMCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMFIXUPCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMUPGRADECRITERIA="+removed,+count[version-lag,solution]"
