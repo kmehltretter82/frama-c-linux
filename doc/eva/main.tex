@@ -758,33 +758,31 @@ In this case, we can afford to spend some time looking at it in more detail.
 Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
 
 \begin{frama-c-commands}
-frama-c-gui -eva-precision 3 -eva *.c > log
+frama-c-gui -eva-precision 3 -eva *.c
 \end{frama-c-commands}
 
 The GUI allows the user to navigate the source code, to inspect the sets of
 values inferred by the analysis and to get
-a feeling of how it works. Right-clicking on the function name
+a feeling of how it works.
+
+Note that the GUI has several different uses, each of them with a customizable
+{\em View} that encapsulates the most relevant components. The {\em Eva Values}
+view is suitable for inspecting values. When selected, is displays the code
+seen by Frama-C in the the upper left component (AST).
+
+Right-clicking on the function name
 at a call site brings a contextual menu to jump
 to the function's definition.
 In order to return to the caller,
 right-clicking on the name of the current function at the top
 brings a contextual menu with a list of callers.
 You can also use the Back button (left arrow) in the toolbar.
-The Information panel also offers navigation possibilities between
-variables and their definitions.
 
-In the graphical interface, three panels (displayed below the
-source code) are very useful for \Eva{}: Properties, Values, and
-Red Alarms. Further details about the GUI are presented in chapter~\ref{gui}.
-For now, it suffices to say that:
-
-\begin{itemize}
-\item Properties displays (among others) the list of alarms in the program;
-\item Values displays the inferred values for the expression selected in the
-  Frama-C normalized source code (highlighted in green);
-\item Red Alarms displays some special cases of alarms that should be considered
-  first.
-\end{itemize}
+Other views often useful for \Eva{} are {\em Eva Summary} and
+{\em Properties}. Further details about the GUI are presented in
+chapter~\ref{gui}, and also in the online help: click on the ``?''
+(question mark) button in the top right corner of a component to
+see the online manual.
 
 In the GUI, each alarm is represented with a ``bullet'' to its left.
 Red bullets mean ``this {\em always} happens''; yellow
@@ -792,32 +790,31 @@ bullets mean ``this {\em may} happen (but I am not sure, due to
 approximations)''. When there are several alarms, some strategies allow
 prioritizing which alarms are more likely to correspond to actual issues.
 
-The overall rule of thumb when inspecting alarms in the GUI\footnote{The first
-  time the Frama-C GUI is run, the Properties panel displays several kinds of
-  properties. For \Eva{}, the most useful view consists in selecting the
-  ``Reset 'Status' filters to show only unproved/invalid'' option, using the
-  button next to ``Refresh'' in the Properties panel.} is the following:
+The Properties component is useful for inspecting alarms. In this component:
 
 \begin{itemize}
-\item inspect red alarms in the Properties panel; these correspond to
-  situations where the analysis is {\em certain} that a problem has arrived;
+\item an Invalid status indicates that the
+  analysis is {\em certain} that a problem has arrived;
   either an actual bug in the code, or some issue in the analysis that needs to
   be addressed (e.g. due to missing or incorrect specifications);
-\item inspect the cases present in the Red Alarms panel; these are situations
+\item the cases marked with an exclamation mark in the {\em Priority}
+  column\footnote{You can right-click the table header to add/remove columns,
+  such as Priority.} indicate situations
   which are likely to correspond to definitive problems, and thus should be
-  treated before others\footnote{The {\em exact} meaning of such red alarms is
-    too complex to be presented here; as a first approximation, these can be
-    seen as intermediate between red and yellow alarms.};
-\item inspect remaining cases (yellow alarms) in the Properties panel.
+  treated before others\footnote{The {\em exact} meaning of
+  ''high-priority alarms'' is
+  too complex to be presented here; as a first approximation, these can be
+  seen as intermediate between red and yellow alarms.};
+\item the remaining cases are usually of {\em Unknown} status.
 \end{itemize}
 
 In the case of our remaining alarm, it is yellow, but it appears in the
-Red Alarms panel. This indicates it is more likely to correspond to a real
+Priority column. This indicates it is more likely to correspond to a real
 issue.
 
-Extra information can be observed by clicking the alarm in the Red Alarms tab,
-which highlights it in the source code, then selecting expression
-\lstinline|hash| in line 17 and reading the \textsf{Values} tab:
+Extra information can be observed by clicking the table row containing the
+alarm, which highlights it in the source code, and then selecting expression
+\lstinline|hash| in line 17 and reading the contents of \textsf{Eva Values}:
 \begin{logs}
   [0] $\in$ {200}
   [1..7] $\in$ UNINITIALIZED
