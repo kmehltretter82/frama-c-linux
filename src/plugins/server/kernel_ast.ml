@@ -286,22 +286,22 @@ struct
       ~descr:(Md.plain "Declaration kind")
       (Junion [
           (* C *)
-          Jkey "ENUM";
-          Jkey "UNION";
-          Jkey "STRUCT";
-          Jkey "TYPEDEF";
-          Jkey "GLOBAL";
-          Jkey "FUNCTION";
+          Jtag "ENUM";
+          Jtag "UNION";
+          Jtag "STRUCT";
+          Jtag "TYPEDEF";
+          Jtag "GLOBAL";
+          Jtag "FUNCTION";
           (* ACSL *)
-          Jkey "LFUNPRED";
-          Jkey "INVARIANT";
-          Jkey "AXIOMATIC";
-          Jkey "MODULE";
-          Jkey "LEMMA";
-          Jkey "EXTENSION";
-          Jkey "VOLATILE";
-          Jkey "LTYPE";
-          Jkey "MODEL";
+          Jtag "LFUNPRED";
+          Jtag "INVARIANT";
+          Jtag "AXIOMATIC";
+          Jtag "MODULE";
+          Jtag "LEMMA";
+          Jtag "EXTENSION";
+          Jtag "VOLATILE";
+          Jtag "LTYPE";
+          Jtag "MODEL";
         ])
 
   let global_annotation_kind = function
@@ -465,14 +465,14 @@ struct
       ~package ~name:"markerKind"
       ~descr:(Md.plain "Marker kind")
       (Junion [
-          Jkey "STMT";
-          Jkey "LFUN"; Jkey "DFUN";
-          Jkey "LVAR"; Jkey "DVAR";
-          Jkey "LVAL"; Jkey "EXP";
-          Jkey "TERM";
-          Jkey "TYPE";
-          Jkey "PROPERTY";
-          Jkey "DECLARATION";
+          Jtag "STMT";
+          Jtag "LFUN"; Jtag "DFUN";
+          Jtag "LVAR"; Jtag "DVAR";
+          Jtag "LVAL"; Jtag "EXP";
+          Jtag "TERM";
+          Jtag "TYPE";
+          Jtag "PROPERTY";
+          Jtag "DECLARATION";
         ])
   let to_json = function
     | PStmt _ | PStmtStart _ -> `String "STMT"
