@@ -211,7 +211,10 @@ statement and **Go to** the callee, to investigate further, repeating the
 procedure if needed. It may end up in an infinite loop, or in a non-terminating
 *priority* alarm.
 
-## Studia {#eva-studia}
+## Origin of alarms and imprecisions {#eva-studia}
+
+The _Studia_ plug-in is used to track the origins of values computed by Eva.
+For a given lvalue, it can highlight all statements that may have written/read it.
 
 To find all statements that may have read or written an lvalue:
 - right-click on the lvalue in the AST component;
@@ -221,6 +224,7 @@ in the dock (on the bottom right of the main window).
 
 This component lists all statements which may read or write the selected
 lvalue, according to the Eva analysis.
+In the [Files](#framac-files-sidebar) sidebar, the [icon-multicheck] icon also signals functions containing at least one such statement.
 
 Studia can also be used on arbitrary lvalues:
 - right-click on a statement in the AST component;
@@ -235,6 +239,12 @@ the set of possible values of the pointer at the given statement.
 
 As before, the [Locations](#framac-locations) component lists all statements
 that may read or write this memory location, according to the Eva analysis.
+
+Typical usage of _Studia_ consists in:
+selecting an alarm (for instance, a possibly invalid memory access),
+inspecting the lvalue that causes the alarm (usually an imprecise value),
+then using the _Studia_ menu to find where the lvalue was defined.
+To find the root cause of a given loss of precision, it may be necessary to reiterate the process.
 
 ## Summary {#eva-summary}
 
