@@ -201,7 +201,7 @@ let handle_annotations env kf stmt =
             in
             let adata2, env = Assert.with_data_from ~loc kf env adata1 in
             let adata2, env =
-              if Options.Assert_print_data.get () then
+              if Options.Optimisations.Print_values.get () then
                 (* To be able to display to the user a meaningful message for
                    the old value and the current value, we need to retrieve the
                    expression for the term [t]. *)
@@ -364,7 +364,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       Bound_variables.get_guard_for_small_type logic_x
     in
     let stmts, env = match guard_for_small_type_opt with
-      | Some p when not @@ Options.Optimisations.Omit_rte.get () ->
+      | Some p when Options.Optimisations.Rte.get () ->
         let adata, env = Assert.empty ~loc kf env in
         Typing.preprocess_predicate ~logic_env p;
         let e, adata, env =

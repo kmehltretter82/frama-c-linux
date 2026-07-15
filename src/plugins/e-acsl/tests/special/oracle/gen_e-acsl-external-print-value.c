@@ -35,7 +35,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&value)";
       __gen_e_acsl_assert_data_2.file = "e-acsl-external-print-value.c";
       __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 7;
+      __gen_e_acsl_assert_data_2.line = 8;
       __gen_e_acsl_assert_data_2.name = "uninitialized";
       __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -47,7 +47,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "\\let x = value; \\false";
     __gen_e_acsl_assert_data.file = "e-acsl-external-print-value.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 7;
+    __gen_e_acsl_assert_data.line = 8;
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }

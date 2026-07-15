@@ -48,7 +48,7 @@ let predicate_to_exp ~adata ?name kf ?rte env p =
 (**************************************************************************)
 
 let must_translate ppt =
-  Options.Valid.get ()
+  Options.Optimisations.Verify_valid.get ()
   || match Property_status.get ppt with
   | Never_tried
   | Inconsistent _
@@ -76,7 +76,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let sizet = Machine.sizeof_type () in
   let stmts = [] in
   let stmts, env =
-    if Options.Optimisations.Omit_rte.get ()
+    if not @@ Options.Optimisations.Rte.get ()
     then stmts, env
     else
       (* Lower guard *)

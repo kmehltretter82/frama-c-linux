@@ -239,7 +239,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   (* Add the check for the length before the for loop *)
   let prepend_coercion_check ~name env stmts array len =
     let array_orig = Option.get (Misc.extract_uncoerced_lval array) in
-    if Options.Optimisations.Omit_rte.get () || array_orig == array then
+    if (not @@ Options.Optimisations.Rte.get ()) || array_orig == array then
       stmts, env
     else
       let len_orig, env =

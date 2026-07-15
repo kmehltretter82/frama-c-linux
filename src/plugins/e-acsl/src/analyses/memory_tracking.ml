@@ -552,9 +552,9 @@ module rec Transfer
                  (fun _ -> register_code_annot kf) stmt state
              in
              if stmt.ghost then
-               let rtes = if Options.Optimisations.Omit_rte.get ()
-                 then []
-                 else Rte.stmt kf stmt
+               let rtes = if Options.Optimisations.Rte.get ()
+                 then Rte.stmt kf stmt
+                 else []
                in
                let logic_env = Analyses_datatype.Logic_env.empty in
                List.iter (Typing.preprocess_rte ~logic_env) rtes;

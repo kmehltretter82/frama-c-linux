@@ -195,7 +195,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     let sizet = Machine.sizeof_type () in
     let sizet_kind = Machine.sizeof_kind () in
     let check_lower_bound, check_upper_bound =
-      if Options.Optimisations.Omit_rte.get ()
+      if not @@ Options.Optimisations.Rte.get ()
       then false, false
       else
         let lower, upper =

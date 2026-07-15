@@ -656,7 +656,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       (* Coerce e2 to mp_bitcnt_t *)
       let coerce_guard_cond, env =
-        if Options.Optimisations.Omit_rte.get ()
+        if not @@ Options.Optimisations.Rte.get ()
         then None, env
         else
           let max_bitcnt =
@@ -719,7 +719,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
 
       (* Boolean to choose whether the guard [e1 >= 0] should be added *)
       let should_guard_e1 =
-        if not @@ Options.Optimisations.Omit_rte.get () then
+        if Options.Optimisations.Rte.get () then
           match bop with
           | Shiftlt -> Kernel.LeftShiftNegative.get ()
           | Shiftrt -> Kernel.RightShiftNegative.get ()

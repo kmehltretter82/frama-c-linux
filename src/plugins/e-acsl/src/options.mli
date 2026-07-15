@@ -9,7 +9,6 @@
 include Plugin.S (** implementation of Log.S for E-ACSL *)
 
 module Run: Parameter_sig.Bool
-module Valid: Parameter_sig.Bool
 module Gmp_only: Parameter_sig.Bool
 module Full_mtracking: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
@@ -17,7 +16,6 @@ module Builtins: Parameter_sig.String_set
 module Temporal_validity: Parameter_sig.Bool
 module Validate_format_strings: Parameter_sig.Bool
 module Replace_libc_functions: Parameter_sig.Bool
-module Assert_print_data: Parameter_sig.Bool
 module Concurrency: Parameter_sig.Bool
 module Interlang: Parameter_sig.Bool
 module Interlang_force: Parameter_sig.Bool
@@ -25,9 +23,11 @@ module Interlang_force: Parameter_sig.Bool
 module O : Parameter_sig.Int
 module Optimisations : sig
   module Hypothesis_gathering : Parameter_sig.Bool
-  module Omit_rte : Parameter_sig.Bool
-  module Omit_trivial_rte : Parameter_sig.Bool
+  module Rte : Parameter_sig.Bool
+  module Trivial_rte : Parameter_sig.Bool
   module Smart_il : Parameter_sig.Bool
+  module Verify_valid: Parameter_sig.Bool
+  module Print_values: Parameter_sig.Bool
 end
 
 module Functions: Parameter_sig.Kernel_function_set

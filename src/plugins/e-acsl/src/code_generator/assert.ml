@@ -176,7 +176,7 @@ let do_pending_register_data env =
     do_queue env
 
 let register ~loc ?(force=false) name e adata =
-  if Options.Assert_print_data.get () then
+  if Options.Optimisations.Print_values.get () then
     match adata, e.enode with
     | Some adata, Const _ when not force ->
       (* By default, do not register constant expressions because the name of

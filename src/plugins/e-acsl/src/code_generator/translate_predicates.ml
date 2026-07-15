@@ -301,7 +301,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
         env
         tlist
     in
-    let env = if Options.Optimisations.Omit_rte.get () then env else rtes () in
+    let env = if Options.Optimisations.Rte.get () then rtes () else env in
     let e, adata, env =
       Memory_translate.call_with_size
         ~adata
@@ -400,7 +400,7 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
         predicate_content_to_exp ?inplace ~adata ?name kf env p
       in
       let env =
-        if rte && not @@ Options.Optimisations.Omit_rte.get () then
+        if rte && Options.Optimisations.Rte.get () then
           Translate_rtes.translate_rte_exp kf env e
         else env
       in

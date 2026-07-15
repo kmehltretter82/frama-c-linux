@@ -17,9 +17,6 @@ Options taking a string as argument should preferably be written
 -e-acsl             generate a new project where E-ACSL annotations are
                     translated to executable C code (opposite option is
                     -no-e-acsl)
--e-acsl-assert-print-data  print data contributing to the failed assertion
-                    along with the runtime error message (set by default,
-                    opposite option is -e-acsl-no-assert-print-data)
 -e-acsl-builtins <s>  C functions which can be used in the E-ACSL
                     specifications (preferably use -e-acsl-builtins="")
 -e-acsl-concurrency  activate the concurrency support of E-ACSL. The option
@@ -46,8 +43,6 @@ Options taking a string as argument should preferably be written
                     Frama-C)
 -e-acsl-temporal-validity  enable temporal analysis in valid annotations
                     (opposite option is -e-acsl-no-temporal-validity)
--e-acsl-valid       translate annotation which have been proven valid
-                    (opposite option is -e-acsl-no-valid)
 -e-acsl-validate-format-strings  enable runtime validation of stdio.h format
                     functions (opposite option is
                     -e-acsl-no-validate-format-strings)
@@ -73,17 +68,24 @@ Options taking a string as argument should preferably be written
                     (set by default, opposite option is
                     -e-acsl-O-no-hyp-gath)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
--e-acsl-O-no-omit-rte  opposite of -e-acsl-O-omit-rte (set by default)
--e-acsl-O-no-omit-trivial-rte  opposite of -e-acsl-O-omit-trivial-rte
+-e-acsl-O-no-print-values  opposite of -e-acsl-O-print-values
+-e-acsl-O-no-rte    opposite of -e-acsl-O-rte
 -e-acsl-O-no-smart-il  opposite of -e-acsl-O-smart-il
--e-acsl-O-omit-rte  (O ≥ 3) omit RTE guard generation for specifications
-                    (opposite option is -e-acsl-O-no-omit-rte)
--e-acsl-O-omit-trivial-rte  (O ≥ 1) omit trivial RTE guard generation for
-                    specifications (set by default, opposite option is
-                    -e-acsl-O-no-omit-trivial-rte)
+-e-acsl-O-no-trivial-rte  opposite of -e-acsl-O-trivial-rte (set by default)
+-e-acsl-O-no-valid  opposite of -e-acsl-O-valid (set by default)
+-e-acsl-O-print-values  (O ≤ 3) print values of variables involved in a
+                    failed verification along with the runtime error message
+                    (set by default, opposite option is
+                    -e-acsl-O-no-print-values)
+-e-acsl-O-rte       (O ≤ 2) generate RTE guards for specifications (set by
+                    default, opposite option is -e-acsl-O-no-rte)
 -e-acsl-O-smart-il  (O ≥ 1) optimises expressions using smart constructors
                     (set by default, opposite option is
                     -e-acsl-O-no-smart-il)
+-e-acsl-O-trivial-rte  (O = 0) generate trivial RTE guards (opposite option
+                    is -e-acsl-O-no-trivial-rte)
+-e-acsl-O-valid     (O = 0) verify annotations which have been proven valid
+                    (opposite option is -e-acsl-O-no-valid)
 
 *** OUTPUT MESSAGES
 
@@ -118,7 +120,8 @@ Options taking a string as argument should preferably be written
                     recursive functions.
 -e-acsl-widening-output <s>  widening strategy for output of recursive
                     functions on a case
-                          by case basis. (preferably use
-                    -e-acsl-widening-output="")
+                                                                             
+                                                           by case basis.
+                    (preferably use -e-acsl-widening-output="")
 -e-acsl-widening-output-base <n>  widening strategy for output of recursive
                     functions.

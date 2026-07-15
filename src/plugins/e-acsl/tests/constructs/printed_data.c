@@ -3,7 +3,8 @@
 */
 /* run.config_dev
    COMMENT: Print the data and filter the addresses of the output so that the test is deterministic.
-   MACRO: ROOT_EACSL_GCC_OPTS_EXT --assert-print-data -e -DE_ACSL_DEBUG_ASSERT -F -no-unicode
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT -e -DE_ACSL_DEBUG_ASSERT -F -no-unicode
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-O-print-values
    MACRO: ROOT_EACSL_EXEC_FILTER sed -e s/0x[0-9a-f]*$/0x000000/g
  */
 
