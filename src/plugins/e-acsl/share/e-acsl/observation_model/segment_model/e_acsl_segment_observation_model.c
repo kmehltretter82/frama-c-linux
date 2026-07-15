@@ -256,7 +256,7 @@ static void argv_alloca(int *argc_ref, char ***argv_ref) {
     size_t arglen = strlen(*argv) + 1;
 #ifdef E_ACSL_TEMPORAL
     /* Move `argv` strings to heap. This is because they are allocated
-       sparcely and there is no way to align they (if they are small), so there
+       sparsely and there is no way to align they (if they are small), so there
        may no be sufficient space for storing origin time stamps.
        Generally speaking, this is not the best of ideas, more of a temporary
        fix to avoid various range comparisons. A different approach is

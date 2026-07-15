@@ -869,7 +869,7 @@ function Simplifications(): JSX.Element {
   const [qed = false, setQed] = States.useSyncState(Params.wpQed);
   const [clean = false, setClean] = States.useSyncState(Params.wpClean);
 
-  const simplications: [string, string, States.State<boolean>][] = [
+  const simplifications: [string, string, States.State<boolean>][] = [
     ['-wp-core', 'Core', Params.wpCore],
     ['-wp-extensional', 'Extensional', Params.wpExtensional],
     ['-wp-filter', 'Filter', Params.wpFilter],
@@ -944,7 +944,7 @@ function Simplifications(): JSX.Element {
           enabled={!qed && goals === 0}
           value={clean}
         />
-        {simplications.map(makeBox)}
+        {simplifications.map(makeBox)}
       </SidebarBlock>
     </Forms.Section>
   );

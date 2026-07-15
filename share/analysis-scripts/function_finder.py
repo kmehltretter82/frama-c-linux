@@ -251,7 +251,7 @@ def find_calls(file_content: str, newlines: list[int]) -> list[tuple[str, int, i
 #
 # [defs] must be sorted in ascending order.
 def find_caller(defs, call):
-    (_called, line, offset) = call
+    _called, line, offset = call
     for fname, _is_def, start, end, brace_offset in defs:
         if start <= line <= end and offset > brace_offset:
             return fname

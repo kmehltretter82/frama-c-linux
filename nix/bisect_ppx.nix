@@ -10,7 +10,7 @@
 
 let
   param =
-    if lib.versionAtLeast ocaml.version "5.04" then
+    if lib.versionAtLeast ocaml.version "5.03" then
       {
         version = "2.8.3+dev";
         owner = "frama-ci-bot";
@@ -28,7 +28,7 @@ let
       };
 in
 
-buildDunePackage rec {
+buildDunePackage (finalAttrs: {
   pname = "bisect_ppx";
   inherit (param) version;
 
@@ -50,4 +50,4 @@ buildDunePackage rec {
     maintainers = with lib.maintainers; [ momeemt ];
     mainProgram = "bisect-ppx-report";
   };
-}
+})

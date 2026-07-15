@@ -34,11 +34,9 @@ script_dir = os.path.dirname(sys.argv[0])
 
 # Command-line parsing ########################################################
 
-parser = argparse.ArgumentParser(
-    description="""Produces a GNUmakefile
+parser = argparse.ArgumentParser(description="""Produces a GNUmakefile
 for analysis with Frama-C. Tries to use a build_commands.json file if
-available."""
-)
+available.""")
 parser.add_argument(
     "--base",
     metavar="DIR",
@@ -139,7 +137,6 @@ blug_dir = blug.resolve().parent
 sys.path.insert(0, blug_dir.as_posix())
 import blug_jbdb
 from blug_jbdb import prettify
-
 
 # Auxiliary functions #########################################################
 
@@ -456,14 +453,12 @@ path_mk = dot_framac_dir / "path.mk"
 if not force and path_mk.exists():
     logging.info("%s already exists, will not overwrite it", path_mk)
 else:
-    path_mk.write_text(
-        f"""FRAMAC_BIN={framac_bin}
+    path_mk.write_text(f"""FRAMAC_BIN={framac_bin}
 ifeq ($(wildcard $(FRAMAC_BIN)),)
 # Frama-C not installed locally; using the version in the PATH
 else
 FRAMAC=$(FRAMAC_BIN)/frama-c
 FRAMAC_GUI=$(FRAMAC_BIN)/frama-c-gui
 endif
-"""
-    )
+""")
     logging.info("wrote: %s", path_mk)

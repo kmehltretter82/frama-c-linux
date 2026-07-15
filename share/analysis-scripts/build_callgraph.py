@@ -143,7 +143,7 @@ def compute_recursive_cycles(cg, acc) -> None:
         cycle = cycle_bfs(cg, visited, just_visited, n)
         visited = visited.union(just_visited)
         if cycle:
-            (fst, snd) = cycle[0]
+            fst, snd = cycle[0]
             cycle_start_loc = cg.edges[(fst, snd)][0]
             acc.append((cycle_start_loc, cycle))
         to_visit -= visited

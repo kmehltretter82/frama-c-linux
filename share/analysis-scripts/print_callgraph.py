@@ -24,13 +24,11 @@ if "--dot" in args:
     args_after = args[dotarg + 2 :]
     args = args_before + args_after
 if not args:
-    sys.exit(
-        f"""\
+    sys.exit(f"""\
 usage: {sys.argv[0]} [--dot outfile] file1 file2 ...
 prints a heuristic callgraph for the specified files.
 If --dot is specified, print in DOT (Graphviz) format
-to file outfile, or to stdout if outfile is '-'."""
-    )
+to file outfile, or to stdout if outfile is '-'.""")
 
 cg = build_callgraph.compute(set([Path(a) for a in args]))
 if dotfile:

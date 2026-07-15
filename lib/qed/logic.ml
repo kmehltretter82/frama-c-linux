@@ -186,10 +186,10 @@ sig
       but fast comparison and efficient merges *)
   module Tmap : Idxmap.S with type key = term
 
-  (** Structuraly ordered, but less efficient access and non-linear merges *)
+  (** Structurally ordered, but less efficient access and non-linear merges *)
   module STset : Set.S with type elt = term
 
-  (** Structuraly ordered, but less efficient access and non-linear merges *)
+  (** Structurally ordered, but less efficient access and non-linear merges *)
   module STmap : Map.S with type key = term
 
   (** {3 Variables} *)
