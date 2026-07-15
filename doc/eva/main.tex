@@ -652,17 +652,10 @@ will prevent it from being unrolled, even when \verb+-eva-auto-loop-unroll+
 is active.
 
 Frama-C's graphical interface can help estimating loop bounds by inspecting the
-values taken by the loop counter, as in the example below:
-
-\begin{figure}[hbt]
-\centering
-\includegraphics[width=0.75\textwidth]{gui-images/gui-loop-to-unroll.png}
-\caption{Estimating loop unroll bounds in the GUI}
-\label{fig:gui-loop-to-unroll}
-\end{figure}
-
-In this case, \verb|WCNT| has a constant value (4), so it could also be used
-to estimate the loop bounds.
+values taken by the loop counter in the \emph{Eva Values} view.
+In this case, the loop condition is \verb|while(i < (size_t)WCNT)|,
+where \verb|WCNT| has the constant value 4 and values of variable \verb|i|
+range from 0 to 4, so the loop bound is 4.
 
 We can then Ctrl+click on the loop condition in the original source view
 (right panel) to open an editor\footnote{The external code editor used by the GUI
