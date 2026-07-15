@@ -1,0 +1,181 @@
+[kernel:CERT:MSC:37] functions.c:196: Warning: 
+  Body of function f5 falls-through. Adding a return statement
+[kernel:CERT:MSC:37] functions.c:200: Warning: 
+  Body of function test_f5 falls-through. Adding a return statement
+[e-acsl] beginning translation.
+[e-acsl] functions.c:135: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:134: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:117: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:142: Warning: 
+  no assigns clause generated for function f6 because pointers as arguments is not yet supported
+[e-acsl] functions.c:145: Warning: 
+  E-ACSL construct `reals: cast from R to Z' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:147: Warning: 
+  E-ACSL construct `predicate with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:148: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[eva:alarm] functions.c:112: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:113: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:114: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:116: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:117: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:118: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:119: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:124: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:127: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:129: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:134: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:134: Warning: assertion got status unknown.
+[eva:alarm] functions.c:135: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:35: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:44: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
+[eva:alarm] functions.c:44: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:140: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl_cast);
+[eva:alarm] functions.c:140: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:141: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:142: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl_cast_2);
+[eva:alarm] functions.c:142: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:143: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:143: Warning: assertion got status unknown.
+[eva:alarm] functions.c:147: Warning: assertion got status unknown.
+[eva:alarm] functions.c:148: Warning: assertion got status unknown.
+[eva:alarm] functions.c:150: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:152: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:153: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:154: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva] functions.c:68: Warning: 
+  Using specification of function __gen_e_acsl_even for recursive calls.
+  Analysis of function __gen_e_acsl_even is thus incomplete and its soundness
+  relies on the written specification.
+[eva] functions.c:69: Warning: 
+  Using specification of function __gen_e_acsl_even for recursive calls.
+  Analysis of function __gen_e_acsl_even is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:157: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:157: Warning: assertion got status unknown.
+[eva:alarm] functions.c:158: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:158: Warning: assertion got status unknown.
+[eva:alarm] functions.c:159: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:159: Warning: assertion got status unknown.
+[eva] functions.c:81: Warning: 
+  Using specification of function __gen_e_acsl_P for recursive calls.
+  Analysis of function __gen_e_acsl_P is thus incomplete and its soundness
+  relies on the written specification.
+[eva] functions.c:82: Warning: 
+  Using specification of function __gen_e_acsl_P for recursive calls.
+  Analysis of function __gen_e_acsl_P is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:160: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:160: Warning: assertion got status unknown.
+[eva:alarm] functions.c:161: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:161: Warning: assertion got status unknown.
+[eva] functions.c:87: Warning: 
+  Using specification of function __gen_e_acsl_identity for recursive calls.
+  Analysis of function __gen_e_acsl_identity is thus incomplete
+  and its soundness relies on the written specification.
+[eva:alarm] functions.c:164: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:164: Warning: assertion got status unknown.
+[eva] functions.c:90: Warning: 
+  Using specification of function __gen_e_acsl_rf1 for recursive calls.
+  Analysis of function __gen_e_acsl_rf1 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:165: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:165: Warning: assertion got status unknown.
+[eva:alarm] functions.c:166: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:166: Warning: assertion got status unknown.
+[eva:alarm] functions.c:167: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:167: Warning: assertion got status unknown.
+[eva] functions.c:93: Warning: 
+  Using specification of function __gen_e_acsl_rf2 for recursive calls.
+  Analysis of function __gen_e_acsl_rf2 is thus incomplete and its soundness
+  relies on the written specification.
+[eva] functions.c:93: Warning: 
+  Using specification of function __gen_e_acsl_rf2 for recursive calls.
+  Analysis of function __gen_e_acsl_rf2 is thus incomplete and its soundness
+  relies on the written specification.
+[eva] functions.c:93: Warning: 
+  Using specification of function __gen_e_acsl_rf2 for recursive calls.
+  Analysis of function __gen_e_acsl_rf2 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:93: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
+[eva:alarm] functions.c:93: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:168: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:168: Warning: assertion got status unknown.
+[eva] functions.c:97: Warning: 
+  Using specification of function __gen_e_acsl_rf3 for recursive calls.
+  Analysis of function __gen_e_acsl_rf3 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:169: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:169: Warning: assertion got status unknown.
+[eva] functions.c:100: Warning: 
+  Using specification of function __gen_e_acsl_rf4 for recursive calls.
+  Analysis of function __gen_e_acsl_rf4 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:170: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:170: Warning: assertion got status unknown.
+[eva] functions.c:105: Warning: 
+  Using specification of function __gen_e_acsl_rf5 for recursive calls.
+  Analysis of function __gen_e_acsl_rf5 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:171: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:171: Warning: assertion got status unknown.
+[eva] functions.c:108: Warning: 
+  Using specification of function __gen_e_acsl_rf6 for recursive calls.
+  Analysis of function __gen_e_acsl_rf6 is thus incomplete and its soundness
+  relies on the written specification.
+[eva:alarm] functions.c:172: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:172: Warning: assertion got status unknown.
+[eva:alarm] functions.c:174: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:174: Warning: assertion got status unknown.
