@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-machdep gcc_x86_64 -cpp-extra-args=\"-include __fc_machdep.h\""
+   STDOPT: +"-machdep gcc_x86_64 -cpp-extra-args=\"-include features.h\""
 */
 
 __int128_t shiftr(__uint128_t x) {
