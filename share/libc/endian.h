@@ -28,7 +28,7 @@
 #define __FC_ENDIAN_H
 #define __LITTLE_ENDIAN 1234
 #define __BIG_ENDIAN 4321
-#include "__fc_machdep.h"
+#include "features.h"
 #include <byteswap.h>
 #include <stdint.h>
 #define __BYTE_ORDER __FC_BYTE_ORDER

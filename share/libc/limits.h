@@ -10,7 +10,7 @@
 #ifndef __FC_LIMITS_H
 #define __FC_LIMITS_H
 
-#include "__fc_machdep.h"
+#include "features.h"
 
 /* Number of bits in a `char'.	*/
 #define CHAR_BIT __CHAR_BIT
