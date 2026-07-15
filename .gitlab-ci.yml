@@ -35,7 +35,7 @@ workflow:
 variables:
   # CI global configuration
   DEFAULT: "master"
-  OCAML: "4.14"
+  OCAML: "5.5"
   NODE: "24"
   # Specific options for Opam
   OPAM_OPTS: "--with-test --with-doc"
