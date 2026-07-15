@@ -22,10 +22,15 @@
   (Makefile.testing as Makefile.testing)
   ; GUI Images
   (frama-c.ico as frama-c.ico)
+  (frama-c-icon.png as frama-c-icon.png)
   (frama-c.png as frama-c.png)
   (unmark.png as unmark.png)
   (switch-on.png as switch-on.png)
-  (switch-off.png as switch-off.png)))
+  (switch-off.png as switch-off.png)
+  ; Linux configuration files
+  (apparmor-profile as apparmor-profile)
+  (frama-c-gui.desktop as frama-c-gui.desktop)
+  ))
 
 ; Analysis scripts (executable files)
 (install

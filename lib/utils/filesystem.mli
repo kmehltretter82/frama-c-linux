@@ -188,14 +188,14 @@ val iter_lines : Filepath.t -> (string -> unit) -> unit
 (** Iter over all text lines and line number in the file
     @raise Sys_error if a system error occurred
     @raise Invalid_argument if the path is empty
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val iteri_lines : Filepath.t -> (int -> string -> unit) -> unit
 
 (** [iter_line_range p i j job] iter over the lines [i] to [j] (included) from
     file [p]. [job] is called for every matching line if it exists.
     @raise Sys_error if a system error occurred
     @raise Invalid_argument if the path is empty
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val iter_line_range :
   Filepath.t -> int -> int -> (int -> string -> unit) -> unit
 

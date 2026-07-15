@@ -309,10 +309,14 @@ module Make
       Right.Store.set_state ?callstack control_point right
 
     let get_state ?callstack control_point =
-      let open Lattice_bounds.TopBottom.Operators in
-      let+ left = Left.Store.get_state ?callstack control_point
-      and+ right = Right.Store.get_state ?callstack control_point in
-      left, right
+      let left = Left.Store.get_state ?callstack control_point
+      and right = Right.Store.get_state ?callstack control_point in
+      match left, right with
+      | `Bottom, _ | _, `Bottom -> `Bottom
+      | `Value l, `Value r -> `Value (l, r)
+      | `Value left, `Top -> `Value (left, Right.top)
+      | `Top, `Value right -> `Value (Left.top, right)
+      | `Top, `Top -> `Top
 
     let callstacks control_point =
       match Left.Store.callstacks control_point with

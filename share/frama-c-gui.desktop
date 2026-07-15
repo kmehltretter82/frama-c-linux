@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Frama-C GUI
+Path=%{install_path}/lib/frama-c/gui
+Exec=frama-c-gui
+Icon=%{install_path}/share/frama-c/share/frama-c-icon.png
+Terminal=false
+Categories=Development;Debugger;

@@ -40,7 +40,6 @@
     "cytoscape-cxtmenu": "",
     "cytoscape-dagre": "",
     "cytoscape-klay": "",
-    "cytoscape-panzoom": "",
     "cytoscape-popper": "",
     "d3-graphviz": "^5",
     "d3-selection": "^3",
@@ -64,8 +63,7 @@
     "react-virtualized-auto-sizer": "^1.0.22",
     "remark-custom-header-id": "1.0.0",
     "source-map-support": "^0.5.21",
-    "tippy.js": "6.3.7",
-    "typedoc": "^0.26.6"
+    "tippy.js": "6.3.7"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
@@ -98,6 +96,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.2.4",
+    "typedoc": "^0.26.6",
     "typescript": "^5",
     "vite": "^5.0.12",
     "vite-plugin-commonjs-externals": "^0.1.4"

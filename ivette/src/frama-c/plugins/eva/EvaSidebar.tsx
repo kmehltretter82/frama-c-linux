@@ -7,18 +7,24 @@
 /* ************************************************************************ */
 
 import React from 'react';
+
+import { useStringSettings } from 'dome';
+import * as Toolbar from 'dome/frame/toolbars';
+import { SidebarTitle } from 'dome/frame/sidebars';
 import * as Forms from 'dome/layout/forms';
+import { HelpButton } from 'dome/help';
+import { Hbox } from 'dome/layout/boxes';
 import { GlobalState, useGlobalState } from 'dome/data/states';
+
 import * as Ivette from 'ivette';
+
 import { useServerField, State, useSyncValue } from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import * as Params from 'frama-c/kernel/api/parameters';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { EvaFormOptions } from 'frama-c/plugins/eva/components/Form';
+
 import EvaTools from './components/Tools';
-import { useStringSettings } from 'dome';
-import * as Toolbar from 'dome/frame/toolbars';
-import { SidebarTitle } from 'dome/frame/sidebars';
 import { TaintSidebar } from './Taint';
 import { CallstackSelection } from './Callstack';
 
@@ -282,21 +288,24 @@ function EvaSidebarSelection(): React.JSX.Element {
 
   return (<>
     <SidebarTitle label='Selection' >
-      <Toolbar.ButtonGroup>
-        <Toolbar.Button
-          key='taints'
-          label='Taints'
-          title='Show taints selection'
-          selected={selected === 'taints'}
-          onClick={() => setSelected('taints')}
-        /><Toolbar.Button
-          key='callstacks'
-          label='Callstacks'
-          title='Show callstacks selection'
-          selected={selected === 'callstacks'}
-          onClick={() => setSelected('callstacks')}
-        />
-      </Toolbar.ButtonGroup>
+      <Hbox style={{ alignItems: "center" }}>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            key='taints'
+            label='Taints'
+            title='Show taints selection'
+            selected={selected === 'taints'}
+            onClick={() => setSelected('taints')}
+            /><Toolbar.Button
+            key='callstacks'
+            label='Callstacks'
+            title='Show callstacks selection'
+            selected={selected === 'callstacks'}
+            onClick={() => setSelected('callstacks')}
+            />
+        </Toolbar.ButtonGroup>
+        <HelpButton id={'eva-sidebars'} size={13} />
+      </Hbox>
     </SidebarTitle>
     <div ref={scrollableArea} className="globals-scrollable-area">
       <div style={selected === "taints" ? opened : closed}>

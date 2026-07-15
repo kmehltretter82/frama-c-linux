@@ -28,6 +28,7 @@ import { Dropdown } from 'dome/dialogs';
 import { Icon } from 'dome/controls/icons';
 import * as Json from 'dome/data/json';
 import { useWindowSettings } from 'dome/data/settings';
+import { HelpButton } from 'dome/help';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -1249,7 +1250,7 @@ export function GlobalByFiles(): JSX.Element {
 
   return (<>
     <SidebarTitle label='Files'>
-      <Hbox>
+      <Hbox style={{ alignItems: "center" }}>
         <Toolbar.ButtonGroup>
           <Toolbar.Button
             icon="CHEVRON.CONTRACT"
@@ -1278,6 +1279,10 @@ export function GlobalByFiles(): JSX.Element {
             onClick={() => flipDispInList()}
           />
         </Toolbar.ButtonGroup>
+        <HelpButton
+          id={'framac-files-sidebar'}
+          size={13}
+        />
       </Hbox>
     </SidebarTitle>
     <SidebarFilesTools

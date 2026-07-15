@@ -33,10 +33,16 @@ workflow:
 ### VARIABLES
 
 variables:
+  # CI global configuration
   DEFAULT: "master"
   OCAML: "4.14"
-  OPAM_OPTS: "--with-test --with-doc"
   NODE: "24"
+  # Specific options for Opam
+  OPAM_OPTS: "--with-test --with-doc"
+  # Linux Bundle configuration
+  BUNDLE_DEBIAN: "11"
+  BUNDLE_OCAML: "5.4.1"
+  # CI mode configuration
   PUBLISH: "no"
   RELEASE: "no"
 
@@ -359,28 +365,38 @@ ivette-plugins:
 
 # API documentation
 
-api-doc:
+.build_template: &api_build_template
   stage: distrib
   variables:
     OUT: "api"
   script:
     - ./nix/build-proxy.sh api-doc
+
+.build_template: &api_artifacts_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
-      - api/frama-c-server-api.tar.gz
-    expire_in: 7 days
-
-api-json-doc:
-  stage: distrib
-  variables:
-    OUT: "api"
-  script:
-    - ./nix/build-proxy.sh api-json-doc
-  artifacts:
-    paths:
       - api/frama-c-api-json.tar.gz
-    expire_in: 7 days
+      - api/frama-c-server-api.tar.gz
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
+
+api:
+  <<: *api_build_template
+
+api-artifacts:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *manual_when_not_special_pipeline
+
+api-nightly:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *when_publish
+
+api-for-release:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *when_release
 
 # Build distribution tarball
 
@@ -397,28 +413,82 @@ build-distrib-tarball:
       - ./*.tar.gz
     expire_in: 1 week
 
-# Build ivette apps
+# Build linux bundle
 
-.build_template: &ivette_linux_build_template
-  stage: distrib
-  <<: *ivette_setup
+.build_template: &bundle_docker_setup
+  image: "debian:$BUNDLE_DEBIAN"
+  before_script:
+    - apt update
+    - apt install -y git curl bubblewrap gcc make autoconf m4
+    # TS
+    - apt install -y xvfb curl unzip libnss3 libasound2-plugins
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - . "$NVM_DIR/nvm.sh"
+    - nvm install $NODE
+    - nvm use node $NODE
+    - corepack enable
+    # Install Opam
+    - curl -fsSL https://opam.ocaml.org/install.sh -o install.sh
+    - chmod +x install.sh
+    - echo | ./install.sh
+    - rm install.sh
+    - opam init -y
+
+.build_template: &linux_bundle
   script:
-    - make -C ivette dist-linux
-    - mv ivette/dist/Ivette-arm64.AppImage ./frama-c-ivette-linux-ARM64.AppImage
-    - mv ivette/dist/Ivette-x86_64.AppImage ./frama-c-ivette-linux-x86-64.AppImage
+    - ./dev/build-bundle.sh
   artifacts:
     paths:
-      - ./*.AppImage
+      - ./*.run
+    expire_in: 1 week
+
+.build_template: &linux_x86_64_bundle
+  stage: distrib
+  variables:
+    BUNDLE_ARCH: "linux-x86-64"
+    BUNDLE_EXT:  "run"
+  <<: *bundle_docker_setup
+  <<: *linux_bundle
   tags:
     - docker
 
-build-ivette-linux-packages:
-  <<: *ivette_linux_build_template
+build-linux-x86-64-bundle:
+  <<: *linux_x86_64_bundle
   <<: *manual_when_not_special_pipeline
 
-build-ivette-linux-packages-release:
-  <<: *ivette_linux_build_template
+build-linux-x86-64-bundle-release:
+  <<: *linux_x86_64_bundle
   <<: *when_release
+
+# Build macOS bundle
+
+.build_template: &macos_bundle
+  stage: distrib
+  variables:
+    BUNDLE_EXT: "pkg"
+  script:
+    # Note, no GUI for macOS, we use the Electron DMG
+    - ./dev/build-bundle.sh --no-gui
+  artifacts:
+    paths:
+      - ./*.pkg
+    expire_in: 1 week
+  parallel:
+    matrix:
+      - BUNDLE_ARCH: [macos-x86, macos-arm]
+  tags:
+    - ${BUNDLE_ARCH}
+
+build-macos-bundle:
+  <<: *macos_bundle
+  <<: *manual_when_not_special_pipeline
+
+build-macos-bundle-release:
+  <<: *macos_bundle
+  <<: *when_release
+
+# Build ivette macOS dmg
 
 .build_template: &ivette_macos_build_template
   stage: distrib
@@ -440,18 +510,18 @@ build-ivette-linux-packages-release:
     - make -C ivette api
     # Build Ivette
     - make -C ivette dist-macOS
-    - mv ivette/dist/Ivette-universal.dmg ./frama-c-ivette-macos-universal.dmg
+    - mv ivette/dist/Frama-C\ GUI-universal.dmg ./frama-c-gui-macos-universal.dmg
   artifacts:
     paths:
       - ./*.dmg
   tags:
     - macos-arm
 
-build-ivette-macos-packages:
+build-ivette-macos-package:
   <<: *ivette_macos_build_template
   <<: *manual_when_not_special_pipeline
 
-build-ivette-macos-packages-release:
+build-ivette-macos-package-release:
   <<: *ivette_macos_build_template
   <<: *when_release
 
@@ -528,10 +598,11 @@ release-content:
   script:
     - ./nix/shell-checkers.sh "./dev/build-release.sh"
   needs:
-    - api-doc
+    - api-for-release
     - build-distrib-tarball
-    - build-ivette-linux-packages-release
-    - build-ivette-macos-packages-release
+    - build-linux-x86-64-bundle-release
+    - build-macos-bundle-release
+    - build-ivette-macos-package-release
     - manuals-for-release
   artifacts:
     paths:
@@ -588,21 +659,21 @@ additional-arch:
   <<: *manual_when_not_special_pipeline
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 additional-arch-nightly:
   <<: *additional_arch_template
   <<: *when_publish
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 additional-arch-release:
   <<: *additional_arch_template
   <<: *when_release
   parallel:
     matrix:
-      - ARCH: [linux-arm, macos-x86, macos-arm]
+      - ARCH: [macos-x86, macos-arm]
 
 # OCaml versions
 
