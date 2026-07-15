@@ -179,6 +179,12 @@ component.
 If there is more than one callstack, the first line shows the set of possible
 values for all callstacks.
 
+A right-click on the row of a given callstack allows to
+_select this callstack_: not only will the table only display this row,
+but this also restricts all Eva results displayed in the interface
+to this specific callstack (all other callstacks are ignored).
+Selected callstacks can be changed in the dedicated [sidebar](#eva-sidebars).
+
 ## Non-termination {#eva-non-termination}
 
 The [AST](#framac-ast) component contains some information which is relevant
