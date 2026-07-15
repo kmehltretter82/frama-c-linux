@@ -1,13 +1,14 @@
 /* run.config
  * COMMENT: Check that the RTE guards are generated at the right place.
- * STDOPT: #"-e-acsl-O-rte-initialized -warn-invalid-pointer"
+ * STDOPT: #"-e-acsl-O-rte-initialized -warn-invalid-pointer -warn-signed-downcast -warn-unsigned-downcast"
 */
-
 /* run.config_dev
- * MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-O-rte-initialized -warn-invalid-pointer
+ * MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-O-rte-initialized -warn-invalid-pointer -warn-signed-downcast -warn-unsigned-downcast
 */
 
+#include <limits.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 struct s {
   int *b;
@@ -82,6 +83,37 @@ void nested_loop() {
   }
 }
 
+// test function for downcast RTE guard
+void dtests() {
+  char x = 42;
+  char y = 59;
+  char z = 101;
+  unsigned char uc = 101;
+  unsigned int ux = 101;
+  unsigned int uy = 100;
+  unsigned int uz = 1;
+  int i = 101;
+  unsigned short j = 101;
+
+  /*@ assert z == (char) (x + y); */
+  /*@ assert uc == (unsigned char) (x + y); */
+  /*@ assert uc == (unsigned char) i; */
+  /*@ assert i == (int) (uy + uz); */
+  /*@ assert ux == (unsigned int) (uy + uz); */
+  /*@ assert j == (unsigned short) (uy + uz); */
+
+  int *ptr_y = &i;
+  // /*@ assert (short)ptr_y == (short)&i; */ // fail because of a pointer downcast assertion
+  /*@ assert \aligned(ptr_y,alignof(int)); */
+
+  char c = 'a';
+  // fail because of a floating point exception
+  // /*@ assert \aligned(&c, ULONG_MAX + 1); */ // pathological case of issue #214
+
+  float fx = 3.0;
+  /*@ assert (int)fx == 3; */
+}
+
 int main(void) {
   int y = 2;
   long z = 2L;
@@ -146,6 +178,8 @@ int main(void) {
 
   func();
   func_ptr();
+
+  dtests();
 
   return 0;
 }
