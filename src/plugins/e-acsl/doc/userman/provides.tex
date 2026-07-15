@@ -539,6 +539,27 @@ which passes the \shortopt{e-acsl-gmp-only} option to the \eacsl
 plug-in. However it could slow down the execution of the instrumented program
 significantly.
 
+\subsubsection{Tweaking integer arithmetic (experts only)}
+
+The analysis for determining whether a value can be represented by an integral \C
+type, is particularly difficult in the presence of (mutually) recursive functions.
+However, through a process called \emph{widening} as described in
+\cite{benjamin23tap}, \eacsl may still be able to conclude that an integral \C
+type may be used for a function's arguments or return type. The widening strategy
+can be tweaked by a number of command-line flags:
+\begin{frama-c-commands}
+\$ frama-c -e-acsl-widening-arguments f1:3,f2:4
+             -e-acsl-widening-arguments-base 5
+             -e-acsl-widening-output f1:1,f3:2
+             -e-acsl-widening-output-base 0
+\end{frama-c-commands}
+Consider for instance the command-line flags above, indicating that for arguments
+of functions \lstinline|f1| and \lstinline|f2| the values 3 and 4 should be used
+respectively, and 5 for any other arguments. Furthermore for the result of the
+functions \lstinline|f1| and \lstinline|f3| the values 1 and 2 should be used, and
+0 for any other function result. For the effects of these values, refer to
+\cite{benjamin23tap}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Memory-related Annotations}
