@@ -1,4 +1,5 @@
-MACRO: DEST @PTEST_RESULT_DIR@/gen_@PTEST_NAME@
+MACRO: DESTNAME gen_@PTEST_NAME@.@PTEST_NUMBER@
+MACRO: DEST @PTEST_RESULT_DIR@/@DESTNAME@
 MACRO: MACHDEP -machdep gcc_x86_64
 MACRO: GLOBAL @MACHDEP@ -keep-unused-functions none -verbose 0 -no-unicode
 
@@ -13,7 +14,7 @@ MACRO: EVENTUALLY -print -ocode @DEST@.c
 PLUGIN: e-acsl eva,scope,inout rtegen
 
 LIBS: @PTEST_SUITE_DIR@/../E_ACSL_test
-LOG: gen_@PTEST_NAME@.c
+LOG: @DESTNAME@.c
 
 COMMENT: No need for explicit dependency towards the plugin share directory
 DEPS:

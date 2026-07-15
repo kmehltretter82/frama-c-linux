@@ -1,5 +1,11 @@
 /* run.config
    COMMENT: extended quantifiers (sum, product, numof)
+   STDOPT:
+   STDOPT: #"-e-acsl-gmp-only"
+*/
+/* run.config_dev
+   EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --gmp
 */
 
 #include <limits.h>
@@ -12,6 +18,7 @@ int main(void) {
   int y = 10;
 
   /*@ assert \sum(2, 10, \lambda integer k; 2 * k) == 108; */;
+  /*@ assert \sum(1, 10, \lambda integer k; 1) == 10; */;
   /*@ assert \sum(2, 35, \lambda integer k; ULLONG_MAX) != 0; */;
   /*@ assert \sum(10, 2, \lambda integer k; k) == 0; */;
   /*@ assert \sum(x * x, 2, \lambda integer k; k) == 0; */;

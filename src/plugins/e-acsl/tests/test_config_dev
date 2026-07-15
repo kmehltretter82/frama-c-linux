@@ -1,5 +1,5 @@
 NOFRAMAC: only the EXEC command below is useful in this config
-MACRO: EACSL_ERR @PTEST_NAME@.e-acsl.err.log
+MACRO: EACSL_ERR @PTEST_NAME@.@PTEST_NUMBER@.e-acsl.err.log
 
 COMMENT: Default options for `e-acsl-gcc`
 MACRO: ROOT_EACSL_GCC_MISC_OPTS -X
@@ -18,7 +18,12 @@ PLUGIN: e-acsl eva,scope rtegen
 COMMENT: No need for explicit dependency towards the plugin share directory
 DEPS: @PTEST_SUITE_DIR@/../wrapper.sh @INCLUDED_HEADERS@
 
-EXECNOW: LOG @EACSL_ERR@ @PTEST_SUITE_DIR@/../wrapper.sh "@frama-c-exe@" "@PTEST_RESULT_DIR@" "@PTEST_NAME@" "@PTEST_FILE@" "@EACSL_ERR@" "@ROOT_EACSL_GCC_MISC_OPTS@ @ROOT_EACSL_GCC_OPTS_EXT@" "@PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@ @ROOT_EACSL_GCC_FC_EXTRA@ @ROOT_EACSL_GCC_FC_EXTRA_EXT@" "@ROOT_EACSL_EXEC_EXIT_CODE@" "@ROOT_EACSL_EXEC_FILTER@"
+COMMENT: Macro to use in EXECNOW: directive in combination with
+COMMENT: @EACSL_ERR@ to run a dev test, like so:
+COMMENT: EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+MACRO: EACSL_EXEC @PTEST_SUITE_DIR@/../wrapper.sh "@frama-c-exe@" "@PTEST_RESULT_DIR@" "@PTEST_NAME@.@PTEST_NUMBER@" "@PTEST_FILE@" "@EACSL_ERR@" "@ROOT_EACSL_GCC_MISC_OPTS@ @ROOT_EACSL_GCC_OPTS_EXT@" "@PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@ @ROOT_EACSL_GCC_FC_EXTRA@ @ROOT_EACSL_GCC_FC_EXTRA_EXT@" "@ROOT_EACSL_EXEC_EXIT_CODE@" "@ROOT_EACSL_EXEC_FILTER@"
+
+EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
 
 COMMENT: These next macros can be redefined in a test file
 
@@ -40,3 +45,24 @@ MACRO: INCLUDED_HEADERS
 COMMENT: Define the following macro in a test to change the expected exit code
 COMMENT: of the execution of the resulting binary.
 MACRO: ROOT_EACSL_EXEC_EXIT_CODE 0
+
+COMMENT: To run the same test with different options, you need to also
+COMMENT: add EXECNOW: directives in your test file. The EXECNOW: in this
+COMMENT: config file is run after the ones in the test files, so there
+COMMENT: is no need to add a directive after the last set of macros
+COMMENT: Example:
+COMMENT: /* run.config_dev
+COMMENT:    COMMENT: First execution with default arguments
+COMMENT:    EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+COMMENT:
+COMMENT:    COMMENT: Configure some arguments for a second execution
+COMMENT:    MACRO: ROOT_EACSL_GCC_OPTS_EXT --assert-print-data
+COMMENT:    EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
+COMMENT:
+COMMENT:    COMMENT: Reset the arguments and change filter for a third
+COMMENT:    COMMENT: execution, since this is the last execution of the
+COMMENT:    COMMENT: file, no need to add an EXECNOW: directive, the one
+COMMENT:    COMMENT: from test_config_dev will be used.
+COMMENT:    MACRO: ROOT_EACSL_GCC_OPTS_EXT
+COMMENT:    MACRO: ROOT_EACSL_EXEC_FILTER sed -e s/0x[0-9a-f]*$/0x0000/g
+COMMENT: */

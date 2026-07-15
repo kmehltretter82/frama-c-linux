@@ -29,92 +29,44 @@
   E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] extended_quantifiers.c:20: Warning: 
-  signed overflow. assert 2 * __gen_e_acsl_k <= 2147483647;
-[eva:alarm] extended_quantifiers.c:20: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_accumulator + __gen_e_acsl_lambda <= 2147483647;
-[eva:alarm] extended_quantifiers.c:20: Warning: 
-  signed overflow. assert __gen_e_acsl_k + __gen_e_acsl_one <= 2147483647;
-[eva:alarm] extended_quantifiers.c:20: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:20: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:21: Warning: 
-  signed overflow. assert __gen_e_acsl_k_2 + __gen_e_acsl_one_2 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:21: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_accumulator_2 + __gen_e_acsl_lambda_2 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:21: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:21: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:22: Warning: 
-  signed overflow. assert __gen_e_acsl_k_3 + __gen_e_acsl_one_3 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:22: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:22: Warning: assertion got status unknown.
+[eva:alarm] extended_quantifiers.c:23: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:23: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:24: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:24: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:25: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_accumulator_6 + __gen_e_acsl_lambda_6 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:25: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:25: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:26: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:28: Warning: 
-  signed overflow.
-  assert
-  -9223372036854775808 <= __gen_e_acsl_accumulator_8 + __gen_e_acsl_lambda_8;
-[eva:alarm] extended_quantifiers.c:28: Warning: 
-  signed overflow. assert __gen_e_acsl_k_8 + __gen_e_acsl_one_8 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:27: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:27: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:30: Warning: 
-  signed overflow. assert __gen_e_acsl_k_9 + __gen_e_acsl_one_9 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:30: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_accumulator_9 + __gen_e_acsl_lambda_9 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:30: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:30: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:31: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_accumulator_10 + __gen_e_acsl_lambda_10 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:31: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:35: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_k_11 + __gen_e_acsl_one_11 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:35: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:35: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:36: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_k_12 + __gen_e_acsl_one_12 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:36: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:36: Warning: assertion got status unknown.
 [eva:alarm] extended_quantifiers.c:37: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_k_13 + __gen_e_acsl_one_13 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:37: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:37: Warning: assertion got status unknown.
-[eva:alarm] extended_quantifiers.c:38: Warning: 
-  signed overflow. assert 2 * __gen_e_acsl_k_14 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:38: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_k_14 + __gen_e_acsl_one_14 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:39: Warning: 
-  signed overflow. assert 2 * __gen_e_acsl_k_15 <= 2147483647;
-[eva:alarm] extended_quantifiers.c:39: Warning: 
-  signed overflow.
-  assert __gen_e_acsl_k_15 + __gen_e_acsl_one_15 <= 2147483647;
 [eva:alarm] extended_quantifiers.c:38: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] extended_quantifiers.c:38: Warning: assertion got status unknown.
