@@ -370,13 +370,15 @@ function createDeadCodeGutter(): Editor.Extension {
   return Editor.createGutter(deps, cls, (props, block, view) => {
     const doc = view.state.doc;
     const line = doc.lineAt(block.from);
+    // Filter should not be needed, but we can't properly handle dependencies
+    // for gutters, so sometimes property nodes do not match the current doc.
     const unreachable = props.unreach
-      .filter(r => r.from <= doc.length)
+      .filter(r => r.to <= doc.length)
       .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
       .find(r => r.from <= line.from && line.to <= r.to);
     if (unreachable) return new DeadCodeGutterMarker('unreachable');
     const nonTerm = props.nonTerm
-      .filter(r => r.from <= doc.length)
+      .filter(r => r.to <= doc.length)
       .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
       .find(r => r.from <= line.from && line.to <= r.to);
     if (nonTerm) return new DeadCodeGutterMarker('non terminating');
