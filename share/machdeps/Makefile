@@ -38,7 +38,14 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
 
 .PHONY: check-schema
 
+ifeq ($(CI),true)
+check-schema:
+	@$(foreach machdep, $(wildcard machdep_*.yaml), \
+           ./make_machdep/make_machdep.py --from-file $(machdep) --check-only \
+           || (echo "$(machdep) does not conform to machdep schema"; exit 1);)
+else
 check-schema:
 	@$(foreach machdep, $(wildcard machdep_*.yaml), \
            ./make_machdep/make_machdep.py --from-file $(machdep) --check-only \
            || echo "$(machdep) does not conform to machdep schema";)
+endif
