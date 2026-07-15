@@ -99,9 +99,7 @@ objects of Sections \ref{sec:metr-norm-ast} and \ref{sec:metrics-original-ast}.
 \subsection{Syntactic metrics}
 \label{sec:syntactic-metrics-normalized-ast}
 
-Only cyclomatic numbers are available for the normalized AST. These are also
-available through Frama-C's graphical user interface (GUI) (see Section
-\ref{sec:gui}).
+Only cyclomatic numbers are available for the normalized AST.
 
 \def\pgname{reach.c}
 
@@ -145,31 +143,6 @@ Note that these results can be printed to a text or html file using the {\sf
   \lstinputlisting[language=Logs,basicstyle=\lp@basic, firstline = 49]{./cil.log}
   \caption{Output of global syntactic metrics for the normalized AST of \pgname}
   \label{fig:cprog_output2}
-\end{figure}
-
-\subsection{Graphical User interface}
-\label{sec:gui}
-
-Metrics on the normalized AST are also accessible through Frama-C's
-GUI. Cyclomatic complexity numbers are shown either globally on the left-hand
-side pane of the GUI, after left-clicking the {\sf Measure} button (see
-Figure~\ref{fig:gui_global}), or for a chosen function (see
-Figure~\ref{fig:gui_function}). To access this functionality, you must
-right-click on the line  where the function is defined to make a menu appear,
-then left-click on {\sf Metrics} as shown in the figure.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=\linewidth]{img/metrics_gui_global.png}
-  \caption{Metrics GUI: calculate global metrics}
-  \label{fig:gui_global}
-\end{figure}
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=\linewidth]{img/metrics_gui_function.png}
-  \caption{Metrics GUI: calculate metrics for a function}
-  \label{fig:gui_function}
 \end{figure}
 
 
@@ -241,8 +214,7 @@ for each function.
 \label{sec:metrics-original-ast}
 
 Only syntactic metrics are available on the original AST. Both Halstead and
-cyclomatic complexity are computed. Note that this part of the plug-in
-cannot be used through the GUI.
+cyclomatic complexity are computed.
 
 \begin{shell}[escapechar={\#}]
 % frama-c -metrics -metrics-by-function -metrics-ast cabs #\pgname#

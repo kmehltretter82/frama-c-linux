@@ -51,9 +51,6 @@ This plug-in adds to \FramaC support for out of \C source files
 intend to write \acsl specifications and do not want to write them
 inside comments of the \C source files as documented in \cite{acsl}.
 
-In addition, the plug-in allows to enter \acsl annotations directly via the
-Graphical User Interface.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Usage}
@@ -333,16 +330,6 @@ void main(void) {
   return;
 }
 \end{shell}
-
-\section*{Adding properties from the Graphical User Interface}
-\markright{}
-\addcontentsline{toc}{section}{Adding properties from the Graphical User Interface}
-Contextual menus are added when selecting statements or function definitions.
-It is possible to insert \verb|acsl_logical_axiomatic|, \verb|acsl_logical_type|,
-           \verb|acsl_logical_predicate|, \verb|acsl_logical_function|,
-           \verb|acsl_volatile_clause|, \verb|acsl_stmt_spec|,
-           \verb|acsl_loop_annotation| and \verb|acsl_code_annotation|.
-Selection of such a menu opens a popup window allowing to type directly the corresponding annotation (i.e. \verb|ensures P(t[0]);|).
 
 \section*{Addons for \acsl}
 \markright{}
