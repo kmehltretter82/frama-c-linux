@@ -646,7 +646,7 @@ additional-arch:
 
 additional-arch-nightly:
   <<: *additional_arch_template
-  <<: *when_publish
+  <<: *when_nightly
   parallel:
     matrix:
       - ARCH: [macos-x86, macos-arm]
