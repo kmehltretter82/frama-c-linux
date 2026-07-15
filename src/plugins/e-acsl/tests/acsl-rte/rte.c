@@ -12,6 +12,11 @@ double avg(double a, double b) {
   return (a + b) / 2;
 }
 
+// pathological case for issue #146
+void g(int a, int *b) {
+  //@ assert a / b[1] == 0;
+}
+
 /*@ logic double f2(double x) = (double)(1/x); */
 
 /*@
