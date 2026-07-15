@@ -107,7 +107,7 @@ void dtests() {
   /*@ assert \aligned(ptr_y,alignof(int)); */
 
   char c = 'a';
-  // fail because of a floating point exception
+  // fail because of an unsigned downcast assertion
   // /*@ assert \aligned(&c, ULONG_MAX + 1); */ // pathological case of issue #214
 
   float fx = 3.0;
