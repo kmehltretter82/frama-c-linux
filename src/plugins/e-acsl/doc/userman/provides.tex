@@ -505,13 +505,15 @@ It might be particularly useful in one of the following contexts:
 \label{sec:integers}
 \index{GMP}
 
-\eacsl uses an \texttt{integer}\codeidx{integer} type corresponding to
-mathematical integers which does not fit in any integral \C type. To circumvent
-this issue, \eacsl uses the \gmp library\footnote{\url{http://gmplib.org}}.
-Thus, even if \eacsl does its best to use standard integral types instead of
-\gmp~\cite{kosmatov20rv}, it may generate such integers from time to time. It is
-notably the case if your program contains \lstinline|long long|, either signed
-or unsigned.
+The \texttt{integer}\codeidx{integer} type in \eacsl represents mathematical
+integers, i.e., integers of arbitrary size, and does therefore in general not fit
+into any integral \C type. To circumvent this issue, \eacsl uses the \gmp
+library\footnote{\url{http://gmplib.org}}.
+Since such arbitrary-precision arithmetic is costly, \eacsl does its best to use
+standard integral \C types instead of \gmp~\cite{kosmatov20rv,benjamin23tap}.
+However, this is not always possible and it may thus generate such \gmp integers
+from time to time. This is notably the case if your program contains
+\lstinline|long long|, either signed or unsigned.
 
 Consider for instance the following program.
 
