@@ -26,8 +26,8 @@ int main(void)
   /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
   state->bitsInQueue = 16U;
   {
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_initialized;
+    int __gen_e_acsl_aligned;
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_aligned_2;
     int __gen_e_acsl_valid_read;
@@ -35,50 +35,50 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state),
+                                                    sizeof(spongeState *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&state",
+                                 (void *)(& state));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(spongeState *)",0,
+                                   sizeof(spongeState *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "uninitialized: \\initialized(&state)",0,
+                                 __gen_e_acsl_initialized);
+    /*@ assert E_ACSL: uninitialized: \initialized(&state); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&state)";
+      __gen_e_acsl_assert_data_2.file = "bts1399.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 19;
+      __gen_e_acsl_assert_data_2.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
     */
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)state,32UL);
     /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
     */
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"state",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"state",
                                  (void *)state);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\"pointer alignment\": \\aligned(state,32)",
                                  0,__gen_e_acsl_aligned);
     /*@ assert E_ACSL: "pointer alignment": \aligned(state,32); */
     {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(state,32)";
-      __gen_e_acsl_assert_data_2.file = "bts1399.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 19;
-      __gen_e_acsl_assert_data_2.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state),
-                                                    sizeof(spongeState *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&state",
-                                 (void *)(& state));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(spongeState *)",0,
-                                   sizeof(spongeState *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "uninitialized: \\initialized(&state)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&state); */
-    {
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&state)";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(state,32)";
       __gen_e_acsl_assert_data_3.file = "bts1399.c";
       __gen_e_acsl_assert_data_3.fct = "main";
       __gen_e_acsl_assert_data_3.line = 19;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
+      __gen_e_acsl_assert_data_3.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =

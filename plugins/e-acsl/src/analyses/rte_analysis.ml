@@ -10,9 +10,7 @@ open Cil_types
 
 let dkey = Options.Dkey.rte
 
-(** [Guards] stores the pairs ([term],[predicate list]) created during the
-    analysis. *)
-module Guards =
+module Guard =
 struct
 
   type kind =
@@ -22,43 +20,59 @@ struct
     | Initialized
     | Pointer_alignment
 
-  type guard = { kind: kind; pred: predicate }
+  type t = { kind: kind; pred: predicate }
 
+  let make k p = {kind = k; pred = p}
+
+  let kind t = t.kind
+  let pred t = t.pred
+
+  let priority t =
+    match t.kind with
+    | Initialized -> 0
+    | Pointer_alignment -> 1
+    | Memory_access -> 2
+    | _ -> 3
+
+  let compare g1 g2 = compare (priority g1) (priority g2)
+end
+
+module Guards =
+struct
+
+  module Guards = Set.Make(Guard)
   module Terms = Terms.Id.Hashtbl
 
   let tbl = Terms.create 10
 
   let add t g =
-    if not @@ Logic_utils.is_trivially_true g.pred then
+    if not @@ Logic_utils.is_trivially_true (Guard.pred g) then
       match Terms.find_opt tbl t with
-      | Some guards -> Terms.replace tbl t (g :: guards)
-      | None -> Terms.add tbl t [g]
-
-  let add_list t guards =
-    match Terms.find_opt tbl t with
-    | Some guards' -> Terms.replace tbl t (guards @ guards')
-    | None -> Terms.add tbl t guards
+      | Some guards -> Terms.replace tbl t (Guards.add g guards)
+      | None -> Terms.add tbl t (Guards.singleton g)
 
   let iter_on_guards t f =
     match Terms.find_opt tbl t with
-    | Some guards -> List.iter (fun g -> f g.pred) guards
+    | Some guards -> Guards.iter (fun g -> f (Guard.pred g)) guards
     | _ -> ()
 
   let fold_guards ~default t f =
     match Terms.find_opt tbl t with
-    | Some guards -> List.fold_left (fun x g -> f g.pred x) default guards
+    | Some guards -> Guards.fold (fun g x -> f (Guard.pred g) x) guards default
     | _ -> default
 
+  (** [copy t_src t_dst] replaces the current binding of [t_dst] in [tbl] by the
+      one of [t_src]. It does nothing if [t_src] is not bound in [tbl]. *)
   let copy t_src t_dst =
     match Terms.find_opt tbl t_src with
-    | Some guards -> add_list t_dst guards
+    | Some guards -> Terms.replace tbl t_dst guards
     | None -> ()
 
   let remove t = Terms.remove tbl t
 
   let mem_guard_kind t kind =
     match Terms.find_opt tbl t with
-    | Some guards -> List.exists (fun g' -> g'.kind = kind) guards
+    | Some guards -> Guards.exists (fun g' -> (Guard.kind g') = kind) guards
     | None -> false
 
   let clear () = Terms.clear tbl
@@ -67,7 +81,9 @@ struct
     let pp_data fmt d =
       Pretty_utils.pp_list
         ~pre:"[" ~suf:"]" ~sep:";@ "
-        Printer.pp_predicate fmt (List.map (fun g -> g.pred) d)
+        Printer.pp_predicate
+        fmt
+        (List.map (fun g -> (Guard.pred g)) (Guards.elements d))
     in
     Terms.pretty
       ~item:(format_of_string "%a --> %a") Printer.pp_term pp_data fmt tbl
@@ -121,8 +137,6 @@ end
 module Undefined_behaviours =
 struct
 
-  let mk_guard kind pred = Guards.{kind; pred}
-
   let preprocess_guard guard =
     Logic_normalizer.preprocess_predicate guard;
     Bound_variables.preprocess_predicate guard
@@ -141,7 +155,7 @@ struct
         (Logic_const.tint Z.zero)
     in
     preprocess_guard pred;
-    mk_guard Division_by_zero pred
+    Guard.make Division_by_zero pred
 
   (** [mem_access ~loc lv] creates the predicate that checks if [lv] is a
        valid read. *)
@@ -154,7 +168,7 @@ struct
         (Logic_const.here_label, addr)
     in
     preprocess_guard pred;
-    mk_guard Memory_access pred
+    Guard.make Memory_access pred
 
   (** [index_bound ~loc t size] creates the predicate that check if [t] is
       between [Z.zero] and the array's upper bound regards of its [size]. *)
@@ -169,7 +183,7 @@ struct
         (Smart_predicate.prel Rlt t_cpy_2 (Logic_utils.expr_to_term size))
     in
     preprocess_guard pred;
-    mk_guard Out_of_bounds pred
+    Guard.make Out_of_bounds pred
 
   (** [initialized ~loc ?label lv typ] creates the predicate that check if [lv]
       is initialized. *)
@@ -179,7 +193,7 @@ struct
       Logic_const.pinitialized ~loc ~names:["uninitialized"] (label, addr)
     in
     preprocess_guard pred;
-    mk_guard Initialized pred
+    Guard.make Initialized pred
 
   (** [pointer_alignment ~loc t typ] creates the predicate that check if [t] is
       aligned regards of [typ]. *)
@@ -191,7 +205,7 @@ struct
         (Smart_term.copy t, Smart_term.talignof ~loc typ)
     in
     preprocess_guard pred;
-    mk_guard Pointer_alignment pred
+    Guard.make Pointer_alignment pred
 
 end
 
@@ -395,10 +409,10 @@ let preprocess ast =
   if Options.Optimisations.Rte.get ()
   then begin
     ignore @@ rte_visitor#visit_file ast;
-    Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
-    Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+    Options.feedback ~dkey "Result of the RTE analysis.%!";
+    Options.feedback ~dkey "%a%!" Guards.pretty ()
   end else
-    Options.feedback ~dkey:dkey "Skip the RTE analysis.%!"
+    Options.feedback ~dkey "Skip the RTE analysis.%!"
 
 let preprocess_predicate p =
   if Options.Optimisations.Rte.get ()
@@ -406,9 +420,9 @@ let preprocess_predicate p =
     ignore @@ rte_visitor#visit_predicate p;
     Options.feedback ~dkey "Result of the RTE analysis on %a.%!"
       Printer.pp_predicate p;
-    Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+    Options.feedback ~dkey "%a%!" Guards.pretty ()
   end else
-    Options.feedback ~dkey:dkey "Skip the RTE analysis on %a.%!"
+    Options.feedback ~dkey "Skip the RTE analysis on %a.%!"
       Printer.pp_predicate p
 
 let iter_on_guards = Guards.iter_on_guards

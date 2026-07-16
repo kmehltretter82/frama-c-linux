@@ -90,53 +90,53 @@ void *thread_start(void *arg)
   __e_acsl_store_block((void *)(& addrof_errno),8UL);
   __e_acsl_full_init((void *)(& addrof_errno));
   {
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_initialized;
+    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)addrof_errno,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"addrof_errno",
-                                 (void *)addrof_errno);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "\"pointer alignment\": \\aligned(addrof_errno,4)",
-                                 0,__gen_e_acsl_aligned);
-    /*@ assert E_ACSL: "pointer alignment": \aligned(addrof_errno,4); */
-    {
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(addrof_errno,4)";
-      __gen_e_acsl_assert_data_5.file = "threads_safe_locations.c";
-      __gen_e_acsl_assert_data_5.fct = "thread_start";
-      __gen_e_acsl_assert_data_5.line = 10;
-      __gen_e_acsl_assert_data_5.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& addrof_errno),
                                                     sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
                                  "&addrof_errno",(void *)(& addrof_errno));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                    "sizeof(int *)",0,sizeof(int *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "uninitialized: \\initialized(&addrof_errno)",
                                  0,__gen_e_acsl_initialized);
     /*@ assert E_ACSL: uninitialized: \initialized(&addrof_errno); */
     {
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&addrof_errno)";
+      __gen_e_acsl_assert_data_5.file = "threads_safe_locations.c";
+      __gen_e_acsl_assert_data_5.fct = "thread_start";
+      __gen_e_acsl_assert_data_5.line = 10;
+      __gen_e_acsl_assert_data_5.name = "uninitialized";
+      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)addrof_errno,4UL);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"addrof_errno",
+                                 (void *)addrof_errno);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                 "\"pointer alignment\": \\aligned(addrof_errno,4)",
+                                 0,__gen_e_acsl_aligned);
+    /*@ assert E_ACSL: "pointer alignment": \aligned(addrof_errno,4); */
+    {
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&addrof_errno)";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(addrof_errno,4)";
       __gen_e_acsl_assert_data_6.file = "threads_safe_locations.c";
       __gen_e_acsl_assert_data_6.fct = "thread_start";
       __gen_e_acsl_assert_data_6.line = 10;
-      __gen_e_acsl_assert_data_6.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_6);
+      __gen_e_acsl_assert_data_6.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     __gen_e_acsl_valid = __e_acsl_valid((void *)addrof_errno,sizeof(int),
@@ -150,51 +150,51 @@ void *thread_start(void *arg)
                                  "\\valid(addrof_errno)",0,
                                  __gen_e_acsl_valid);
     if (__gen_e_acsl_valid) {
-      int __gen_e_acsl_aligned_2;
       int __gen_e_acsl_initialized_2;
+      int __gen_e_acsl_aligned_2;
       int __gen_e_acsl_initialized_3;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
-      __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)addrof_errno,4UL);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                   "addrof_errno",(void *)addrof_errno);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                   "\"pointer alignment\": \\aligned(addrof_errno,4)",
-                                   0,__gen_e_acsl_aligned_2);
-      /*@ assert E_ACSL: "pointer alignment": \aligned(addrof_errno,4); */
-      {
-        __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(addrof_errno,4)";
-        __gen_e_acsl_assert_data_7.file = "threads_safe_locations.c";
-        __gen_e_acsl_assert_data_7.fct = "thread_start";
-        __gen_e_acsl_assert_data_7.line = 10;
-        __gen_e_acsl_assert_data_7.name = "pointer alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_7);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-        {.values = (void *)0};
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& addrof_errno),
                                                         sizeof(int *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                    "&addrof_errno",(void *)(& addrof_errno));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(int *)",0,sizeof(int *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "uninitialized: \\initialized(&addrof_errno)",
                                    0,__gen_e_acsl_initialized_2);
       /*@ assert E_ACSL: uninitialized: \initialized(&addrof_errno); */
       {
+        __gen_e_acsl_assert_data_7.blocking = 1;
+        __gen_e_acsl_assert_data_7.kind = "RTE";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&addrof_errno)";
+        __gen_e_acsl_assert_data_7.file = "threads_safe_locations.c";
+        __gen_e_acsl_assert_data_7.fct = "thread_start";
+        __gen_e_acsl_assert_data_7.line = 10;
+        __gen_e_acsl_assert_data_7.name = "uninitialized";
+        __e_acsl_assert(__gen_e_acsl_initialized_2,
+                        & __gen_e_acsl_assert_data_7);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      }
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)addrof_errno,4UL);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+                                   "addrof_errno",(void *)addrof_errno);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                   "\"pointer alignment\": \\aligned(addrof_errno,4)",
+                                   0,__gen_e_acsl_aligned_2);
+      /*@ assert E_ACSL: "pointer alignment": \aligned(addrof_errno,4); */
+      {
         __gen_e_acsl_assert_data_8.blocking = 1;
         __gen_e_acsl_assert_data_8.kind = "RTE";
-        __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&addrof_errno)";
+        __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(addrof_errno,4)";
         __gen_e_acsl_assert_data_8.file = "threads_safe_locations.c";
         __gen_e_acsl_assert_data_8.fct = "thread_start";
         __gen_e_acsl_assert_data_8.line = 10;
-        __gen_e_acsl_assert_data_8.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_2,
-                        & __gen_e_acsl_assert_data_8);
+        __gen_e_acsl_assert_data_8.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_8);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
       }
       __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)addrof_errno,
