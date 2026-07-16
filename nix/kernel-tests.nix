@@ -6,6 +6,7 @@ mk_tests {
     dune exec -- frama-c-ptests -never-disabled tests
     dune build -j1 \
       @tests/cil/ptests \
+      @tests/dynamic/ptests \
       @tests/jcdb/ptests \
       @tests/libc/ptests \
       @tests/misc/ptests \
@@ -13,11 +14,9 @@ mk_tests {
       @tests/saveload/ptests \
       @tests/spec/ptests \
       @tests/syntax/ptests \
-      @tests/variadic/ptests \
-      @src/kernel_internals/parsing/tests/runtest
-    dune runtest -j1 \
-      tests
-    dune build @runtest-frama_c_kernel
+      @tests/variadic/ptests
+    dune runtest -j1 tests
+    dune build -j1 @runtest-frama_c_kernel @runtest-parsing
     make -C share/machdeps check-schema
   '';
 }

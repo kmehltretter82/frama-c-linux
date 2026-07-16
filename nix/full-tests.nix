@@ -6,7 +6,7 @@ mk_tests {
   tests-name = "full-tests";
   tests-command = ''
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
-    dune build @ptests
+    dune build @runtest @ptests
   '';
   has-wp-proofs = true ;
 }

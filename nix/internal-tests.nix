@@ -47,7 +47,7 @@
 , jq
 , perl
 , pkgs
-, python310
+, python3
 , python3Packages
 , socat
 , swi-prolog
@@ -116,7 +116,7 @@ stdenvNoCC.mkDerivation rec {
     jq
     perl
     pkgs.fontconfig
-    python310
+    python3
     python3Packages.jsonschema
     python3Packages.pyaml
     socat
@@ -161,7 +161,7 @@ stdenvNoCC.mkDerivation rec {
     runHook preCheck
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
-    dune build -j1 @ptests_config
+    dune build -j1 @runtest @ptests_config
   '';
 
   installFlags = [

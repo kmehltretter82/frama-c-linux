@@ -32,6 +32,7 @@ import sys
 import tempfile
 import logging
 import yaml
+import os
 
 my_path = Path(sys.argv[0]).parent
 
@@ -108,21 +109,29 @@ def make_schema():
 schema = make_schema()
 
 
+def is_optional(field):
+    return "optional" in schema[field] and schema[field]["optional"]
+
+
 def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
 
         strict_schema = {
             # extract the keys
-            "required": [x for x in schema],
+            "required": [x for x in schema if (not is_optional(x))],
             "properties": schema,
             "additionalProperties": False,
         }
         validate(machdep, strict_schema)
         return True
     except ImportError:
-        logging.warning("jsonschema is not available: no validation will be performed")
-        return True
+        if os.environ.get("CI") == "true":
+            logging.error("jsonschema is not available: stopping")
+            sys.exit(1)
+        else:
+            logging.warning("jsonschema is not available: no validation will be performed")
+            return True
     except ValidationError as exn:
         logging.warning(f"machdep object is not conforming to machdep schema:\n{exn.message}")
         return False
@@ -464,9 +473,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         machdep["machdep_name"] = Path(args.dest_file.name).stem
     else:
         machdep["machdep_name"] = "anonymous_machdep"
-
-    def is_optional(field):
-        return "optional" in schema[field] and schema[field]["optional"]
 
     machdep = {f: v for [f, v] in machdep.items() if not (is_optional(f) and v is None)}
 

@@ -62,7 +62,7 @@ while read -r var fcplugin ivetteplugin; do
   ivette_plugins[$var]=$ivetteplugin
 done < "./nix/ivette-plugins.txt"
 
-for plugin in ${!plugins[@]}; do
+for plugin in "${!plugins[@]}"; do
   location="${plugins[$plugin]}"
   if [ -n "$location" ] && [ "$location" != "none" ]; then
     repo="https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/$location"
@@ -76,6 +76,20 @@ for plugin in ${!plugins[@]}; do
     git clone --depth=1 --branch="$branch" "$repo" "ivette/src/frama-c/plugins/$plugin"
   fi
 done
+
+## Opam dependencies of plugins (only on CI)
+if [[ "$CI" == "true" ]]; then
+  ## Frama-C will be installed later, but is a dependency of external
+  ## plugins, fake its installation here so that the dependencies
+  ## installation of plugins succeeds without installing frama-c
+  opam install --fake frama-c
+  for plugin in "${!plugins[@]}"; do
+    opam install --jobs 2 --deps-only --yes "src/plugins/$plugin"
+  done
+  ## Now that dependencies have been installed, remove the fake install
+  ## of Frama-C
+  opam uninstall frama-c
+fi
 
 # Build Frama-C API with the new plugins
 dune build -j2 @install

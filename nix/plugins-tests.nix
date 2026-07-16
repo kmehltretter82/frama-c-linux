@@ -11,8 +11,8 @@ mk_tests {
       @tests/metrics/ptests \
       @tests/occurrence/ptests \
       @tests/pdg/ptests \
-      @tests/slicing/ptests \
       @tests/scope/ptests \
+      @tests/slicing/ptests \
       @tests/sparecode/ptests \
       @src/plugins/acsl-importer/tests/ptests \
       @src/plugins/aorai/tests/ptests \
