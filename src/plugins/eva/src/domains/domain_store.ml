@@ -67,7 +67,13 @@ module Make (Domain: InputDomain) = struct
      so this boolean should be saved as false. *)
   let () =
     if Descr.is_unmarshable Domain.datatype_descr
-    then Save.howto_marshal (fun r -> Option.map (fun _ -> false) !r) (ref)
+    then
+      let marshal b =
+        if b then
+          Self.warning "Cannot save states of %s domain on disk." Domain.name;
+        false
+      in
+      Save.howto_marshal (fun r -> Option.map marshal !r) (ref)
 
   module Table =
     State_builder.Hashtbl (ControlPoint.Hashtbl) (Domain) (val info "Table")
