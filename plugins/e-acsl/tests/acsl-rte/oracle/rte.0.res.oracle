@@ -65,6 +65,8 @@
 [eva:alarm] rte.c:129: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:129: Warning: 
+  assertion 'E_ACSL,uninitialized' got status unknown.
+[eva:alarm] rte.c:129: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] rte.c:129: Warning: assertion got status unknown.
 [eva:alarm] rte.c:132: Warning: 
@@ -85,5 +87,7 @@
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] rte.c:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.c:31: Warning: 
+  assertion 'E_ACSL,uninitialized' got status unknown.
 [eva:alarm] rte.c:31: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.

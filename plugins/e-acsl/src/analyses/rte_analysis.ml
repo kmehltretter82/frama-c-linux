@@ -324,10 +324,13 @@ let rte_visitor =
     method private add_initialized ~orig ~loc lv typ =
       let needs_guard lv =
         match lv with
-        | TVar { lv_origin = Some vi }, _ ->
+        | TVar { lv_kind = (LVQuant | LVLocal | LVFormal) }, _ -> false
+        | TVar { lv_origin = Some vi }, TNoOffset ->
           not (vi.vglob || vi.vformal || vi.vtemp) &&
           not (Ast_types.C.is_struct_or_union typ)
-        | _ -> false
+        (* Frama-C kernel ensures that '__retres' is always initialized. *)
+        | TResult _, TNoOffset -> false
+        | _ -> not Ast_types.C.(is_fun typ || is_struct_or_union typ)
       in
       if Flags.needs_initialized current_func && needs_guard lv then
         Guards.add orig (Undefined_behaviours.initialized ~loc lv)
