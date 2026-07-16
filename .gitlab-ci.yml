@@ -82,16 +82,6 @@ variables:
       - $PUBLISH == "yes"
 
 ################################################################################
-### IVETTE SETUP TEMPLATE
-
-.build_template: &ivette_setup
-  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
-  before_script:
-    # Build Frama-C API
-    - dune build -j2 @install
-    - make -C ivette api
-
-################################################################################
 ### PREPARE
 
 check-stable-pipeline:
@@ -199,8 +189,10 @@ frama-c:
 
 ivette:
   stage: build
-  <<: *ivette_setup
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   script:
+    - dune build -j2 @install
+    - make -C ivette api
     - make -C ivette check-lint
     - make -C ivette dist
   tags:
@@ -298,9 +290,11 @@ wp-tests:
 
 ivette-tests:
   stage: tests
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   when: manual
-  <<: *ivette_setup
   script:
+    - dune build -j2 @install
+    - make -C ivette api
     - make -C ivette dist
     - cd ivette
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
@@ -334,7 +328,7 @@ external-plugins:
 
 ivette-plugins:
   stage: tests
-  <<: *ivette_setup
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   script:
     # Following command is needed due to recent git releases which enforce stricter
     # permission controls w.r.t ownership of '.git'
