@@ -1583,14 +1583,16 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
   let r1 = eval_term ~alarm_mode env arg1 in
   let r2 = eval_term ~alarm_mode env arg2 in
   let v =
-    try
-      let i1 = Cvalue.V.project_ival r1.eover in
-      let f1 = Ival.project_float i1 in
-      let i2 = Cvalue.V.project_ival r2.eover in
-      let f2 = Ival.project_float i2 in
-      Cvalue.V.inject_float (fcaml f1 f2)
-    with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify Origin.Arith (V.join r1.eover r2.eover)
+    if V.is_bottom r1.eover || V.is_bottom r2.eover then V.bottom
+    else
+      try
+        let i1 = Cvalue.V.project_ival r1.eover in
+        let f1 = Ival.project_float i1 in
+        let i2 = Cvalue.V.project_ival r2.eover in
+        let f2 = Ival.project_float i2 in
+        Cvalue.V.inject_float (fcaml f1 f2)
+      with Cvalue.V.Not_based_on_null ->
+        Cvalue.V.topify Origin.Arith (V.join r1.eover r2.eover)
   in
   let eunder = under_from_over v in
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
@@ -1606,12 +1608,14 @@ and eval_float_builtin_arity1  ~alarm_mode env name arg =
   in
   let r = eval_term ~alarm_mode env arg in
   let v =
-    try
-      let i = Cvalue.V.project_ival r.eover in
-      let f = Ival.project_float i in
-      Cvalue.V.inject_float (fcaml f)
-    with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify Origin.Arith r.eover
+    if V.is_bottom r.eover then V.bottom
+    else
+      try
+        let i = Cvalue.V.project_ival r.eover in
+        let f = Ival.project_float i in
+        Cvalue.V.inject_float (fcaml f)
+      with Cvalue.V.Not_based_on_null ->
+        Cvalue.V.topify Origin.Arith r.eover
   in
   let eunder = under_from_over v in
   { etype = r.etype; eunder; eover = v; ldeps=r.ldeps; empty = r.empty; }

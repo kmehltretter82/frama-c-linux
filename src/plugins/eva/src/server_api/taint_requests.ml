@@ -266,11 +266,13 @@ end
 
 let zone_of_predicate kinstr predicate =
   let state = Results.(before_kinstr kinstr |> get_cvalue_model) in
-  let env = Eval_terms.env_only_here state in
-  let logic_deps = Eval_terms.predicate_deps env predicate in
-  match Option.map Cil_datatype.Logic_label.Map.bindings logic_deps with
-  | Some [ BuiltinLabel Here, zone ] -> Ok zone
-  | _ -> Error LogicError
+  if not (Cvalue.Model.is_reachable state) then Ok Memory_zone.bottom
+  else
+    let env = Eval_terms.env_only_here state in
+    let logic_deps = Eval_terms.predicate_deps env predicate in
+    match Option.map Cil_datatype.Logic_label.Map.bindings logic_deps with
+    | Some [ BuiltinLabel Here, zone ] -> Ok zone
+    | _ -> Error LogicError
 
 let get_predicate = function
   | Property.IPCodeAnnot ica ->
