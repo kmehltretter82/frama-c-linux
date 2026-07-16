@@ -342,36 +342,45 @@ export function DragSource(props: DragSourceProps): JSX.Element {
   const { onStart, onDrag, onStop } = props;
   // --- Dragging State
   const [dragging, setDragging] = React.useState<Dragging | undefined>();
+  const pendingDragRef = React.useRef<Dragging | undefined>();
+  const dragStartedRef = React.useRef(false);
   // --- Dropping Ref
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
   // --- onStart
   const handleStart: DraggableEventHandler = React.useCallback(
     (_, { x, y, node }) => {
-      if (dnd && nodeRef.current)
-        dnd.handleStart(nodeRef.current);
-      setDragging({
+      pendingDragRef.current = {
         rootX: x, rootY: y,
         dragX: x, dragY: y,
         rect: node.getBoundingClientRect(),
-      });
-      if (onStart) onStart();
-    }, [dnd, nodeRef, onStart]);
+      };
+      dragStartedRef.current = false;
+    }, []);
   // --- onDrag
   const handleDrag: DraggableEventHandler = React.useCallback(
     (e, { x, y }) => {
-      if (e && dnd) dnd.handleEvent(e);
-      if (dragging) {
-        const newDragging = { ...dragging, dragX: x, dragY: y };
+      const pendingDrag = pendingDragRef.current;
+      if (pendingDrag) {
+        if (!dragStartedRef.current) {
+          dragStartedRef.current = true;
+          if (dnd && nodeRef.current) dnd.handleStart(nodeRef.current);
+          if (onStart) onStart();
+        }
+        if (e && dnd) dnd.handleEvent(e);
+        const newDragging = { ...pendingDrag, dragX: x, dragY: y };
         setDragging(newDragging);
         if (onDrag) onDrag(newDragging);
       }
-    }, [dnd, dragging, onDrag]);
+    }, [dnd, nodeRef, onDrag, onStart]);
   // --- onStop
   const handleStop: DraggableEventHandler = React.useCallback(
     () => {
-      if (dnd) dnd.handleDrop();
+      pendingDragRef.current = undefined;
+      const dragStarted = dragStartedRef.current;
+      dragStartedRef.current = false;
+      if (dragStarted && dnd) dnd.handleDrop();
+      if (dragStarted && onStop) onStop();
       setDragging(undefined);
-      if (onStop) onStop();
     }, [dnd, onStop]);
   // --- Renderer
   const render = RenderOverlay(props, dragging);
