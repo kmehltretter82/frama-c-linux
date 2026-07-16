@@ -1,11 +1,15 @@
 /* run.config
  * COMMENT: Check that the RTE guards are generated at the right place.
+ * STDOPT: #"-e-acsl-O-rte-initialized"
+*/
+
+/* run.config_dev
+ * MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-O-rte-initialized
 */
 
 #include <stdlib.h>
 
-struct s
-{
+struct s {
   int *b;
 };
 
@@ -20,6 +24,18 @@ double avg(double a, double b) {
 // pathological case for issue #146
 void g(int a, int *b) {
   //@ assert a / b[1] == 0;
+}
+
+int n = 1;
+
+/*@ ensures *\result == 1; */ // pathological case for item #202
+int *func_ptr() {
+  return &n;
+}
+
+/*@ ensures \result == 1; */ // pathological case for item #136
+int func() {
+  return 1;
 }
 
 /*@ logic double f2(double x) = (double)(1/x); */
@@ -125,8 +141,11 @@ int main(void) {
   /*@ assert ***p / i == 23; */
 
   struct s struct_s;
-  struct_s.b;
+  struct_s.b = &c;
   /*@ assert !\initialized(struct_s.b + (0..1)); */ // pathological case for item #96
+
+  func();
+  func_ptr();
 
   return 0;
 }
