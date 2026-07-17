@@ -8,7 +8,9 @@
 
 import React from 'react';
 
-import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
+import {
+  EditorState, StateField, Facet, Extension, AnnotationType
+} from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
 import { EditorSelection, Text, Prec } from '@codemirror/state';
 
@@ -77,7 +79,10 @@ export type Handlers<I> = { [e in keyof EventMap]?: Handler<I, EventMap[e]> };
 // structure is exposed for two reasons. The first one is that it contains the
 // extension that must be added to the CodeMirror instantiation. The second one
 // is that it is needed during the Aspects creation's process.
-export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
+export interface Field<A> extends Data<A, StateField<A>> {
+  set: Set<A>,
+  annot: AnnotationType<A>
+}
 
 // An Aspect is a data associated with an editor state and computed by combining
 // data from several fields. A typical use case is if one needs a data that
@@ -178,7 +183,9 @@ export function createField<A>(init: A): Field<A> {
   const set: Set<A> = (v, a) => v?.dispatch({ annotations: annot.of(a) });
   const isUpdated: IsUpdated = (update) =>
     update.transactions.find((tr) => tr.annotation(annot)) !== undefined;
-  return { init, get, set, structure: field, extension: field, isUpdated };
+  return {
+    init, get, set, structure: field, extension: field, isUpdated, annot
+  };
 }
 
 // An Aspect is declared using its dependencies and a function. This function's
@@ -363,8 +370,7 @@ function createSelectionField(): Field<EditorSelection> {
   const cursor = EditorSelection.cursor(0);
   const field = createField<EditorSelection>(EditorSelection.create([cursor]));
   const set: Set<EditorSelection> = (view, selection) => {
-    view?.dispatch({ selection });
-    field.set(view, selection);
+    view?.dispatch({ selection, annotations: field.annot.of(selection) });
   };
   const updater = EditorView.updateListener.of((update) => {
     if (update.selectionSet) field.set(update.view, update.state.selection);
@@ -399,8 +405,7 @@ function createDocumentField(): Field<Text> {
     const selection = { anchor: 0 };
     const length = view?.state.doc.length;
     const changes = { from: 0, to: length, insert: text };
-    view?.dispatch({ changes, selection });
-    field.set(view, text);
+    view?.dispatch({ changes, selection, annotations: field.annot.of(text) });
   };
   const updater = EditorView.updateListener.of((update) => {
     if (update.docChanged) field.set(update.view, update.state.doc);
@@ -416,8 +421,7 @@ export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
     const selection = { anchor: 0 };
     const length = view?.state.doc.length;
     const changes = { from: 0, to: length, insert: toString(text) };
-    view?.dispatch({ changes, selection });
-    field.set(view, text);
+    view?.dispatch({ changes, selection, annotations: field.annot.of(text) });
   };
   return { ...field, set };
 }
