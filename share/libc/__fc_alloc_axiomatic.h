@@ -10,7 +10,6 @@
 #define __FC_ALLOC_AXIOMATIC_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 #include "__fc_define_wchar_t.h"
 
 __BEGIN_DECLS

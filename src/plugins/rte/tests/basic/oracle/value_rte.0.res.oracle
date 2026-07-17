@@ -158,11 +158,11 @@
 --- Properties of Function 'getchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns ("FRAMAC_SHARE/libc/stdio.h", line 332)
+[ Extern  ] Assigns ("FRAMAC_SHARE/libc/stdio.h", line 331)
             Unverifiable but considered Valid.
-[ Extern  ] Froms ("FRAMAC_SHARE/libc/stdio.h", line 332)
+[ Extern  ] Froms ("FRAMAC_SHARE/libc/stdio.h", line 331)
             Unverifiable but considered Valid.
-[ Extern  ] Froms ("FRAMAC_SHARE/libc/stdio.h", line 332)
+[ Extern  ] Froms ("FRAMAC_SHARE/libc/stdio.h", line 331)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.

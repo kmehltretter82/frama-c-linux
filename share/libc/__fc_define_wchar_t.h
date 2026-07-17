@@ -11,7 +11,6 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
-#include "__fc_machdep.h"
 #if !defined(__cplusplus)
 /* wchar_t is a keyword in C++ and shall not be a typedef. */
 typedef __WCHAR_T wchar_t;

@@ -10,7 +10,6 @@
 #define __FC_DEFINE_OFF_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 __BEGIN_DECLS
 #ifndef __off_t_defined
 typedef long int off_t;

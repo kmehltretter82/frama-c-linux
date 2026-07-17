@@ -14,7 +14,6 @@ __BEGIN_DECLS
 
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_ioctl.h"
-#include "__fc_machdep.h"
 
 typedef __INT32_T t_scalar_t;
 typedef __UINT32_T t_uscalar_t;

@@ -946,7 +946,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(memptr,8)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_2.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_2.line = 1006;
+      __gen_e_acsl_assert_data_2.line = 1005;
       __gen_e_acsl_assert_data_2.name = "pointer alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -965,7 +965,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(memptr)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "posix_memalign";
-    __gen_e_acsl_assert_data.line = 1006;
+    __gen_e_acsl_assert_data.line = 1005;
     __gen_e_acsl_assert_data.name = "valid_memptr";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -989,7 +989,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_3.pred_txt = "\\result == 22";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_3.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_3.line = 1014;
+      __gen_e_acsl_assert_data_3.line = 1013;
       __gen_e_acsl_assert_data_3.name = "invalid_alignment/result_einval";
       __e_acsl_assert(__retres == 22,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -1006,7 +1006,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_5.pred_txt = "\\result == 0";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_5.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_5.line = 1022;
+      __gen_e_acsl_assert_data_5.line = 1021;
       __gen_e_acsl_assert_data_5.name = "allocation/result_zero";
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -1030,7 +1030,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_6.pred_txt = "\\result < 0 || \\result > 0";
       __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_6.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_6.line = 1028;
+      __gen_e_acsl_assert_data_6.line = 1027;
       __gen_e_acsl_assert_data_6.name = "no_allocation/result_non_zero";
       __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -1105,7 +1105,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data.pred_txt = "\\old(alignment) != 0";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data.line = 557;
+      __gen_e_acsl_assert_data.line = 556;
       __gen_e_acsl_assert_data.name = "division by zero";
       __e_acsl_assert(alignment != 0UL,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -1127,7 +1127,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
     __gen_e_acsl_assert_data_2.pred_txt = "is_valid_alignment(alignment)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_2.fct = "aligned_alloc";
-    __gen_e_acsl_assert_data_2.line = 540;
+    __gen_e_acsl_assert_data_2.line = 539;
     __gen_e_acsl_assert_data_2.name = "valid_alignment";
     __e_acsl_assert(__gen_e_acsl_is_valid_alignment_2,
                     & __gen_e_acsl_assert_data_2);
@@ -1145,7 +1145,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_4.pred_txt = "alignment != 0";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_4.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_4.line = 541;
+      __gen_e_acsl_assert_data_4.line = 540;
       __gen_e_acsl_assert_data_4.name = "division by zero";
       __e_acsl_assert(alignment != 0UL,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -1159,7 +1159,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
     __gen_e_acsl_assert_data_3.pred_txt = "size % alignment == 0";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_3.fct = "aligned_alloc";
-    __gen_e_acsl_assert_data_3.line = 541;
+    __gen_e_acsl_assert_data_3.line = 540;
     __gen_e_acsl_assert_data_3.name = "alignment_modulo";
     __e_acsl_assert(size % alignment == 0UL,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -1196,7 +1196,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_7.pred_txt = "__fc_errno == \\old(__fc_errno)";
       __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_7.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_7.line = 558;
+      __gen_e_acsl_assert_data_7.line = 557;
       __gen_e_acsl_assert_data_7.name = "allocation/errno_same";
       __e_acsl_assert(errno == __gen_e_acsl_at,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -1205,7 +1205,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(\\result,\\old(alignment))";
       __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_6.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_6.line = 557;
+      __gen_e_acsl_assert_data_6.line = 556;
       __gen_e_acsl_assert_data_6.name = "allocation/alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -1226,7 +1226,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_9.pred_txt = "__fc_errno == 12";
       __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_9.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_9.line = 567;
+      __gen_e_acsl_assert_data_9.line = 566;
       __gen_e_acsl_assert_data_9.name = "no_allocation/errno_set";
       __e_acsl_assert(errno == 12,& __gen_e_acsl_assert_data_9);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
@@ -1235,7 +1235,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_8.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_8.line = 566;
+      __gen_e_acsl_assert_data_8.line = 565;
       __gen_e_acsl_assert_data_8.name = "no_allocation/null_result";
       __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
@@ -1256,7 +1256,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_11.pred_txt = "__fc_errno == 22";
       __gen_e_acsl_assert_data_11.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_11.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_11.line = 574;
+      __gen_e_acsl_assert_data_11.line = 573;
       __gen_e_acsl_assert_data_11.name = "no_allocation_invalid_align/errno_set";
       __e_acsl_assert(errno == 22,& __gen_e_acsl_assert_data_11);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
@@ -1265,7 +1265,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_10.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_10.fct = "aligned_alloc";
-      __gen_e_acsl_assert_data_10.line = 573;
+      __gen_e_acsl_assert_data_10.line = 572;
       __gen_e_acsl_assert_data_10.name = "no_allocation_invalid_align/null_result";
       __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);

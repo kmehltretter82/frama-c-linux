@@ -11,7 +11,6 @@
 #define __FC_STDIO_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 #include "__fc_string_axiomatic.h"
 #include <stdarg.h>
 #include <stddef.h>

@@ -11,7 +11,6 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
-#include "__fc_machdep.h"
 #include "__fc_string_axiomatic.h"
 
 #define	GLOB_ERR	(1 << 0)/* Return on read errors.  */

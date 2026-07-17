@@ -11,7 +11,6 @@
 #define __FC_STDLIB_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_machdep.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_sys_wait_macros.h"
 #include "__fc_define_wchar_t.h"

@@ -604,6 +604,10 @@ let machdep_macro_name s =
 
 let gen_all_defines fmt mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
+  Format.fprintf fmt "#ifndef __FC_CAN_INCLUDE_MACHDEP__@\n";
+  Format.fprintf fmt
+    "#error \"This file is supposed to be included only from Frama-C's features.h header\"@\n";
+  Format.fprintf fmt "#endif@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
   gen_define_int fmt ("__FC_" ^ (machdep_macro_name mach.machdep_name)) 1;
   gen_byte_order fmt mach;
