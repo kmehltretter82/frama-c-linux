@@ -38,7 +38,7 @@ Save analysis performed with most domains.
   [eva] Warning: Cannot save states of apron-octagon domain on disk.
 
 Load analysis file.
-  $ frama-c -load eva.sav
+  $ frama-c -no-autoload-plugins -load-module eva,eva.apron,inout,scope -load eva.sav
   [eva:experimental] Warning: The apron-octagon domain is experimental.
   [eva:experimental] Warning: The numerors domain is experimental.
   [eva:experimental] Warning: The taint domain is experimental.
