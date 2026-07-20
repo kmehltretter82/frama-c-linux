@@ -16,6 +16,9 @@
 , gnused
 , llvmPackages
 , pcre2
+# UnitCheck
+, alcotest
+, angstrom
 # Frama-C build
 , apron
 , camlzip
@@ -78,6 +81,7 @@ stdenvNoCC.mkDerivation rec {
   ];
 
   buildInputs = [
+    angstrom
     apron
     camlp-streams
     camlzip
@@ -110,6 +114,7 @@ stdenvNoCC.mkDerivation rec {
     zarith
     zmq
     # Tests
+    alcotest
     alt-ergo
     check-jsonschema
     dos2unix
