@@ -1363,7 +1363,7 @@ let pp_enabled_if_bin fmt (bins, deps) =
     Fmt.(list (var_binavailable Format.pp_print_string)) bins
 
 let pp_command_deps fmt command =
-  Format.fprintf fmt "%S %a (package frama-c) %a %a"
+  Format.fprintf fmt "%S %a (package frama-c) %a %a (env_var FC_FORCE_PTESTS)"
     (* the test file *)
     command.file
     (* from DEPS: LIBS: and MODULE: directives *)
