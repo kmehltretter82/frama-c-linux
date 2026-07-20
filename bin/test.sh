@@ -149,7 +149,11 @@ function RunBench
         # The --prepare option is because we cannot use dune --force to re-run
         # our tests for now. It can be removed once dune --force works as
         # expected.
-        Run hyperfine --warmup 5 --prepare "make clean && make && make run-ptests" "$*"
+        # Our ptests tests depend on the FC_FORCE_PTESTS environment variable,
+        # hyperfine needs to change the value of that variable between each run.
+        # The current timestamp (with nanoseconds) is assigned to this
+        # variable for each run in order to do that.
+        Run hyperfine --warmup 1 "FC_FORCE_PTESTS=\$(date +%s.%N) $*"
     else
         Run "$@"
     fi
@@ -278,6 +282,18 @@ if [ "$FORCE" = "yes" ]; then
     # directory, instead we pass --force to dune to force these tests to
     # be reexecuted as if the build directory were removed.
     DUNE_OPT+=("--force")
+fi
+
+if [ "$FORCE" = "yes" ] && [ "$BENCH" != "yes" ]; then
+    # The --force flag does not work as expected in dune and in
+    # particular cannot re-run ptests tests that declare targets. This
+    # work-around uses an environment variable as dependency for those
+    # tests, and the script assigns the current timestamp to
+    # FC_FORCE_PTESTS so that it changes every second and can trigger a
+    # re-run of the test. (another technique is used for BENCH so we
+    # only do that for "FORCE and not BENCH").
+    FC_FORCE_PTESTS="$(date +%s)"
+    export FC_FORCE_PTESTS
 fi
 
 if [ "$UPDATE" = "yes" ] || [ "$GENERATE" = "yes" ]; then
