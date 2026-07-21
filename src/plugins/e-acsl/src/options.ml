@@ -16,6 +16,10 @@ module P = Plugin.Register
     end)
 include P
 
+module Group = struct
+  let widening = add_group "Tweaking integer analysis (experts only)"
+end
+
 module Run =
   False
     (struct
@@ -145,10 +149,14 @@ module Interlang_opt =
 module Widening_arguments_base =
   Int
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = 1
       let option_name = "-e-acsl-widening-arguments-base"
       let arg_name = "n"
-      let help = "widening strategy for arguments of recursive functions."
+      let help = "tweak integer analysis by using <n> as a default value for \
+                  arguments during the widening of recursive functions. \
+                  May be used to improve performance of integer arithmetics \
+                  at the cost of a slower compilation time."
     end)
 let () = Widening_arguments_base.set_range ~min:0 ~max:2
 
@@ -156,20 +164,26 @@ module Widening_arguments =
   String_map
     (Value_int)
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-arguments"
       let arg_name = ""
-      let help = "widening strategy for arguments of functions on a case by case \
-                  basis."
+      let help = Format.asprintf
+          "like %s, but defines specific values for individual functions. \
+           For example f1:3,f2:4 uses the values 3 and 4 for f1 and f2."
+          Widening_arguments_base.name
     end)
 
 module Widening_output_base =
   Int
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = 1
       let option_name = "-e-acsl-widening-output-base"
       let arg_name = "n"
-      let help = "wideining strategy for output of recursive functions."
+      let help = Format.asprintf
+          "like %s, but defines a value for results (and not arguments)"
+          Widening_arguments_base.name
     end)
 let () = Widening_output_base.set_range ~min:0 ~max:2
 
@@ -177,11 +191,13 @@ module Widening_output =
   String_map
     (Value_int)
     (struct
+      let () = Parameter_customize.set_group Group.widening
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-output"
       let arg_name = ""
-      let help = "widening strategy for output of recursive functions on a case
-      by case basis."
+      let help = Format.asprintf
+          "like %s, but defines values for results (and not arguments)"
+          Widening_arguments.name
     end)
 
 let parameter_states =

@@ -58,17 +58,6 @@ Options taking a string as argument should preferably be written
 -e-acsl-validate-format-strings  enable runtime validation of stdio.h format
                     functions (opposite option is
                     -e-acsl-no-validate-format-strings)
--e-acsl-widening-arguments <s>  widening strategy for arguments of functions
-                    on a case by case basis. (preferably use
-                    -e-acsl-widening-arguments="")
--e-acsl-widening-arguments-base <n>  widening strategy for arguments of
-                    recursive functions.
--e-acsl-widening-output <s>  widening strategy for output of recursive
-                    functions on a case
-                          by case basis. (preferably use
-                    -e-acsl-widening-output="")
--e-acsl-widening-output-base <n>  wideining strategy for output of recursive
-                    functions.
 
 *** DEBUG
 
@@ -102,3 +91,20 @@ Options taking a string as argument should preferably be written
                     warning, error, abort, feedback-once, warning-once,
                     error-once. Defaults to warning. (preferably use
                     -e-acsl-warn-key="k1[=s1][,...,kn[=sn]]")
+
+*** TWEAKING INTEGER ANALYSIS (EXPERTS ONLY)
+
+-e-acsl-widening-arguments <s>  like -e-acsl-widening-arguments-base, but
+                    defines specific values for individual functions. For
+                    example f1:3,f2:4 uses the values 3 and 4 for f1 and f2.
+                    (preferably use -e-acsl-widening-arguments="")
+-e-acsl-widening-arguments-base <n>  tweak integer analysis by using <n> as a
+                    default value for arguments during the widening of
+                    recursive functions. May be used to improve performance
+                    of integer arithmetics at the cost of a slower
+                    compilation time.
+-e-acsl-widening-output <s>  like -e-acsl-widening-arguments, but defines
+                    values for results (and not arguments) (preferably use
+                    -e-acsl-widening-output="")
+-e-acsl-widening-output-base <n>  like -e-acsl-widening-arguments-base, but
+                    defines a value for results (and not arguments)
