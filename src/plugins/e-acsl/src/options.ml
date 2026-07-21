@@ -80,7 +80,6 @@ module Full_mtracking =
       let option_name = "-e-acsl-full-mtracking"
       let help = "maximal memory-related instrumentation"
     end)
-let () = Full_mtracking.add_aliases ~deprecated:true [ "-e-acsl-full-mmodel" ]
 
 module Builtins =
   String_set

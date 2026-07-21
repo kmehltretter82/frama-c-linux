@@ -323,7 +323,7 @@ check_getopt;
 
 # Getopt options
 LONGOPTIONS="help,compile,no-compile,compile-only,debug:,ocode:,oexec:,verbose:,
-  frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
+  frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mtracking,gmp,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
   print-mmodels,rt-debug,rte-select:,then,then-last,e-acsl-extra:,check,no-constfold,
@@ -570,11 +570,7 @@ do
       OPTION_FRAMA_STDLIB="-frama-c-stdlib"
     ;;
     # Use as much memory-related instrumentation as possible
-    -M|--full-mtracking|--full-mmodel)
-      if [ "$i" = "--full-mmodel" ]; then
-        warning "--full-mmodel is a deprecated alias for option --full-mtracking."
-        warning "Please use --full-mtracking instead."
-      fi
+    -M|--full-mtracking)
       shift;
       OPTION_FULL_MTRACKING="-e-acsl-full-mtracking"
     ;;

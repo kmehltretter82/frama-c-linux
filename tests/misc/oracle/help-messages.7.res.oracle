@@ -27,7 +27,6 @@ Options taking a string as argument should preferably be written
                     -e-acsl-no-concurrency)
 -e-acsl-full-mtracking  maximal memory-related instrumentation (opposite
                     option is -e-acsl-no-full-mtracking)
--e-acsl-full-mmodel  alias for option -e-acsl-full-mtracking
 -e-acsl-functions <f1, ..., fn>  only annotations in functions f1, ..., fn
                     are checked at runtime (preferably use
                     -e-acsl-functions="f1, ..., fn")
