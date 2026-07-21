@@ -2083,22 +2083,40 @@ let warn_if_not_enabled =
           (escaped_cond cond) (safe_cond cond)
       in
       let conds = StringSet.elements enabled_if in
-      Format.fprintf fmt
-        "(rule ; Warns when some test conditions are disabled\n  \
-         (alias disabled_%s)\n  \
-         (deps (universe))\n  \
-         (enabled_if (or false %a))\n  \
-         (action (progn (echo \"WARNING: Enabling conditions of some tests are false for @@%s/%s\\n\")\n  \
-         %a))\n\
-         )@."
-        (* alias: *)
-        (ptests_alias ~env)
-        (* enabled_if *)
-        (Fmt.list pp_disabled) conds
-        (* action: *)
-        suite
-        (ptests_alias ~env)
-        (Fmt.list pp_enabled) conds
+      if not @@ !never_disabled then
+        Format.fprintf fmt
+          "(rule ; Warns when some test conditions are disabled\n  \
+           (alias disabled_%s)\n  \
+           (deps (universe))\n  \
+           (enabled_if (or false %a))\n  \
+           (action (progn (echo \"WARNING: Enabling conditions of some tests are false for @@%s/%s\\n\")\n  \
+           %a))\n\
+           )@."
+          (* alias: *)
+          (ptests_alias ~env)
+          (* enabled_if *)
+          (Fmt.list pp_disabled) conds
+          (* action: *)
+          suite
+          (ptests_alias ~env)
+          (Fmt.list pp_enabled) conds
+      else
+        Format.fprintf fmt
+          "(rule ; Warns when some test conditions are disabled\n  \
+           (alias disabled_%s)\n  \
+           (deps (universe))\n  \
+           (enabled_if (or false %a))\n  \
+           (action (progn (echo \"WARNING: Force run of some tests in @@%s/%s despite enabling condition evaluating to false\\n\")\n  \
+           %a))\n\
+           )@."
+          (* alias: *)
+          (ptests_alias ~env)
+          (* enabled_if *)
+          (Fmt.list pp_disabled) conds
+          (* action: *)
+          suite
+          (ptests_alias ~env)
+          (Fmt.list pp_enabled) conds
     end
 
 let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
