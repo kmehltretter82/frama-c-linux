@@ -2,12 +2,12 @@ Tests that the automatic configuration by -eva-verbose N does not overwrite
 message and warning categories set by the user.
 
 Verbose 0: no message, even if the user enables some keys.
-  $ frama-c -commands-file options.txt -eva-verbose 0 -eva-msg-key=summary,show -eva-warn-key="loop-unroll=feedback"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 0 -eva-msg-key=summary,show -eva-warn-key="loop-unroll=feedback"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
 
 Verbose 1: summary but no message from "show" or "loop-unroll".
-  $ frama-c -commands-file options.txt -eva-verbose 1
+  $ frama-c -commands-file options.txt file.i -eva-verbose 1
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -24,7 +24,7 @@ Verbose 1: summary but no message from "show" or "loop-unroll".
     ----------------------------------------------------------------------------
 
 Verbose 1 but disable "summary" and enable "show" and "loop-unroll".
-  $ frama-c -commands-file options.txt -eva-verbose 1 -eva-msg-key=-summary -eva-msg-key=show -eva-warn-key="loop-unroll:auto=feedback" -eva-warn-key="loop-unroll:partial=feedback"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 1 -eva-msg-key=-summary -eva-msg-key=show -eva-warn-key="loop-unroll:auto=feedback" -eva-warn-key="loop-unroll:partial=feedback"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -33,7 +33,7 @@ Verbose 1 but disable "summary" and enable "show" and "loop-unroll".
   [eva:show] file.i:13: Frama_C_show_each: {9}
 
 Idem but with a different syntax.
-  $ frama-c -commands-file options.txt -eva-verbose 1 -eva-msg-key=-summary,show -eva-warn-key="loop-unroll=feedback,loop-unroll:missing=ignore"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 1 -eva-msg-key=-summary,show -eva-warn-key="loop-unroll=feedback,loop-unroll:missing=ignore"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -42,7 +42,7 @@ Idem but with a different syntax.
   [eva:show] file.i:13: Frama_C_show_each: {9}
 
 Verbose 4: "summary", "show", "partition" and "loop-unroll" are enabled by default.
-  $ frama-c -commands-file options.txt -eva-verbose 4
+  $ frama-c -commands-file options.txt file.i -eva-verbose 4
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -63,21 +63,21 @@ Verbose 4: "summary", "show", "partition" and "loop-unroll" are enabled by defau
     ----------------------------------------------------------------------------
 
 Verbose 4 but disable "summary", "show" and "loop-unroll".
-  $ frama-c -commands-file options.txt -eva-verbose 4 -eva-msg-key=-summary -eva-msg-key=-show -eva-warn-key="loop-unroll:auto=ignore" -eva-warn-key="loop-unroll:partial=ignore"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 4 -eva-msg-key=-summary -eva-msg-key=-show -eva-warn-key="loop-unroll:auto=ignore" -eva-warn-key="loop-unroll:partial=ignore"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
   [eva:partition] file.i:8: starting to merge loop iterations
 
 Idem but with a different syntax.
-  $ frama-c -commands-file options.txt -eva-verbose 4 -eva-msg-key=-summary,-show -eva-warn-key="loop-unroll=ignore"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 4 -eva-msg-key=-summary,-show -eva-warn-key="loop-unroll=ignore"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
   [eva:partition] file.i:8: starting to merge loop iterations
 
 Verbose 1 but warn on "loop-unroll".
-  $ frama-c -commands-file options.txt -eva-verbose 1 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 1 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -88,7 +88,7 @@ Verbose 1 but warn on "loop-unroll".
   [eva:show] file.i:13: Frama_C_show_each: {9}
 
 Verbose 4 but warn on "loop-unroll".
-  $ frama-c -commands-file options.txt -eva-verbose 4 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
+  $ frama-c -commands-file options.txt file.i -eva-verbose 4 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
@@ -98,3 +98,27 @@ Verbose 4 but warn on "loop-unroll".
     for loop without unroll annotation
   [eva:loop-unroll:auto] file.i:11: Warning: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
+
+Verbose 1 should disable "malloc" key but not "malloc:new" set by user.
+  $ frama-c -commands-file options.txt malloc.c -eva-verbose 1 -eva-msg-key=malloc:new,-summary
+  [kernel] Expanding arguments from options.txt
+  [kernel] Parsing malloc.c (with preprocessing)
+  [eva] Analyzing a complete application starting at main
+  [eva:malloc:new] malloc.c:5: allocating variable __malloc_main_l5
+
+Verbose 8 should enable "malloc" but not "malloc:new" unset by user.
+  $ frama-c -commands-file options.txt malloc.c -eva-verbose 8 -eva-msg-key=-malloc:new,-summary
+  [kernel] Expanding arguments from options.txt
+  [kernel] Parsing malloc.c (with preprocessing)
+  [eva:widen-hints] computing global widen hints
+  [eva] Analyzing a complete application starting at main
+  [eva:initial-state] Values of globals at initialization
+    
+  [eva:malloc] malloc.c:8: weak free on bases: {__malloc_main_l5}
+  [eva] ====== VALUES COMPUTED ======
+  [eva:final-states] Values at end of function main:
+    __fc_heap_status ∈ [--..--]
+    __fc_errno ∈ [--..--]
+    p ∈ {{ NULL ; &__malloc_main_l5 }} or ESCAPINGADDR
+    __malloc_main_l5 ∈ {42} or UNINITIALIZED
+

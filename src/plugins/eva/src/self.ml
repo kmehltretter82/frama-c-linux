@@ -6,28 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Parses a string given to -eva-msg-key or -eva-warn-key into a list of
-   message or warning category names. *)
-let parse_categories s =
-  let categories = String.split_on_char ',' s in
-  let parse_name s =
-    match String.split_on_char '=' s with
-    | [] -> assert false (* split_on_char never returns an empty list *)
-    | "" :: _ -> None
-    | name :: _ ->
-      match String.get name 0 with
-      | '-' | '+' -> Some (String.sub name 1 (String.length name - 1))
-      | _ -> Some name
-  in
-  List.filter_map parse_name categories
-
-(* Split a category "x:y:z" into a list of subcategories "x", "x:y", "x:y:z". *)
-let split_category name =
-  let list = String.split_on_char ':' name in
-  let concat acc elt = let acc = acc ^ elt in acc ^ ":", acc in
-  snd (List.fold_left_map concat "" list)
-
-
 let default_verbosity = 5
 let () = Plugin.set_default_verbose_level default_verbosity
 
@@ -97,24 +75,36 @@ let clear_results () =
 
 (* ----- Verbosity configuration -------------------------------------------- *)
 
-(* List of message and warn categories manually set by the user via -eva-msg-key
-   or -eva-warn-key. Here, names of both category kinds are in the same list,
-   assuming no messages and warnings share the same category name.
-   In Log, enabled categories are not projectified nor saved on disk, so we
-   simply use a reference. *)
-let user_categories : string list ref = ref []
-let add_user_category s = user_categories := s :: !user_categories
+(* Returns a function that re-applies all strings manually set by the user to
+   parameter M. This is used to reset categories set by parameters -eva-msg-key
+   and -eva-warn-key. *)
+let reset_string_parameter (module M: Parameter_sig.String) =
+  (* Reference to the list of strings provided by the user for parameter M.
+     In Log, enabled categories are not projectified nor saved on disk, so we
+     simply use a reference. *)
+  let string_list = ref [] in
+  (* Reference used to prevent reentry by the hook below. *)
+  let active = ref true in
+  (* Register all strings set by the user in [string_list] reference. *)
+  let hook _ s = if !active then string_list := s :: !string_list in
+  M.add_set_hook hook;
+  fun () ->
+    (* Avoid setting the parameter if it was not set by the user. *)
+    if !string_list <> [] then begin
+      active := false;
+      (* Re-apply all strings in the order they were set by the user.
+         Start by setting "" to ensure next strings are really applied. *)
+      List.iter M.unsafe_set ("" :: List.rev !string_list);
+      active := true
+    end
 
-(* Avoid enabling/disabling categories set by the user. *)
-let is_used_category name =
-  split_category name |>
-  List.exists (fun name -> List.mem name !user_categories)
+(* Returns a function that re-applies all message and warning categories
+   previously set by the user via -eva-msg-key or -eva-warn-key. *)
+let reset_user_categories =
+  let reset_messages = reset_string_parameter (module Message_category) in
+  let reset_warnings = reset_string_parameter (module Warn_category) in
+  fun () -> reset_messages (); reset_warnings ()
 
-(* Hook to register categories set by the user. *)
-let () =
-  let hook _ s = parse_categories s |> List.iter add_user_category in
-  Message_category.add_set_hook hook;
-  Warn_category.add_set_hook hook
 
 module IntTbl = Hashtbl.Make (Datatype.Int)
 
@@ -136,23 +126,21 @@ let register_key_verbosity tbl category level =
     let list = IntTbl.find_default ~default:[] tbl level in
     IntTbl.replace tbl level (category :: list)
 
-(* Enable/disable message and warning categories according to -eva-verbose,
-   except for categories manually set by the user. *)
+(* Enable/disable message and warning categories according to -eva-verbose. *)
 let configure_verbosity () =
   let level = Verbose.get () in
-  let change_message positive category =
-    if not (is_used_category (dkey_name category)) then
-      (if positive then add_debug_keys else del_debug_keys) category
+  let change_message i =
+    if i <= level then add_debug_keys else del_debug_keys
   in
-  let enable i list = List.iter (change_message (i <= level)) list in
-  IntTbl.iter enable dkey_by_verbosity;
-  let change_warning positive warn_category =
-    if not (is_used_category (wkey_name warn_category)) then
-      let status = if positive then Log.Wfeedback else Log.Winactive in
-      set_warn_status warn_category status
+  IntTbl.iter (fun i -> List.iter (change_message i)) dkey_by_verbosity;
+  let change_warning i warn_category =
+    let status = if i <= level then Log.Wfeedback else Log.Winactive in
+    set_warn_status warn_category status
   in
-  let enable i list = List.iter (change_warning (i <= level)) list in
-  IntTbl.iter enable wkey_by_verbosity
+  IntTbl.iter (fun i -> List.iter (change_warning i)) wkey_by_verbosity;
+  (* Reset all message and warning categories previously set by the user,
+     which may have been erased by operations above.  *)
+  reset_user_categories ()
 
 (* Makes the help message mandatory and adds an optional verbosity level. *)
 let register_category ?level ~help name =
