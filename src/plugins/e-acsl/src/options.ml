@@ -70,8 +70,9 @@ module Replace_libc_functions =
   False
     (struct
       let option_name = "-e-acsl-replace-libc-functions"
-      let help = "replace some libc functions (such as strcpy) with built-in\
-                  RTL alternatives"
+      let help = "replace some libc functions (such as strcpy) with built-in \
+                  RTL alternatives, which have function contracts and \
+                  additional runtime safe-guards"
     end)
 
 module Full_mtracking =

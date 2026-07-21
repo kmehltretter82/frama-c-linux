@@ -481,14 +481,14 @@ the one of your system. If you do not want to use it, you have to add the option
 \shortopt{no-framac-stdlib}\optionidx{-}{framac-stdlib} to the \framac command
 line.
 
-It might be particularly useful in one of the following contexts:
+This might be particularly useful in one of the following contexts:
 \begin{itemize}
   \item several libc functions used by the analyzed program are still not defined
         in the \framac libc; or
   \item your system libc and the \framac libc mismatch about several function
         types (for instance, your system libc is not 100\% POSIX compliant); or
   \item several \framac lib functions get a contract and you are not interested in
-        verifying them (for instance, only checking undefine behaviors matters).
+        verifying them (for instance, only checking undefined behaviors matters).
 \end{itemize}
 
 \begin{important}
@@ -944,19 +944,21 @@ Abort
 \subsection{Incorrect Usage of Libc Functions}
 \index{Libc}
 
-Whenever option \longopt{libc-replacements} of \eacslgcc is set, \eacsl is
-able to detect incorrect usage of the following libc functions:
+Whenever option \longopt{libc-replacements} of \eacslgcc is set
+(or equivalently: the option \texttt{-e-acsl-replace-libc-functions} of \framac),
+\eacsl is able to detect incorrect usage of the following libc functions:
 \begin{itemize}
-  \item \texttt{memcmp}
-  \item \texttt{memcpy}
-  \item \texttt{memmove}
-  \item \texttt{memset}
-  \item \texttt{strcat}
-  \item \texttt{strncat}
-  \item \texttt{strcmp}
-  \item \texttt{strcpy}
-  \item \texttt{strncpy}
-  \item \texttt{strlen}
+  \item \textttuse{memcmp}
+  \item \textttuse{memcpy}
+  \item \textttuse{memmove}
+  \item \textttuse{memset}
+  \item \textttuse{strcat}
+  \item \textttuse{strncat}
+  \item \textttuse{strcmp}
+  \item \textttuse{strncmp}
+  \item \textttuse{strcpy}
+  \item \textttuse{strncpy}
+  \item \textttuse{strlen}
 \end{itemize}
 
 For instance, the program below incorrectly uses \texttt{strcpy} because the

@@ -45,8 +45,9 @@ Options taking a string as argument should preferably be written
 -e-acsl-project <prj>  the name of the generated project is <prj> (default to
                     "e-acsl") (preferably use -e-acsl-project="prj")
 -e-acsl-replace-libc-functions  replace some libc functions (such as strcpy)
-                    with built-inRTL alternatives (opposite option is
-                    -e-acsl-no-replace-libc-functions)
+                    with built-in RTL alternatives, which have function
+                    contracts and additional runtime safe-guards (opposite
+                    option is -e-acsl-no-replace-libc-functions)
 -e-acsl-share <dir>  set the plug-in share directory to <dir> (may be used if
                     the plug-in is not installed at the same place as
                     Frama-C)
