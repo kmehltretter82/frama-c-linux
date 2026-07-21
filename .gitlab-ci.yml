@@ -39,9 +39,6 @@ variables:
   NODE: "24"
   # Specific options for Opam
   OPAM_OPTS: "--with-test --with-doc"
-  # Linux Bundle configuration
-  BUNDLE_DEBIAN: "11"
-  BUNDLE_OCAML: "5.4.1"
   # CI mode configuration
   PUBLISH: "no"
   RELEASE: "no"
@@ -393,24 +390,7 @@ build-distrib-tarball:
 # Build linux bundle
 
 .build_template: &bundle_docker_setup
-  image: "debian:$BUNDLE_DEBIAN"
-  before_script:
-    - apt update
-    - apt install -y git curl bubblewrap gcc make autoconf m4
-    # TS
-    - apt install -y xvfb curl unzip libnss3 libasound2-plugins
-    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - . "$NVM_DIR/nvm.sh"
-    - nvm install $NODE
-    - nvm use node $NODE
-    - corepack enable
-    # Install Opam
-    - curl -fsSL https://opam.ocaml.org/install.sh -o install.sh
-    - chmod +x install.sh
-    - echo | ./install.sh
-    - rm install.sh
-    - opam init -y
+  image: 'registry.frama-c.com/frama-c/frama-c:release'
 
 .build_template: &linux_bundle
   script:
