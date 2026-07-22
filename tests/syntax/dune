@@ -28,4 +28,12 @@
 (cram
   (applies_to cpp-command)
   (enabled_if %{read:../../python-3.10-available})
+  (deps cram-filter.py)
+)
+
+(cram
+  (applies_to force-posix)
+  (enabled_if (and %{read:../../python-3.10-available}
+                   %{read:../../gcc-is-genuine}))
+  (deps cram-filter.py)
 )
