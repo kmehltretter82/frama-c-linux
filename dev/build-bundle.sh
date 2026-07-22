@@ -83,7 +83,7 @@ cd ..
 git clone \
   https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/frama-c/meta.git \
   -b "$DEFAULT" \
-  src/plugins/meta
+  plugins/meta
 
 dune build --release --promote-install-files=false @install
 dune install --root . --prefix "./bundle" --relocatable

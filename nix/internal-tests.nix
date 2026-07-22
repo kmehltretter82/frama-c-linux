@@ -160,7 +160,7 @@ stdenvNoCC.mkDerivation rec {
   checkPhase = ''
     runHook preCheck
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
-    dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
+    dune exec -- frama-c-ptests -never-disabled tests plugins/*/tests
     dune build -j1 @runtest @ptests_config
   '';
 

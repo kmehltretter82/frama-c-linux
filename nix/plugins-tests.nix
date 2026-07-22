@@ -26,17 +26,17 @@ let plugins = [
 ]; in
 let ptests_aliases =
   builtins.toString
-    (builtins.map (plugin: "@src/plugins/" + plugin + "/tests/ptests") plugins);
+    (builtins.map (plugin: "@plugins/" + plugin + "/tests/ptests") plugins);
 in
 let runtest_aliases =
   builtins.toString
-    (builtins.map (plugin: "@src/plugins/" + plugin + "/runtest") plugins);
+    (builtins.map (plugin: "@plugins/" + plugin + "/runtest") plugins);
 in
 
 mk_tests {
   tests-name = "plugins-tests";
   tests-command = ''
-    dune exec -- frama-c-ptests -never-disabled src/plugins/*/tests
+    dune exec -- frama-c-ptests -never-disabled plugins/*/tests
     dune build -j1 ${ptests_aliases}
     dune build -j1 ${runtest_aliases}
   '';

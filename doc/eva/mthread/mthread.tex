@@ -8,7 +8,7 @@
 \newcommand{\pthreads}{\library{pthreads}}
 
 % this is for compilation purposes
-\def\evadir{../../src/plugins/eva}
+\def\evadir{../../plugins/eva}
 \def\sharedir{\evadir/share/mthread}
 \def\testdir{\evadir/tests/mthread}
 \def\mthreadtexdir{./mthread}
@@ -453,7 +453,7 @@ Let us consider an event $e$ for an access to a zone $z$.
 \end{description}
 %
 An example of the various cases above can be found in the file
-\verb+src/plugins/eva/tests/mthread/sharedvars.c+,
+\verb+plugins/eva/tests/mthread/sharedvars.c+,
 which we do not reproduce below for space consideration.
 Of the 6 variables of the programs, 3 are shared (those starting by \verb+'s'+)
 and 3 are not (those starting by \verb+'u'+).
@@ -552,7 +552,7 @@ The functions currently supported by
 \mthread are detailed in the next sections.
 
 In this chapter, and unless stated otherwise, the files we refer to
-are located in the \verb+src/plugins/eva/share/mthread/+ directory of \FramaC
+are located in the \verb+plugins/eva/share/mthread/+ directory of \FramaC
 sources, or alternatively in the \verb+share/mt+ of the Frama-C installation.
 After installation, this directory can be found by running the command
 \verb+echo $(frama-c -print-share-path)/mt+. This directory will be

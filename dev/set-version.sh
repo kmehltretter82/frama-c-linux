@@ -96,7 +96,7 @@ else
       $SED -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" $FC_CHANGELOG;
   fi
 
-  EA_CHANGELOG="src/plugins/e-acsl/doc/Changelog"
+  EA_CHANGELOG="plugins/e-acsl/doc/Changelog"
   EA_CL_MSG_FUTURE="Plugin E-ACSL <next-release>"
   EA_CL_MSG_NEXT="Plugin E-ACSL $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
@@ -104,7 +104,7 @@ else
       $SED -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" $EA_CHANGELOG
   fi
 
-  WP_CHANGELOG="src/plugins/wp/Changelog"
+  WP_CHANGELOG="plugins/wp/Changelog"
   WP_CL_MSG_FUTURE="Plugin WP <next-release>"
   WP_CL_MSG_NEXT="Plugin WP $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
@@ -114,6 +114,7 @@ else
 
   # API doc
   find src -name '*.ml*' -exec $SED -i -e "s/Frama-C\(+\|~\)dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
+  find plugins -name '*.ml*' -exec $SED -i -e "s/Frama-C\(+\|~\)dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
 
   # Manuals changes
   $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
@@ -123,13 +124,13 @@ else
   $SED -i "s/\(^\\\\subsection{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
     doc/aorai/main.tex
   $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
-    src/plugins/acsl-importer/doc/manual/user-changes.tex
+    plugins/acsl-importer/doc/manual/user-changes.tex
   $SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
-    src/plugins/e-acsl/doc/userman/changes.tex
+    plugins/e-acsl/doc/userman/changes.tex
   $SED -i "s/\(^\\\\subsection\*{Version Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\subsection\*{Version $NEXT_CODENAME-$NEXT_MAJOR}/g" \
-    src/plugins/e-acsl/doc/refman/changes_modern.tex
+    plugins/e-acsl/doc/refman/changes_modern.tex
   $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
-    src/plugins/volatile/doc/manual/user-changes.tex
+    plugins/volatile/doc/manual/user-changes.tex
 
   # Reference configuration
   $SED -i "s/Frama-C [1-9][0-9]\.[0-9]/Frama-C $NEXT_MAJOR.$NEXT_MINOR/gI" \

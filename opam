@@ -119,7 +119,7 @@ remove: [
 ]
 
 run-test: [
-  ["dune" "exec" "--release" "--" "frama-c-ptests" "tests" "src/plugins/*/tests"
+  ["dune" "exec" "--release" "--" "frama-c-ptests" "tests" "plugins/*/tests"
   ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd" & os-family != "windows"}
   ["dune" "build" "--release" "-j%{jobs}%" "@ptests_config"
   ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd" & os-family != "windows"}

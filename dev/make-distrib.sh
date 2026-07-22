@@ -122,13 +122,13 @@ fi
 
 declare -a FC_PLUGINS
 while IFS= read -r -d $'\0' p; do FC_PLUGINS+=("$p"); done < <(
-  find src/plugins -mindepth 1 -maxdepth 1 -type d -print0)
+  find plugins -mindepth 1 -maxdepth 1 -type d -print0)
 declare -a IVETTE_PLUGINS
 while IFS= read -r -d $'\0' p; do IVETTE_PLUGINS+=("$p"); done < <(
   find ivette/src/frama-c/plugins -mindepth 1 -maxdepth 1 -type d -print0)
 declare -a FC_EXTERNAL_PLUGINS
 while IFS= read -r -d $'\0' p; do FC_EXTERNAL_PLUGINS+=("$p"); done < <(
-  find src/plugins -type d -name ".git" -print0 | sed "s/\/.git//g")
+  find plugins -type d -name ".git" -print0 | sed "s/\/.git//g")
 declare -a IVETTE_EXTERNAL_PLUGINS
 while IFS= read -r -d $'\0' p; do IVETTE_EXTERNAL_PLUGINS+=("$p"); done < <(
   find ivette/src/frama-c/plugins -type d -name ".git" -print0 | sed "s/\/.git//g")

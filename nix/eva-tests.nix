@@ -2,11 +2,11 @@
 
 let eva-tests = "eva-tests" + (if config == "" then "" else "-" + config); in
 let ptests = "ptests_config" + (if config == "" then "" else "_" + config) ; in
-let eva-test-dir = "src/plugins/eva/tests" ; in
+let eva-test-dir = "plugins/eva/tests" ; in
 let eva-test-target = "@${eva-test-dir}/${ptests}" ; in
 
 # Only run cram tests on the default configuration.
-let cram-tests-cmd = "dune runtest -j1 src/plugins/eva"; in
+let cram-tests-cmd = "dune runtest -j1 plugins/eva"; in
 let eva-cram-tests = if config == "" then cram-tests-cmd else ""; in
 
 mk_tests {

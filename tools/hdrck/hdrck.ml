@@ -28,7 +28,7 @@ type spec_format = Sep1Line1 (* <space>* FileName <space>* `:` <space>* HeaderId
 
 (* From the git archive
    > git ls-files -z | git check-attr --stdin -z header_spec \
-     | headers/hdrck --stdin -z -header-dirs headers/open-source -header-dirs src/plugins/e-acsl/headers/open-source
+     | headers/hdrck --stdin -z -header-dirs headers/open-source -header-dirs plugins/e-acsl/headers/open-source
 *)
 
 (* Parameters settable from command line and/or environment variables *)

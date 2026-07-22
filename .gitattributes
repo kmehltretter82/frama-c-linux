@@ -56,7 +56,7 @@ Changelog merge=union
 # Unchecked C files
 
 tests/**/*.[ch] -check-indent
-src/plugins/*/tests/**/*.[ch] -check-indent
+plugins/*/tests/**/*.[ch] -check-indent
 
 doc/aorai/**/*.[ch]  -check-indent
 doc/developer/**/*.[ch] -check-indent
@@ -65,14 +65,14 @@ doc/rte/**/*.[ch] -check-indent
 doc/userman/examples/generated/*.[ch] -check-indent
 share/**/*.[ch] -check-indent
 
-src/plugins/wp/doc/**/*.[ch] -check-indent
+plugins/wp/doc/**/*.[ch] -check-indent
 
 # Unchecked python files
 
 share/analysis-scripts/benchmark_database.py -check-indent
 share/analysis-scripts/summary.py -check-indent
 share/analysis-scripts/results_display.py -check-indent
-src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
+plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 ## Unset "-check-eoleof"
 

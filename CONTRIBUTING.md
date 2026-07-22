@@ -60,7 +60,7 @@ The detailed steps to submit a contribution to Frama-C are:
   the [coding conventions](#coding-conventions);
 
 6. (Optional) Locally add non-regression test cases to the appropriate
-  subdirectory in `./tests/` or `./src/plugins/<plugin>/tests/`.
+  subdirectory in `./tests/` or `./plugins/<plugin>/tests/`.
   Consult the [plug-in developer manual](https://frama-c.com/download/frama-c-plugin-development-guide.pdf)
   for details on how to run tests inside Frama-C.
   You can also provide the non-regression test case in the Gitlab issue

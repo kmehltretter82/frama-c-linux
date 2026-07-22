@@ -26,7 +26,7 @@ _coverage
 _bisect
 
 # This file is generated (on need) during configure
-/src/plugins/dune
+/plugins/dune
 
 #lint
 /.lint/
@@ -37,8 +37,8 @@ _bisect
 /tests/**/result*/
 /tests/**/oracle*/dune
 
-/src/plugins/*/tests/**/result*/
-/src/plugins/*/tests/**/oracle*/dune
+/plugins/*/tests/**/result*/
+/plugins/*/tests/**/oracle*/dune
 
 /tests/crowbar/*constfold
 /tests/crowbar/integer_bb_pretty
@@ -120,18 +120,18 @@ _bisect
 /doc/server/
 
 #plugins
-/src/plugins/*/doc/*/*.dot
-/src/plugins/*/doc/*/*.aux
-/src/plugins/*/doc/*/*.bbl
-/src/plugins/*/doc/*/*.blg
-/src/plugins/*/doc/*/*.cb*
-/src/plugins/*/doc/*/*.ilg
-/src/plugins/*/doc/*/*.ind
-/src/plugins/*/doc/*/*.toc
-/src/plugins/*/doc/*/*.lof
-/src/plugins/*/doc/*/*.log
-/src/plugins/*/doc/*/*.out
-/src/plugins/*/doc/*/*.idx
+/plugins/*/doc/*/*.dot
+/plugins/*/doc/*/*.aux
+/plugins/*/doc/*/*.bbl
+/plugins/*/doc/*/*.blg
+/plugins/*/doc/*/*.cb*
+/plugins/*/doc/*/*.ilg
+/plugins/*/doc/*/*.ind
+/plugins/*/doc/*/*.toc
+/plugins/*/doc/*/*.lof
+/plugins/*/doc/*/*.log
+/plugins/*/doc/*/*.out
+/plugins/*/doc/*/*.idx
 
 # WP/Coq Generated file
 .lia.cache
