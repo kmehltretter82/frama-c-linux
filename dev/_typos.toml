@@ -131,10 +131,10 @@ extend-exclude = [
 # themselves (otherwise they might reappear in other files).
 "src/kernel/services/ast_queries/logic_const.ml",
 "src/kernel/services/ast_queries/logic_const.mli",
-"lib/datatype/structural_descr.ml",
-"lib/datatype/structural_descr.mli",
-"lib/arithmetic/finite.ml",
-"lib/arithmetic/finite.mli",
+"src/lib/datatype/structural_descr.ml",
+"src/lib/datatype/structural_descr.mli",
+"src/lib/arithmetic/finite.ml",
+"src/lib/arithmetic/finite.mli",
 # excluded because they contain French text, hashes, or contain typos that were
 # not introduced by us and we do not feel like fixing them (e.g. source code
 # written by others)

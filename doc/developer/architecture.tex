@@ -205,24 +205,24 @@ only possible one to define mutually dependent plug-ins.
 
 \section{Libraries}\label{archi:libraries}
 
-Libraries are defined in the directory \texttt{src/libraries}. They are either
+Libraries are defined in the directory \texttt{src/lib}. They are either
 third-party libraries or dedicated independent libraries which may be used by
 other parts of \framac.
 
 Extension of the \caml standard library are provided in directory
-\texttt{src/libraries/stdlib}. For instance, modules \texttt{FC$module\_name$}
+\texttt{src/lib/stdlib}. For instance, modules \texttt{FC$module\_name$}
 (e.g. \texttt{FCHashtbl}\codeidxdef{FCHashtbl}) provides a
 \texttt{$module\_name$}-like interface (e.g. \texttt{Hashtbl}) with an uniform
 API for all \ocaml versions supported by \framac and possibly additional useful
 operations for the corresponding datastructures.
 
 Single-file libraries are provided in directory
-\texttt{src/libraries/utils}. For instance,
+\texttt{src/lib/utils}. For instance,
 \texttt{Pretty\_utils}\codeidxdef{Pretty\_utils} provides pretty-printing
 facilities.
 
-\emph{datatype} (directory \texttt{src/libraries/datatype}) and \emph{project}
-(directory \texttt{src/libraries/project}) are two multiple-files
+\emph{datatype} (directory \texttt{src/lib/datatype}) and \emph{project}
+(directory \texttt{src/lib/project}) are two multiple-files
 libraries. They are respectively presented in Sections~\ref{adv:datatype} and
 \ref{adv:project}.
 
