@@ -1,0 +1,12 @@
+MACRO: EVA_MAIN_PLUGINS eva,scope
+MACRO: EVA_PLUGINS from,inout @EVA_MAIN_PLUGINS@
+MACRO: EVA_DEFAULT_OPTIONS -eva-msg-key=progress,-summary
+
+MACRO: SPARECODE_PLUGINS @EVA_PLUGINS@ sparecode
+
+PLUGIN: @SPARECODE_PLUGINS@
+OPT: @EVA_OPTIONS@ -sparecode-debug 1
+
+# Late declaration to allow redefinition of EVA_OPTIONS in subsidiary test_config files
+MACRO: EVA_OPTIONS @EVA_DEFAULT_OPTIONS@
+

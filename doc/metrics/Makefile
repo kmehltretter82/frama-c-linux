@@ -22,7 +22,7 @@ RM = rm -Rf
 STYLE_FILES = $(FRAMAC_MODERN)
 TEXFILES = metrics.tex
 
-EXAMPLE_FILE = tests/metrics/reach.c
+EXAMPLE_FILE = src/plugins/metrics/tests/metrics/reach.c
 $(TARGET): $(STYLE_FILES) $(TEXFILES)
 
 # Hack to get nicer paths (in particular, relative ones)

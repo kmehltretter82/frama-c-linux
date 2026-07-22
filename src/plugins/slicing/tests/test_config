@@ -1,0 +1,8 @@
+MACRO: EVA_DEFAULT_OPTIONS -eva-msg-key=progress,-summary
+
+PLUGIN: eva,scope slicing
+OPT: @EVA_OPTIONS@ -machdep x86_32 -add-symbolic-path="@PTEST_SUITE_DIR@/../../..:PLUGINS"
+
+# Late declaration to allow redefinition of EVA_OPTIONS in subsidiary test_config files
+MACRO: EVA_OPTIONS @EVA_DEFAULT_OPTIONS@
+
