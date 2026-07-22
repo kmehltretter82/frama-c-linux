@@ -905,12 +905,13 @@ any application of the form \lstinline|a(...)| occurring inside an annotation,
 When invoking \framac with the flag \texttt{-e-acsl-builtins=<s>} the \C functions
 in the comma-separated sequence \texttt{<s>} are added to the execution
 environment as logic functions. In this manner parts of the specification can be
-expressed in \C.
+expressed in \C. Similarly to \jml pure methods, these functions should be
+side-effect free.
 
 \listingname{builtins.c}
 \cinput{examples/builtins.c}
 
-This code is parsable if the command-line flag \texttt{-e-acsl-builtins=incr} is supplied.
+This code is parsable only if the command-line flag \texttt{-e-acsl-builtins=incr} is supplied.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
