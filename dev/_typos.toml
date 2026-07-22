@@ -155,7 +155,7 @@ extend-exclude = [
 "share/emacs/acsl.el",
 "share/libc/netinet/tcp.h",
 "src/plugins/acsl-importer/doc/manual/bib.bib",
-"src/plugins/aorai/path_analysis.ml",
+"src/plugins/aorai/src/path_analysis.ml",
 "src/plugins/e-acsl/contrib/libdlmalloc/dlmalloc.c",
 "src/plugins/e-acsl/doc/doxygen/doxygen.cfg.in",
 "src/plugins/e-acsl/doc/refman/macros_modern.tex",
