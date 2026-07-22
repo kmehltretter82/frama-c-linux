@@ -180,14 +180,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'provable' ("initialized_memvar.i", line 39, characters 23-41):
-Let a = Init_c_0.Init_F2_C_s.
-Let a_1 = Init_c_0.Init_F2_C_a.
+Let a = Init_c_0.s.
+Let a_1 = Init_c_0.a.
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 9).
   (* Pre-condition *)
-  Have: (Init_c_0.Init_F2_C_x=true) /\ (a.Init_F1_S_x=true) /\
-      (a.Init_F1_S_y=true) /\
+  Have: (Init_c_0.x=true) /\ (a.x=true) /\ (a.y=true) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) -> (a_1[i_1]=true)))).
 }
 Prove: (a_1[i]=true).
@@ -195,12 +194,11 @@ Prove: (a_1[i]=true).
 ------------------------------------------------------------
 
 Goal Check 'provable' ("initialized_memvar.i", line 40, characters 24-45):
-Let a = Init_c_0.Init_F2_C_s.
-Let a_1 = Init_c_0.Init_F2_C_a.
+Let a = Init_c_0.s.
+Let a_1 = Init_c_0.a.
 Assume {
   (* Pre-condition *)
-  Have: (Init_c_0.Init_F2_C_x=true) /\ (a.Init_F1_S_x=true) /\
-      (a.Init_F1_S_y=true) /\
+  Have: (Init_c_0.x=true) /\ (a.x=true) /\ (a.y=true) /\
       (forall i : Z. ((0 <= i) -> ((i <= 9) -> (a_1[i]=true)))).
 }
 Prove: (a_1[4]=true).
@@ -208,12 +206,11 @@ Prove: (a_1[4]=true).
 ------------------------------------------------------------
 
 Goal Check 'not_provable' ("initialized_memvar.i", line 41, characters 28-50):
-Let a = Init_c_0.Init_F2_C_s.
-Let a_1 = Init_c_0.Init_F2_C_a.
+Let a = Init_c_0.s.
+Let a_1 = Init_c_0.a.
 Assume {
   (* Pre-condition *)
-  Have: (Init_c_0.Init_F2_C_x=true) /\ (a.Init_F1_S_x=true) /\
-      (a.Init_F1_S_y=true) /\
+  Have: (Init_c_0.x=true) /\ (a.x=true) /\ (a.y=true) /\
       (forall i : Z. ((0 <= i) -> ((i <= 9) -> (a_1[i]=true)))).
 }
 Prove: (a_1[10]=true).
@@ -221,14 +218,13 @@ Prove: (a_1[10]=true).
 ------------------------------------------------------------
 
 Goal Check 'provable' ("initialized_memvar.i", line 42, characters 24-50):
-Let a = Init_c_0.Init_F2_C_s.
-Let a_1 = Init_c_0.Init_F2_C_a.
+Let a = Init_c_0.s.
+Let a_1 = Init_c_0.a.
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 9).
   (* Pre-condition *)
-  Have: (Init_c_0.Init_F2_C_x=true) /\ (a.Init_F1_S_x=true) /\
-      (a.Init_F1_S_y=true) /\
+  Have: (Init_c_0.x=true) /\ (a.x=true) /\ (a.y=true) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) -> (a_1[i_1]=true)))).
 }
 Prove: (a_1[i]=true).

@@ -29,23 +29,23 @@ Assume {
   Type: is_sint32(k).
   (* Heap *)
   Type: IsArray_S1(comp_0) /\
-      (forall i : Z. region(comp_0[i].F1_ptr.base) <= 0).
+      (forall i : Z. region(comp_0[i].ptr.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 19).
 }
-Prove: comp_0[k].F1_ptr != global(L_m_29).
+Prove: comp_0[k].ptr != global(L_m_29).
 
 ------------------------------------------------------------
 
 Goal Assertion 'RES' ("frame.i", line 11, characters 20-26):
-Let a = comp_0[k].F1_ptr.
+Let a = comp_0[k].ptr.
 Let a_1 = global(L_m_29).
 Let x = Mint_0[a <- 4][a_1].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x).
   (* Heap *)
   Type: IsArray_S1(comp_0) /\
-      (forall i : Z. region(comp_0[i].F1_ptr.base) <= 0).
+      (forall i : Z. region(comp_0[i].ptr.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 19).
   (* Initializer *)

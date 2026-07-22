@@ -885,22 +885,8 @@ let rec typecheck env expected (a : ast) =
     let vk = typecheck env Tany k in
     let ve = typecheck env expected v in
     typecheck env (array vk ve) a
-  | Field(v,fid) ->
-    begin
-      match typecheck env Tany v with
-      | Type(Record fds) ->
-        begin
-          try
-            let (_,ft) =
-              List.find (fun (fd,_) -> Lang.Field.name fd = fid) fds in
-            tc_merge env ~loc ~expected (Type ft)
-          with Not_found -> expected
-        end
-      | Tany -> expected
-      | vr ->
-        typecheck_error env v.loc "Not a record type (%a)" vpretty vr ;
-        expected
-    end
+  | Field(v,_) ->
+    ignore @@ typecheck env Tany v ; expected
   | Call(_f,vs,_) ->
     List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; expected
   | Forall(_,p) | Exists(_,p) ->

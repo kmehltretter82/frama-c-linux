@@ -39,7 +39,7 @@ let once f e =
 
 let head_fields = function
   | [] -> ""
-  | (Lang.Cfield(fd, _),_):: _ -> let open Cil_types in fd.fcomp.cname
+  | (fd,_):: _ -> Qed.Symbol.(Data.name @@ record_of_field fd)
 
 let head e =
   let open Qed.Logic in

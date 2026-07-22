@@ -37,12 +37,14 @@ let to_infix s =
 (* -------------------------------------------------------------------------- *)
 
 let fullname id =
-  let ps,m,ns = Why3.Theory.restore_path id in
-  let buffer = Buffer.create 80 in
-  List.iter (Printf.bprintf buffer "%s.") ps ;
-  Buffer.add_string buffer m ;
-  List.iter (fun x -> Printf.bprintf buffer ".%s" @@ of_infix x) ns ;
-  Buffer.contents buffer
+  try
+    let ps,m,ns = Why3.Theory.restore_path id in
+    let buffer = Buffer.create 80 in
+    List.iter (Printf.bprintf buffer "%s.") ps ;
+    Buffer.add_string buffer m ;
+    List.iter (fun x -> Printf.bprintf buffer ".%s" @@ of_infix x) ns ;
+    Buffer.contents buffer
+  with Not_found -> of_infix id.id_string
 
 (* -------------------------------------------------------------------------- *)
 (* --- Why3 Symbol Generic Lookup                                         --- *)
@@ -105,22 +107,22 @@ type context =
   | Cluster of { mutable closed : Why3.Theory.theory option }
 
 type cluster = {
-  cluster : context ;
+  ct : context ;
   mutable uc : Why3.Theory.theory_uc ;
 }
 
 let cluster ?(path=["qed";"generated"]) ?loc name =
-  let cluster = Cluster { closed = None } in
+  let ct = Cluster { closed = None } in
   let uc = Why3.Theory.create_theory ~path @@ Why3.Ident.id_fresh ?loc name in
-  { cluster ; uc }
+  { ct ; uc }
 
 let close = function
-  | { cluster = Theory _ } -> assert false
-  | { uc ; cluster = Cluster c } ->
+  | { ct = Theory _ } -> assert false
+  | { uc ; ct = Cluster c } ->
     let th = Why3.Theory.close_theory uc in
     c.closed <- Some th ; th
 
-let context = function
+let theory = function
   | Theory th | Cluster { closed = Some th } -> th
   | Cluster { closed = None } -> invalid_arg "Qed.Symbol.theory"
 
@@ -180,12 +182,12 @@ let constructors (Data a) =
   match a.cs with
   | Some cs -> cs
   | None ->
-    let th = context a.ct in
+    let th = theory a.ct in
     let cs = try Why3.Decl.find_constructors th.th_known a.ts with _ -> [] in
     a.cs <- Some cs ; cs
 
 let use_data cluster (Data d) = iter (use cluster) d.ct
-let new_data { cluster = ct } ts = Data { ct ; ts ; cs = None ; fs = None }
+let new_data { ct = ct } ts = Data { ct ; ts ; cs = None ; fs = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Records                                                            --- *)
@@ -206,10 +208,12 @@ let fields (Data a as data) =
       with Not_found -> []
     in a.fs <- Some fds ; fds
 
-let field data fd =
+let find_field data fd =
   List.find (function Field f -> f.ls.ls_name.id_string = fd) @@ fields data
 
-let by_field_rank (Field a) (Field b) = b.rank - a.rank
+let field_rank (Field a) = a.rank
+let by_field_rank (Field a) (Field b) = a.rank - b.rank
+let record_of_field (Field a) = a.data
 
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Functions & Predicates                                       --- *)
@@ -237,7 +241,7 @@ let find_lfun env name =
     Hashtbl.add hs name lfun ; lfun
 
 let use_lfun context (Fun f) = iter (use context) f.ct
-let new_lfun { cluster = ct } ls = Fun { ct ; ls ; def = None }
+let new_lfun { ct = ct } ls = Fun { ct ; ls ; def = None }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generic Symbols                                                    --- *)
@@ -247,7 +251,7 @@ module type Sid =
 sig
   type t
   type symbol
-  val theory : t -> Why3.Theory.theory
+  val context : t -> context
   val symbol : t -> symbol
   val ident : t -> Why3.Ident.ident
 end
@@ -265,6 +269,7 @@ sig
   val symbol : t -> symbol
   val ident : t -> Why3.Ident.ident
   val theory : t -> Why3.Theory.theory
+  val use : cluster -> t -> unit
 end
 
 module Make(S : Sid) : Symbol with type t = S.t and type symbol = S.symbol =
@@ -276,13 +281,15 @@ struct
   let name a = of_infix (ident a).id_string
   let fullname a = fullname (ident a)
   let pretty fmt a = Format.pp_print_string fmt @@ name a
+  let theory a = theory @@ S.context a
+  let use cluster a = iter (use cluster) @@ S.context a
 end
 
 module Data = Make
     (struct
       type t = data
       type symbol = Why3.Ty.tysymbol
-      let theory (Data a) = context a.ct
+      let context (Data a) = a.ct
       let symbol (Data a) = a.ts
       let ident (Data a) = a.ts.ts_name
     end)
@@ -291,7 +298,7 @@ module Field = Make
     (struct
       type t = field
       type symbol = Why3.Term.lsymbol
-      let theory (Field fd) = context fd.ct
+      let context (Field fd) = fd.ct
       let symbol (Field fd) = fd.ls
       let ident (Field fd) = fd.ls.ls_name
     end)
@@ -300,7 +307,7 @@ module Fun = Make
     (struct
       type t = lfun
       type symbol = Why3.Term.lsymbol
-      let theory (Fun fn) = context fn.ct
+      let context (Fun fn) = fn.ct
       let symbol (Fun fn) = fn.ls
       let ident (Fun fn) = fn.ls.ls_name
     end)
@@ -309,15 +316,15 @@ module Fun = Make
 (* --- Types                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type tau = (field,data) Logic.datatype
+type tau = data Logic.datatype
 
 module Tau =
 struct
   type t = tau
-  let hash = Kind.hash_tau Field.hash Data.hash
-  let equal = Kind.eq_tau Field.equal Data.equal
-  let compare = Kind.compare_tau Field.compare Data.compare
-  let pretty = Kind.pp_tau Kind.pp_tvar Field.pretty Data.pretty
+  let hash = Kind.hash_tau Data.hash
+  let equal = Kind.eq_tau Data.equal
+  let compare = Kind.compare_tau Data.compare
+  let pretty = Kind.pp_tau Kind.pp_tvar Data.pretty
 end
 
 let hty : tau Why3.Ty.Hty.t = Why3.Ty.Hty.create 32
@@ -337,6 +344,16 @@ let data (Data d as adt) = function
   | [a;b] when Why3.Ty.(ts_equal d.ts ts_func) -> Logic.Array(a,b)
   | ts -> Logic.Data(adt, ts)
 
+let sort ty =
+  let open Logic in
+  let open Why3.Ty in
+  if ty_equal ty ty_int then Sint else
+  if ty_equal ty ty_bool then Sbool else
+  if ty_equal ty ty_real then Sreal else
+    Sdata
+
+let osort = function None -> Logic.Sprop | Some ty -> sort ty
+
 let rec of_ty context ?(sigma=Why3.Ty.Mtv.empty) ty =
   try Why3.Ty.Hty.find hty ty with Not_found ->
   match ty.ty_node with
@@ -349,6 +366,10 @@ let rec of_ty context ?(sigma=Why3.Ty.Mtv.empty) ty =
 let of_oty context ?sigma = function
   | None -> Logic.Prop
   | Some ty -> of_ty ?sigma context ty
+
+(* -------------------------------------------------------------------------- *)
+(* --- Typechecking                                                       --- *)
+(* -------------------------------------------------------------------------- *)
 
 let rec unify sigma (ty : Why3.Ty.ty) (t : tau) =
   match ty.ty_node, t with
@@ -385,7 +406,11 @@ let apply (Fun f) ?result ts =
   let s = ref Why3.Ty.Mtv.empty in
   unify_all s f.ls.ls_args ts ;
   Option.iter (unify_opt s f.ls.ls_value) result ;
-  of_oty ~sigma:!s (context f.ct) f.ls.ls_value
+  of_oty ~sigma:!s (theory f.ct) f.ls.ls_value
+
+(* -------------------------------------------------------------------------- *)
+(* --- Functions                                                          --- *)
+(* -------------------------------------------------------------------------- *)
 
 let signature (Fun f) =
   let r = ref 0 in
@@ -400,7 +425,7 @@ let signature (Fun f) =
     | Tyapp(_,ts) -> List.iter addt ts in
   Option.iter addt f.ls.ls_value ;
   List.iter addt f.ls.ls_args ;
-  let th = context f.ct in
+  let th = theory f.ct in
   !r, of_oty ~sigma:!s th f.ls.ls_value,
   List.map (of_ty ~sigma:!s th) f.ls.ls_args
 
@@ -411,8 +436,85 @@ let definition (Fun f) =
     let def =
       try
         Option.map Why3.Decl.open_ls_defn @@
-        Why3.Decl.find_logic_definition (context f.ct).th_known f.ls
+        Why3.Decl.find_logic_definition (theory f.ct).th_known f.ls
       with _ -> None
     in f.def <- Some def ; def
+
+(* -------------------------------------------------------------------------- *)
+(* --- Declarations                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let tvar = Why3.Wstdlib.Hint.memo 0 @@
+  fun i ->
+  Why3.Ty.create_tvsymbol @@ Why3.Ident.id_fresh @@
+  String.make 1 @@ char_of_int @@ int_of_char 'a' + i mod 26
+
+let tvars =
+  Why3.Wstdlib.Hint.memo 0 @@
+  fun n -> let rec vs k = if k < n then tvar k :: vs (succ k) else [] in vs 0
+
+let new_type cluster ?loc ?(vars=0) name =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let vs = if vars = 0 then [] else tvars vars in
+  let ts = Why3.Ty.create_tysymbol id  vs NoDef in
+  let { ct } = cluster in
+  let data = Data { ct ; ts ; cs = None ; fs = None } in
+  let decl = Why3.Decl.create_ty_decl ts in
+  add cluster decl ; data
+
+let new_datatype cluster ?loc name ctors =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let tvs =
+    Why3.Ty.Stv.elements @@
+    List.fold_left
+      (fun tvs (_,ts) -> List.fold_left Why3.Ty.ty_freevars tvs ts)
+      Why3.Ty.Stv.empty ctors in
+  let ts = Why3.Ty.create_tysymbol id tvs NoDef in
+  let tr = Why3.Ty.ty_app ts (List.map Why3.Ty.ty_var tvs) in
+  let constr = List.length ctors in
+  let ctors : Why3.Decl.constructor list =
+    List.map
+      (fun (name,tys) ->
+         let id = Why3.Ident.id_fresh ?loc name in
+         Why3.Term.create_fsymbol ~constr id tys tr,
+         List.map (fun _ -> None) tys
+      ) ctors in
+  let { ct } = cluster in
+  let decl = Why3.Decl.create_data_decl [ts,ctors] in
+  let data = Data { ct ; ts ; cs = Some ctors ; fs = None } in
+  let cfs = List.map (fun (ls,_) -> Fun { ct ; ls ; def = None }) ctors in
+  add cluster decl ; data, cfs
+
+let new_record cluster ?loc name fds =
+  let id = Why3.Ident.id_fresh ?loc name in
+  let mk = Why3.Ident.id_fresh ?loc (name ^ "'mk") in
+  let tvs =
+    Why3.Ty.Stv.elements @@
+    List.fold_left
+      (fun tvs (_,ty) -> Why3.Ty.ty_freevars tvs ty)
+      Why3.Ty.Stv.empty fds in
+  let ts = Why3.Ty.create_tysymbol id tvs NoDef in
+  let fts = List.map snd fds in
+  let tr = Why3.Ty.ty_app ts (List.map Why3.Ty.ty_var tvs) in
+  let prjs =
+    List.map
+      (fun (fd,ty) ->
+         let id = Why3.Ident.id_fresh ?loc fd in
+         let fs = Why3.Term.create_fsymbol ~proj:true id [tr] ty in
+         Some fs
+      ) fds in
+  let { ct } = cluster in
+  let data = Data { ct ; ts ; cs = None ; fs = None } in
+  let fields =
+    List.mapi
+      (fun rank prj ->
+         Field { ct ; rank ; ls = Option.get prj ; data }
+      ) prjs in
+  let ls = Why3.Term.create_lsymbol ~constr:1 mk fts (Some tr) in
+  let record = Fun { ct ; ls ; def = None } in
+  let ctors = [ls,prjs] in
+  let decl = Why3.Decl.create_data_decl [ts,ctors] in
+  let Data d = data in d.fs <- Some fields ; d.cs <- Some ctors ;
+  add cluster decl ; data, record, fields
 
 (* -------------------------------------------------------------------------- *)

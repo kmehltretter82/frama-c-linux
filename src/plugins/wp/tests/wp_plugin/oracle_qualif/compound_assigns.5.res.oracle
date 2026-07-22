@@ -7,6 +7,7 @@
 [wp] [Valid] Goal swap_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal swap_terminates (Cfg) (Trivial)
 [wp] 8 goals scheduled
+[wp] [Valid] bytes_swap_ensures_P (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_swap_ensures_Q (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_swap_assigns_part1 (Qed)
 [wp] [Valid] bytes_swap_assigns_part2 (Qed)
@@ -14,16 +15,14 @@
 [wp] [Valid] bytes_init_ensures_2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] bytes_init_assert_PF_Z3_only (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_init_assigns (Qed)
-[wp] [Valid] bytes_swap_ensures_P (Tactic) (Alt-Ergo) (Cached)
 [wp] Proved goals:   11 / 12
   Terminating:     2
   Unreachable:     2
   Qed:             3
-  Alt-Ergo:        3
-  Script:          1 (Tactic) (Alt-Ergo 1/2) (Cached)
+  Alt-Ergo:        4
   Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  swap                      4        1        6       100%
+  swap                      4        2        6       100%
   init                      3        2        6      83.3%
 ------------------------------------------------------------

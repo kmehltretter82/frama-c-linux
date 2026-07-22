@@ -39,7 +39,7 @@ let tmode = function
   | Bool -> Mterm
   | Int -> Mterm_int
   | Real -> Mterm_real
-  | Tvar _ | Array _ | Record _ | Data _ -> Mterm
+  | Tvar _ | Array _ | Data _ -> Mterm
 
 let ctau = function
   | Prop -> Cprop
@@ -299,7 +299,6 @@ struct
         | Prop -> pp_print_string fmt self#t_prop
         | Array(Int,d) -> self#pp_array fmt d
         | Array(k,d) -> self#pp_farray fmt k d
-        | Record _fts -> failwith "Qed.Export.record"
         | Tvar x -> self#pp_tvar fmt x
         | Data(adt,ts) -> self#pp_datatype adt fmt ts
 

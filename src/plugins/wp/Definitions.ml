@@ -29,8 +29,6 @@ type cluster = {
   c_title : string ;
   c_position : Filepos.t option ;
   mutable c_age : int ;
-  mutable c_records : compinfo list ;
-  mutable c_irecords : compinfo list ;
   mutable c_types : logic_type_info list ;
   mutable c_symbols : dfun list ;
   mutable c_lemmas : dlemma list ;
@@ -197,16 +195,12 @@ let pp_typedef fmt (t : logic_type_info) =
     Format.fprintf fmt "@]"
 
 let is_empty c =
-  c.c_records = [] &&
-  c.c_irecords = [] &&
   c.c_types = [] &&
   c.c_symbols = [] &&
   c.c_lemmas = []
 
 let dump fmt (c : cluster) =
   Format.fprintf fmt "@[<hv 0>@[<hv 2>Cluster %s {@," c.c_id ;
-  List.iter (Format.fprintf fmt "@ %a@," pp_record) c.c_records ;
-  List.iter (Format.fprintf fmt "@ %a@," pp_irecord) c.c_irecords ;
   List.iter (Format.fprintf fmt "@ %a@," pp_typedef) c.c_types ;
   List.iter (Format.fprintf fmt "@ %a@," pp_dfun) c.c_symbols ;
   List.iter (Format.fprintf fmt "@ %a@," pp_lemma) c.c_lemmas ;
@@ -299,8 +293,6 @@ let newcluster ~id ?title ?position () =
     c_position = position ;
     c_age = 0 ;
     c_types = [] ;
-    c_records = [] ;
-    c_irecords = [] ;
     c_symbols = [] ;
     c_lemmas = [] ;
   }
@@ -334,20 +326,8 @@ let compinfo c =
          if c.cstruct
          then Printf.sprintf "Struct '%s'" c.cname
          else Printf.sprintf "Union '%s'" c.cname in
-       let cluster = newcluster ~id ~title ()
-       in cluster.c_records <- [c] ; cluster)
+       newcluster ~id ~title ())
     (comp_id c)
-
-let icompinfo c =
-  Cluster.memoize
-    (fun id ->
-       let title =
-         if c.cstruct
-         then Printf.sprintf "Init Struct '%s'" c.cname
-         else Printf.sprintf "Init Union '%s'" c.cname in
-       let cluster = newcluster ~id ~title ()
-       in cluster.c_irecords <- [c] ; cluster)
-    (comp_init_id c)
 
 let matrix () = cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
@@ -364,7 +344,6 @@ let call_pred lfun cc es =
 (* -------------------------------------------------------------------------- *)
 
 module DT = Logic_type_info.Set
-module DR = Compinfo.Set
 module DS = Datatype.String.Set
 module DF = Set.Make(Fun)
 module DW = Set.Make
@@ -389,8 +368,6 @@ class virtual visitor main =
 
     val mutable terms    = Tset.empty
     val mutable types    = DT.empty
-    val mutable comps    = DR.empty
-    val mutable icomps   = DR.empty
     val mutable symbols  = DF.empty
     val mutable dlemmas  = DS.empty
     val mutable lemmas   = DS.empty
@@ -430,56 +407,15 @@ class virtual visitor main =
             end
         end
 
-    method vcomp r =
-      if not (DR.mem r comps) then
-        begin
-          comps <- DR.add r comps ;
-          let c = compinfo r in
-          if self#do_local c then
-            begin
-              let fts = Option.map
-                  (List.map
-                     (fun f ->
-                        let t = tau_of_ctype f.ftype in
-                        self#vtau t ; cfield f , t
-                     ))
-                  r.cfields
-              in self#on_comp r fts ;
-            end
-        end
-
-    method vicomp r =
-      if not (DR.mem r icomps) then
-        begin
-          icomps <- DR.add r icomps ;
-          let c = icompinfo r in
-          if self#do_local c then
-            begin
-              let fts = Option.map
-                  (List.map
-                     (fun f ->
-                        let t = init_of_ctype f.ftype in
-                        self#vtau t ; cfield ~kind:KInit f , t
-                     ))
-                  r.cfields
-              in self#on_icomp r fts ;
-            end
-        end
-
-    method vfield = function
-      | Cfield(f, KValue) -> self#vcomp f.fcomp
-      | Cfield(f, KInit) -> self#vicomp f.fcomp
+    method vfield f = self#on_data @@ Qed.Symbol.record_of_field f
 
     method vadt = function
       | Qdata a -> self#on_data a
-      | Comp(r, KValue) -> self#vcomp r
-      | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
 
     method vtau = function
       | Prop | Bool | Int | Real | Tvar _ -> ()
       | Array(a,b) -> self#vtau a ; self#vtau b
-      | Record _ -> assert false
       | Data(a,ts) -> self#vadt a ; List.iter self#vtau ts
 
     method vparam x = self#vtau (tau_of_var x)
@@ -630,8 +566,6 @@ class virtual visitor main =
         end
 
     method vtypes = (* Visit the types *)
-      rev_iter self#vcomp main.c_records ;
-      rev_iter self#vicomp main.c_irecords ;
       rev_iter self#vtype main.c_types
 
     method vsymbols = (* Visit the definitions *)
@@ -652,8 +586,6 @@ class virtual visitor main =
     method virtual on_data : Qed.Symbol.data -> unit
     method virtual on_lfun : Qed.Symbol.lfun -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
-    method virtual on_comp : compinfo -> (field * tau) list option -> unit
-    method virtual on_icomp : compinfo -> (field * tau) list option -> unit
     method virtual on_dlemma : dlemma -> unit
     method virtual on_dfun : dfun -> unit
 

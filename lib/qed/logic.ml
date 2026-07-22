@@ -40,15 +40,14 @@ type binder =
   | Exists
   | Lambda
 
-type ('f,'a) datatype =
+type 'a datatype =
   | Prop
   | Bool
   | Int
   | Real
   | Tvar of int (** ranges over [1..arity] *)
-  | Array of ('f,'a) datatype * ('f,'a) datatype
-  | Record of ('f *  ('f,'a) datatype) list
-  | Data of 'a * ('f,'a) datatype list
+  | Array of 'a datatype * 'a datatype
+  | Data of 'a * 'a datatype list
 
 type sort =
   | Sprop
@@ -117,9 +116,9 @@ end
 
 (** {2 Representation of Patterns, Functions and Terms} *)
 
-type ('f,'a) funtype = {
-  result : ('f,'a) datatype ; (** Type of returned value *)
-  params : ('f,'a) datatype list ; (** Type of parameters *)
+type 'a funtype = {
+  result : 'a datatype ; (** Type of returned value *)
+  params : 'a datatype list ; (** Type of parameters *)
 }
 
 (** representation of terms. type arguments are the following:
@@ -147,7 +146,7 @@ type ('f,'a,'d,'x,'b,'e) term_repr =
   | Lt    of 'e * 'e
   | Aget  of 'e * 'e      (** access: array1[idx2] *)
   | Aset  of 'e * 'e * 'e (** update: array1[idx2 -> elem3] *)
-  | Acst  of ('f,'a) datatype * 'e (** constant array [ type -> value ] *)
+  | Acst  of 'a datatype * 'e (** constant array [ type -> value ] *)
   | Rget  of 'e * 'f
   | Rdef  of ('f * 'e) list
   | And   of 'e list      (** and: e11 && ... && e1n *)
@@ -157,9 +156,9 @@ type ('f,'a,'d,'x,'b,'e) term_repr =
   | If    of 'e * 'e * 'e (** ite: if c1 then e2 else e3 *)
   | Fun   of 'd * 'e list (** Complete call (no partial app.) *)
   | Fvar  of 'x
-  | Bvar  of int * ('f,'a) datatype
+  | Bvar  of int * 'a datatype
   | Apply of 'e * 'e list (** High-Order application (Cf. binder) *)
-  | Bind  of binder * ('f,'a) datatype * 'b
+  | Bind  of binder * 'a datatype * 'b
 
 type 'a affine = Z.t * (Z.t * 'a) list
 
@@ -195,7 +194,7 @@ sig
   (** {3 Variables} *)
 
   type var = Var.t
-  type tau = (Field.t,ADT.t) datatype
+  type tau = ADT.t datatype
 
   module Tau : Data with type t = tau
   module Vars : Idxset.S with type elt = var

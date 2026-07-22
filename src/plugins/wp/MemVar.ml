@@ -234,14 +234,17 @@ struct
         Bag.elt (Mstore(lv,v2))
 
   and rdiff lv v1 v2 = function
-    | (Lang.Cfield (fi, _k) as fd ,f2) :: fvs ->
-      let f1 = F.e_getfield v1 fd in
-      if f1 == f2 then rdiff lv v1 v2 fvs else
-        let upd = diff (Mstate.field lv fi) f1 f2 in
-        let m = F.e_setfield v2 fd f1 in
-        Bag.concat upd (diff lv v1 m)
-    (* | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2)) *)
     | [] -> Bag.empty
+    | (fd ,f2) :: fvs ->
+      try
+        let fi = Cvalues.fieldinfo fd in
+        let f1 = F.e_getfield v1 fd in
+        if f1 == f2 then rdiff lv v1 v2 fvs else
+          let upd = diff (Mstate.field lv fi) f1 f2 in
+          let m = F.e_setfield v2 fd f1 in
+          Bag.concat upd (diff lv v1 m)
+      with Not_found ->
+        Bag.elt (Mstore(lv,v2))
 
   let updates (seq : Sigma.state sequence) domain =
     let pre = icmap domain seq.pre in

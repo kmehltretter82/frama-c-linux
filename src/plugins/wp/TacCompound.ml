@@ -30,8 +30,10 @@ let get_record_assoc = function
   | (f,_)::_ -> Some (Lang.fields_of_field f)
   | _ -> None
 
+let get_fields_opt = function [] -> None | fs -> Some fs
+
 let get_record_type = function
-  | Qed.Logic.Record fts -> get_record_assoc fts
+  | Qed.Logic.Data(adt,_) -> get_fields_opt @@ Lang.fields_of_adt adt
   | _ -> None
 
 let get_record_term a =

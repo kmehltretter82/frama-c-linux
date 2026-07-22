@@ -14,13 +14,12 @@ theory S1_X
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  type S1_X =
-    | S1_X1 (F1_X_a:int) (F1_X_b:int) (F1_X_c:int)
+  (* use wp.generated.X *)
   
   (* use frama_c_wp.cint.Cint *)
   
-  predicate IsS1_X (s:S1_X) =
-    is_sint8 (F1_X_a s) /\ is_sint16 (F1_X_b s) /\ is_sint32 (F1_X_c s)
+  predicate IsS1_X (s:X) =
+    is_sint8 (a s) /\ is_sint16 (b s) /\ is_sint32 (c s)
   
 end
 ---------------------------------------------
@@ -35,26 +34,13 @@ theory Chunk
   (* use frama_c_wp.cint.Cint *)
   
   predicate is_sint8_chunk (m:addr -> int) =
-    forall a:addr. is_sint8 (get m a)
+    forall a1:addr. is_sint8 (get m a1)
   
   predicate is_sint16_chunk (m:addr -> int) =
-    forall a:addr. is_sint16 (get m a)
+    forall a1:addr. is_sint16 (get m a1)
   
   predicate is_sint32_chunk (m:addr -> int) =
-    forall a:addr. is_sint32 (get m a)
-  
-end
----------------------------------------------
---- Context 'typed_foo' Cluster 'Init_S1_X' 
----------------------------------------------
-theory Init_S1_X
-  
-  (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use why3.Bool.Bool *)
-  
-  type Init_S1_X =
-    | Init_S1_X1 (Init_F1_X_a:bool) (Init_F1_X_b:bool) (Init_F1_X_c:bool)
+    forall a1:addr. is_sint32 (get m a1)
   
 end
 ---------------------------------------------
@@ -72,17 +58,17 @@ theory Compound
   
   function shiftfield_F1_X_c (p:addr) : addr = shift p 2
   
-  (* use wp.generated.S1_X *)
+  (* use wp.generated.X *)
   
   function Load_S1_X (p:addr) (mchar:addr -> int) (mint:addr -> int) (mint1:
-    addr -> int) : S1_X =
-    S1_X1 (get mchar (shiftfield_F1_X_a p)) (get mint (shiftfield_F1_X_b p))
+    addr -> int) : X =
+    X'mk (get mchar (shiftfield_F1_X_a p)) (get mint (shiftfield_F1_X_b p))
     (get mint1 (shiftfield_F1_X_c p))
   
-  (* use wp.generated.Init_S1_X *)
+  (* use wp.generated.Init_X *)
   
-  function Load_Init_S1_X (p:addr) (init:addr -> bool) : Init_S1_X =
-    Init_S1_X1 (get init (shiftfield_F1_X_a p))
+  function Load_Init_S1_X (p:addr) (init:addr -> bool) : Init_X =
+    Init_X'mk (get init (shiftfield_F1_X_a p))
     (get init (shiftfield_F1_X_b p)) (get init (shiftfield_F1_X_c p))
   
   (* use frama_c_wp.memory.Memory *)
@@ -107,6 +93,8 @@ end
     
     (* use frama_c_wp.memaddr.MemAddr *)
     
+    (* use wp.generated.X *)
+    
     (* use wp.generated.S1_X *)
     
     (* use wp.generated.Chunk *)
@@ -119,14 +107,15 @@ end
   
   goal wp :
     forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-     addr -> int, a:addr, x:S1_X.
-     region (a.base) <= 0 ->
+     addr -> int, a1:addr, x:X.
+     region (a1.base) <= 0 ->
      IsS1_X x ->
      is_sint16_chunk t3 ->
      is_sint32_chunk t4 ->
      is_sint8_chunk t2 ->
      linked t1 ->
-     sconst t2 -> scinit t -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rd t1 a 3
+     sconst t2 ->
+     scinit t -> IsS1_X (Load_S1_X a1 t2 t3 t4) -> valid_rd t1 a1 3
 [wp:print-generated] 
   theory WP1
     
@@ -146,15 +135,15 @@ end
   
   goal wp :
     forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-     addr -> int, a:addr.
-     region (a.base) <= 0 ->
+     addr -> int, a1:addr.
+     region (a1.base) <= 0 ->
      is_sint16_chunk t3 ->
      is_sint32_chunk t4 ->
      is_sint8_chunk t2 ->
      linked t1 ->
      sconst t2 ->
      scinit t ->
-     valid_rd t1 a 3 -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rw t1 a 3
+     valid_rd t1 a1 3 -> IsS1_X (Load_S1_X a1 t2 t3 t4) -> valid_rw t1 a1 3
 [wp] 2 goals generated
 ------------------------------------------------------------
   Function foo
@@ -175,19 +164,19 @@ Cluster Chunk {
 
 Cluster Compound {
   
-  Function Load_Init_S1_X (p_0 : addr) (Init_0 : bool[addr]) : Init_S1_X
+  Function Load_Init_S1_X (p_0 : addr) (Init_0 : bool[addr]) : Init_X
     = {
-         Init_F1_X_a = Init_0[(shiftfield_F1_X_a p_0)] ;
-         Init_F1_X_b = Init_0[(shiftfield_F1_X_b p_0)] ;
-         Init_F1_X_c = Init_0[(shiftfield_F1_X_c p_0)]
+         a = Init_0[(shiftfield_F1_X_a p_0)] ;
+         b = Init_0[(shiftfield_F1_X_b p_0)] ;
+         c = Init_0[(shiftfield_F1_X_c p_0)]
       }
   
   Function Load_S1_X (p_0 : addr) (Mchar_0 : int[addr]) (Mint_0 : int[addr])
-    (Mint_1 : int[addr]) : S1_X
+    (Mint_1 : int[addr]) : X
     = {
-         F1_X_a = Mchar_0[(shiftfield_F1_X_a p_0)] ;
-         F1_X_b = Mint_0[(shiftfield_F1_X_b p_0)] ;
-         F1_X_c = Mint_1[(shiftfield_F1_X_c p_0)]
+         a = Mchar_0[(shiftfield_F1_X_a p_0)] ;
+         b = Mint_0[(shiftfield_F1_X_b p_0)] ;
+         c = Mint_1[(shiftfield_F1_X_c p_0)]
       }
   
   Function shiftfield_F1_X_c (p_2 : addr) : addr = (shift p_2 2)
@@ -218,20 +207,10 @@ Cluster Compound {
   
 }
 
-Cluster Init_S1_X {
-  
-  Type Init_S1_X = { Init_F1_X_a : bool; Init_F1_X_b : bool;
-    Init_F1_X_c : bool; }
-  
-}
-
 Cluster S1_X {
   
-  Type S1_X = { F1_X_a : int; F1_X_b : int; F1_X_c : int; }
-  
-  Predicate IsS1_X (S_0 : S1_X)
-    = (is_sint8 S_0.F1_X_a) /\ (is_sint16 S_0.F1_X_b)
-      /\ (is_sint32 S_0.F1_X_c)
+  Predicate IsS1_X (S_0 : X)
+    = (is_sint8 S_0.a) /\ (is_sint16 S_0.b) /\ (is_sint32 S_0.c)
   
 }
 

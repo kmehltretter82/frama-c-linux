@@ -23,16 +23,7 @@ struct
   (* ---  Types                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let pp_alpha fmt = function
-    | 0 -> pp_print_string fmt "'a"
-    | 1 -> pp_print_string fmt "'b"
-    | 2 -> pp_print_string fmt "'c"
-    | 3 -> pp_print_string fmt "'d"
-    | 4 -> pp_print_string fmt "'e"
-    | n -> fprintf fmt "?%d" (n-4)
-
-  let pp_tau fmt t =
-    Kind.pp_tau pp_alpha Field.pretty ADT.pretty fmt t
+  let pp_tau fmt t = Kind.pp_tau Kind.pp_tvar ADT.pretty fmt t
 
   (* -------------------------------------------------------------------------- *)
   (* --- Shareable                                                          --- *)

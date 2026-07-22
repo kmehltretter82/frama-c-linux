@@ -31,21 +31,15 @@ theory S1_S
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use map.Map *)
-  
-  type S1_S =
-    | S1_S1 (F1_S_f:int) (F1_S_a:int -> int) (F1_S_b:int -> int)
+  (* use wp.generated.S *)
   
   (* use wp.generated.Matrix *)
   
-  predicate IsS1_S (s:S1_S) =
-    IsArray_sint64 (F1_S_b s) /\
-    IsArray_uint32 (F1_S_a s) /\ is_sint32 (F1_S_f s)
+  predicate IsS1_S (s:S) =
+    IsArray_sint64 (b s) /\ IsArray_uint32 (a s) /\ is_sint32 (f s)
   
-  predicate EqS1_S (s:S1_S) (s1:S1_S) =
-    F1_S_f s1 = F1_S_f s /\
-    EqArray_int 5 (F1_S_a s) (F1_S_a s1) /\
-    EqArray_int 5 (F1_S_b s) (F1_S_b s1)
+  predicate EqS1_S (s:S) (s1:S) =
+    f s1 = f s /\ EqArray_int 5 (a s) (a s1) /\ EqArray_int 5 (b s) (b s1)
   
 end
 ---------------------------------------------
@@ -71,11 +65,11 @@ theory Compound
   
   function Array_sint64 addr int (addr -> int) : int -> int
   
-  (* use wp.generated.S1_S *)
+  (* use wp.generated.S *)
   
   function Load_S1_S (p:addr) (mint:addr -> int) (mint1:addr -> int) (mint2:
-    addr -> int) : S1_S =
-    S1_S1 (get mint1 (shiftfield_F1_S_f p))
+    addr -> int) : S =
+    S'mk (get mint1 (shiftfield_F1_S_f p))
     (Array_uint32 (shiftfield_F1_S_a p) 5 mint)
     (Array_sint64 (shiftfield_F1_S_b p) 5 mint2)
   
@@ -124,10 +118,10 @@ end
   end
   
   goal wp :
-    forall t:addr -> int, t1:addr -> int, t2:addr -> int, a:addr, i:int.
-     let a1 = Load_S1_S a t t2 t1 in
-     let a2 = Load_S1_S a t (set t2 (shiftfield_F1_S_f a) i) t1 in
-     region (a.base) <= 0 -> IsS1_S a1 -> IsS1_S a2 -> EqS1_S a2 a1
+    forall t:addr -> int, t1:addr -> int, t2:addr -> int, a1:addr, i:int.
+     let a2 = Load_S1_S a1 t t2 t1 in
+     let a3 = Load_S1_S a1 t (set t2 (shiftfield_F1_S_f a1) i) t1 in
+     region (a1.base) <= 0 -> IsS1_S a2 -> IsS1_S a3 -> EqS1_S a3 a2
 [wp] 1 goal generated
 ------------------------------------------------------------
   Function job
@@ -136,11 +130,11 @@ end
 Cluster Compound {
   
   Function Load_S1_S (p_0 : addr) (Mint_0 : int[addr]) (Mint_1 : int[addr])
-    (Mint_2 : int[addr]) : S1_S
+    (Mint_2 : int[addr]) : S
     = {
-         F1_S_f = Mint_1[(shiftfield_F1_S_f p_0)] ;
-         F1_S_a = (Array_uint32 (shiftfield_F1_S_a p_0) 5 Mint_0) ;
-         F1_S_b = (Array_sint64 (shiftfield_F1_S_b p_0) 5 Mint_2)
+         f = Mint_1[(shiftfield_F1_S_f p_0)] ;
+         a = (Array_uint32 (shiftfield_F1_S_a p_0) 5 Mint_0) ;
+         b = (Array_sint64 (shiftfield_F1_S_b p_0) 5 Mint_2)
       }
   
   Function Array_sint64 (p_1 : addr) (n_1 : int) (Mint_3 : int[addr]) : int[]
@@ -221,15 +215,12 @@ Cluster Matrix {
 
 Cluster S1_S {
   
-  Type S1_S = { F1_S_f : int; F1_S_a : int[]; F1_S_b : int[]; }
+  Predicate EqS1_S (S_0 : S) (S_1 : S)
+    = (S_1.f=S_0.f) /\ (EqArray_int 5 S_0.a S_1.a)
+      /\ (EqArray_int 5 S_0.b S_1.b)
   
-  Predicate EqS1_S (S_0 : S1_S) (S_1 : S1_S)
-    = (S_1.F1_S_f=S_0.F1_S_f) /\ (EqArray_int 5 S_0.F1_S_a S_1.F1_S_a)
-      /\ (EqArray_int 5 S_0.F1_S_b S_1.F1_S_b)
-  
-  Predicate IsS1_S (S_0 : S1_S)
-    = (IsArray_sint64 S_0.F1_S_b) /\ (IsArray_uint32 S_0.F1_S_a)
-      /\ (is_sint32 S_0.F1_S_f)
+  Predicate IsS1_S (S_0 : S)
+    = (IsArray_sint64 S_0.b) /\ (IsArray_uint32 S_0.a) /\ (is_sint32 S_0.f)
   
 }
 

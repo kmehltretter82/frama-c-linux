@@ -163,7 +163,7 @@ logic.i:49: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w.F1_y = 11.
+Prove: w.y = 11.
 
 ------------------------------------------------------------
 
@@ -172,7 +172,7 @@ logic.i:50: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w.F3_tab[1] = 11.
+Prove: w.tab[1] = 11.
 
 ------------------------------------------------------------
 
@@ -181,7 +181,7 @@ logic.i:51: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Point) from (int [2]) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w.F1_y = 11.
+Prove: w.y = 11.
 
 ------------------------------------------------------------
 
@@ -241,7 +241,7 @@ logic.i:56: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w[1].F1_y = 21.
+Prove: w[1].y = 21.
 
 ------------------------------------------------------------
 
@@ -250,7 +250,7 @@ logic.i:57: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (Triangle) from (int [6]) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w[1].F1_y = 21.
+Prove: w[1].y = 21.
 
 ------------------------------------------------------------
 
@@ -286,7 +286,7 @@ logic.i:61: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w.F3_tab[1] = 11.
+Prove: w.tab[1] = 11.
 
 ------------------------------------------------------------
 
@@ -295,7 +295,7 @@ logic.i:62: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Tint2) from (int [6]) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
-Prove: w.F3_tab[1] = 11.
+Prove: w.tab[1] = 11.
 
 ------------------------------------------------------------
 

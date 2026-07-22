@@ -20,7 +20,6 @@ let rec of_poly alpha = function
   | Tvar x -> alpha x
   | Data _ -> Sdata
   | Array(_,d) -> Sarray (of_poly alpha d)
-  | Record _ -> Sdata
 
 let of_tau t = of_poly (fun _ -> Sdata) t
 
@@ -58,15 +57,14 @@ let basename = function
   | Sreal -> "r"
   | Sarray _ -> "m"
 
-let rec map_tau fd adt = function
+let rec map_tau adt = function
   | Int -> Int
   | Real -> Real
   | Bool -> Bool
   | Prop -> Prop
   | Tvar _ as x -> x
-  | Array(a,b) -> Array(map_tau fd adt a,map_tau fd adt b)
-  | Data(a,ts) -> Data(adt a,List.map (map_tau fd adt) ts)
-  | Record fts -> Record(List.map (fun (f,t) -> fd f,map_tau fd adt t) fts)
+  | Array(a,b) -> Array(map_tau adt a,map_tau adt b)
+  | Data(a,ts) -> Data(adt a,List.map (map_tau adt) ts)
 
 let rec map_element f = function
   | (E_none | E_true | E_false | E_int _) as elt -> elt
@@ -105,52 +103,41 @@ let pp_tvar fmt k =
   else
     Format.fprintf fmt "'%d" k
 
-let rec pp_tau pvar pfield pdata fmt = function
+let rec pp_tau pvar pdata fmt = function
   | Int -> Format.pp_print_string fmt "int"
   | Real -> Format.pp_print_string fmt "real"
   | Bool -> Format.pp_print_string fmt "bool"
   | Prop -> Format.pp_print_string fmt "prop"
   | Tvar x -> pvar fmt x
   | Array(Int,te) ->
-    Format.fprintf fmt "%a[]" (pp_tau pvar pfield pdata) te
+    Format.fprintf fmt "%a[]" (pp_tau pvar pdata) te
   | Array(tk,te) ->
     Format.fprintf fmt "%a[%a]"
-      (pp_tau pvar pfield pdata) te (pp_tau pvar pfield pdata) tk
-  | Data(a,ts) -> pp_data pdata (pp_tau pvar pfield pdata) fmt a ts
-  | Record fts -> pp_record pfield (pp_tau pvar pfield pdata) fmt fts
+      (pp_tau pvar pdata) te (pp_tau pvar pdata) tk
+  | Data(a,ts) -> pp_data pdata (pp_tau pvar pdata) fmt a ts
 
-let rec hash_tau hfield hadt = function
+let rec hash_tau hadt = function
   | Int -> 0
   | Real -> 1
   | Bool -> 2
   | Prop -> 3
   | Tvar k -> 4+k
   | Array(tk,te) ->
-    7 * Hcons.hash_pair (hash_tau hfield hadt tk) (hash_tau hfield hadt te)
+    7 * Hcons.hash_pair (hash_tau hadt tk) (hash_tau hadt te)
   | Data(a,te) ->
-    11 * Hcons.hash_list (hash_tau hfield hadt) (hadt a) te
-  | Record fts ->
-    Hcons.hash_list (hash_field hfield hadt) 13 fts
+    11 * Hcons.hash_list (hash_tau hadt) (hadt a) te
 
-and hash_field hfield hadt (f,t) =
-  Hcons.hash_pair (hfield f) (hash_tau hfield hadt t)
-
-let rec eq_tau cfield cadt t1 t2 =
+let rec eq_tau cadt t1 t2 =
   match t1 , t2 with
   | (Bool|Int|Real|Prop|Tvar _) , (Bool|Int|Real|Prop|Tvar _) -> t1 = t2
   | Array(ta,tb) , Array(ta',tb') ->
-    eq_tau cfield cadt ta ta' && eq_tau cfield cadt tb tb'
+    eq_tau cadt ta ta' && eq_tau cadt tb tb'
   | Array _ , _  | _ , Array _ -> false
   | Data(a,ts) , Data(b,ts') ->
-    cadt a b && Hcons.equal_list (eq_tau cfield cadt) ts ts'
+    cadt a b && Hcons.equal_list (eq_tau cadt) ts ts'
   | Data _ , _ | _ , Data _ -> false
-  | Record fts , Record gts ->
-    Hcons.equal_list
-      (fun (f,t) (g,t') -> cfield f g && eq_tau cfield cadt t t')
-      fts gts
-  | Record _ , _ | _ , Record _ -> false
 
-let rec compare_tau cfield cadt t1 t2 =
+let rec compare_tau cadt t1 t2 =
   match t1 , t2 with
   | Bool , Bool -> 0
   | Bool , _ -> (-1)
@@ -168,33 +155,23 @@ let rec compare_tau cfield cadt t1 t2 =
   | Tvar _ , _ -> (-1)
   | _ , Tvar _ -> 1
   | Array(ta,tb) , Array(ta',tb') ->
-    let c = compare_tau cfield cadt ta ta' in
-    if c = 0 then compare_tau cfield cadt tb tb' else c
+    let c = compare_tau cadt ta ta' in
+    if c = 0 then compare_tau cadt tb tb' else c
   | Array _ , _ -> (-1)
   | _ , Array _ -> 1
   | Data(a,ts) , Data(b,ts') ->
     let c = cadt a b in
-    if c = 0 then Hcons.compare_list (compare_tau cfield cadt) ts ts' else c
-  | Data _ , _ -> (-1)
-  | _ , Data _ -> 1
-  | Record fts , Record gts ->
-    Hcons.compare_list
-      (fun (f,t) (g,t') ->
-         let c = cfield f g in
-         if c = 0 then compare_tau cfield cadt t t' else c
-      ) fts gts
+    if c = 0 then Hcons.compare_list (compare_tau cadt) ts ts' else c
 
-module MakeTau(F : Field)(A : Data) =
+module MakeTau(A : Data) =
 struct
 
-  type t = (F.t,A.t) datatype
+  type t = A.t datatype
 
-  let equal = eq_tau F.equal A.equal
-  let compare = compare_tau F.compare A.compare
-  let hash = hash_tau F.hash A.hash
-  let pretty = pp_tau
-      (fun fmt k -> Format.fprintf fmt "`%d" k)
-      F.pretty A.pretty
+  let equal = eq_tau A.equal
+  let compare = compare_tau A.compare
+  let hash = hash_tau A.hash
+  let pretty = pp_tau pp_tvar A.pretty
 
   let name = Format.asprintf "%a" pretty
   let fullname = name
@@ -204,7 +181,6 @@ struct
     | Real -> "r"
     | Prop -> "p"
     | Bool -> "p"
-    | Data(a,_) -> A.basename a
     | Array _ -> "t"
     | Tvar 1 -> "a"
     | Tvar 2 -> "b"
@@ -212,6 +188,6 @@ struct
     | Tvar 4 -> "d"
     | Tvar 5 -> "e"
     | Tvar _ -> "f"
-    | Record _ -> "r"
+    | Data(a,_) -> A.basename a
 
 end

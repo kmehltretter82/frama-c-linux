@@ -1385,14 +1385,12 @@ struct
     match t with
     | Qed.Logic.Array(ta,tb) ->
       Fset.union (fset_of_tau ta) (fset_of_tau tb)
-    | Qed.Logic.Record fts ->
-      fsetmap (fun (f,t) -> Fset.add f (fset_of_tau t)) fts
     | Qed.Logic.Data(adt,ts) ->
       Fset.union (fsetmap fset_of_tau ts) (fset_of_adt adt)
     | _ -> Fset.empty
 
   and fset_of_adt adt =
-    fsetmap fset_of_field (Lang.fields_of_adt adt)
+    fsetmap fset_of_field (fields_of_adt adt)
 
   and fset_of_field fd =
     let tf = Lang.tau_of_field fd in

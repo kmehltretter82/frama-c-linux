@@ -28,16 +28,25 @@ type field
 val fields : data -> field list
 
 (** @raise Not_found for non-record data *)
-val field : data -> string -> field
+val find_field : data -> string -> field
+
+(** Record datatype the field belong to *)
+val record_of_field : field -> data
+
+(** Order of field in record definition *)
+val field_rank : field -> int
 
 (** Ordering with respect to field declaration order in record *)
 val by_field_rank : field -> field -> int
 
 (** Logic Types *)
-type tau = (field,data) Logic.datatype
+type tau = data Logic.datatype
 
 val data : data -> tau list -> tau
 (** Converts builtin Qed types from external data symbols *)
+
+val sort : Why3.Ty.ty -> Logic.sort
+val osort : Why3.Ty.ty option -> Logic.sort
 
 (** Logic Functions *)
 type lfun
@@ -58,6 +67,9 @@ val definition : lfun -> (Why3.Term.vsymbol list * Why3.Term.term) option
 val apply : lfun -> ?result:tau -> tau list -> tau
 
 (** {2 Symbol Lookup} *)
+
+val tvar : int -> tvsymbol
+val tvars : int -> tvsymbol list
 
 val find_ts : env -> string -> (theory -> tysymbol -> 'a) -> 'a
 val find_ls : env -> string -> (theory -> lsymbol -> 'a) -> 'a
@@ -113,6 +125,26 @@ val new_data : cluster -> Why3.Ty.tysymbol -> data
 val new_lfun : cluster -> Why3.Term.lsymbol -> lfun
 val close : cluster -> Why3.Theory.theory
 
+(** {2 Declaration Factory} *)
+
+(** Declares a new abstract type in the provided cluster. *)
+val new_type :
+  cluster -> ?loc:Why3.Loc.position -> ?vars:int -> string -> data
+
+
+(** Declares a new data type in the provided cluster.
+    Returns a tuple [d,cs] with the created datatype [d] and its constructors [cs]. *)
+val new_datatype :
+  cluster -> ?loc:Why3.Loc.position -> string -> (string * Why3.Ty.ty list) list ->
+  data * lfun list
+
+(** Declares a new record type in the provided cluster.
+    Returns a tuple [d,c,fs] with the created datatype [d], its constructor [c] and
+    the associated fields [fs]. *)
+val new_record :
+  cluster -> ?loc:Why3.Loc.position -> string -> (string * Why3.Ty.ty) list ->
+  data * lfun * field list
+
 (** {2 Symbol Modules} *)
 
 module type Symbol =
@@ -133,6 +165,7 @@ sig
   val symbol : t -> symbol
   val ident : t -> ident
   val theory : t -> theory
+  val use : cluster -> t -> unit
 end
 
 module Data : Symbol with type t = data and type symbol = tysymbol

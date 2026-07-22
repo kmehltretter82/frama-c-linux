@@ -14,20 +14,19 @@
 
 Cluster Compound {
   
-  Function Load_Init_S1_A (p_1 : addr) (init_3 : bool[][]) : Init_S1_A
+  Function Load_Init_S1_A (p_1 : addr) (init_3 : bool[][]) : Init_A
     = {
-         Init_F1_A_f = (Array_sint32_init (shiftfield_F1_A_f p_1) 4 init_3) ;
-         Init_F1_A_g = (read_init64 init_3 (shiftfield_F1_A_g p_1))
+         f = (Array_sint32_init (shiftfield_F1_A_f p_1) 4 init_3) ;
+         g = (read_init64 init_3 (shiftfield_F1_A_g p_1))
       }
   
   Function Array_sint32_init (p_1 : addr) (n_1 : int)
     (init_3 : bool[][]) : bool[]
   
-  Function Load_S1_A (p_1 : addr) (mem_3 : int[][]) : S1_A
+  Function Load_S1_A (p_1 : addr) (mem_3 : int[][]) : A
     = {
-         F1_A_f = (Array_sint32 (shiftfield_F1_A_f p_1) 4 mem_3) ;
-         F1_A_g =
-           (int_to_float64 (read_uint64 mem_3 (shiftfield_F1_A_g p_1)))
+         f = (Array_sint32 (shiftfield_F1_A_f p_1) 4 mem_3) ;
+         g = (int_to_float64 (read_uint64 mem_3 (shiftfield_F1_A_g p_1)))
       }
   
   Function Array_sint32 (p_1 : addr) (n_1 : int) (mem_3 : int[][]) : int[]
@@ -130,12 +129,10 @@ Cluster MemBytes.PointersProperties {
 
 Cluster S1_A {
   
-  Type S1_A = { F1_A_f : int[]; F1_A_g : f64; }
+  Predicate EqS1_A (S_0 : A) (S_1 : A)
+    = (S_1.g=S_0.g) /\ (EqArray_int 4 S_0.f S_1.f)
   
-  Predicate EqS1_A (S_0 : S1_A) (S_1 : S1_A)
-    = (S_1.F1_A_g=S_0.F1_A_g) /\ (EqArray_int 4 S_0.F1_A_f S_1.F1_A_f)
-  
-  Predicate IsS1_A (S_0 : S1_A) = (IsArray_sint32 S_0.F1_A_f)
+  Predicate IsS1_A (S_0 : A) = (IsArray_sint32 S_0.f)
   
 }
 
@@ -437,20 +434,19 @@ Prove: EqS1_A(a, a_1).
 
 Cluster Compound {
   
-  Function Load_Init_S1_A (p_2 : addr) (init_6 : bool[][]) : Init_S1_A
+  Function Load_Init_S1_A (p_2 : addr) (init_6 : bool[][]) : Init_A
     = {
-         Init_F1_A_f = (Array_sint32_init (shiftfield_F1_A_f p_2) 4 init_6) ;
-         Init_F1_A_g = (read_init64 init_6 (shiftfield_F1_A_g p_2))
+         f = (Array_sint32_init (shiftfield_F1_A_f p_2) 4 init_6) ;
+         g = (read_init64 init_6 (shiftfield_F1_A_g p_2))
       }
   
   Function Array_sint32_init (p_2 : addr) (n_2 : int)
     (init_6 : bool[][]) : bool[]
   
-  Function Load_S1_A (p_2 : addr) (mem_6 : int[][]) : S1_A
+  Function Load_S1_A (p_2 : addr) (mem_6 : int[][]) : A
     = {
-         F1_A_f = (Array_sint32 (shiftfield_F1_A_f p_2) 4 mem_6) ;
-         F1_A_g =
-           (int_to_float64 (read_uint64 mem_6 (shiftfield_F1_A_g p_2)))
+         f = (Array_sint32 (shiftfield_F1_A_f p_2) 4 mem_6) ;
+         g = (int_to_float64 (read_uint64 mem_6 (shiftfield_F1_A_g p_2)))
       }
   
   Function Array_sint32 (p_2 : addr) (n_2 : int) (mem_6 : int[][]) : int[]
@@ -577,12 +573,10 @@ Cluster MemBytes.PointersProperties {
 
 Cluster S1_A {
   
-  Type S1_A = { F1_A_f : int[]; F1_A_g : f64; }
+  Predicate EqS1_A (S_0 : A) (S_1 : A)
+    = (S_1.g=S_0.g) /\ (EqArray_int 4 S_0.f S_1.f)
   
-  Predicate EqS1_A (S_0 : S1_A) (S_1 : S1_A)
-    = (S_1.F1_A_g=S_0.F1_A_g) /\ (EqArray_int 4 S_0.F1_A_f S_1.F1_A_f)
-  
-  Predicate IsS1_A (S_0 : S1_A) = (IsArray_sint32 S_0.F1_A_f)
+  Predicate IsS1_A (S_0 : A) = (IsArray_sint32 S_0.f)
   
 }
 
@@ -678,20 +672,19 @@ Prove: true.
 
 Cluster Compound {
   
-  Function Load_Init_S1_A (p_0 : addr) (init_0 : bool[][]) : Init_S1_A
+  Function Load_Init_S1_A (p_0 : addr) (init_0 : bool[][]) : Init_A
     = {
-         Init_F1_A_f = (Array_sint32_init (shiftfield_F1_A_f p_0) 4 init_0) ;
-         Init_F1_A_g = (read_init64 init_0 (shiftfield_F1_A_g p_0))
+         f = (Array_sint32_init (shiftfield_F1_A_f p_0) 4 init_0) ;
+         g = (read_init64 init_0 (shiftfield_F1_A_g p_0))
       }
   
   Function Array_sint32_init (p_0 : addr) (n_0 : int)
     (init_0 : bool[][]) : bool[]
   
-  Function Load_S1_A (p_0 : addr) (mem_0 : int[][]) : S1_A
+  Function Load_S1_A (p_0 : addr) (mem_0 : int[][]) : A
     = {
-         F1_A_f = (Array_sint32 (shiftfield_F1_A_f p_0) 4 mem_0) ;
-         F1_A_g =
-           (int_to_float64 (read_uint64 mem_0 (shiftfield_F1_A_g p_0)))
+         f = (Array_sint32 (shiftfield_F1_A_f p_0) 4 mem_0) ;
+         g = (int_to_float64 (read_uint64 mem_0 (shiftfield_F1_A_g p_0)))
       }
   
   Function Array_sint32 (p_0 : addr) (n_0 : int) (mem_0 : int[][]) : int[]
@@ -794,12 +787,10 @@ Cluster MemBytes.PointersProperties {
 
 Cluster S1_A {
   
-  Type S1_A = { F1_A_f : int[]; F1_A_g : f64; }
+  Predicate EqS1_A (S_0 : A) (S_1 : A)
+    = (S_1.g=S_0.g) /\ (EqArray_int 4 S_0.f S_1.f)
   
-  Predicate EqS1_A (S_0 : S1_A) (S_1 : S1_A)
-    = (S_1.F1_A_g=S_0.F1_A_g) /\ (EqArray_int 4 S_0.F1_A_f S_1.F1_A_f)
-  
-  Predicate IsS1_A (S_0 : S1_A) = (IsArray_sint32 S_0.F1_A_f)
+  Predicate IsS1_A (S_0 : A) = (IsArray_sint32 S_0.f)
   
 }
 

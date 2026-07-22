@@ -32,8 +32,7 @@ Prove: (Init_x_0=true).
 
 Goal Check 'FAIL' ("assigned_not_initialized_memvar.i", line 24, characters 19-35):
 Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
-Prove: (Init_s_0.Init_F1_S_i=true) /\
-    (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) ->
-     (Init_s_0.Init_F1_S_a[i_1]=true)))).
+Prove: (Init_s_0.i=true) /\
+    (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) -> (Init_s_0.a[i_1]=true)))).
 
 ------------------------------------------------------------

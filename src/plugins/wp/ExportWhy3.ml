@@ -38,17 +38,15 @@ module SMAP(S : sig type data val name : string end) =
 
 module TS = SMAP(struct type data = Why3.Ty.tysymbol let name = "TS" end)
 module LS = SMAP(struct type data = Why3.Term.lsymbol let name = "LS" end)
-module FS = SMAP(struct type data = Why3.Term.lsymbol let name = "FS" end)
-module CS = SMAP(struct type data = Why3.Term.lsymbol let name = "CS" end)
 
 let get_ts ctxt name =
   let data = Qed.Symbol.find_data ctxt.env name in
-  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Data.theory data ;
+  Qed.Symbol.Data.use ctxt.cluster data ;
   Qed.Symbol.Data.symbol data
 
 let get_ls ctxt name =
   let lfun  = Qed.Symbol.find_lfun ctxt.env name in
-  Qed.Symbol.use ctxt.cluster @@ Qed.Symbol.Fun.theory lfun ;
+  Qed.Symbol.Fun.use ctxt.cluster lfun ;
   Qed.Symbol.Fun.symbol lfun
 
 let t_app env name ?result tl =
@@ -80,14 +78,6 @@ let gamma context = {
   locals = Lang.F.Tmap.empty ;
 }
 
-let tvar =
-  let tvar = Datatype.Int.Hashtbl.create 10 in
-  fun i ->
-    Datatype.Int.Hashtbl.memo tvar i
-      (fun i ->
-         let id = Why3.Ident.id_fresh (Printf.sprintf "a%i" i) in
-         Why3.Ty.create_tvsymbol id)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Sharing                                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -116,13 +106,14 @@ let subterms f e =
 
 (* conversion *)
 
-let cc_adt (adt : Lang.adt) =
-  try match adt with
-    | Qdata a -> Qed.Symbol.Data.symbol a
-    | Atype lt -> TS.find (Lang.type_id lt)
-    | Comp(c,KValue) -> TS.find (Lang.comp_id c)
-    | Comp(c,KInit) -> TS.find (Lang.comp_init_id c)
-  with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
+let cc_adt context (adt : Lang.adt) =
+  match adt with
+  | Qdata a ->
+    Qed.Symbol.Data.use context.cluster a ;
+    Qed.Symbol.Data.symbol a
+  | Atype lt ->
+    try TS.find (Lang.type_id lt)
+    with Not_found -> failwith "Undefined logic type %S" @@ Lang.ADT.fullname adt
 
 let cc_lfun (lf : Lang.lfun) =
   try match lf with
@@ -132,15 +123,15 @@ let cc_lfun (lf : Lang.lfun) =
     | CTOR c -> LS.find (Lang.ctor_id c)
   with Not_found -> failwith "Undefined logic symbol %S" @@ Lang.Fun.fullname lf
 
-let cc_field (fd : Lang.field) =
-  try FS.find (Lang.Field.name fd)
-  with Not_found -> failwith "Undefined field symbol %S" @@ Lang.Field.fullname fd
+let cc_field ctxt (fd : Lang.field) =
+  Qed.Symbol.Field.use ctxt.cluster fd ;
+  Qed.Symbol.Field.symbol fd
 
-let cc_comp = function
-  | [] -> assert false
-  | (fd,_) :: _ ->
-    try CS.find (Lang.ADT.name @@ Lang.adt_of_field fd)
-    with Not_found -> failwith "Undefined record symbol for field %S" @@ Lang.Field.fullname fd
+let cc_record ctxt fvs =
+  let data = Qed.Symbol.record_of_field @@ fst @@ List.hd fvs in
+  Qed.Symbol.Data.use ctxt.cluster data ;
+  fst @@ List.hd @@ Qed.Symbol.constructors data,
+  List.sort (fun (f,_) (g,_) -> Qed.Symbol.by_field_rank f g) fvs
 
 let is_cassoc = function Qed.Logic.Operator op -> op.associative | _ -> false
 
@@ -160,10 +151,9 @@ let rec cc_tau ctxt (t:Lang.F.tau) =
     let ts = get_ts ctxt "map.Map.map" in
     Some (Why3.Ty.ty_app ts [Option.get (cc_tau ctxt k); Option.get (cc_tau ctxt v)])
   | Data(adt,l) ->
-    let ts = cc_adt adt in
+    let ts = cc_adt ctxt adt in
     Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (cc_tau ctxt e)) l))
-  | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
-  | Record _ -> failwith "Type %a not (yet) convertible" Lang.F.pp_tau t
+  | Tvar i -> Some (Why3.Ty.ty_var (Qed.Symbol.tvar i))
 
 let const_int z =
   let k = Why3.BigInt.of_string (Z.to_string z) in
@@ -331,10 +321,11 @@ and cc_any env t =
         else call ts
     end
   | Rget(e,fd) ->
-    Why3.Term.t_app_infer (cc_field fd) [cc_term env e]
+    Why3.Term.t_app_infer (cc_field env.context fd) [cc_term env e]
   | Rdef fvs ->
+    let mk,fvs = cc_record env.context fvs in
     let ts = List.map (fun (_,v) -> cc_term env v) fvs in
-    Why3.Term.t_app_infer (cc_comp fvs) ts
+    Why3.Term.t_app_infer mk ts
 
 and cc_equal env a b =
   let a = cc env a in
@@ -493,7 +484,7 @@ class visitor ctxt c =
     method on_type lt def =
       let name = Lang.type_id lt in
       let id = Why3.Ident.id_fresh name in
-      let map i _ = tvar i in
+      let map i _ = Qed.Symbol.tvar i in
       let tvs = List.mapi map lt.lt_params in
       match def with
       | Tabs ->
@@ -535,51 +526,12 @@ class visitor ctxt c =
               let id = Why3.Ident.id_fresh name in
               let ty = Option.get (cc_tau ctxt ty) in
               let ls = Why3.Term.create_fsymbol ~proj:true id [rty] ty in
-              FS.update name ls ;
               Some ls,ty
             ) fields in
         let id = Why3.Ident.id_fresh (Lang.type_id lt) in
         let ctor = Why3.Term.create_fsymbol ~constr:1 id args rty in
-        CS.update name ctor ;
         Qed.Symbol.add ctxt.cluster @@
         Why3.Decl.create_data_decl [tys,[ctor,fields]]
-
-    method private on_comp_gen kind c fts =
-      begin
-        let name = match kind with
-          | Lang.KValue -> Lang.comp_id c
-          | Lang.KInit -> Lang.comp_init_id c in
-        let compare_field (f,_) (g,_) =
-          let cmp = Lang.Field.compare f g in
-          if cmp = 0 then assert false (* by definition *) else cmp
-        in
-        let fts = Option.map (List.sort compare_field) fts in
-        let id = Why3.Ident.id_fresh name in
-        let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
-        let ty = Why3.Ty.ty_app ts [] in
-        let field (fd,tau) =
-          let tf = cc_tau ctxt tau in
-          let name = Lang.Field.name fd in
-          let id = Why3.Ident.id_fresh name in
-          let ls = Why3.Term.create_lsymbol ~proj:true id [ty] tf in
-          FS.update name ls ;
-          (Some ls,Option.get tf) in
-        let decl =
-          match fts with
-          | None -> Why3.Decl.create_ty_decl ts
-          | Some fts ->
-            let projs,fields = List.split @@ List.map field fts in
-            let id = Why3.Ident.id_fresh name in
-            let ctor = Why3.Term.create_fsymbol ~constr:1 id fields ty in
-            CS.update name ctor ;
-            Why3.Decl.create_data_decl [ts,[ctor,projs]]
-        in
-        TS.update name ts ;
-        Qed.Symbol.add ctxt.cluster decl
-      end
-
-    method on_comp = self#on_comp_gen KValue
-    method on_icomp = self#on_comp_gen KInit
 
     method private make_lemma env ?prefix (l: Definitions.dlemma) =
       let name = match prefix with
@@ -608,8 +560,8 @@ class visitor ctxt c =
       Wp_parameters.debug ~dkey:dkey_compile "Define %a@." Lang.Fun.pretty d.d_lfun ;
       let name = Lang.Fun.name d.d_lfun in
       let id = Why3.Ident.id_fresh name in
-      let map e = Option.get (cc_tau ctxt (Lang.F.tau_of_var e)) in
-      let tvs = List.map map d.d_params in
+      let param v = Option.get (cc_tau ctxt (Lang.F.tau_of_var v)) in
+      let tvs = List.map param d.d_params in
       let env = gamma ctxt in
       List.iter (Lang.F.add_var env.pool) d.d_params;
       begin
@@ -694,7 +646,12 @@ class visitor ctxt c =
 module CC =
 struct
   type nonrec env = env
-  let tvar = tvar
+  let cluster env = env.context.cluster
+  let export name cc =
+    let context = context (Why3Env.env ()) name in
+    let data = cc (gamma context) in
+    Qed.Symbol.close context.cluster, data
+
   let find_ts env = get_ts env.context
   let find_ls env = get_ls env.context
   let cc_tau env = cc_tau env.context

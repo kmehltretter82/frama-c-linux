@@ -64,6 +64,9 @@ val has_ctype : typ -> term -> pred
 val cdomain : c_object -> (term -> pred) option
 val ldomain : logic_type -> (term -> pred) option
 
+(** @raise Not_found *)
+val fieldinfo : Lang.field -> fieldinfo
+
 (** {2 Volatile Access} *)
 
 val volatile : ?warn:string -> unit -> bool
