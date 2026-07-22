@@ -1,103 +1,103 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[mt] Preparing sources for Mthread with lib pthreads
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
+[eva] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing null.c (with preprocessing)
-[mt] Warning: Mthread is an experimental plugin and is still in development.
-[mt] ******* Starting mthread
+[eva] Warning: Mthread is an experimental plugin and is still in development.
+[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
-[mt] *** Computing value analysis for main thread
+[eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[mt] New thread: <main>, fun main
-[mt] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
-[mt] null.c:24: Start thread tjob0
+[eva] New thread: <main>, fun main
+[eva] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
+[eva] null.c:24: Start thread tjob0
 [eva:alarm] null.c:27: Warning: 
   out of bounds read. assert \valid_read((char *)i);
-[mt] *** First value analysis for main thread done.
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] *** First value analysis for main thread done.
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
   v: read by <main> at null.c:26 <- main
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread <main> computed
-[mt] ******* Starting to iterate
-[mt] ***** Iteration 1
-[mt] *** Computing thread tjob0, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread tjob0
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread <main> computed
+[eva] ******* Starting to iterate
+[eva] ***** Iteration 1
+[eva] *** Computing thread tjob0, iteration 1 (first iteration)
+[eva] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   NULL[100..200]: write by tjob0 at null.c:16 <- job0
   v: read by tjob0 at null.c:15 <- job0
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread tjob0
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread tjob0 computed
-[mt] ***** Threads computed for iteration 1.
-[mt] * Computing live threads and locked mutexes
-[mt] * threads and mutexes computed
-[mt] ***** Computing shared variables
-[mt] Imprecise locations to watch: NULL[100..200]
-[mt] Concurrent imprecise accesses have changed: before
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread tjob0 computed
+[eva] ***** Threads computed for iteration 1.
+[eva] * Computing live threads and locked mutexes
+[eva] * threads and mutexes computed
+[eva] ***** Computing shared variables
+[eva] Imprecise locations to watch: NULL[100..200]
+[eva] Concurrent imprecise accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
-[mt] Possible read/write data races:
+[eva] Possible read/write data races:
   none
-[mt] Shared memory: \nothing
-[mt] Mutexes for concurrent accesses:
-[mt] Detailed shared zones protections
-[mt] ***** Shared variables computed
-[mt] ***** Iteration 2
-[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread <main>
+[eva] Shared memory: \nothing
+[eva] Mutexes for concurrent accesses:
+[eva] Detailed shared zones protections
+[eva] ***** Shared variables computed
+[eva] ***** Iteration 2
+[eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] Thread <main>, fun main
+[eva] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
   v: read by <main> at null.c:26 <- main
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread <main> computed
-[mt] *** Computing thread tjob0, iteration 2 (potential shared vars changed and
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread <main> computed
+[eva] *** Computing thread tjob0, iteration 2 (potential shared vars changed and
     interferences changed)
-[mt] * Computing value analysis for thread tjob0
+[eva] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
 [eva:interferences] null.c:16: inject threads interferences at this point
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   NULL[100..200]: write by tjob0 at null.c:16 <- job0
   v: read by tjob0 at null.c:15 <- job0
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread tjob0
     concurrent writes:
@@ -110,66 +110,66 @@
     interferences by mutexes:
       {}:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread tjob0 computed
-[mt] ***** Threads computed for iteration 2.
-[mt] * Computing live threads and locked mutexes
-[mt] * threads and mutexes computed
-[mt] ***** Computing shared variables
-[mt] Imprecise locations to watch: NULL[100..200]
-[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
-[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
-[mt] Possible read/write data races:
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread tjob0 computed
+[eva] ***** Threads computed for iteration 2.
+[eva] * Computing live threads and locked mutexes
+[eva] * threads and mutexes computed
+[eva] ***** Computing shared variables
+[eva] Imprecise locations to watch: NULL[100..200]
+[eva] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
+[eva] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
+[eva] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:27, unprotected
     write by tjob0 at null.c:16, unprotected
-[mt] Shared memory: NULL[100..200]
-[mt] Concurrent precise var accesses have changed: before
+[eva] Shared memory: NULL[100..200]
+[eva] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
-[mt] Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
-[mt] Mutexes for concurrent accesses:
+[eva] Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
+[eva] Mutexes for concurrent accesses:
   NULL[100..200]  unprotected
-[mt] Detailed shared zones protections
+[eva] Detailed shared zones protections
   NULL[100..200]: Read by <main>, Write by tjob0: unprotected
-[mt] ***** Shared variables computed
-[mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+[eva] ***** Shared variables computed
+[eva] ***** Iteration 3
+[eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
-[mt] * Computing value analysis for thread <main>
+[eva] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] null.c:27: inject threads interferences at this point
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
   v: read by <main> at null.c:26 <- main
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {NULL}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread <main> computed
-[mt] ***** Threads computed for iteration 3.
-[mt] * Computing live threads and locked mutexes
-[mt] * threads and mutexes computed
-[mt] ***** Computing shared variables
-[mt] Imprecise locations to watch: NULL[100..200]
-[mt] Possible read/write data races:
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread <main> computed
+[eva] ***** Threads computed for iteration 3.
+[eva] * Computing live threads and locked mutexes
+[eva] * threads and mutexes computed
+[eva] ***** Computing shared variables
+[eva] Imprecise locations to watch: NULL[100..200]
+[eva] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:27, unprotected
     write by tjob0 at null.c:16, unprotected
-[mt] Shared memory: NULL[100..200]
-[mt] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
-[mt] Mutexes for concurrent accesses:
+[eva] Shared memory: NULL[100..200]
+[eva] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
+[eva] Mutexes for concurrent accesses:
   NULL[100..200]  unprotected
-[mt] Detailed shared zones protections
+[eva] Detailed shared zones protections
   NULL[100..200]: Read by <main>, Write by tjob0: unprotected
-[mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 3 iterations
+[eva] ***** Shared variables computed
+[eva] ******* Analysis performed, 3 iterations

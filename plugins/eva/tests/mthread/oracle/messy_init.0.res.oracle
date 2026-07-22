@@ -1,74 +1,74 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[mt] Preparing sources for Mthread with lib pthreads
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
+[eva] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing messy_init.c (with preprocessing)
-[mt] Warning: Mthread is an experimental plugin and is still in development.
-[mt] ******* Starting mthread
+[eva] Warning: Mthread is an experimental plugin and is still in development.
+[eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
-[mt] *** Computing value analysis for main thread
+[eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[mt] New thread: <main>, fun main
+[eva] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
   Neither code nor specification for function random, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
-[mt] messy_init.c:16: Initializing mutex lock
-[mt] messy_init.c:19: Lock lock
-[mt] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
-[mt] messy_init.c:22: Start thread job
-[mt] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
-[mt] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
-[mt] *** First value analysis for main thread done.
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
-[mt] * shared variables computed
+[eva] messy_init.c:16: Initializing mutex lock
+[eva] messy_init.c:19: Lock lock
+[eva] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
+[eva] messy_init.c:22: Start thread job
+[eva] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
+[eva] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
+[eva] *** First value analysis for main thread done.
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread <main> computed
-[mt] ******* Starting to iterate
-[mt] ***** Iteration 1
-[mt] *** Computing thread job, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread job
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread <main> computed
+[eva] ******* Starting to iterate
+[eva] ***** Iteration 1
+[eva] *** Computing thread job, iteration 1 (first iteration)
+[eva] * Computing value analysis for thread job
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjob for thread job
-[mt] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
-[mt] messy_init.c:10: Warning: 
+[eva] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
+[eva] messy_init.c:10: Warning: 
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
-[mt] messy_init.c:10: Lock lock
-[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
+[eva] messy_init.c:10: Lock lock
+[eva] FRAMAC_SHARE/eva/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
+[eva] * Computing shared variables
+[eva] Globals accessed by thread:
   lock:
-    read by job at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
+    read by job at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
       pthread_mutex_lock :: messy_init.c:10 <- fjob
-[mt] * shared variables computed
+[eva] * shared variables computed
 [eva:interferences] 
   Interferences from thread job
     concurrent writes:
     shared bases: {}
     interferences by location:
     interferences by mutexes:
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread job computed
-[mt] ***** Threads computed for iteration 1.
-[mt] * Computing live threads and locked mutexes
-[mt] * threads and mutexes computed
-[mt] ***** Computing shared variables
-[mt] Imprecise locations to watch: \nothing
-[mt] Possible read/write data races:
+[eva] * Computing cfg
+[eva] * Cfg computed
+[eva] *** Thread job computed
+[eva] ***** Threads computed for iteration 1.
+[eva] * Computing live threads and locked mutexes
+[eva] * threads and mutexes computed
+[eva] ***** Computing shared variables
+[eva] Imprecise locations to watch: \nothing
+[eva] Possible read/write data races:
   none
-[mt] Shared memory: \nothing
-[mt] Mutexes for concurrent accesses:
-[mt] Detailed shared zones protections
-[mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 1 iterations
+[eva] Shared memory: \nothing
+[eva] Mutexes for concurrent accesses:
+[eva] Detailed shared zones protections
+[eva] ***** Shared variables computed
+[eva] ******* Analysis performed, 1 iterations
