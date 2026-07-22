@@ -131,7 +131,7 @@ PTEST_ALL_DIRS:=tests $(shell find -L plugins -type d -name tests)
 
 # Test aliasing definition allowing ./configure --disable-<plugin>
 PTEST_ALIASES:=@tests/ptests @plugins/ptests \
-  @src/kernel_internals/parsing/tests/ptests
+  @src/kernel/internals/parsing/tests/ptests
 
 # WP tests need WP cache
 PTEST_USE_WP_CACHE:=yes

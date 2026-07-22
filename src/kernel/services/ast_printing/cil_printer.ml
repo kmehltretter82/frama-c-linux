@@ -182,7 +182,7 @@ let state =
    have the largest level. The correctness criterion is that a smaller level
    MUST correspond to a stronger precedence!
    These levels must be coherent with the precedence used in file
-   [src/kernel_internals/parsing/logic_parser.mly].
+   [src/kernel/internals/parsing/logic_parser.mly].
 *)
 module Precedence = struct
 

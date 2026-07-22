@@ -129,8 +129,8 @@ extend-exclude = [
 # files temporarily excluded because they contain deprecated terms that are
 # being migrated towards a fixed version. We do not want to add the words
 # themselves (otherwise they might reappear in other files).
-"src/kernel_services/ast_queries/logic_const.ml",
-"src/kernel_services/ast_queries/logic_const.mli",
+"src/kernel/services/ast_queries/logic_const.ml",
+"src/kernel/services/ast_queries/logic_const.mli",
 "lib/datatype/structural_descr.ml",
 "lib/datatype/structural_descr.mli",
 "lib/arithmetic/finite.ml",

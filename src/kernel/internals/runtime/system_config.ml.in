@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-# 24 "src/kernel_internals/runtime/system_config.ml.in"
+# 24 "src/kernel/internals/runtime/system_config.ml.in"
 
 module Version = struct
   let id = "@VERSION@"

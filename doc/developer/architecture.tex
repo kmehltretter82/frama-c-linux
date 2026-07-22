@@ -230,7 +230,7 @@ libraries. They are respectively presented in Sections~\ref{adv:datatype} and
 
 \section{Kernel Services}\label{archi:services}\index{Kernel!Services|bfit}
 
-The kernel services is defined in directory \texttt{src/kernel\_services}. It
+The kernel services is defined in directory \texttt{src/kernel/services}. It
 is the part of the \framac kernel which may be useful to develop plug-ins.
 
 This services may be split in four main parts:
@@ -243,37 +243,37 @@ This services may be split in four main parts:
 
 The standard AST used by most analyzers is defined in module
 \texttt{Cil\_types}\codeidx{Cil\_types} of directory
-\texttt{src/kernel\_services/ast\_data}. It contains the types which describes
+\texttt{src/kernel/services/ast\_data}. It contains the types which describes
 both the \C constructs and the \acsl ones~\cite{acsl}. The same directory also
 contains modules defining datastructures directly based upon the AST (module
 \texttt{Globals}\codeidx{Globals}), functions (module
 \texttt{Kernel\_function}\codeidx{Kernel\_function}), annotations (module
 \texttt{Annotations}\codeidx{Annotations}) and so on. A related directory is
-\texttt{src/kernel\_services/ast\_queries}. It contains modules which provides
+\texttt{src/kernel/services/ast\_queries}. It contains modules which provides
 specific operations in order to get information about AST-related values.
 
 In the same way, an untyped AST quite close of the \C input source is defined in
 module \texttt{Cabs}\codeidx{Cabs} of directory
-\texttt{src/kernel\_services/parsetree}. This AST is only well suited
+\texttt{src/kernel/services/parsetree}. This AST is only well suited
 for syntactic analyzers/program transformers.
 
 \framac also provides services to plug-ins which help both their integration in
 the platform and their interactions with the kernel and the other plug-ins. They
 enforce some platform-wide consistency by ensuring that some common actions
 (\emph{e.g.} printing messages to end-users) are handled by all plugins in a
-similar way. Directory \texttt{src/kernel\_services/cmdline\_parameters}
+similar way. Directory \texttt{src/kernel/services/cmdline\_parameters}
 provides modules which eases the definition of analyzers' parameters accessible
 by the end-user through command-line options. Similarly, directory
-\texttt{src/kernel\_services/plugin\_entry\_points} provides modules to interact
+\texttt{src/kernel/services/plugin\_entry\_points} provides modules to interact
 with the \framac kernel or other plug-ins.
 
 Next, \framac provides predefined ways to visit the ASTs, in particular through
 object-oriented visitors defined in directory
-\texttt{src/kernel\_services/visitors} (see Section~\ref{adv:visitors}).
+\texttt{src/kernel/services/visitors} (see Section~\ref{adv:visitors}).
 Some predefined analyzers, such as a multiple generic dataflow analysis
-are provided in directory \texttt{src/kernel\_services/analysis}, while some
+are provided in directory \texttt{src/kernel/services/analysis}, while some
 predefined program transformation, such as cloning a function, are provided in
-directory \texttt{src/kernel\_services/ast\_transformations}.
+directory \texttt{src/kernel/services/ast\_transformations}.
 Finally, \framac provides an abstract interpretation
 toolbox\index{Abstract Interpretation}
 with various lattices in directory \texttt{abstract\_interp}.
@@ -284,7 +284,7 @@ with various lattices in directory \texttt{abstract\_interp}.
 
 \begin{target}kernel developers.\end{target}
 
-The kernel internals is defined in directory \texttt{src/kernel\_internals}. It
+The kernel internals is defined in directory \texttt{src/kernel/internals}. It
 is part of the \framac kernel which should be useless to develop analysis
 plug-ins, except possibly for very low-level interactions, or to extend the
 C or ACSL services of Frama-C. Consequently, if you are not a kernel
@@ -293,12 +293,12 @@ developer, you can safely ignore this section.
 The internals is split in three different parts, each of them being an
 independent subdirectory:
 \begin{itemize}
-\item the directory \texttt{src/kernel\_internals/parsing} contains the lexer
+\item the directory \texttt{src/kernel/internals/parsing} contains the lexer
   and parser which generate the untyped AST (\emph{aka} Cabs) from the \C input
   source code;
-\item the directory \texttt{src/kernel\_internals/typing} contains the
+\item the directory \texttt{src/kernel/internals/typing} contains the
   compiler which generates the standard AST (\emph{aka} Cil) from the untyped
   one;
-\item the directory \texttt{src/kernel\_internals/runtime} contains modules
+\item the directory \texttt{src/kernel/internals/runtime} contains modules
   whose primary purpose is to perform side-effects while \framac is booting.
 \end{itemize}

@@ -16,7 +16,7 @@
  (modules configurator))
 
 (rule
- (deps VERSION VERSION_CODENAME src/kernel_internals/runtime/system_config.ml.in)
+ (deps VERSION VERSION_CODENAME src/kernel/internals/runtime/system_config.ml.in)
  (targets
    python-3.10-available
    gcc-is-genuine
