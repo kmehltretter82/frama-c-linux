@@ -101,6 +101,10 @@ function Usage
     echo "  FRAMAC_DEVONLY_OPTIONS_POST"
     echo "    Options that frama-c will pre/ap-pend to its actual command-line"
     echo ""
+    echo "DOCUMENTATION"
+    echo ""
+    echo "  Additional documentation for ${THIS_SCRIPT} and how to run tests"
+    echo "  is available at https://git.frama-c.com/frama-c/frama-c/-/wikis/home#running-tests"
 }
 
 # --------------------------------------------------------------------------
