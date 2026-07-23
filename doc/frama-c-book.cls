@@ -633,6 +633,15 @@
 \lstnewenvironment{logs}[1][]%
 {\lstset{language=Logs,basicstyle=\lp@basic,#1}}{}
 
+% Allow mathescape, so that e.g. unicode translations are possible
+\lstdefinelanguage{LogsMath}[]{}{%
+  style=frama-c-basic-style,
+  backgroundcolor=
+}
+
+\lstnewenvironment{logsmath}[1][]%
+{\lstset{language=LogsMath,basicstyle=\lp@basic,#1}}{}
+
 % Makefile
 % --------------------------------------------------------------------------
 

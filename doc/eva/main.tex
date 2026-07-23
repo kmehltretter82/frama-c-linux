@@ -139,9 +139,9 @@ invalid pointer accesses,\ldots
 
 When launched with \lstinline|frama-c -eva rte.c|,
 \Eva{} emits a warning about an out-of-bound access at line 5:
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] rte.c:5: Warning: accessing out of bounds index. assert i < 10;
-\end{logs}
+\end{logsmath}
 There is in fact an out-of-bounds access at this line in the program.
 It can also happen that, because of approximations during its computations,
 Frama-C emits warnings for constructs
@@ -341,7 +341,7 @@ gcc *.c
 ./a.out
 \end{frama-c-commands}
 
-\begin{logs}
+\begin{logsmath}
 215
 215
 189
@@ -350,7 +350,7 @@ gcc *.c
 124
 124
 13
-\end{logs}
+\end{logsmath}
 
 \begin{important}
   Your actual result may differ from the one above;
@@ -434,12 +434,12 @@ This should match lines indicating functions that are both undefined
 (without source) and that have no specification in Frama-C's standard library.
 In our example, we obtain the following lines in the log:
 
-\begin{logs}
+\begin{logsmath}
 [kernel:annot:missing-spec] main_1.c:13: Warning:
   Neither code nor specification for function Skein_256_Init,
   generating default assigns from the prototype
 [eva] using specification for function Skein_256_Init
-\end{logs}
+\end{logsmath}
 
 The same messages are produced for functions \verb|Skein_256_Update| and
 \verb|Skein_256_Final|.
@@ -515,22 +515,22 @@ By default, \textsf{Metrics} does not list functions from the standard C
 library. This can be done by adding option \verb|-metrics-libc|, which would
 produce something similar to:
 
-\begin{logs}
+\begin{logsmath}
 Specified-only functions (94)
 =======================
 [...]
 memcpy (21 calls); (...) memset (27 calls); (...) printf_va_1 (1 call);
-\end{logs}
+\end{logsmath}
 
 The fact that these functions are marked as {\em Specified-only}
 means that \Eva{} will use their ACSL specifications (which are already present
 in Frama-C's libc) instead of their code (which is absent). When running \Eva{},
 some of these functions result in an output similar to the following:
 
-\begin{logs}
+\begin{logsmath}
 [eva] FRAMAC_SHARE/libc/string.h:118:
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-\end{logs}
+\end{logsmath}
 
 Note that this message is {\em not} a warning (it does not begin with the word
 ``Warning'') neither an alarm (it is not prefixed with \verb|[eva:alarm]|). It
@@ -590,9 +590,9 @@ standard library.
 
 After the initial values, the analysis log contains some lines such as:
 
-\begin{logs}
+\begin{logsmath}
 [eva] skein_block.c:56: starting to merge loop iterations
-\end{logs}
+\end{logsmath}
 
 This means that \Eva{} has encountered a loop and is performing an
 approximation. These messages can be ignored for now.
@@ -600,10 +600,10 @@ approximation. These messages can be ignored for now.
 Arguably some of the most important messages in the analysis are {\em alarms},
 such as the one below:
 
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] skein_block.c:69: Warning:
   accessing uninitialized left-value. assert \initialized(&ks[i]);
-\end{logs}
+\end{logsmath}
 
 As we will find out later in this tutorial, this alarm is a false
 alarm, an indication of a potential problem in a place where there is
@@ -652,17 +652,10 @@ will prevent it from being unrolled, even when \verb+-eva-auto-loop-unroll+
 is active.
 
 Frama-C's graphical interface can help estimating loop bounds by inspecting the
-values taken by the loop counter, as in the example below:
-
-\begin{figure}[hbt]
-\centering
-\includegraphics[width=0.75\textwidth]{gui-images/gui-loop-to-unroll.png}
-\caption{Estimating loop unroll bounds in the GUI}
-\label{fig:gui-loop-to-unroll}
-\end{figure}
-
-In this case, \verb|WCNT| has a constant value (4), so it could also be used
-to estimate the loop bounds.
+values taken by the loop counter in the \emph{Eva Values} view.
+In this case, the loop condition is \verb|while(i < (size_t)WCNT)|,
+where \verb|WCNT| has the constant value 4 and values of variable \verb|i|
+range from 0 to 4, so the loop bound is 4.
 
 We can then Ctrl+click on the loop condition in the original source view
 (right panel) to open an editor\footnote{The external code editor used by the GUI
@@ -684,9 +677,9 @@ complete is to check that ``starting to merge loop iterations'' is no
 longer emitted when entering the loop. Also, when a loop unroll annotation
 is present but insufficient to unroll the loop, a message is emitted:
 
-\begin{logs}
+\begin{logsmath}
 [eva:loop-unroll] skein_block.c:57: loop not completely unrolled
-\end{logs}
+\end{logsmath}
 
 Once a loop is completely unrolled, any ``leftovers'' are ignored, so it incurs
 no extra cost. Using a value larger than necessary is therefore not an issue.
@@ -747,14 +740,14 @@ frama-c -eva-precision 3 -eva *.c > log
 Now, the analysis goes rather far without finding any alarm,
 but when it is almost done (after the analysis of function
 \lstinline|Skein_256_Final|), it produces:
-\begin{logs}
+\begin{logsmath}
 ...
 [eva] using specification for function printf_va_1
 [eva:alarm] main_1.c:17: Warning:
   accessing uninitialized left-value. assert \initialized(&hash[i]);
 [eva] Done for function main
 ...
-\end{logs}
+\end{logsmath}
 
 There remains an alarm about initialization, but all the others have been
 removed. Trying larger values for precision or slevel does not change this.
@@ -765,33 +758,31 @@ In this case, we can afford to spend some time looking at it in more detail.
 Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
 
 \begin{frama-c-commands}
-frama-c-gui -eva-precision 3 -eva *.c > log
+frama-c-gui -eva-precision 3 -eva *.c
 \end{frama-c-commands}
 
 The GUI allows the user to navigate the source code, to inspect the sets of
 values inferred by the analysis and to get
-a feeling of how it works. Right-clicking on the function name
+a feeling of how it works.
+
+Note that the GUI has several different uses, each of them with a customizable
+{\em View} that encapsulates the most relevant components. The {\em Eva Values}
+view is suitable for inspecting values. When selected, is displays the code
+seen by Frama-C in the the upper left component (AST).
+
+Right-clicking on the function name
 at a call site brings a contextual menu to jump
 to the function's definition.
 In order to return to the caller,
 right-clicking on the name of the current function at the top
 brings a contextual menu with a list of callers.
 You can also use the Back button (left arrow) in the toolbar.
-The Information panel also offers navigation possibilities between
-variables and their definitions.
 
-In the graphical interface, three panels (displayed below the
-source code) are very useful for \Eva{}: Properties, Values, and
-Red Alarms. Further details about the GUI are presented in chapter~\ref{gui}.
-For now, it suffices to say that:
-
-\begin{itemize}
-\item Properties displays (among others) the list of alarms in the program;
-\item Values displays the inferred values for the expression selected in the
-  Frama-C normalized source code (highlighted in green);
-\item Red Alarms displays some special cases of alarms that should be considered
-  first.
-\end{itemize}
+Other views often useful for \Eva{} are {\em Eva Summary} and
+{\em Properties}. Further details about the GUI are presented in
+chapter~\ref{gui}, and also in the online help: click on the ``?''
+(question mark) button in the top right corner of a component to
+see the online manual.
 
 In the GUI, each alarm is represented with a ``bullet'' to its left.
 Red bullets mean ``this {\em always} happens''; yellow
@@ -799,36 +790,35 @@ bullets mean ``this {\em may} happen (but I am not sure, due to
 approximations)''. When there are several alarms, some strategies allow
 prioritizing which alarms are more likely to correspond to actual issues.
 
-The overall rule of thumb when inspecting alarms in the GUI\footnote{The first
-  time the Frama-C GUI is run, the Properties panel displays several kinds of
-  properties. For \Eva{}, the most useful view consists in selecting the
-  ``Reset 'Status' filters to show only unproved/invalid'' option, using the
-  button next to ``Refresh'' in the Properties panel.} is the following:
+The Properties component is useful for inspecting alarms. In this component:
 
 \begin{itemize}
-\item inspect red alarms in the Properties panel; these correspond to
-  situations where the analysis is {\em certain} that a problem has arrived;
+\item an Invalid status indicates that the
+  analysis is {\em certain} that a problem has arrived;
   either an actual bug in the code, or some issue in the analysis that needs to
   be addressed (e.g. due to missing or incorrect specifications);
-\item inspect the cases present in the Red Alarms panel; these are situations
+\item the cases marked with an exclamation mark in the {\em Priority}
+  column\footnote{You can right-click the table header to add/remove columns,
+  such as Priority.} indicate situations
   which are likely to correspond to definitive problems, and thus should be
-  treated before others\footnote{The {\em exact} meaning of such red alarms is
-    too complex to be presented here; as a first approximation, these can be
-    seen as intermediate between red and yellow alarms.};
-\item inspect remaining cases (yellow alarms) in the Properties panel.
+  treated before others\footnote{The {\em exact} meaning of
+  ''high-priority alarms'' is
+  too complex to be presented here; as a first approximation, these can be
+  seen as intermediate between red and yellow alarms.};
+\item the remaining cases are usually of {\em Unknown} status.
 \end{itemize}
 
 In the case of our remaining alarm, it is yellow, but it appears in the
-Red Alarms panel. This indicates it is more likely to correspond to a real
+Priority column. This indicates it is more likely to correspond to a real
 issue.
 
-Extra information can be observed by clicking the alarm in the Red Alarms tab,
-which highlights it in the source code, then selecting expression
-\lstinline|hash| in line 17 and reading the \textsf{Values} tab:
-\begin{logs}
+Extra information can be observed by clicking the table row containing the
+alarm, which highlights it in the source code, and then selecting expression
+\lstinline|hash| in line 17 and reading the contents of \textsf{Eva Values}:
+\begin{logsmath}
   [0] $\in$ {200}
   [1..7] $\in$ UNINITIALIZED
-\end{logs}
+\end{logsmath}
 This means that element \lstinline|hash[0]| has value 200, but elements 1 to 7
 are definitely uninitialized. Therefore the first iteration of the loop
 proceeds as expected, but on the second iteration, the analysis of the branch
@@ -857,7 +847,7 @@ The bug can be fixed by passing
 With this fix in place, the analysis
 with \lstinline|-eva-precision 3| produces no alarms and gives the following
 result:
-\begin{logs}
+\begin{logsmath}
 Values for function main:
   hash[0] $\in$ {40}
       [1] $\in$ {234}
@@ -868,10 +858,10 @@ Values for function main:
       [6] $\in$ {37}
       [7] $\in$ {35}
   i $\in$ {8}
-\end{logs}
+\end{logsmath}
 
 Meanwhile, compiling and executing the fixed test produces the result:
-\begin{logs}
+\begin{logsmath}
 40
 234
 138
@@ -880,7 +870,7 @@ Meanwhile, compiling and executing the fixed test produces the result:
 120
 37
 35
-\end{logs}
+\end{logsmath}
 
 \section{Guaranteeing the absence of bugs}
 
@@ -949,10 +939,10 @@ We can get the complete list of locations that may be modified by each
 function by adding the option \verb|-out| to the other options we were
 already using. These locations are computed in a quick analysis that comes
 after \Eva{}. In the results of this analysis, we find:
-\begin{logs}
+\begin{logsmath}
 [inout] Out (internal) for function main:
           Frama_C_entropy_source; msg[0..79]; i; hash[0..7]; skein_context; tmp
-\end{logs}
+\end{logsmath}
 The ``(internal)'' reminds us that this list includes the local variables
 of \lstinline|main| that have been modified. Indeed, all the variables
 that we could expect to appear in the list are here: the input buffer, that
@@ -987,10 +977,10 @@ void main(void)
 
 Using option \verb|-out-external| in order to obtain lists of
 locations that exclude each function's local variables, we get:
-\begin{logs}
+\begin{logsmath}
 [inout] Out (external) for function do_Skein_256:
           hash[0..7]
-\end{logs}
+\end{logsmath}
 This means that no location other than \lstinline|hash[0..7]| was
 modified by the sequence of calls to Skein-256 functions. It doesn't
 mean that each of the cells of the array was overwritten: we have to
@@ -1009,7 +999,7 @@ the input locations that influence the final contents of this output location:
 \begin{frama-c-commands}
 frama-c -eva *.c -eva-precision 3 -deps
 \end{frama-c-commands}
-\begin{logs}
+\begin{logsmath}
 Function Skein_256_Init:
   skein_context.h.hashBitLen FROM ctx; hashBitLen
                .h{.bCnt; .T[0..1]; } FROM ctx
@@ -1041,7 +1031,7 @@ Function Skein_256_Final:
                                             (and SELF)
                .b[16..31] FROM skein_context.h.bCnt; ctx (and SELF)
   \result FROM \nothing
-\end{logs}
+\end{logsmath}
 The functional dependencies for the functions \lstinline|Init|,
 \lstinline|Update| and \lstinline|Final| are quite cryptic. They refer
 to fields of the struct \lstinline|skein_context|. We have not had
@@ -1063,10 +1053,10 @@ Since we don't know how the functions are supposed to work,
 it is difficult to tell if these
 dependencies are normal or reveal a problem. Let us move on to the
 functional dependencies of \lstinline|do_Skein_256|:
-\begin{logs}
+\begin{logsmath}
 Function do_Skein_256:
   hash[0..7] FROM msg[0..79]; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
-\end{logs}
+\end{logsmath}
 
 These dependencies make the effect of the functions clearer.  The
 \verb|FROM msg[0..79]| part is what we expect.  The
@@ -1344,9 +1334,9 @@ addresses, whose result cannot be precisely represented by the analyzer.
 \csource{examples/ari.c}
 In this example, the return value for \lstinline|f| is:
 
-\begin{logs}
+\begin{logsmath}
 {{ garbled mix of &{x; y} (origin: Arithmetic {ari.c:4}) }}
-\end{logs}
+\end{logsmath}
 
 \subsubsection{Misaligned read}
 
@@ -1412,9 +1402,9 @@ the then branch and from the else branch contain in the array
 \csource{examples/merge.c}
 The value returned by function \lstinline|main| is:
 
-\begin{logs}
+\begin{logsmath}
 {{ garbled mix of &{ x; y } (origin: Merge { merge.c:10 }) }}
-\end{logs}
+\end{logsmath}
 
 \subsubsection{Well value}
 
@@ -1460,10 +1450,10 @@ array accesses that may be invalid are flagged.
 In the above example, the analysis is not able to guarantee that
 the memory accesses \lstinline|t[i]| and \lstinline|*p| are valid,
 so it emits a proof obligation for each:
-\begin{logs}
+\begin{logsmath}
 invalid.c:5: ... accessing out of bounds index. assert i < 10;
 invalid.c:7: ... out of bounds write. assert \valid(p);
-\end{logs}
+\end{logsmath}
 (Notice that no alarm \lstinline|assert 0 <= i| is emitted, as the
 analysis is able to guarantee that this always holds.)
 
@@ -1501,12 +1491,12 @@ In the above example, the analysis emits alignment alarms on the conversion of
 \lstinline|c| and \lstinline|c2| as a pointer to \lstinline|int|.
 On the other hand, the next two conversions are valid and no alarm is emitted.
 
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] pointer_alignment.c:5: Warning:
   unaligned pointer creation. assert \aligned((char *)c,alignof(int));
 [eva:alarm] pointer_alignment.c:6: Warning:
   unaligned pointer creation. assert \aligned((char *)c2,alignof(int));
-\end{logs}
+\end{logsmath}
 
 All alignment alarms can be disabled with the
 \lstinline|-no-warn-unaligned-pointer| parameter.
@@ -1549,20 +1539,20 @@ In the example below, the first increment of the pointer \lstinline|p| is valid,
 although the resulting pointer should not be dereferenced. The second increment
 leads to an invalid alarm when option \lstinline|-warn-invalid-pointer| is on.
 \csource{examples/alarms/pointer_arith.c}
-\begin{logs}
+\begin{logsmath}
   [eva:alarm] pointer_arith.c:4: Warning:
     invalid pointer creation. assert \object_pointer(p + 1);
-\end{logs}
+\end{logsmath}
 
 In the same way, in the example below, the first conversion at line~5
 does not generate an alarm, but the second conversion leads to an invalid alarm
 with option \lstinline|-warn-invalid-pointer|.
 
 \csource{examples/alarms/pointer_conversion.c}
-\begin{logs}
+\begin{logsmath}
   [eva:alarm] pointer_arith.c:6: Warning:
     invalid pointer creation. assert \object_pointer((char *)(a + 2));
-\end{logs}
+\end{logsmath}
 
 
 \subsubsection{Division by zero}
@@ -1582,10 +1572,10 @@ the analysis after this point.
 The property expressed by an alarm may also not be taken into account
 when it is not easy to do so.
 \csource{examples/alarms/div.c}
-\begin{logs}
+\begin{logsmath}
 div.c:4: ... division by zero. assert (int)(x*y) $\not\equiv$ 0;
 div.c:5: ... division by zero. assert x $\not\equiv$ 0;
-\end{logs}
+\end{logsmath}
 In the above example, there is no way for the analyzer
 to guarantee that \lstinline|x*y| is not null, so it emits
 an alarm at line 4. In theory, it could avoid emitting
@@ -1604,9 +1594,9 @@ operation does not produce the \lstinline|0| or \lstinline|-1|
 result that could have been expected. Here is an example
 of program with such an issue, and the resulting alarm:
 \csource{examples/alarms/shift.c}
-\begin{logs}
+\begin{logsmath}
 shift.c:4: ... invalid RHS operand for shift. assert 0 $\le$ c < 32;
-\end{logs}
+\end{logsmath}
 
 \Eva{} also detects shifts on negative integers.
 Left-shifting a negative integer is an undefined behavior according to the
@@ -1619,10 +1609,10 @@ However, the option \lstinline|-warn-right-shift-negative| can be used to
 enable such alarms.
 
 \csource{examples/alarms/lshift.c}
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] lshift.c:4: Warning:
   invalid LHS operand for left shift. assert 0 $\le$ x;
-\end{logs}
+\end{logsmath}
 
 \subsubsection{Overflow in integer arithmetic}
 
@@ -1665,7 +1655,7 @@ An alarm is emitted when a floating-point value appears to exceed the
 range of the integer type it is converted to.
 
 \csource{examples/alarms/ov_float_int.c}
-\begin{logs}
+\begin{logsmath}
 ...
 [eva:alarm] ov_float_int.c:6: Warning: overflow in conversion from floating-point
  to integer. assert f < 2147483648;
@@ -1673,7 +1663,7 @@ range of the integer type it is converted to.
 [eva] Values at end of function main:
 f $\in$ [2000000000. .. 3000000000.]
 __retres $\in$ [2000000000..2147483647]
-\end{logs}
+\end{logsmath}
 
 \subsubsection{Floating-point alarms}
 
@@ -1687,10 +1677,10 @@ first kind of alarm can be seen in the following example.
 \begin{frama-c-commands}
 frama-c -eva -main sum double_op_res.c
 \end{frama-c-commands}
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] double_op_res.c:3: Warning: non-finite double value.
     assert \is_finite((double)(a+b));
-\end{logs}
+\end{logsmath}
 
 An alarm is also emitted when the program uses as argument to
 a floating-point operation a value from memory that does not
@@ -1705,10 +1695,10 @@ See the example below.
 \begin{frama-c-commands}
 frama-c -eva double_op_arg.c
 \end{frama-c-commands}
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] double_op_arg.c:7: Warning: non-finite float value.
     assert \is_finite(bits.f);
-\end{logs}
+\end{logsmath}
 
 These floating-point alarms can be disabled — thus allowing \lstinline|NaN| and infinite
 values for the analysis — by setting the \lstinline|-warn-special-float|
@@ -1733,13 +1723,13 @@ example:
 \Eva{} emits alarms for lines 5
 (variable \lstinline|r| may be uninitialized)
 and 13 (a dangling pointer to local variable \lstinline|t| is used).
-\begin{logs}
+\begin{logsmath}
 uninitialized.c:5: ...
   accessing uninitialized left-value. assert \initialized(&r);
 uninitialized.c:13: ...
   accessing left-value that contains escaping addresses.
   assert !\dangling(&p);
-\end{logs}
+\end{logsmath}
 
 By default, \Eva{} emits an alarm as soon as a value that may be uninitialized
 or a dangling address is read, even if this value is not used in any computation.
@@ -1780,10 +1770,10 @@ Trap representations can be created through unions or pointer casts.
 \begin{frama-c-commands}
 frama-c -eva invalid_bool.c
 \end{frama-c-commands}
-\begin{logs}
+\begin{logsmath}
   [eva:alarm] invalid_bool.c:4: Warning:
     trap representation of a _Bool lvalue. assert ub.b $\equiv$ 0 $\vee$ ub.b $\equiv$ 1;
-\end{logs}
+\end{logsmath}
 
 The option \lstinline|-no-warn-invalid-bool| can be used to disable alarms
 on \texttt{\_Bool} trap representations, in which case they are handled as
@@ -1861,7 +1851,7 @@ With option \verb|-unspecified-access|, three warnings are emitted during
 parsing. Each of these only mean that an expression with side-effects
 will require checking after the Abstract Syntax Tree has been elaborated.
 For instance, the first of these warnings is:
-\begin{logs}
+\begin{logsmath}
 [kernel] se.c:5: Warning:
   Unspecified sequence with side effect:
   /*  <-  */
@@ -1870,16 +1860,16 @@ For instance, the first of these warnings is:
   x ++;
   /* y <- x tmp */
   y = x + tmp;
-\end{logs}
+\end{logsmath}
 
 Then \Eva{} is run on the program.
 In the example at hand, the analysis finds problems at lines 5 and 7.
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] se.c:5: Warning: undefined multiple accesses in expression.
   assert \separated(&x, &x);
 [eva:alarm] se.c:7: Warning: undefined multiple accesses in expression.
   assert \separated(&x, p);
-\end{logs}
+\end{logsmath}
 At line 5, it can guarantee that an undefined behavior exists, and the analysis
 is halted.
 For line 7, it is not able to guarantee that \lstinline|p| does not point to
@@ -1932,9 +1922,9 @@ The program breaking this rule means compilers neither have to emit
 warnings (none of the above did) nor produce code that does what the
 programmer intended, whatever that was.
 Launched on the above program, \Eva{} says:
-\begin{logs}
+\begin{logsmath}
 partially overlapping lvalue assignment. assert p == q || \separated(p, q);
-\end{logs}
+\end{logsmath}
 
 By choice, \Eva{} does not emit alarms for overlapping
 assignments of size less than \lstinline|int|, for which reading and
@@ -1958,7 +1948,7 @@ and \lstinline|int *| are \emph{not} compatible).
 
 \csource{examples/alarms/valid_function.c}
 
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] valid_function.c:9: Warning:
   pointer to function with incompatible type. assert \valid_function(p);
 [kernel:annot:missing-spec] valid_function.c:9: Warning:
@@ -1969,7 +1959,7 @@ and \lstinline|int *| are \emph{not} compatible).
   pointer to function with incompatible type. assert \valid_function(p);
 [eva] valid_function.c:12:
   assertion 'Eva,function_pointer' got final status invalid.
-\end{logs}
+\end{logsmath}
 
 %TODO: alarm for pointer subtraction
 
@@ -2017,23 +2007,23 @@ is imprecise.
 
 Examples of messages that result from the apparition of imprecision in the
 analysis are:
-\begin{logs}
+\begin{logsmath}
 [eva] origin.c:14:
   Assigning imprecise value to pa1.
   The imprecision originates from Arithmetic {origin.c:14}
 
 [eva] origin.c:15:
   writing somewhere in {ta1} because of Arithmetic {origin.c:14}.
-\end{logs}
+\end{logsmath}
 
 Examples of messages that correspond to unusual circumstances are:
-\begin{logs}
+\begin{logsmath}
 [kernel] alloc.c:20: Warning:
   all target addresses were invalid. This path is assumed to be dead.
 
 [eva:locals-escaping] origin.i:86: Warning:
   locals {x} escaping the scope of local_escape_1 through esc2
-\end{logs}
+\end{logsmath}
 
 Note that a few messages are prefixed with \verb|[kernel]| instead of
 \verb|[eva]|, for technical reasons, but it is the analysis by \Eva{}
@@ -2044,7 +2034,7 @@ which causes them to be emitted.
 At the end of the analysis, \Eva{} produces a summary such as the
 following:
 
-\begin{logs}
+\begin{logsmath}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   6 functions analyzed (out of 44): 13% coverage.
@@ -2062,7 +2052,7 @@ following:
     Preconditions    11 valid     0 unknown     0 invalid     11 total
   100% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
-\end{logs}
+\end{logsmath}
 
 It contains:
 
@@ -2979,13 +2969,13 @@ Example:
 \begin{frama-c-commands}
 frama-c -eva-help
 \end{frama-c-commands}
-\begin{logs}
+\begin{logsmath}
 ...
 -eva-slevel <n>     superpose up to <n> states when unrolling control flow.
                     The larger n, the more precise and expensive the analysis
                     (defaults to 0)
 ...
-\end{logs}
+\end{logsmath}
 
 \begin{important}
   Historically, \Eva{} was called Value, and most of its options
@@ -3497,12 +3487,12 @@ For the recursive calls, the analysis' soundness relies entirely on the
 specification provided by the user, which is not verified, and a warning
 is emitted.
 
-\begin{logs}
+\begin{logsmath}
 [eva] file.c: Warning:
   Using specification of function <name> for recursive calls.
   Analysis of function <name> is thus incomplete and its soundness
   relies on the written specification.
-\end{logs}
+\end{logsmath}
 
 If no ACSL contract is provided for the recursive function,
 a minimal specification is inferred by the \FramaC kernel
@@ -4869,7 +4859,7 @@ frama-c -eva -eva-secure-flow sf.c
 \end{frama-c-commands}
 
 \Eva{} emits the following warnings:
-\begin{logs}
+\begin{logsmath}
 [eva:secure-flow:condition] sf.c:8: Warning:
   non-interference violation on condition involving {user_input; secret}
 [eva:secure-flow:indirect] sf.c:9: Warning:
@@ -4882,7 +4872,7 @@ frama-c -eva -eva-secure-flow sf.c
   indirect non-interference violation on {y; z}
 [eva:alarm] sf.c:24: Warning: assertion got status unknown.
 [eva:alarm] sf.c:25: Warning: assertion got status unknown.
-\end{logs}
+\end{logsmath}
 
 Warnings classified as \lstinline|eva:secure-flow| are non-interference
 violations. The first warning indicates a control-flow dependency on private
@@ -5220,10 +5210,10 @@ frama-c -eva -eva-slevel 12 -lib-entry -main f reduction.c
 \end{frama-c-commands}
 
 \Eva{} emits the following two warnings:
-\begin{logs}
+\begin{logsmath}
 reduction.c:8: warning: Assertion got status unknown.
 reduction.c:8: warning: Assertion got status valid.
-\end{logs}
+\end{logsmath}
 The first warning is emitted at the first iteration through the loop,
 with a state where it is not certain that \lstinline|x| is in the interval
 \lstinline|[0..9]|. The second warning is for the following iterations.
@@ -6341,10 +6331,10 @@ happens in the following example:
 \csource{examples/false_al.c}
 
 Analyzing this example with the default options produces:
-\begin{logs}
+\begin{logsmath}
 [eva:alarm] false_al.c:7: Warning: accessing out of bounds index. assert 0 <= i;
 [eva:alarm] false_al.c:9: Warning: division by zero. assert y != 0;
-\end{logs}
+\end{logsmath}
 
 On line 7, the tool is only capable of detecting that \lstinline|i| lies in
 the interval \lstinline|-100..100|, which is approximated but correct.

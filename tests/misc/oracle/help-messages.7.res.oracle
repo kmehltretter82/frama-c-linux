@@ -24,7 +24,6 @@ Options taking a string as argument should preferably be written
                     -e-acsl-no-concurrency)
 -e-acsl-full-mtracking  maximal memory-related instrumentation (opposite
                     option is -e-acsl-no-full-mtracking)
--e-acsl-full-mmodel  alias for option -e-acsl-full-mtracking
 -e-acsl-functions <f1, ..., fn>  only annotations in functions f1, ..., fn
                     are checked at runtime (preferably use
                     -e-acsl-functions="f1, ..., fn")
@@ -36,8 +35,9 @@ Options taking a string as argument should preferably be written
 -e-acsl-project <prj>  the name of the generated project is <prj> (default to
                     "e-acsl") (preferably use -e-acsl-project="prj")
 -e-acsl-replace-libc-functions  replace some libc functions (such as strcpy)
-                    with built-inRTL alternatives (opposite option is
-                    -e-acsl-no-replace-libc-functions)
+                    with built-in RTL alternatives, which have function
+                    contracts and additional runtime safe-guards (opposite
+                    option is -e-acsl-no-replace-libc-functions)
 -e-acsl-share <dir>  set the plug-in share directory to <dir> (may be used if
                     the plug-in is not installed at the same place as
                     Frama-C)
@@ -111,17 +111,19 @@ Options taking a string as argument should preferably be written
                     error-once. Defaults to warning. (preferably use
                     -e-acsl-warn-key="k1[=s1][,...,kn[=sn]]")
 
-*** WIDENING
+*** TWEAKING INTEGER ANALYSIS (EXPERTS ONLY)
 
--e-acsl-widening-arguments <s>  widening strategy for arguments of functions
-                    on a case by case basis. (preferably use
-                    -e-acsl-widening-arguments="")
--e-acsl-widening-arguments-base <n>  widening strategy for arguments of
-                    recursive functions.
--e-acsl-widening-output <s>  widening strategy for output of recursive
-                    functions on a case
-                                                                             
-                                                           by case basis.
-                    (preferably use -e-acsl-widening-output="")
--e-acsl-widening-output-base <n>  widening strategy for output of recursive
-                    functions.
+-e-acsl-widening-arguments <s>  like -e-acsl-widening-arguments-base, but
+                    defines specific values for individual functions. For
+                    example f1:3,f2:4 uses the values 3 and 4 for f1 and f2.
+                    (preferably use -e-acsl-widening-arguments="")
+-e-acsl-widening-arguments-base <n>  tweak integer analysis by using <n> as a
+                    default value for arguments during the widening of
+                    recursive functions. May be used to improve performance
+                    of integer arithmetics at the cost of a slower
+                    compilation time.
+-e-acsl-widening-output <s>  like -e-acsl-widening-arguments, but defines
+                    values for results (and not arguments) (preferably use
+                    -e-acsl-widening-output="")
+-e-acsl-widening-output-base <n>  like -e-acsl-widening-arguments-base, but
+                    defines a value for results (and not arguments)

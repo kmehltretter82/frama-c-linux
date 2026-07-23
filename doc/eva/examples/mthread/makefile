@@ -27,6 +27,7 @@ clean:
 MT_QUEUE = ${MTSHARE}/mthread_queue.c
 
 MT_COMMON_FLAGS = \
+  -eva \
   -mthread \
 	-mt-threads-lib pthreads \
 	-eva-verbose 0 \

@@ -216,7 +216,7 @@ more information about whether a specific set of UBs is handled by the platform.
   \label{tab:ubs-not-handled}%
   CC.2 & Syntactic; out of the scope of \FramaC's analyzers.\\
   CC.3 & Out of scope (lexing/preprocessing-related).\\
-  CC.5 & Requires concurrency analysis; the Mthread plugin can provide some guarantees.\\
+  CC.5 & Requires concurrency analysis; the \mthread plugin can provide some guarantees.\\
   CC.14 & Only applies to implementations not following IEEE-754. \FramaC's machdeps assume they do.\\
   CC.18 & Only applies to implementations not following IEEE-754. \FramaC's machdeps assume they do.\\
   CC.27 & Out of scope (lexing/preprocessing-related).\\
@@ -346,7 +346,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{328}: Reversible One-Way Hash & Annotations & Requires annotating hash-related functions and variables\\
   \CWE{338}: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG) & Annotations & Requires annotating PRNG-related functions and variables\\
   \CWE{364}: Signal Handler Race Condition & Not Handled & -\\
-  \CWE{366}: Race Condition Within Thread & Not Handled & Some situations can be handled by the Mthread plugin\\
+  \CWE{366}: Race Condition Within Thread & Not Handled & Some situations can be handled by the \mthread plugin\\
   \CWE{367}: TOC TOU & Not Handled & -\\
   \CWE{369}: Divide by Zero & Handled & -\\
   \CWE{377}: Insecure Temporary File & Annotations & Requires annotating functions and data flows related to temporary files\\

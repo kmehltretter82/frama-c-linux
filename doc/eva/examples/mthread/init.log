@@ -4,8 +4,8 @@
 [kernel] Parsing init.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva:experimental] Warning: The mthread domain is experimental.
+[mt] *** Computing value analysis for main thread
 [mt] New thread: <main>, fun main
 [mt] init.c:20: Initializing mutex locks[0]
 [mt] init.c:20: Initializing mutex locks[1]
@@ -25,12 +25,6 @@
   Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:13: Warning: The mutex 0 is already registered.
 [mt] *** First value analysis for main thread done.
+[mt] *** Thread <main> computed
 [mt] ******* Starting to iterate
-[mt] ***** Iteration 1
-[mt] ***** Threads computed for iteration 1.
-[mt] ***** Computing shared variables
-[mt] Possible read/write data races:
-  none
-[mt] Mutexes for concurrent accesses:
-[mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 1 iterations
+[mt] ******* Analysis performed, 0 iterations

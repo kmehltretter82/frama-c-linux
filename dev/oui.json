@@ -1,7 +1,7 @@
 {
   "name": "frama-c",
   "fullname": "Frama-C",
-  "version": "33.0~beta",
+  "version": "33.0",
   "exec_files": [
     "bin/frama-c",
     "bin/frama-c-script",
