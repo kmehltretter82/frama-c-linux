@@ -594,6 +594,7 @@ module Provers = String_list
          - '<why3-prover>' (any Why3 prover, see -wp-list-provers)\n\
         "
     end)
+let () = on_reset Provers.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Interactive = String
