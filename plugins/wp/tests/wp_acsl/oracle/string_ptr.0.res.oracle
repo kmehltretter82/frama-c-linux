@@ -1,0 +1,41 @@
+# frama-c -wp [...]
+[kernel] Parsing string_ptr.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function main
+------------------------------------------------------------
+
+Goal Check 'A' ("string_ptr.c", line 16):
+Let a_1 = global(K___fc_lit_string1_22).
+Let x = Mchar_0[shift_sint8(a, 0)].
+Assume {
+  Type: is_sint8(x) /\ is_sint8(Mchar_0[shift_sint8(a, 3)]).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ sconst(Mchar_0).
+  (* Initializer *)
+  Init: forall i : Z. ((3 <= i) -> ((i <= 3) ->
+      (Mchar_0[shift_sint8(a_1, i)] = 0))).
+  (* Initializer *)
+  Init: shift_sint8(a_1, 0) = a.
+}
+Prove: x = 65.
+
+------------------------------------------------------------
+
+Goal Check 'Z' ("string_ptr.c", line 17):
+Let a_1 = global(K___fc_lit_string1_22).
+Let x = Mchar_0[shift_sint8(a, 3)].
+Assume {
+  Type: is_sint8(Mchar_0[shift_sint8(a, 0)]) /\ is_sint8(x).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ sconst(Mchar_0).
+  (* Initializer *)
+  Init: forall i : Z. ((3 <= i) -> ((i <= 3) ->
+      (Mchar_0[shift_sint8(a_1, i)] = 0))).
+  (* Initializer *)
+  Init: shift_sint8(a_1, 0) = a.
+}
+Prove: x = 0.
+
+------------------------------------------------------------
