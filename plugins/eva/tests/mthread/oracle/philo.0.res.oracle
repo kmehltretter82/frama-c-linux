@@ -559,15 +559,15 @@
 [eva:shared-memory:zone] Shared memory: end2
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  end2  write protected by (?)locks[0] (?)locks[1] (?)locks[2] (?)locks[3]
-        (?)locks[4], read unprotected
+    end2  write protected by (?)locks[0] (?)locks[1] (?)locks[2] (?)locks[3]
+          (?)locks[4], read unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  end2:
-    Read by <main>, Write by jobs[4]: unprotected
-    Read by <main>, Write by jobs[3]: unprotected
-    Read by <main>, Write by jobs[2]: unprotected
-    Read by <main>, Write by jobs[0]: unprotected
+  Detailed shared memory protections:
+    end2:
+      Read by <main>, Write by jobs[4]: unprotected
+      Read by <main>, Write by jobs[3]: unprotected
+      Read by <main>, Write by jobs[2]: unprotected
+      Read by <main>, Write by jobs[0]: unprotected
 [eva:data-races] 
   Possible read/write data races:
     end2:

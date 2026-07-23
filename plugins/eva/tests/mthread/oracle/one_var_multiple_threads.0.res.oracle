@@ -817,14 +817,14 @@
 [eva:shared-memory:zone] Shared memory: s1; s2
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  s1  protected by lock1
-  s2  protected by lock2
+    s1  protected by lock1
+    s2  protected by lock2
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  s2.data2: Read by <main>, Write by jobs: protected by lock2
-  s2.data: Read by <main>, Write by jobs: protected by lock2
-  s1.data2: Read by <main>, Write by jobs: protected by lock1
-  s1.data: Read by <main>, Write by jobs: protected by lock1
+  Detailed shared memory protections:
+    s2.data2: Read by <main>, Write by jobs: protected by lock2
+    s2.data: Read by <main>, Write by jobs: protected by lock2
+    s1.data2: Read by <main>, Write by jobs: protected by lock1
+    s1.data: Read by <main>, Write by jobs: protected by lock1
 [eva:data-races] 
   Possible read/write data races:
     none

@@ -600,16 +600,16 @@
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  shared_a  unprotected
-  shared_b  unprotected
+    shared_a  unprotected
+    shared_b  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  shared_b:
-    Read by joboneshot, Write by joblooped: unprotected
-    Read by <main>, Write by joblooped: unprotected
-  shared_a:
-    Read by joblooped, Write by joboneshot: unprotected
-    Read by <main>, Write by joboneshot: unprotected
+  Detailed shared memory protections:
+    shared_b:
+      Read by joboneshot, Write by joblooped: unprotected
+      Read by <main>, Write by joblooped: unprotected
+    shared_a:
+      Read by joblooped, Write by joboneshot: unprotected
+      Read by <main>, Write by joboneshot: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   interferences.c:110 (for shared_b)

@@ -122,10 +122,10 @@
 [eva:shared-memory:zone] Shared memory: r
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  r  write unprotected, read unaccessed
+    r  write unprotected, read unaccessed
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  r:
+  Detailed shared memory protections:
+    r:
 [eva:data-races] 
   Possible read/write data races:
     none

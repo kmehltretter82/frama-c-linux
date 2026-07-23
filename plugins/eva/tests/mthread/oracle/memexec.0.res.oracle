@@ -124,12 +124,12 @@
 [eva:shared-memory:zone] Shared memory: a; c
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  a  unprotected
-  c  unprotected
+    a  unprotected
+    c  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  c: Read by <main>, Write by th1: unprotected
-  a: Read by <main>, Write by th1: unprotected
+  Detailed shared memory protections:
+    c: Read by <main>, Write by th1: unprotected
+    a: Read by <main>, Write by th1: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   memexec.c:33 (for a; c)

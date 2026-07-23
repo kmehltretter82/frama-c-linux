@@ -1216,16 +1216,16 @@
 [eva:shared-memory:zone] Shared memory: s4; s5; s6
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  s4  unprotected
-  s5  unprotected
-  s6  unprotected
+    s4  unprotected
+    s5  unprotected
+    s6  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  s6:
-    Read by jobs6, Write by jobs4: unprotected
-    Read by jobs4, Write by jobs6: unprotected
-  s5: Read by jobs51, Write by jobs5: unprotected
-  s4: Read by jobs4, Write by <main>: unprotected
+  Detailed shared memory protections:
+    s6:
+      Read by jobs6, Write by jobs4: unprotected
+      Read by jobs4, Write by jobs6: unprotected
+    s5: Read by jobs51, Write by jobs5: unprotected
+    s4: Read by jobs4, Write by <main>: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   sharedvars.c:68 (for s4)

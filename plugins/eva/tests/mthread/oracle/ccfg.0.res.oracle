@@ -1330,49 +1330,49 @@
 [eva:shared-memory:zone] Shared memory: global1; global2[0..1]; a; b; c; d; e; f
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  global1  unprotected
-  global2[0..1]  unprotected
-  a  protected by lock
-  b  protected by lock
-  c  unprotected
-  d  unprotected
-  e  unprotected
-  f  unprotected
+    global1  unprotected
+    global2[0..1]  unprotected
+    a  protected by lock
+    b  protected by lock
+    c  unprotected
+    d  unprotected
+    e  unprotected
+    f  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  f:
-    Read by job_f1, Write by job_f2: unprotected
-    Read by <main>, Write by job_f2: unprotected
-  e:
-    Read by job_f2, Write by job_f1: unprotected
-    Read by <main>, Write by job_f1: unprotected
-  d:
-    Read by job_f1, Write by job_f2: unprotected
-    Read by <main>, Write by job_f2: unprotected
-  c:
-    Read by job_f2, Write by job_f1: unprotected
-    Read by <main>, Write by job_f1: unprotected
-  b:
-    Read by job_f1, Write by job_f2: protected by lock
-    Read by <main>, Write by job_f2: protected by lock
-  a:
-    Read by job_f2, Write by job_f1: protected by lock
-    Read by <main>, Write by job_f1: protected by lock
-  global2[1]:
-    Read by jobs[3], Write by <main>: unprotected
-    Read by jobs[2], Write by <main>: unprotected
-    Read by jobs[1], Write by <main>: unprotected
-    Read by jobs[0], Write by <main>: unprotected
-  global2[0]:
-    Read by jobs[3], Write by <main>: unprotected
-    Read by jobs[2], Write by <main>: unprotected
-    Read by jobs[1], Write by <main>: unprotected
-    Read by jobs[0], Write by <main>: unprotected
-  global1:
-    Read by jobs[3], Write by <main>: unprotected
-    Read by jobs[2], Write by <main>: unprotected
-    Read by jobs[1], Write by <main>: unprotected
-    Read by jobs[0], Write by <main>: unprotected
+  Detailed shared memory protections:
+    f:
+      Read by job_f1, Write by job_f2: unprotected
+      Read by <main>, Write by job_f2: unprotected
+    e:
+      Read by job_f2, Write by job_f1: unprotected
+      Read by <main>, Write by job_f1: unprotected
+    d:
+      Read by job_f1, Write by job_f2: unprotected
+      Read by <main>, Write by job_f2: unprotected
+    c:
+      Read by job_f2, Write by job_f1: unprotected
+      Read by <main>, Write by job_f1: unprotected
+    b:
+      Read by job_f1, Write by job_f2: protected by lock
+      Read by <main>, Write by job_f2: protected by lock
+    a:
+      Read by job_f2, Write by job_f1: protected by lock
+      Read by <main>, Write by job_f1: protected by lock
+    global2[1]:
+      Read by jobs[3], Write by <main>: unprotected
+      Read by jobs[2], Write by <main>: unprotected
+      Read by jobs[1], Write by <main>: unprotected
+      Read by jobs[0], Write by <main>: unprotected
+    global2[0]:
+      Read by jobs[3], Write by <main>: unprotected
+      Read by jobs[2], Write by <main>: unprotected
+      Read by jobs[1], Write by <main>: unprotected
+      Read by jobs[0], Write by <main>: unprotected
+    global1:
+      Read by jobs[3], Write by <main>: unprotected
+      Read by jobs[2], Write by <main>: unprotected
+      Read by jobs[1], Write by <main>: unprotected
+      Read by jobs[0], Write by <main>: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   ccfg.c:19 (for global1; global2[0..1])

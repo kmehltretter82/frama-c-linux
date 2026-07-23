@@ -255,12 +255,12 @@
 [eva:shared-memory:zone] Shared memory: a; b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  a  unprotected
-  b  unprotected
+    a  unprotected
+    b  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  b: Read by tjob2, Write by <main>: unprotected
-  a: Read by tjob1, Write by <main>: unprotected
+  Detailed shared memory protections:
+    b: Read by tjob2, Write by <main>: unprotected
+    a: Read by tjob1, Write by <main>: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   memcpy.c:32 (for b)

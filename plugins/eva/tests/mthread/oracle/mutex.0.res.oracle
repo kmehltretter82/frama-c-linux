@@ -365,12 +365,12 @@
 [eva:shared-memory:zone] Shared memory: s1; s2
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write unprotected, read protected by m1
+    s1  write protected by m1 m2, read protected by m1
+    s2  write unprotected, read protected by m1
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  s2: Read by jobs2, Write by jobs3: unprotected
-  s1: Read by jobs2, Write by jobs1: protected by m1
+  Detailed shared memory protections:
+    s2: Read by jobs2, Write by jobs3: unprotected
+    s1: Read by jobs2, Write by jobs1: protected by m1
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   mutex.c:34 (for s2)

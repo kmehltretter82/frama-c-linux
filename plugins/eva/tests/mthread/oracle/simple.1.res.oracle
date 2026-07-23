@@ -438,24 +438,24 @@
 [eva:shared-memory:zone] Shared memory: a; b; c; v
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  a  protected by lock
-  b  protected by lock
-  c  protected by lock
-  v  protected by lock
+    a  protected by lock
+    b  protected by lock
+    c  protected by lock
+    v  protected by lock
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  v:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  c:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  b:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
-  a:
-    Read by <main>, Write by job2: protected by lock
-    Read by <main>, Write by job1: protected by lock
+  Detailed shared memory protections:
+    v:
+      Read by <main>, Write by job2: protected by lock
+      Read by <main>, Write by job1: protected by lock
+    c:
+      Read by <main>, Write by job2: protected by lock
+      Read by <main>, Write by job1: protected by lock
+    b:
+      Read by <main>, Write by job2: protected by lock
+      Read by <main>, Write by job1: protected by lock
+    a:
+      Read by <main>, Write by job2: protected by lock
+      Read by <main>, Write by job1: protected by lock
 [eva:data-races] 
   Possible read/write data races:
     none

@@ -541,20 +541,20 @@
   Shared memory: interrupt_received_a; interrupt_received_b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  interrupt_received_a  unprotected
-  interrupt_received_b  unprotected
+    interrupt_received_a  unprotected
+    interrupt_received_b  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  interrupt_received_b:
-    Read by <interrupt_handler interrupt_cross_incr1>,
-      Write by <interrupt_handler interrupt_cross_incr2>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
-      unprotected
-  interrupt_received_a:
-    Read by <interrupt_handler interrupt_cross_incr2>,
-      Write by <interrupt_handler interrupt_cross_incr1>: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
-      unprotected
+  Detailed shared memory protections:
+    interrupt_received_b:
+      Read by <interrupt_handler interrupt_cross_incr1>,
+        Write by <interrupt_handler interrupt_cross_incr2>: unprotected
+      Read by <main>, Write by <interrupt_handler interrupt_cross_incr2>:
+        unprotected
+    interrupt_received_a:
+      Read by <interrupt_handler interrupt_cross_incr2>,
+        Write by <interrupt_handler interrupt_cross_incr1>: unprotected
+      Read by <main>, Write by <interrupt_handler interrupt_cross_incr1>:
+        unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   interrupt.c:41 (for interrupt_received_b)

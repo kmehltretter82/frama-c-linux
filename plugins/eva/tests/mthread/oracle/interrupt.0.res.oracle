@@ -208,11 +208,12 @@
 [eva:shared-memory:zone] Shared memory: interrupt_received
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  interrupt_received  unprotected
+    interrupt_received  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  interrupt_received:
-    Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
+  Detailed shared memory protections:
+    interrupt_received:
+      Read by <main>, Write by <interrupt_handler interrupt_oneshot>:
+        unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   interrupt.c:18 (for interrupt_received)

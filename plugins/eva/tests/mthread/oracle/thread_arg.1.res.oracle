@@ -588,16 +588,18 @@
 [eva:shared-memory:zone] Shared memory: Frama_C_entropy_source; vars[0..1]
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
-  vars[0]  write protected by locks[0], read protected by locks[0] (?)locks[1]
-      [1]  write protected by locks[1], read protected by (?)locks[0] locks[1]
+    Frama_C_entropy_source  protected by (?)locks[0] (?)locks[1]
+    vars[0]
+         write protected by locks[0], read protected by locks[0] (?)locks[1]
+        [1]
+         write protected by locks[1], read protected by (?)locks[0] locks[1]
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
-  vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
-  Frama_C_entropy_source:
-    Read by jobs[1], Write by jobs[0]: unprotected
-    Read by jobs[0], Write by jobs[1]: unprotected
+  Detailed shared memory protections:
+    vars[1]: Read by <main>, Write by jobs[1]: protected by locks[1]
+    vars[0]: Read by <main>, Write by jobs[0]: protected by locks[0]
+    Frama_C_entropy_source:
+      Read by jobs[1], Write by jobs[0]: unprotected
+      Read by jobs[0], Write by jobs[1]: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   thread_arg.c:26 (for Frama_C_entropy_source)

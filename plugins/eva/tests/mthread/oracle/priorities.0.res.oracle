@@ -501,14 +501,14 @@
 [eva:shared-memory:zone] Shared memory: s1; s2
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  s1  write protected by m1 m2, read protected by m1
-  s2  write protected by (?)m2, read protected by m1 m2
+    s1  write protected by m1 m2, read protected by m1
+    s2  write protected by (?)m2, read protected by m1 m2
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  s2:
-    Read by <main>, Write by jobs4: protected by priorities
-    Read by <main>, Write by jobs3: protected by priorities
-  s1: Read by jobs1, Write by <main>: protected by m1
+  Detailed shared memory protections:
+    s2:
+      Read by <main>, Write by jobs4: protected by priorities
+      Read by <main>, Write by jobs3: protected by priorities
+    s1: Read by jobs1, Write by <main>: protected by m1
 [eva:data-races] 
   Possible read/write data races:
     s2:

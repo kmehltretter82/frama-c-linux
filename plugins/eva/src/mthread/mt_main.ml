@@ -123,12 +123,12 @@ let print_shared_memory analysis =
   let precise_accesses = analysis.concurrent_accesses_by_nodes in
   let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
   Self.result ~dkey:Self.dkey_shared_memory_mutex
-    "@[<v 0>Mutexes protecting access to shared memory:@ %a@]"
+    "@[<v 2>Mutexes protecting access to shared memory:@ %a@]"
     Mt_mutexes_types.MutexesByZone.pretty mutexes;
   if Self.(is_debug_key_enabled dkey_shared_memory_mutex_details) then
     let protections = Mt_mutexes.check_protection analysis precise_accesses in
     Self.result ~dkey:Self.dkey_shared_memory_mutex_details
-      "Detailed shared memory protections@.%a"
+      "@[<v 2>Detailed shared memory protections:@ %a@]"
       Mt_mutexes.pretty_protections protections;
     let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
     let need_sync = Mt_mutexes.need_sync ill_protected in

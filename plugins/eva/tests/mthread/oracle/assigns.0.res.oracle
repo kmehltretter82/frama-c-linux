@@ -218,12 +218,12 @@
 [eva:shared-memory:zone] Shared memory: a; b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  a  unprotected
-  b  unprotected
+    a  unprotected
+    b  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  b: Read by jobs1, Write by jobs2: unprotected
-  a: Read by jobs2, Write by jobs1: unprotected
+  Detailed shared memory protections:
+    b: Read by jobs1, Write by jobs2: unprotected
+    a: Read by jobs2, Write by jobs1: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   assigns.c:20 (for b)

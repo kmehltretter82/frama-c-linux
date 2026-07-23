@@ -441,20 +441,20 @@
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  shared_a  unprotected
-  shared_b  unprotected
+    shared_a  unprotected
+    shared_b  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  shared_b:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
-  shared_a:
-    Read by jobptr2, Write by jobptr1: unprotected
-    Read by jobptr1, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr2: unprotected
-    Read by <main>, Write by jobptr1: unprotected
+  Detailed shared memory protections:
+    shared_b:
+      Read by jobptr2, Write by jobptr1: unprotected
+      Read by jobptr1, Write by jobptr2: unprotected
+      Read by <main>, Write by jobptr2: unprotected
+      Read by <main>, Write by jobptr1: unprotected
+    shared_a:
+      Read by jobptr2, Write by jobptr1: unprotected
+      Read by jobptr1, Write by jobptr2: unprotected
+      Read by <main>, Write by jobptr2: unprotected
+      Read by <main>, Write by jobptr1: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   interferences.c:75 (for shared_a; shared_b)

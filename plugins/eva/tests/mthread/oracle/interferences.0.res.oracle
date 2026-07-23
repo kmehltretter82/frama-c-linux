@@ -992,38 +992,38 @@
 [eva:shared-memory:zone] Shared memory: shared_a; shared_b; shared_c
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  shared_a  unprotected
-  shared_b  unprotected
-  shared_c  unprotected
+    shared_a  unprotected
+    shared_b  unprotected
+    shared_c  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  shared_c:
-    Read by job3, Write by job1: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-  shared_b:
-    Read by job3, Write by job1: unprotected
-    Read by job3, Write by <interrupt_handler interrupt>: unprotected
-    Read by job2, Write by job1: unprotected
-    Read by job2, Write by <interrupt_handler interrupt>: unprotected
-    Read by job1, Write by <interrupt_handler interrupt>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job1: unprotected
-    Read by <main>, Write by job1: unprotected
-    Read by <main>, Write by <interrupt_handler interrupt>: unprotected
-  shared_a:
-    Read by job3, Write by job2: unprotected
-    Read by job3, Write by <main>: unprotected
-    Read by job2, Write by job3: unprotected
-    Read by job2, Write by <main>: unprotected
-    Read by job1, Write by job3: unprotected
-    Read by job1, Write by job2: unprotected
-    Read by job1, Write by <main>: unprotected
-    Read by <interrupt_handler interrupt>, Write by job3: unprotected
-    Read by <interrupt_handler interrupt>, Write by job2: unprotected
-    Read by <interrupt_handler interrupt>, Write by <main>: unprotected
-    Read by <main>, Write by job3: unprotected
-    Read by <main>, Write by job2: unprotected
+  Detailed shared memory protections:
+    shared_c:
+      Read by job3, Write by job1: unprotected
+      Read by job2, Write by job1: unprotected
+      Read by <interrupt_handler interrupt>, Write by job1: unprotected
+      Read by <main>, Write by job1: unprotected
+    shared_b:
+      Read by job3, Write by job1: unprotected
+      Read by job3, Write by <interrupt_handler interrupt>: unprotected
+      Read by job2, Write by job1: unprotected
+      Read by job2, Write by <interrupt_handler interrupt>: unprotected
+      Read by job1, Write by <interrupt_handler interrupt>: unprotected
+      Read by <interrupt_handler interrupt>, Write by job1: unprotected
+      Read by <main>, Write by job1: unprotected
+      Read by <main>, Write by <interrupt_handler interrupt>: unprotected
+    shared_a:
+      Read by job3, Write by job2: unprotected
+      Read by job3, Write by <main>: unprotected
+      Read by job2, Write by job3: unprotected
+      Read by job2, Write by <main>: unprotected
+      Read by job1, Write by job3: unprotected
+      Read by job1, Write by job2: unprotected
+      Read by job1, Write by <main>: unprotected
+      Read by <interrupt_handler interrupt>, Write by job3: unprotected
+      Read by <interrupt_handler interrupt>, Write by job2: unprotected
+      Read by <interrupt_handler interrupt>, Write by <main>: unprotected
+      Read by <main>, Write by job3: unprotected
+      Read by <main>, Write by job2: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   interferences.c:14 (for shared_a; shared_b; shared_c)

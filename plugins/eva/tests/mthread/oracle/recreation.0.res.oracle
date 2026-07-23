@@ -1199,48 +1199,48 @@
 [eva:shared-memory:zone] Shared memory: end
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  end  write protected by (?)locks[0] (?)locks[2] (?)locks[3] (?)locks[4]
-       (?)locks[5] (?)locks[6] (?)locks[7] (?)locks[8] (?)locks[9] (?)locks[10]
-       (?)locks[11], read unprotected
+    end  write protected by (?)locks[0] (?)locks[2] (?)locks[3] (?)locks[4]
+         (?)locks[5] (?)locks[6] (?)locks[7] (?)locks[8] (?)locks[9]
+         (?)locks[10] (?)locks[11], read unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  end:
-    Read by jobs[2], Write by jobs[11]: unprotected
-    Read by jobs[2], Write by jobs[10]: unprotected
-    Read by jobs[2], Write by jobs[9]: unprotected
-    Read by jobs[2], Write by jobs[8]: unprotected
-    Read by jobs[2], Write by jobs[7]: unprotected
-    Read by jobs[2], Write by jobs[6]: unprotected
-    Read by jobs[2], Write by jobs[5]: unprotected
-    Read by jobs[2], Write by jobs[4]: unprotected
-    Read by jobs[2], Write by jobs[3]: unprotected
-    Read by jobs[1], Write by jobs[11]: unprotected
-    Read by jobs[1], Write by jobs[10]: unprotected
-    Read by jobs[1], Write by jobs[9]: unprotected
-    Read by jobs[1], Write by jobs[8]: unprotected
-    Read by jobs[1], Write by jobs[7]: unprotected
-    Read by jobs[1], Write by jobs[6]: unprotected
-    Read by jobs[1], Write by jobs[5]: unprotected
-    Read by jobs[1], Write by jobs[4]: unprotected
-    Read by jobs[1], Write by jobs[3]: unprotected
-    Read by jobs[0], Write by jobs[11]: unprotected
-    Read by jobs[0], Write by jobs[10]: unprotected
-    Read by jobs[0], Write by jobs[9]: unprotected
-    Read by jobs[0], Write by jobs[8]: unprotected
-    Read by jobs[0], Write by jobs[7]: unprotected
-    Read by jobs[0], Write by jobs[6]: unprotected
-    Read by jobs[0], Write by jobs[5]: unprotected
-    Read by jobs[0], Write by jobs[4]: unprotected
-    Read by jobs[0], Write by jobs[3]: unprotected
-    Read by <main>, Write by jobs[11]: unprotected
-    Read by <main>, Write by jobs[10]: unprotected
-    Read by <main>, Write by jobs[9]: unprotected
-    Read by <main>, Write by jobs[8]: unprotected
-    Read by <main>, Write by jobs[7]: unprotected
-    Read by <main>, Write by jobs[6]: unprotected
-    Read by <main>, Write by jobs[5]: unprotected
-    Read by <main>, Write by jobs[4]: unprotected
-    Read by <main>, Write by jobs[3]: unprotected
+  Detailed shared memory protections:
+    end:
+      Read by jobs[2], Write by jobs[11]: unprotected
+      Read by jobs[2], Write by jobs[10]: unprotected
+      Read by jobs[2], Write by jobs[9]: unprotected
+      Read by jobs[2], Write by jobs[8]: unprotected
+      Read by jobs[2], Write by jobs[7]: unprotected
+      Read by jobs[2], Write by jobs[6]: unprotected
+      Read by jobs[2], Write by jobs[5]: unprotected
+      Read by jobs[2], Write by jobs[4]: unprotected
+      Read by jobs[2], Write by jobs[3]: unprotected
+      Read by jobs[1], Write by jobs[11]: unprotected
+      Read by jobs[1], Write by jobs[10]: unprotected
+      Read by jobs[1], Write by jobs[9]: unprotected
+      Read by jobs[1], Write by jobs[8]: unprotected
+      Read by jobs[1], Write by jobs[7]: unprotected
+      Read by jobs[1], Write by jobs[6]: unprotected
+      Read by jobs[1], Write by jobs[5]: unprotected
+      Read by jobs[1], Write by jobs[4]: unprotected
+      Read by jobs[1], Write by jobs[3]: unprotected
+      Read by jobs[0], Write by jobs[11]: unprotected
+      Read by jobs[0], Write by jobs[10]: unprotected
+      Read by jobs[0], Write by jobs[9]: unprotected
+      Read by jobs[0], Write by jobs[8]: unprotected
+      Read by jobs[0], Write by jobs[7]: unprotected
+      Read by jobs[0], Write by jobs[6]: unprotected
+      Read by jobs[0], Write by jobs[5]: unprotected
+      Read by jobs[0], Write by jobs[4]: unprotected
+      Read by jobs[0], Write by jobs[3]: unprotected
+      Read by <main>, Write by jobs[11]: unprotected
+      Read by <main>, Write by jobs[10]: unprotected
+      Read by <main>, Write by jobs[9]: unprotected
+      Read by <main>, Write by jobs[8]: unprotected
+      Read by <main>, Write by jobs[7]: unprotected
+      Read by <main>, Write by jobs[6]: unprotected
+      Read by <main>, Write by jobs[5]: unprotected
+      Read by <main>, Write by jobs[4]: unprotected
+      Read by <main>, Write by jobs[3]: unprotected
 [eva:shared-memory:mutex-details] 
   Statements needing manual synchronisation
   recreation.c:28 (for end)

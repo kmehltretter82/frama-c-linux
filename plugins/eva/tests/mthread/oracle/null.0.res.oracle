@@ -107,10 +107,10 @@
 [eva:shared-memory:zone] Shared memory: NULL[100..200]
 [eva:shared-memory:mutex] 
   Mutexes protecting access to shared memory:
-  NULL[100..200]  unprotected
+    NULL[100..200]  unprotected
 [eva:shared-memory:mutex-details] 
-  Detailed shared memory protections
-  NULL[100..200]: Read by <main>, Write by tjob0: unprotected
+  Detailed shared memory protections:
+    NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [eva:data-races] 
   Possible read/write data races:
     NULL[100..200]:
