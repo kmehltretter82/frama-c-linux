@@ -17,7 +17,7 @@
  CMD: %{dep:./check_header_guards.sh} @FRAMAC_SHARE@/libc
    OPT:
  CMD: @frama-c@
- ENABLED_IF: %{read:../../../python-3.10-available}
+ ENABLED_IF: %{read:@PTEST_SUITE_DIR@/../../python-3.10-available}
    OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | python3 %{dep:./check_some_metrics.py} "> 100" "> 400" ">= 0" "> 0" "== 1" "== 1" "== 0" "== 0" "== 0" "== 1"
 **/
 
