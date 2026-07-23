@@ -236,7 +236,7 @@ void *eacsl_builtin_memset(void *s, int c, size_t n) {
 
 int eacsl_builtin_memcmp(const void *s1, const void *s2, size_t n) {
   validate_allocated_space((void *)s1, n, "memcmp", "space 1 ");
-  validate_allocated_space((void *)s2, n, "memcmp", "space 1 ");
+  validate_allocated_space((void *)s2, n, "memcmp", "space 2 ");
   validate_overlapping_spaces((uintptr_t)s1, n, (uintptr_t)s2, n, "memcpy");
   return memcmp(s1, s2, n);
 }

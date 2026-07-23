@@ -481,14 +481,14 @@ the one of your system. If you do not want to use it, you have to add the option
 \shortopt{no-framac-stdlib}\optionidx{-}{framac-stdlib} to the \framac command
 line.
 
-It might be particularly useful in one of the following contexts:
+This might be particularly useful in one of the following contexts:
 \begin{itemize}
   \item several libc functions used by the analyzed program are still not defined
         in the \framac libc; or
   \item your system libc and the \framac libc mismatch about several function
         types (for instance, your system libc is not 100\% POSIX compliant); or
   \item several \framac lib functions get a contract and you are not interested in
-        verifying them (for instance, only checking undefine behaviors matters).
+        verifying them (for instance, only checking undefined behaviors matters).
 \end{itemize}
 
 \begin{important}
@@ -505,13 +505,15 @@ It might be particularly useful in one of the following contexts:
 \label{sec:integers}
 \index{GMP}
 
-\eacsl uses an \texttt{integer}\codeidx{integer} type corresponding to
-mathematical integers which does not fit in any integral \C type. To circumvent
-this issue, \eacsl uses the \gmp library\footnote{\url{http://gmplib.org}}.
-Thus, even if \eacsl does its best to use standard integral types instead of
-\gmp~\cite{kosmatov20rv}, it may generate such integers from time to time. It is
-notably the case if your program contains \lstinline|long long|, either signed
-or unsigned.
+The \texttt{integer}\codeidx{integer} type in \eacsl represents mathematical
+integers, i.e., integers of arbitrary size, and does therefore in general not fit
+into any integral \C type. To circumvent this issue, \eacsl uses the \gmp
+library\footnote{\url{http://gmplib.org}}.
+Since such arbitrary-precision arithmetic is costly, \eacsl does its best to use
+standard integral \C types instead of \gmp~\cite{kosmatov20rv,benjamin23tap}.
+However, this is not always possible and it may thus generate such \gmp integers
+from time to time. This is notably the case if your program contains
+\lstinline|long long|, either signed or unsigned.
 
 Consider for instance the following program.
 
@@ -536,6 +538,27 @@ required). This option is controlled through \shortopt{g} switch of \eacslgcc
 which passes the \shortopt{e-acsl-gmp-only} option to the \eacsl
 plug-in. However it could slow down the execution of the instrumented program
 significantly.
+
+\subsubsection{Tweaking integer arithmetic (experts only)}
+
+The analysis for determining whether a value can be represented by an integral \C
+type, is particularly difficult in the presence of (mutually) recursive functions.
+However, through a process called \emph{widening} as described in
+\cite{benjamin23tap}, \eacsl may still be able to conclude that an integral \C
+type may be used for a function's arguments or return type. The widening strategy
+can be tweaked by a number of command-line flags:
+\begin{frama-c-commands}
+\$ frama-c -e-acsl-widening-arguments f1:3,f2:4
+             -e-acsl-widening-arguments-base 5
+             -e-acsl-widening-output f1:1,f3:2
+             -e-acsl-widening-output-base 0
+\end{frama-c-commands}
+Consider for instance the command-line flags above, indicating that for arguments
+of functions \lstinline|f1| and \lstinline|f2| the values 3 and 4 should be used
+respectively, and 5 for any other arguments. Furthermore for the result of the
+functions \lstinline|f1| and \lstinline|f3| the values 1 and 2 should be used, and
+0 for any other function result. For the effects of these values, refer to
+\cite{benjamin23tap}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -873,6 +896,23 @@ With values:
         - custom print for x
 \end{logs}
 
+\subsection{Using \C functions in annotations}
+
+Normally, annotations cannot contain calls to \C functions. Thus, for
+any application of the form \lstinline|a(...)| occurring inside an annotation,
+\lstinline|a| is necessarily either a predicate or a logic function.
+
+When invoking \framac with the flag \texttt{-e-acsl-builtins=<s>} the \C functions
+in the comma-separated sequence \texttt{<s>} are added to the execution
+environment as logic functions. In this manner parts of the specification can be
+expressed in \C. Similarly to \jml pure methods, these functions should be
+side-effect free.
+
+\listingname{builtins.c}
+\cinput{examples/builtins.c}
+
+This code is parsable only if the command-line flag \texttt{-e-acsl-builtins=incr} is supplied.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%>>>
@@ -905,19 +945,21 @@ Abort
 \subsection{Incorrect Usage of Libc Functions}
 \index{Libc}
 
-Whenever option \longopt{libc-replacements} of \eacslgcc is set, \eacsl is
-able to detect incorrect usage of the following libc functions:
+Whenever option \longopt{libc-replacements} of \eacslgcc is set
+(or equivalently: the option \texttt{-e-acsl-replace-libc-functions} of \framac),
+\eacsl is able to detect incorrect usage of the following libc functions:
 \begin{itemize}
-  \item \texttt{memcmp}
-  \item \texttt{memcpy}
-  \item \texttt{memmove}
-  \item \texttt{memset}
-  \item \texttt{strcat}
-  \item \texttt{strncat}
-  \item \texttt{strcmp}
-  \item \texttt{strcpy}
-  \item \texttt{strncpy}
-  \item \texttt{strlen}
+  \item \textttuse{memcmp}
+  \item \textttuse{memcpy}
+  \item \textttuse{memmove}
+  \item \textttuse{memset}
+  \item \textttuse{strcat}
+  \item \textttuse{strncat}
+  \item \textttuse{strcmp}
+  \item \textttuse{strncmp}
+  \item \textttuse{strcpy}
+  \item \textttuse{strncpy}
+  \item \textttuse{strlen}
 \end{itemize}
 
 For instance, the program below incorrectly uses \texttt{strcpy} because the
