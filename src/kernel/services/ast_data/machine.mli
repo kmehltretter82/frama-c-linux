@@ -162,10 +162,6 @@ val custom_defs: unit -> (string * string) list
 
 val use_logical_operators: unit -> bool
 
-val lower_constants: unit -> bool
-[@@deprecated "Use Kernel.Constfold.get instead."]
-[@@migrate { repl = Kernel.Constfold.get }]
-
 val insert_implicit_casts: unit -> bool
 
 val max_extended_alignment: unit -> int
