@@ -407,10 +407,6 @@ module type S_pp = sig
   (** {3 Printer for C constructs} *)
   (* ********************************************************************* *)
 
-  val pp_location: Format.formatter -> Fileloc.t -> unit
-  [@@deprecated "Use Fileloc.pretty instead"]
-  [@@migrate { repl = Fileloc.pretty }]
-
   val pp_constant: Format.formatter -> constant -> unit
 
   val pp_storage: Format.formatter -> storage -> unit
