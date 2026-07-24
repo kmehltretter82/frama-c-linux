@@ -15,8 +15,6 @@ eva: $(TARGETS)
 parse: $(TARGETS:%.eva=%.parse)
 # Opening one GUI for each target is cumbersome; we open only the first target
 gui: $(firstword $(TARGETS)).gui
-ivette: $(firstword $(TARGETS)).ivette
-	$(warning The ivette target is deprecated, use gui)
 
 # Default target
 all: eva

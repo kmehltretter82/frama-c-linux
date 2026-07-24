@@ -284,10 +284,6 @@ endef
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
 
-%.ivette: %
-	$(warning The .ivette target is deprecated, use .gui)
-	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
-
 # Produce and open an SVG + HTML from raw flamegraph data produced by Eva
 %/flamegraph: %/flamegraph.html
 	@
