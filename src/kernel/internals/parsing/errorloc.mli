@@ -66,11 +66,6 @@ val convert_loc: Lexing.position * Lexing.position -> Fileloc.t
 val pp_context_from_file:
   ?ctx:int -> Format.formatter -> Fileloc.t -> unit
 
-(** prints a readable description of a location
-    @since 22.0-Titanium *)
-val pp_location: Format.formatter -> Fileloc.t -> unit
-[@@deprecated "Use Fileloc.pretty_long_range instead"]
-
 (** Emits the corresponding error message with some location information.
     If not given, [location] will be considered to be between the end of
     the forelast token read by the parser and the start of the last token,
