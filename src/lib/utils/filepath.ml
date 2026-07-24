@@ -221,34 +221,6 @@ let all_symbolic_dirs () =
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Position in source file                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-type position = {
-  pos_path : t;
-  pos_lnum : int;
-  pos_bol : int;
-  pos_cnum : int;
-}
-
-let empty_pos = {
-  pos_path = empty;
-  pos_lnum = 0;
-  pos_bol = 0;
-  pos_cnum = -1;
-}
-
-let pp_pos fmt pos =
-  let path = pos.pos_path in
-  if is_empty path || is_special_stdout path then
-    Format.fprintf fmt "%a" pretty path
-  else
-    Format.fprintf fmt "%a:%d" pretty path pos.pos_lnum
-
-let is_empty_pos pos = pos == empty_pos
-
-
-(* -------------------------------------------------------------------------- *)
 (* --- Tests                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
