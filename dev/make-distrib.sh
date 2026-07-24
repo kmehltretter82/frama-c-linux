@@ -92,11 +92,7 @@ VERSION=$(cat VERSION)
 VERSION_SAFE="${VERSION/~/-}"
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
-if [ "$USE_STASH" == "yes" ]; then
-    FRAMAC_TAR="frama-c-current.tar"
-else
-    FRAMAC_TAR="$FRAMAC.tar"
-fi
+FRAMAC_TAR="frama-c.tar"
 
 ################################################################################
 # Check Opam file
@@ -262,10 +258,6 @@ DATE="$(date +%F)"
 $TAR czf "$FRAMAC_TAR.gz" -C "$TMP_DIR" "$FRAMAC" \
   --numeric-owner --owner=0 --group=0 --sort=name --mode='a+rw' \
   --mtime="$DATE Z"
-
-if [[ "$CI_LINK" == "yes" ]]; then
-  ln "$FRAMAC_TAR.gz" "frama-c.tar.gz"
-fi
 
 ################################################################################
 # Cleaning

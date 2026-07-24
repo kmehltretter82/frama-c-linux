@@ -7,10 +7,10 @@ let
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
-    bisect_ppx = oself.callPackage ./bisect_ppx.nix {};
+    bisect_ppx = oself.callPackage ./bisect_ppx.nix {
+      cmdliner = oself.cmdliner.override { version = "1.3.0"; };
+    };
     combinetura = oself.callPackage ./combinetura.nix {};
-    dolmen = oself.callPackage ./dolmen.nix {};
-    ppxlib = oself.callPackage ./ppxlib.nix {};
     why3 = oself.callPackage ./why3.nix {
       coqPackages = pkgs.coqPackages_8_19 ;
     };

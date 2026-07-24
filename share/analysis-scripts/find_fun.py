@@ -19,14 +19,12 @@ from pathlib import Path
 
 import function_finder
 
-parser = argparse.ArgumentParser(
-    description="""
+parser = argparse.ArgumentParser(description="""
 Looks for likely declarations/definitions of a function
 in files with extensions '.c', '.h' and '.i'.
 If any directories are specified, looks inside them,
 otherwise looks inside PWD and /usr/include.
-Subdirectories are always considered recursively."""
-)
+Subdirectories are always considered recursively.""")
 
 parser.add_argument(
     "--directory",

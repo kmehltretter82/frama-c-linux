@@ -37,7 +37,7 @@ opam install -y --confirm-level=unsafe-yes \
   dune-site \
   camlzip \
   menhir \
-  ocaml."$BUNDLE_OCAML" \
+  ocaml \
   ocamlgraph \
   oui \
   unionFind \
@@ -82,7 +82,7 @@ cd ..
 
 git clone \
   https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/frama-c/meta.git \
-  -b stable/arsenic \
+  -b "$DEFAULT" \
   src/plugins/meta
 
 dune build --release --promote-install-files=false @install

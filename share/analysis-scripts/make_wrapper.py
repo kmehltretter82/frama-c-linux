@@ -42,11 +42,9 @@ if os.system(cmd) != 0:
     if os.system(cmd) != 0:
         sys.exit("error: could not find GNU make >= 4.0 (tried 'gmake' and 'make')")
 
-parser = argparse.ArgumentParser(
-    description="""
+parser = argparse.ArgumentParser(description="""
 Builds the specified target, parsing the output to identify and recommend
-actions in case of failure."""
-)
+actions in case of failure.""")
 parser.add_argument(
     "--make-dir",
     metavar="DIR",
@@ -54,7 +52,7 @@ parser.add_argument(
     help="directory containing the makefile (default: .frama-c)",
 )
 
-(make_dir_arg, args) = parser.parse_known_args()
+make_dir_arg, args = parser.parse_known_args()
 make_dir = vars(make_dir_arg)["make_dir"]
 args = args[1:]
 

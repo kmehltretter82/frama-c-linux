@@ -82,9 +82,9 @@ if [[ "$CI" == "true" ]]; then
   ## Frama-C will be installed later, but is a dependency of external
   ## plugins, fake its installation here so that the dependencies
   ## installation of plugins succeeds without installing frama-c
-  opam install --fake frama-c
+  opam install --fake frama-c .
   for plugin in "${!plugins[@]}"; do
-    opam install --jobs 2 --deps-only --yes "src/plugins/$plugin"
+    opam install --jobs 2 --deps-only --yes --confirm-level unsafe-yes "src/plugins/$plugin"
   done
   ## Now that dependencies have been installed, remove the fake install
   ## of Frama-C

@@ -33,10 +33,8 @@ import source_filter
 # TODO : try to check for pragmas
 # TODO : detect absence of 'main' function (library)
 
-parser = argparse.ArgumentParser(
-    description="""
-Estimates the difficulty of analyzing a given code base"""
-)
+parser = argparse.ArgumentParser(description="""
+Estimates the difficulty of analyzing a given code base""")
 parser.add_argument(
     "paths",
     nargs="+",
@@ -111,7 +109,7 @@ def get_framac_libc_function_statuses(
     framac: Path | None, framac_share: Path
 ) -> tuple[list[str], list[str]]:
     if framac:
-        (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
+        _handler, metrics_tmpfile = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
         logging.debug("metrics_tmpfile: %s", metrics_tmpfile)
         fc_runtime = framac_share / "libc" / "__fc_runtime.c"
         fc_libc_headers = framac_share / "libc" / "__fc_libc.h"
@@ -277,10 +275,10 @@ for cycle_start_loc, cycle in recursive_cycles:
     if cycle[-1] in reported_recursive_pairs:
         continue
     reported_recursive_pairs.add(cycle[-1])
-    (filename, line) = cycle_start_loc
+    filename, line = cycle_start_loc
 
     def pretty_cycle(cycle):
-        (x, y) = cycle[0]
+        x, y = cycle[0]
         res = f"{x} -> {y}"
         for x, y in cycle[1:]:
             res += f" -> {y}"
@@ -364,7 +362,7 @@ logging.log(
     "\n".join([f"  <{header}>" for header in sorted(used_headers)]),
 )
 
-(chevron_includes, quote_includes) = get_includes(files)
+chevron_includes, quote_includes = get_includes(files)
 
 logging.info(
     "Estimating difficulty for %d '#include <header>' directives...", len(chevron_includes)

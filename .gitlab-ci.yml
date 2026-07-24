@@ -35,13 +35,10 @@ workflow:
 variables:
   # CI global configuration
   DEFAULT: "master"
-  OCAML: "4.14"
+  OCAML: "5.5"
   NODE: "24"
   # Specific options for Opam
   OPAM_OPTS: "--with-test --with-doc"
-  # Linux Bundle configuration
-  BUNDLE_DEBIAN: "11"
-  BUNDLE_OCAML: "5.4.1"
   # CI mode configuration
   PUBLISH: "no"
   RELEASE: "no"
@@ -80,33 +77,6 @@ variables:
   only:
     variables:
       - $PUBLISH == "yes"
-
-################################################################################
-### IVETTE SETUP TEMPLATE
-
-.build_template: &ivette_setup
-  image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
-  before_script:
-    # Prepare
-    - sudo apt update
-    # TS
-    - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
-    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - . "$NVM_DIR/nvm.sh"
-    - nvm install $NODE
-    - nvm use node $NODE
-    - corepack enable
-    # Opam
-    - opam switch create --empty .
-    - eval $(opam env --switch=. --set-switch)
-    - opam pin . -n -k path
-    - opam depext frama-c
-    - opam install headache
-    - opam install --jobs 2 --deps-only .
-    # Build Frama-C API
-    - dune build -j2 @install
-    - make -C ivette api
 
 ################################################################################
 ### PREPARE
@@ -216,8 +186,10 @@ frama-c:
 
 ivette:
   stage: build
-  <<: *ivette_setup
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   script:
+    - dune build -j2 @install
+    - make -C ivette api
     - make -C ivette check-lint
     - make -C ivette dist
   tags:
@@ -315,9 +287,11 @@ wp-tests:
 
 ivette-tests:
   stage: tests
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   when: manual
-  <<: *ivette_setup
   script:
+    - dune build -j2 @install
+    - make -C ivette api
     - make -C ivette dist
     - cd ivette
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
@@ -351,7 +325,7 @@ external-plugins:
 
 ivette-plugins:
   stage: tests
-  <<: *ivette_setup
+  image: 'registry.frama-c.com/frama-c/frama-c:$OCAML'
   script:
     # Following command is needed due to recent git releases which enforce stricter
     # permission controls w.r.t ownership of '.git'
@@ -410,30 +384,13 @@ build-distrib-tarball:
     - ./nix/shell-checkers.sh "./dev/make-distrib.sh"
   artifacts:
     paths:
-      - ./*.tar.gz
+      - ./frama-c.tar.gz
     expire_in: 1 week
 
 # Build linux bundle
 
 .build_template: &bundle_docker_setup
-  image: "debian:$BUNDLE_DEBIAN"
-  before_script:
-    - apt update
-    - apt install -y git curl bubblewrap gcc make autoconf m4
-    # TS
-    - apt install -y xvfb curl unzip libnss3 libasound2-plugins
-    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - . "$NVM_DIR/nvm.sh"
-    - nvm install $NODE
-    - nvm use node $NODE
-    - corepack enable
-    # Install Opam
-    - curl -fsSL https://opam.ocaml.org/install.sh -o install.sh
-    - chmod +x install.sh
-    - echo | ./install.sh
-    - rm install.sh
-    - opam init -y
+  image: 'registry.frama-c.com/frama-c/frama-c:release'
 
 .build_template: &linux_bundle
   script:
@@ -659,28 +616,28 @@ additional-arch:
   <<: *manual_when_not_special_pipeline
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 additional-arch-nightly:
   <<: *additional_arch_template
-  <<: *when_publish
+  <<: *when_nightly
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 additional-arch-release:
   <<: *additional_arch_template
   <<: *when_release
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 # OCaml versions
 
 .build_template: &ocaml_always_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.4"]
+      - OCAML: ["5.2"]
 
 # Uncomment this block when there are intermediate versions to check manually
 # Beware that some targets may fail if the target job does not provide the
@@ -688,7 +645,7 @@ additional-arch-release:
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.1", "5.2", "5.3"]
+      - OCAML: ["5.3", "5.4"]
   when: manual
 
 .build_template: &ocaml_versions_template
@@ -718,11 +675,9 @@ ocaml-versions-nightly:
 
 .build_template: &opam_pin_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  image: 'registry.frama-c.com/frama-c/frama-c:no-deps-$OCAML'
   script:
-    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
-    - opam init --reinit -ni
-    - sudo apt update
+    - apt update
     - opam pin . -n -k path
     - opam install --jobs 2 frama-c $OPAM_OPTS
     - frama-c --plugins
@@ -747,23 +702,19 @@ opam-pin-release:
 
 .build_template: &opam_pin_minimal_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  image: 'registry.frama-c.com/frama-c/frama-c:no-deps-$OCAML'
   variables:
     OPAMDOWNLOADJOBS: "1"
     OPAMERRLOGLEN: "0"
     OPAMSOLVERTIMEOUT: "500"
     OPAMPRECISETRACKING: "1"
   script:
-    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
-    - opam --version
-    - opam init --reinit -ni
-    - sudo apt update
+    - apt update
     - export OPAMCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - export OPAMFIXUPCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - export OPAMUPGRADECRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - opam pin . -n -k path
     - opam update --depexts
-    - opam depext --jobs 2 frama-c
     - export OPAMCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMFIXUPCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMUPGRADECRITERIA="+removed,+count[version-lag,solution]"
