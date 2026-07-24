@@ -64,12 +64,6 @@ val pretty_text:
 
 (** {2 Iterators } *)
 
-(** Returns the index (starting at 0) of the first element verifying the
-    condition.
-    Appears in Ocaml 5.1.
-    @since 33.0-Arsenic *)
-val find_index: ('a -> bool) -> 'a list -> int option
-
 (** Same as {!Stdlib.List.map2} but gives the index of the current element to
     [f]
     @since 33.0-Arsenic *)
