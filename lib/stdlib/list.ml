@@ -52,12 +52,6 @@ let pretty_text
 
 (** {2 Iterators } *)
 
-let find_index f l =
-  let rec aux i = function
-      [] -> None
-    | x::l -> if f x then Some i else aux (i+1) l
-  in aux 0 l
-
 let mapi2 f l1 l2 =
   let i = ref 0 in
   map2 (fun x y -> let r = f !i x y in incr i; r) l1 l2

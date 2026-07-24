@@ -8,8 +8,6 @@
 
 include Stdlib.Fun
 
-let compose f g x = f (g x)
-
 let uncurry2 f (x, y) = f x y
 
 module Operators =

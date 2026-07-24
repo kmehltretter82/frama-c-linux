@@ -98,7 +98,7 @@ include (
     let reprs = [ dummy ]
     let equal = String.equal
     let compare = String.compare
-    let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)
+    let hash = String.hash
     let copy = Fun.id
   end) : Datatype.S_with_collections with type t := t)
 
