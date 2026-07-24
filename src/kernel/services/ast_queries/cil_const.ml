@@ -195,5 +195,3 @@ let make_logic_type name = {
   lt_def = None ;
   lt_attr = [] ;
 }
-
-let new_raw_id = new_raw_vid
