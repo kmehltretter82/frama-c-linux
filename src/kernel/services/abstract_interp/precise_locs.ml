@@ -157,7 +157,6 @@ type precise_addr_bits =
   | PLLoc of Addresses.Bits.t
   | PLVarOffset of Base.t * precise_offset
   | PLLocOffset of Addresses.Bits.t * precise_offset
-type precise_location_bits = precise_addr_bits
 
 let pretty_addr_bits fmt = function
   | PLBottom -> Format.fprintf fmt "[Bot]"
@@ -166,7 +165,6 @@ let pretty_addr_bits fmt = function
     Format.fprintf fmt "[%a+%a]" Base.pretty b pretty_offset po
   | PLLocOffset (loc, po) ->
     Format.fprintf fmt "[%a+%a]" Addresses.Bits.pretty loc pretty_offset po
-let pretty_loc_bits = pretty_addr_bits
 
 let equal_addr_bits l1 l2 = match l1, l2 with
   | PLBottom, PLBottom -> true
@@ -178,7 +176,6 @@ let equal_addr_bits l1 l2 = match l1, l2 with
   | _, _ -> false
 
 let bottom_addr_bits = PLBottom
-let bottom_location_bits = bottom_addr_bits
 
 let cardinal_zero_or_one_addr_bits = function
   | PLBottom -> true
@@ -189,7 +186,6 @@ let cardinal_zero_or_one_addr_bits = function
 
 let inject_addr_bits loc =
   if Addresses.Bits.is_bottom loc then PLBottom else PLLoc loc
-let inject_location_bits = inject_addr_bits
 
 let combine_base_precise_offset base po =
   match po with
@@ -215,7 +211,6 @@ let combine_addr_precise_offset loc po =
     match Addresses.Bits.cardinal loc with
     | Some card when small_cardinal (Z.mul card c) -> PLLocOffset (loc, po)
     | _ -> PLLoc (Addresses.Bits.shift (imprecise_offset po) loc)
-let combine_loc_precise_offset = combine_addr_precise_offset
 
 
 let imprecise_addr_bits = function
@@ -223,7 +218,6 @@ let imprecise_addr_bits = function
   | PLLoc l -> l
   | PLVarOffset (b, po) -> Addresses.Bits.inject b (imprecise_offset po)
   | PLLocOffset (loc, po) -> Addresses.Bits.shift (imprecise_offset po) loc
-let imprecise_location_bits = imprecise_addr_bits
 
 type precise_location = {
   addr: precise_addr_bits;
