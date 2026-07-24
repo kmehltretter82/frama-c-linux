@@ -244,47 +244,10 @@ module Make_Hashconsed_Lattice_Set
 
 end
 
-module Int = struct
-
-  include (Integer: module type of Integer with type t = Integer.t)
-  [@@alert "-deprecated"]
-
-  include (Datatype.Integer: Datatype.S_with_collections with type t := t)
-  [@@alert "-deprecated"]
-
-  (** execute [f] on [inf], [inf + step], ... *)
-  let fold f ~inf ~sup ~step acc =
-    (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
-           pretty inf pretty sup pretty step; *)
-    let nb_loop = Z.ediv (Z.sub sup inf) step in
-    let rec fold_incr ~counter ~inf acc =
-      if equal counter 1000z then
-        feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if Z.leq inf sup then begin
-        (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
-        fold_incr ~counter:(Z.succ counter) ~inf:(Z.add step inf) (f inf acc)
-      end else acc
-    in
-    let rec fold_decr ~counter ~sup acc =
-      if equal counter 1000z then
-        feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if Z.leq inf sup then begin
-        (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
-        fold_decr ~counter:(Z.succ counter) ~sup:(Z.add step sup) (f sup acc)
-      end else acc
-    in
-    if Z.leq Z.zero step
-    then fold_incr ~counter:Z.zero ~inf acc
-    else fold_decr ~counter:Z.zero ~sup acc
-
-end
-
 
 (* Typing constraints are enforced directly in the .mli *)
 module Rel = struct
   include Z
-
-  let e_rem = erem
 
   let check ~rem ~modu =
     zero <= rem && rem < modu
