@@ -16,10 +16,6 @@ include module type of Stdlib.String
 (** Case-insensitive string comparison. Only ISO-8859-1 accents are handled. *)
 val compare_ignore_case: string -> string -> int
 
-(** Same as {!String.hash} but made available here until the minimal supported
-    version of OCaml is 5.0. *)
-val hash: string -> int
-
 (** [remove_prefix ~strict prefix s] returns [None] if [prefix] is not a prefix
     of [s] and [Some s'] iff [s=prefix^s']. *)
 val remove_prefix: ?strict:bool -> string -> string -> string option
