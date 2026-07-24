@@ -134,7 +134,7 @@ depends: [
   "conf-graphviz" { post }
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
-  "ocaml" { >= "4.14.0" }
+  "ocaml" { >= "5.2.0" }
   "ocamlgraph" { >= "2.0.0" }
   "ocamlgraph" { with-test & >= "2.2.0" }
   "ocp-indent" { with-dev-setup & >= "1.9.0" }
