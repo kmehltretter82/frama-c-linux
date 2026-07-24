@@ -463,7 +463,6 @@ module Macros = struct
        deprecated *)
     ignore deprecate;
     StringMap.empty
-    |> deprecate "PTEST_RESULT_FILE" "Please use PTEST_RESULT instead" `Fail
   (* Use deprecate function to add deprecated macro. The last argument is
      either `Fail or `Continue depending on if ptests should stop immediately
      or continue:
