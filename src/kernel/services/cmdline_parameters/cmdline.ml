@@ -1231,8 +1231,3 @@ let explain_cmdline () =
        Format.fprintf fmt "[kernel] Explaining command-line options:@.");
   List.iter pp_option_help (List.rev option_names);
   raise Exit
-
-(* deprecated *)
-
-let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
-let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]

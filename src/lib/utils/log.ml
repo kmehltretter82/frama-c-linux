@@ -1324,12 +1324,6 @@ end
 
 (* Deprecated *)
 
-let kernel_channel_name = "kernel"
-let kernel_label_name = "kernel"
-
-let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
-let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
-
 let source ~file ~line =
   Filepos.make ~path:file ~line ()
 

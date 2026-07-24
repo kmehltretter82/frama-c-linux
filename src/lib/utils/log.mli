@@ -499,19 +499,6 @@ val log_channel : channel -> ?kind:kind -> 'a pretty_printer
     @since Beryllium-20090901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val kernel_channel_name: string
-(** the reserved channel name used by the Frama-C kernel.
-    @since Beryllium-20090601-beta1 *)
-[@@deprecated "Use Kernel_log.kernel_channel_name instead."]
-[@@migrate { repl = Kernel_log.kernel_channel_name } ]
-
-
-val kernel_label_name: string
-(** the reserved label name used by the Frama-C kernel.
-    @since Beryllium-20090601-beta1 *)
-[@@deprecated "Use Kernel_log.kernel_label_name instead."]
-[@@migrate { repl = Kernel_log.kernel_label_name } ]
-
 val source : file:Filepath.t -> line:int -> Filepos.t
 (** @since Chlorine-20180501 *)
 [@@deprecated "Use Filepos.make instead"]
@@ -572,12 +559,6 @@ val check_not_yet: (event -> bool) ref
     not reprinted. Currently set in {!module-type:Messages}. Not for the casual
     user.
 *)
-
-val cmdline_error_occurred: (exn -> unit) ref
-[@@deprecated "Use Cmdline.error_occurred directly instead"]
-
-val cmdline_at_error_exit: ((exn -> unit) -> unit) ref
-[@@deprecated "Use Cmdline.at_error_exit directly instead"]
 
 val treat_deferred_error: unit -> unit
 (** call this function when it is a good time to raise an exception following
