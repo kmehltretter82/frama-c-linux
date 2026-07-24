@@ -500,9 +500,6 @@ struct
   (** {3 Filepath} *)
   (* ************************************************************************ *)
 
-  (* Deprecated module, Use [Fclib.Filepath] instead. *)
-  module Fc_Filepath = Filepath
-
   let normalize_filepath ~existence ~file_kind s =
     try
       Filepath.of_string ~existence s
