@@ -616,21 +616,21 @@ additional-arch:
   <<: *manual_when_not_special_pipeline
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 additional-arch-nightly:
   <<: *additional_arch_template
   <<: *when_nightly
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 additional-arch-release:
   <<: *additional_arch_template
   <<: *when_release
   parallel:
     matrix:
-      - ARCH: [macos-x86, macos-arm]
+      - ARCH: [linux-arm, macos-x86, macos-arm]
 
 # OCaml versions
 
