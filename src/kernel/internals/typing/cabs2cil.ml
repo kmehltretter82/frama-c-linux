@@ -10341,7 +10341,3 @@ let convFile (path, f) =
     globinit = None;
     globinitcalled = false;
   }
-
-(* Deprecated *)
-
-let prefix prefix s = String.starts_with ~prefix s
