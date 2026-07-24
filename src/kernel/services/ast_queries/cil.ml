@@ -6833,7 +6833,5 @@ let typeDeepDropAllAttributes t =
 
 (* Deprecated *)
 
-let mkBinOp_safe_ptr_cmp = mkBinOp_exn ~constfold:false
-
 let range_loc start_loc end_loc =
   Fileloc.join start_loc end_loc
