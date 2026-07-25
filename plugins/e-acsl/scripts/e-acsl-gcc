@@ -768,11 +768,11 @@ $zone_help_msg"
     # Print data contributing to a failed runtime assertion
     --assert-print-data)
       shift;
-      OPTION_ASSERT_PRINT_DATA="-e-acsl-assert-print-data"
+      OPTION_ASSERT_PRINT_DATA="-e-acsl-O-print-values"
     ;;
     --no-assert-print-data)
       shift;
-      OPTION_ASSERT_PRINT_DATA="-e-acsl-no-assert-print-data"
+      OPTION_ASSERT_PRINT_DATA="-e-acsl-O-no-print-values"
     ;;
     # Custom function for printing value
     --external-print-value)

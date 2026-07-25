@@ -58,7 +58,7 @@ let must_translate ppt =
     (* [TODO] generating code for "valid under hypotheses" properties could be
        useful for some use cases (in particular, when E-ACSL does not stop on
        the very first error).
-       ==> introduce a new option or modify the behavior of -e-acsl-valid,
+       ==> introduce a new option or modify the behavior of -e-acsl-O-valid,
        see e-acsl#35 *)
     false
 

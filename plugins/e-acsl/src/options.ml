@@ -212,6 +212,8 @@ module Optimisations = struct
       let level = Eq 0
       let descr = "verify annotations which have been proven valid"
     end)
+  let () = Verify_valid.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-valid"]
 
   module Print_values =
     Make (struct
@@ -220,6 +222,8 @@ module Optimisations = struct
       let descr = "print values of variables involved in a failed \
                    verification along with the runtime error message"
     end)
+  let () = Verify_valid.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-assert-print-data"]
 
 end
 
