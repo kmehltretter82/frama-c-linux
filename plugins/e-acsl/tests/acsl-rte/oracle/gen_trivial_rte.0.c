@@ -11,9 +11,20 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
+    __e_acsl_mpz_t __gen_e_acsl_;
+    __e_acsl_mpz_t __gen_e_acsl__2;
+    __e_acsl_mpz_t __gen_e_acsl__3;
+    int __gen_e_acsl_ne;
+    __e_acsl_mpz_t __gen_e_acsl_div;
+    int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gmpz_init_set_si(__gen_e_acsl_,4L);
+    __gmpz_init_set_si(__gen_e_acsl__2,2L);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gmpz_init_set_si(__gen_e_acsl__3,0L);
+    __gen_e_acsl_ne = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__2),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     /*@ assert E_ACSL: "division by zero": 2 != 0; */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
@@ -23,15 +34,25 @@ int main(void)
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 8;
       __gen_e_acsl_assert_data_2.name = "division by zero";
-      __e_acsl_assert(1,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert(__gen_e_acsl_ne != 0,& __gen_e_acsl_assert_data_2);
     }
+    __gmpz_init(__gen_e_acsl_div);
+    __gmpz_tdiv_q(__gen_e_acsl_div,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_div),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "4 / 2 == 2";
     __gen_e_acsl_assert_data.file = "trivial_rte.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 8;
-    __e_acsl_assert(1,& __gen_e_acsl_assert_data);
+    __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
+    __gmpz_clear(__gen_e_acsl_);
+    __gmpz_clear(__gen_e_acsl__2);
+    __gmpz_clear(__gen_e_acsl__3);
+    __gmpz_clear(__gen_e_acsl_div);
   }
   /*@ assert 4 / 2 == 2; */ ;
   __retres = 0;

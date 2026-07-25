@@ -9,7 +9,6 @@
 include Plugin.S (** implementation of Log.S for E-ACSL *)
 
 module Run: Parameter_sig.Bool
-module Gmp_only: Parameter_sig.Bool
 module Full_mtracking: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
 module Builtins: Parameter_sig.String_set
@@ -28,6 +27,7 @@ module Optimisations : sig
   module Smart_il : Parameter_sig.Bool
   module Verify_valid: Parameter_sig.Bool
   module Print_values: Parameter_sig.Bool
+  module Gmp_only: Parameter_sig.Bool
 end
 
 module Functions: Parameter_sig.Kernel_function_set

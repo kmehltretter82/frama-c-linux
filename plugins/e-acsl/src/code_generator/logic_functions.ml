@@ -122,9 +122,9 @@ let type_of_number_ty lv = function
     (* GMP's integer are arrays: consider them as pointers in function's
        parameters *)
     Gmp_types.Z.t_as_ptr ()
-  | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
+  | C_integer _ when Options.Optimisations.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
   | C_integer ik -> Cil_const.mk_tint ik
-  | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
+  | C_float _ when Options.Optimisations.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
   | C_float fk -> Cil_const.mk_tfloat fk
   (* for the time being, no reals but rationals instead *)
   | Rational -> Gmp_types.Q.t ()

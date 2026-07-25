@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-  E-ACSL     [2026-07-25] Rename flag -e-acsl-gmp-only to -e-acsl-O-gmp-only
 -  E-ACSL     [2026-07-15] Rename flag -e-acsl-assert-print-data to
                            -e-acsl-O-print-values
 -  E-ACSL     [2026-07-15] Rename flag -e-acsl-valid to -e-acsl-O-valid

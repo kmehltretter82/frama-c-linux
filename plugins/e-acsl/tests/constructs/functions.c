@@ -3,7 +3,7 @@
    STDOPT: +"-eva-slevel 10 -eva-unroll-recursive-calls 10"
    COMMENT: Eva analysis is too long when trying to analyze recursive calls with
    COMMENT: GMP. Use minimum precision for this case.
-   STDOPT: #"-e-acsl-gmp-only" +"-eva-precision 0"
+   STDOPT: #"-e-acsl-O-gmp-only" +"-eva-precision 0"
 */
 /* run.config_dev
    EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@

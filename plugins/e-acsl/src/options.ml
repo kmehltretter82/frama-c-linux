@@ -39,13 +39,6 @@ module Project_name =
       let arg_name = "prj"
     end)
 
-module Gmp_only =
-  False
-    (struct
-      let option_name = "-e-acsl-gmp-only"
-      let help = "always use GMP integers instead of C integral types"
-    end)
-
 module Temporal_validity =
   False
     (struct
@@ -225,6 +218,14 @@ module Optimisations = struct
   let () = Verify_valid.add_aliases ~deprecated:true ~visible:false
       ["-e-acsl-assert-print-data"]
 
+  module Gmp_only = Make (struct
+      let name = "gmp-only"
+      let level = Leq 1
+      let descr = "always use GMP integers instead of C integral types"
+    end)
+  let () = Gmp_only.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-gmp-only"]
+
 end
 
 
@@ -283,7 +284,7 @@ module Widening_output =
 
 let parameter_states =
   [ Optimisations.Verify_valid.self;
-    Gmp_only.self;
+    Optimisations.Gmp_only.self;
     Full_mtracking.self;
     Builtins.self;
     Temporal_validity.self;
@@ -303,7 +304,7 @@ let emitter =
                    Instrument.parameter;
                    Validate_format_strings.parameter;
                    Temporal_validity.parameter ]
-    ~tuning:[ Gmp_only.parameter;
+    ~tuning:[ Optimisations.Gmp_only.parameter;
               Optimisations.Verify_valid.parameter;
               Replace_libc_functions.parameter;
               Full_mtracking.parameter;

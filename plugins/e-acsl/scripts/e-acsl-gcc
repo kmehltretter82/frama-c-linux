@@ -577,7 +577,7 @@ do
     # Use GMP everywhere
     -g|--gmp)
       shift;
-      OPTION_GMP="-e-acsl-gmp-only"
+      OPTION_GMP="-e-acsl-O-gmp-only"
     ;;
     # Concurrency support
     --concurrency)

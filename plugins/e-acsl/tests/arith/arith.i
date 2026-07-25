@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: arithmetic operations
    STDOPT:
-   STDOPT: #"-e-acsl-gmp-only"
+   STDOPT: #"-e-acsl-O-gmp-only"
 */
 /* run.config_dev
    EXECNOW: LOG @EACSL_ERR@ @EACSL_EXEC@
