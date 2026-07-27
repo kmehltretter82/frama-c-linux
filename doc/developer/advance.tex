@@ -516,7 +516,7 @@ DIRECTIVE: value (everything until the newline character)
 \end{listing-nonumber}
 
 \begin{example}
-  Test \texttt{src/plugins/sparecode/tests/sparecode/calls.c} declares the
+  Test \texttt{plugins/sparecode/tests/sparecode/calls.c} declares the
   following directives.
   \nscodeidx{Test!Directive}{OPT}
 \begin{listing-nonumber}
@@ -992,7 +992,7 @@ Section~\ref{tut2:hello}.
 Indicating whether a plug-in is available and why (availability of the
 dependencies) is now handled via the \texttt{frama-c-configure} rule.
 
-When working in the Frama-C \texttt{src/plugins} directory, enabling or
+When working in the Frama-C \texttt{plugins} directory, enabling or
 disabling the plug-in at build time is done thanks to the script
 \texttt{dev/disable-plugins.sh}.
 
@@ -1580,7 +1580,7 @@ Self.result "Hello, this is @{<bold,red>Foo@} Logs !"
 \end{ocamlcode}
 
 The list of supported tags is available in
-\texttt{src/libraries/utils/ansi\_escape.mli}.
+\texttt{src/lib/utils/ansi\_escape.mli}.
 Plugins may also extend and manage the set of supported semantic tags
 using this module.
 
@@ -2485,7 +2485,7 @@ Plug-in \texttt{from}\index{From} creates a \texttt{State}\index{State} exposed
 via its API.
 
 \noindent
-\listingname{src/plugins/from/functionwise.ml}
+\listingname{plugins/from/src/functionwise.ml}
 \scodeidx{Kernel\_function}{Make\_Table}
 \sscodeidx{Eva}{Analysis}{self}
 \begin{ocamlcode}
@@ -2499,7 +2499,7 @@ module Tbl =
      end)
 let self = Tbl.self
 \end{ocamlcode}
-\listingname{src/plugins/from/from.ml}
+\listingname{plugins/from/src/from.ml}
 \begin{ocamlcode}
 let self = Functionwise.self
 \end{ocamlcode}
@@ -2508,7 +2508,7 @@ Plug-in \texttt{pdg}\index{Plug-in!Pdg|see{Pdg}}\index{Pdg} uses
 \texttt{from}\index{From} for computing its own internal state. So it declares
 this dependency as follows.
 
-\noindent\listingname{src/plugins/pdg/pdg\_tbl.ml}
+\noindent\listingname{plugins/pdg/src/pdg\_tbl.ml}
 \scodeidx{Kernel\_function}{Make\_Table}
 \begin{ocamlcode}
 module Tbl =
@@ -2521,7 +2521,7 @@ module Tbl =
     end)
 let self = Tbl.self
 \end{ocamlcode}
-\listingname{src/plugins/pdg/register.ml}
+\listingname{plugins/pdg/src/register.ml}
 \scodeidx{State\_dependency\_graph}{S.add\_codependencies}
 \scodeidx{Cmdline}{run\_after\_extended\_stage}
 \begin{ocamlcode}
@@ -2887,7 +2887,7 @@ corresponding to the parameter and a short description for this option.
 \begin{example}
   The parameter corresponding to the option \texttt{-occurrence} of the plug-in
   \texttt{occurrence} is the module \texttt{Print} (defined in the file
-  \texttt{src/plugins/occurrence/options.ml}). It is implemented as follows.
+  \texttt{plugins/occurrence/src/options.ml}). It is implemented as follows.
   \sscodeidx{Parameter\_sig}{Builder}{False}
 \begin{ocamlcode}
 module Print =
@@ -2907,7 +2907,7 @@ module Print: Parameter_sig.Bool
 Another example is the parameter corresponding to the option
 \texttt{-impact-annot} of the plug-in \texttt{impact}. This parameter is
 defined by the module \texttt{Annot} (defined in the file
-\texttt{src/plugins/impact/options.ml}). It is implemented as follows.
+\texttt{plugins/impact/src/options.ml}). It is implemented as follows.
 \sscodeidx{Parameter\_sig}{Builder}{Kernel\_function\_set}
 \begin{ocamlcode}
 module Annot =
@@ -4393,11 +4393,11 @@ See the documentation in the following files for details about the
 provided operations on these types:
 \begin{itemize}
   \item For \texttt{Locations}:
-    \texttt{src/kernel\_services/abstract\_interp/locations.mli};
+    \texttt{src/kernel/services/abstract\_interp/locations.mli};
   \item For \texttt{Addresses}:
-    \texttt{src/kernel\_services/abstract\_interp/addresses.mli};
+    \texttt{src/kernel/services/abstract\_interp/addresses.mli};
   \item For \texttt{Memory\_zone}:
-    \texttt{src/kernel\_services/abstract\_interp/memory\_zone.mli}.
+    \texttt{src/kernel/services/abstract\_interp/memory\_zone.mli}.
 \end{itemize}
 
 The four representations are:

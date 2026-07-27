@@ -605,7 +605,7 @@ internal-nightly:
     - opam pin add ocaml $(grep $OCAML nix/ocaml-versions.txt) -n
     - opam install . --deps-only --with-test -y
     - dune build @install
-    - dune exec -- frama-c-ptests tests src/plugins/*/tests
+    - dune exec -- frama-c-ptests tests plugins/*/tests
     - dune build @ptests_config
   timeout: 4h
   tags:

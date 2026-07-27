@@ -5,7 +5,7 @@
         "rettype":"Return type of the builtin. Whitespace is important: types are matched as exact strings, with a single space between components.",
         "args":"List of the types of the builtin arguments. Whitespace is important: types are matched as exact strings, with a single space between components.",
         "variadic":"When present, this builtin behaves as a variadic function.",
-        "_comment": "Adding new types to fields 'rettype' or 'args' requires updating the list of recognized types in 'src/kernel_services/ast_queries/cil_builtins.ml'."
+        "_comment": "Adding new types to fields 'rettype' or 'args' requires updating the list of recognized types in 'src/kernel/services/ast_queries/cil_builtins.ml'."
     },
     "data":{
         "__builtin__annotation": {

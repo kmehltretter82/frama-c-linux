@@ -8,8 +8,8 @@
 # - tests-command (mandatory):
 #   The tests command to execute, generally something like:
 #   ''
-#     dune exec -- frama-c-ptests -never-disabled tests src/plugins/e-acsl/tests
-#     dune build -j1 @src/plugins/e-acsl/tests/ptests
+#     dune exec -- frama-c-ptests -never-disabled tests plugins/e-acsl/tests
+#     dune build -j1 @plugins/e-acsl/tests/ptests
 #   ''
 #
 # - has-wp-proofs (optional, defaults to 'false')

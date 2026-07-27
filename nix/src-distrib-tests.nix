@@ -7,7 +7,7 @@ mk_tests_distrib {
   cover = false ;
   tests-name = "src-distrib-tests" ;
   tests-command = ''
-    dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
+    dune exec -- frama-c-ptests -never-disabled tests plugins/*/tests
     dune build -j1 @ptests_config
   '' ;
 }

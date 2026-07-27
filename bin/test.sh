@@ -33,10 +33,10 @@ ALIAS_NAME=ptests
 LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
-TEST_DIRS="tests src/plugins/*"
+TEST_DIRS="tests plugins/*"
 
 # The first target runs all inline tests in kernel and fclib and the second a
-# specific test in kernel_internals/parsing
+# specific test in src/kernel/internals/parsing
 KERNEL_TEST_ALIASES="@runtest-frama_c_kernel @runtest-parsing"
 # --------------------------------------------------------------------------
 # ---  Help Message
@@ -55,7 +55,7 @@ function Usage
     echo "  <FILE>    single test file <FILE>"
     echo "  <DIR>     all tests in <DIR>,"
     echo "            or in directory tests/<DIR> (if it exists)"
-    echo "            or in plugin src/plugins/<DIR> (if it exists)"
+    echo "            or in plugin plugins/<DIR> (if it exists)"
     echo "  kernel    all kernel tests, i.e. all tests in tests/, inline tests"
     echo "            and any test declared in kernel sources."
     echo ""
@@ -267,8 +267,8 @@ do
                 TESTS+=("$1")
             elif [ -d "tests/$1" ]; then
                 TESTS+=("tests/$1")
-            elif [ -d "src/plugins/$1" ]; then
-                TESTS+=("src/plugins/$1")
+            elif [ -d "plugins/$1" ]; then
+                TESTS+=("plugins/$1")
             elif [ "$1" == "kernel" ]; then
                 Head "Register kernel tests"
                 TESTS+=("tests/")

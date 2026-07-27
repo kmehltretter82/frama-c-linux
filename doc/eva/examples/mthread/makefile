@@ -1,5 +1,5 @@
 FRAMAC=../../../../bin/frama-c
-MTSHARE=../../../../src/plugins/eva/share/mthread
+MTSHARE=../../../../plugins/eva/share/mthread
 
 TARGETS = \
   ccfg.log \

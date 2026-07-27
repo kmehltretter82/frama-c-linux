@@ -56,7 +56,7 @@ Changelog merge=union
 # Unchecked C files
 
 tests/**/*.[ch] -check-indent
-src/plugins/*/tests/**/*.[ch] -check-indent
+plugins/*/tests/**/*.[ch] -check-indent
 
 doc/aorai/**/*.[ch]  -check-indent
 doc/developer/**/*.[ch] -check-indent
@@ -65,14 +65,14 @@ doc/rte/**/*.[ch] -check-indent
 doc/userman/examples/generated/*.[ch] -check-indent
 share/**/*.[ch] -check-indent
 
-src/plugins/wp/doc/**/*.[ch] -check-indent
+plugins/wp/doc/**/*.[ch] -check-indent
 
 # Unchecked python files
 
 share/analysis-scripts/benchmark_database.py -check-indent
 share/analysis-scripts/summary.py -check-indent
 share/analysis-scripts/results_display.py -check-indent
-src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
+plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 ## Unset "-check-eoleof"
 
@@ -265,84 +265,84 @@ ptests_config header_spec=.ignore
 /share/libc/argz.h header_spec=CEA_FSF_LGPL
 /share/libc/argz.c header_spec=CEA_FSF_LGPL
 
-/src/kernel_internals/parsing/clexer.mli header_spec=CIL
-/src/kernel_internals/parsing/clexer.mll header_spec=CIL
-/src/kernel_internals/parsing/cparser.mly header_spec=CIL
-/src/kernel_internals/parsing/errorloc.ml header_spec=CIL
-/src/kernel_internals/parsing/errorloc.mli header_spec=CIL
-/src/kernel_internals/parsing/lexerhack.ml header_spec=CIL
-/src/kernel_internals/parsing/lexerhack.mli header_spec=CIL
-/src/kernel_internals/parsing/logic_lexer.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/parsing/logic_lexer.mll header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/parsing/logic_parser.mly header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/parsing/logic_preprocess.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/parsing/logic_preprocess.mll header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/runtime/machdeps.ml header_spec=CIL
-/src/kernel_internals/runtime/machdeps.mli header_spec=CIL
-/src/kernel_internals/typing/alpha.ml header_spec=CIL
-/src/kernel_internals/typing/alpha.mli header_spec=CIL
-/src/kernel_internals/typing/cabs2cil.ml header_spec=CIL
-/src/kernel_internals/typing/cabs2cil.mli header_spec=CIL
-/src/kernel_internals/typing/cfg.ml header_spec=CIL
-/src/kernel_internals/typing/cfg.mli header_spec=CIL
-/src/kernel_internals/typing/frontc.ml header_spec=CIL
-/src/kernel_internals/typing/frontc.mli header_spec=CIL
-/src/kernel_internals/typing/logic_builtin.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/typing/logic_builtin.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/typing/mergecil.ml header_spec=CIL
-/src/kernel_internals/typing/mergecil.mli header_spec=CIL
-/src/kernel_internals/typing/oneret.ml header_spec=CIL
-/src/kernel_internals/typing/oneret.mli header_spec=CIL
-/src/kernel_internals/typing/rmtmps.ml header_spec=CIL
-/src/kernel_internals/typing/rmtmps.mli header_spec=CIL
-/src/kernel_internals/typing/translate_lightweight.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_internals/typing/translate_lightweight.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/analysis/dataflows.ml header_spec=CIL
-/src/kernel_services/analysis/dataflows.mli header_spec=CIL
-/src/kernel_services/ast_data/cil_types.mli header_spec=CIL
-/src/kernel_services/ast_data/cil_types.ml header_spec=CIL
-/src/kernel_services/ast_printing/cprint.ml header_spec=CIL
-/src/kernel_services/ast_printing/cprint.mli header_spec=CIL
-/src/kernel_services/ast_printing/logic_print.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_printing/logic_print.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/cil.ml header_spec=CIL
-/src/kernel_services/ast_queries/cil.mli header_spec=CIL
-/src/kernel_services/ast_queries/cil_builtins.ml header_spec=CIL
-/src/kernel_services/ast_queries/cil_builtins.mli header_spec=CIL
-/src/kernel_services/ast_queries/cil_const.ml header_spec=CIL
-/src/kernel_services/ast_queries/cil_const.mli header_spec=CIL
-/src/kernel_services/ast_queries/logic_const.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_const.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_env.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_env.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_typing.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_typing.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_utils.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/ast_queries/logic_utils.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/parsetree/cabs.ml header_spec=CIL
-/src/kernel_services/parsetree/cabshelper.ml header_spec=CIL
-/src/kernel_services/parsetree/cabshelper.mli header_spec=CIL
-/src/kernel_services/parsetree/logic_ptree.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/visitors/cabsvisit.ml header_spec=CIL
-/src/kernel_services/visitors/cabsvisit.mli header_spec=CIL
-/src/kernel_services/visitors/visitor_behavior.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/visitors/visitor_behavior.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/parsing/clexer.mli header_spec=CIL
+/src/kernel/internals/parsing/clexer.mll header_spec=CIL
+/src/kernel/internals/parsing/cparser.mly header_spec=CIL
+/src/kernel/internals/parsing/errorloc.ml header_spec=CIL
+/src/kernel/internals/parsing/errorloc.mli header_spec=CIL
+/src/kernel/internals/parsing/lexerhack.ml header_spec=CIL
+/src/kernel/internals/parsing/lexerhack.mli header_spec=CIL
+/src/kernel/internals/parsing/logic_lexer.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/parsing/logic_lexer.mll header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/parsing/logic_parser.mly header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/parsing/logic_preprocess.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/parsing/logic_preprocess.mll header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/runtime/machdeps.ml header_spec=CIL
+/src/kernel/internals/runtime/machdeps.mli header_spec=CIL
+/src/kernel/internals/typing/alpha.ml header_spec=CIL
+/src/kernel/internals/typing/alpha.mli header_spec=CIL
+/src/kernel/internals/typing/cabs2cil.ml header_spec=CIL
+/src/kernel/internals/typing/cabs2cil.mli header_spec=CIL
+/src/kernel/internals/typing/cfg.ml header_spec=CIL
+/src/kernel/internals/typing/cfg.mli header_spec=CIL
+/src/kernel/internals/typing/frontc.ml header_spec=CIL
+/src/kernel/internals/typing/frontc.mli header_spec=CIL
+/src/kernel/internals/typing/logic_builtin.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/typing/logic_builtin.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/typing/mergecil.ml header_spec=CIL
+/src/kernel/internals/typing/mergecil.mli header_spec=CIL
+/src/kernel/internals/typing/oneret.ml header_spec=CIL
+/src/kernel/internals/typing/oneret.mli header_spec=CIL
+/src/kernel/internals/typing/rmtmps.ml header_spec=CIL
+/src/kernel/internals/typing/rmtmps.mli header_spec=CIL
+/src/kernel/internals/typing/translate_lightweight.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/internals/typing/translate_lightweight.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/analysis/dataflows.ml header_spec=CIL
+/src/kernel/services/analysis/dataflows.mli header_spec=CIL
+/src/kernel/services/ast_data/cil_types.mli header_spec=CIL
+/src/kernel/services/ast_data/cil_types.ml header_spec=CIL
+/src/kernel/services/ast_printing/cprint.ml header_spec=CIL
+/src/kernel/services/ast_printing/cprint.mli header_spec=CIL
+/src/kernel/services/ast_printing/logic_print.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_printing/logic_print.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/cil.ml header_spec=CIL
+/src/kernel/services/ast_queries/cil.mli header_spec=CIL
+/src/kernel/services/ast_queries/cil_builtins.ml header_spec=CIL
+/src/kernel/services/ast_queries/cil_builtins.mli header_spec=CIL
+/src/kernel/services/ast_queries/cil_const.ml header_spec=CIL
+/src/kernel/services/ast_queries/cil_const.mli header_spec=CIL
+/src/kernel/services/ast_queries/logic_const.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_const.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_env.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_env.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_typing.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_typing.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_utils.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/ast_queries/logic_utils.mli header_spec=CEA_INRIA_LGPL
+/src/kernel/services/parsetree/cabs.ml header_spec=CIL
+/src/kernel/services/parsetree/cabshelper.ml header_spec=CIL
+/src/kernel/services/parsetree/cabshelper.mli header_spec=CIL
+/src/kernel/services/parsetree/logic_ptree.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/visitors/cabsvisit.ml header_spec=CIL
+/src/kernel/services/visitors/cabsvisit.mli header_spec=CIL
+/src/kernel/services/visitors/visitor_behavior.ml header_spec=CEA_INRIA_LGPL
+/src/kernel/services/visitors/visitor_behavior.mli header_spec=CEA_INRIA_LGPL
 
-/lib/datatype/unmarshal.ml header_spec=INRIA_BSD
-/lib/datatype/unmarshal.mli header_spec=INRIA_BSD
-/lib/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
-/lib/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
-/lib/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
-/lib/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
-/lib/utils/escape.ml header_spec=CIL
-/lib/utils/escape.mli header_spec=CIL
-/lib/utils/hptmap.ml header_spec=MODIFIED_MENHIR
-/lib/utils/hptmap.mli header_spec=MODIFIED_MENHIR
-/lib/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
-/lib/utils/rangemap.ml header_spec=OCAML_STDLIB
-/lib/utils/rangemap.mli header_spec=OCAML_STDLIB
-/lib/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
-/lib/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
+/src/lib/datatype/unmarshal.ml header_spec=INRIA_BSD
+/src/lib/datatype/unmarshal.mli header_spec=INRIA_BSD
+/src/lib/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
+/src/lib/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
+/src/lib/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
+/src/lib/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
+/src/lib/utils/escape.ml header_spec=CIL
+/src/lib/utils/escape.mli header_spec=CIL
+/src/lib/utils/hptmap.ml header_spec=MODIFIED_MENHIR
+/src/lib/utils/hptmap.mli header_spec=MODIFIED_MENHIR
+/src/lib/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
+/src/lib/utils/rangemap.ml header_spec=OCAML_STDLIB
+/src/lib/utils/rangemap.mli header_spec=OCAML_STDLIB
+/src/lib/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
+/src/lib/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
 
 /tools/lint/UTF8.ml header_spec=MODIFIED_CAMOMILE
 
@@ -358,4 +358,4 @@ ptests_config header_spec=.ignore
 /share/emacs/frama-c-*.el header_spec=CEA_LGPL
 /share/_frama-c header_spec=CEA_LGPL
 
-/src/kernel_internals/runtime/system_config.ml.in header_spec=CEA_LGPL
+/src/kernel/internals/runtime/system_config.ml.in header_spec=CEA_LGPL

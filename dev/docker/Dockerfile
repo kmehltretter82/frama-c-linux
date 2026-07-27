@@ -85,4 +85,4 @@ FROM frama-c AS tests
 RUN eval $(opam env) && cd /frama-c && make run-ptests && dune build @ptests_config
 
 ## Run an extra test for WP with provers
-RUN eval $(opam env) && cd /frama-c/ && cd src/plugins/wp/tests/ && frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo
+RUN eval $(opam env) && cd /frama-c/ && cd plugins/wp/tests/ && frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo

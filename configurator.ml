@@ -322,7 +322,7 @@ let configure configurator =
   Fc_version.add_macros macros version;
   Cpp.add_macros macros cpp;
   OS.add_macros macros os;
-  let ic = open_in "src/kernel_internals/runtime/system_config.ml.in" in
+  let ic = open_in "src/kernel/internals/runtime/system_config.ml.in" in
   let oc = open_out "system_config.ml" in
   try
     while true; do

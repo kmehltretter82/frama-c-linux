@@ -67,7 +67,7 @@ for plugin in "${!plugins[@]}"; do
   if [ -n "$location" ] && [ "$location" != "none" ]; then
     repo="https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/$location"
     branch="$(get_matching_branch "$repo" "$git_current_branch")"
-    git clone --depth=1 --branch="$branch" "$repo" "src/plugins/$plugin"
+    git clone --depth=1 --branch="$branch" "$repo" "plugins/$plugin"
   fi
   location="${ivette_plugins[$plugin]}"
   if [ -n "$location" ] && [ "$location" != "none" ]; then
@@ -84,7 +84,7 @@ if [[ "$CI" == "true" ]]; then
   ## installation of plugins succeeds without installing frama-c
   opam install --fake frama-c .
   for plugin in "${!plugins[@]}"; do
-    opam install --jobs 2 --deps-only --yes --confirm-level unsafe-yes "src/plugins/$plugin"
+    opam install --jobs 2 --deps-only --yes --confirm-level unsafe-yes "plugins/$plugin"
   done
   ## Now that dependencies have been installed, remove the fake install
   ## of Frama-C

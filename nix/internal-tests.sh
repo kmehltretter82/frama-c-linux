@@ -75,7 +75,7 @@ done < "./nix/external-plugins.txt"
 for plugin in ${!plugins[@]}; do
   repo=${plugins[$plugin]}
   branch="$(get_matching_branch "$repo" "$git_current_branch")"
-  git clone --depth=1 --branch="$branch" "$repo" "src/plugins/$plugin"
+  git clone --depth=1 --branch="$branch" "$repo" "plugins/$plugin"
 done
 
 nix-build --no-out-link "./nix/pkgs.nix" -A ocaml-ng.ocamlPackages_$OCAML.internal-tests

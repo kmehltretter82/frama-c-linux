@@ -75,12 +75,12 @@ clean::
 	$(MAKE) -C userman clean
 	$(MAKE) -C developer dist-clean
 	$(MAKE) -C rte clean
-	$(MAKE) -C ../src/plugins/acsl-importer/doc/manual clean
+	$(MAKE) -C ../plugins/acsl-importer/doc/manual clean
 	$(MAKE) -C aorai clean
 	$(MAKE) -C eva clean
 	$(MAKE) -C metrics clean
-	$(MAKE) -C ../src/plugins/volatile/doc/manual clean
-	$(MAKE) -C ../src/plugins/wp/doc/manual clean
+	$(MAKE) -C ../plugins/volatile/doc/manual clean
+	$(MAKE) -C ../plugins/wp/doc/manual clean
 
 all: \
 	manuals/user-manual$(FC_SUFFIX).pdf \
@@ -113,7 +113,7 @@ manuals/%:
 manuals/user-manual$(FC_SUFFIX).pdf: userman/userman.pdf
 manuals/plugin-development-guide$(FC_SUFFIX).pdf: developer/developer.pdf
 manuals/rte-manual$(FC_SUFFIX).pdf: rte/main.pdf
-manuals/acsl-importer-manual$(FC_SUFFIX).pdf: ../src/plugins/acsl-importer/doc/manual/acsl-importer.pdf
+manuals/acsl-importer-manual$(FC_SUFFIX).pdf: ../plugins/acsl-importer/doc/manual/acsl-importer.pdf
 manuals/aorai-manual$(FC_SUFFIX).pdf: aorai/main.pdf
 manuals/aorai-example$(FC_SUFFIX).tar.gz: aorai/aorai-example.tar.gz
 manuals/hello$(FC_SUFFIX).tar.gz: developer/hello.tar.gz
@@ -121,9 +121,9 @@ manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/mthread-manual$(FC_SUFFIX).pdf: eva/mthread.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
 manuals/mthread-manual$(FC_SUFFIX).pdf: eva/mthread.pdf
-manuals/volatile-manual$(FC_SUFFIX).pdf: ../src/plugins/volatile/doc/manual/volatile.pdf
-manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
-manuals/region-manual$(FC_SUFFIX).pdf: ../src/plugins/region/doc/manual/region.pdf
+manuals/volatile-manual$(FC_SUFFIX).pdf: ../plugins/volatile/doc/manual/volatile.pdf
+manuals/wp-manual$(FC_SUFFIX).pdf: ../plugins/wp/doc/manual/wp.pdf
+manuals/region-manual$(FC_SUFFIX).pdf: ../plugins/region/doc/manual/region.pdf
 
 
 ###################
@@ -161,12 +161,12 @@ manuals/acsl-version.txt:
 # E-ACSL          #
 ###################
 
-EACSL_DOC=../src/plugins/e-acsl/doc
+EACSL_DOC=../plugins/e-acsl/doc
 EACSL_VERSION=$(shell grep 'newcommand{\\eacsllangversion' $(EACSL_DOC)/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 
 ifeq ($(EACSL_VERSION),)
 
-$(info "could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex")
+$(info "could not retrieve E-ACSL version from ../plugins/e-acsl/doc/refman/main.tex")
 
 else
 
