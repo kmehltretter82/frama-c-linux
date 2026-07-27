@@ -1,7 +1,7 @@
 The following set of packages is known to be a working configuration for
 compiling Frama-C 33.0.
 
-- OCaml 4.14.2
+- OCaml 5.5.0
 - dune.3.19.1
 - dune-configurator.3.19.1
 - dune-site.3.19.1
