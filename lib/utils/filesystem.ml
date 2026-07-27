@@ -139,20 +139,7 @@ let temp_file ~prefix ~suffix =
   Filename.temp_file prefix suffix |> Filepath.of_string
 
 let temp_dir ~prefix ~suffix =
-  (* temp_dir is introduced in Ocaml 5.1 *)
-  let rec one_try limit =
-    try
-      let dir = Filename.temp_file prefix suffix in
-      Unix.unlink dir;
-      Unix.mkdir dir 0o700;
-      Filepath.of_string dir
-    with
-    | Unix.Unix_error _ when limit >= 0 ->
-      one_try (pred limit)
-    | exn ->
-      raise (convert_exception exn)
-  in
-  one_try 10
+  Filename.temp_dir prefix suffix |> Filepath.of_string
 
 
 (* -------------------------------------------------------------------------- *)
