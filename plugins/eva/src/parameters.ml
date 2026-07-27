@@ -902,7 +902,7 @@ module BuiltinsOverrides =
     end)
 let () = add_correctness_dep BuiltinsOverrides.parameter
 
-(* Exported in Eva.mli. *)
+(* Exported in Eva.ml. *)
 let use_builtin key name =
   if mem_builtin name
   then BuiltinsOverrides.add (key, name)
