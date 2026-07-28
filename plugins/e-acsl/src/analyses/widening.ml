@@ -52,7 +52,7 @@ let chose_widen n i1 i2 =
       n
 
 let widen_ival ~arg name i1 i2 =
-  if Options.Gmp_only.get ()
+  if Options.Optimisations.Gmp_only.get ()
   then top_ival
   else
     let n =

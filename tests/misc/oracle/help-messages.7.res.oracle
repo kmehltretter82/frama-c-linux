@@ -27,8 +27,6 @@ Options taking a string as argument should preferably be written
 -e-acsl-functions <f1, ..., fn>  only annotations in functions f1, ..., fn
                     are checked at runtime (preferably use
                     -e-acsl-functions="f1, ..., fn")
--e-acsl-gmp-only    always use GMP integers instead of C integral types
-                    (opposite option is -e-acsl-no-gmp-only)
 -e-acsl-instrument <f1, ..., fn>  only instrument functions f1, ..., fn. Be
                     aware that runtime verdicts may become partial.
                     (preferably use -e-acsl-instrument="f1, ..., fn")
@@ -64,9 +62,12 @@ Options taking a string as argument should preferably be written
                     optimisations. 2: moderate-cost optimisations. 3:
                     aggressive optimisations (which may even exploit
                     undefined behaviours in the annotations).
+-e-acsl-O-gmp-only  (O ≤ 1) always use GMP integers instead of C integral
+                    types (opposite option is -e-acsl-O-no-gmp-only)
 -e-acsl-O-hyp-gath  (O ≥ 1) hypothesis gathering (in inductive extraction)
                     (set by default, opposite option is
                     -e-acsl-O-no-hyp-gath)
+-e-acsl-O-no-gmp-only  opposite of -e-acsl-O-gmp-only (set by default)
 -e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
 -e-acsl-O-no-print-values  opposite of -e-acsl-O-print-values
 -e-acsl-O-no-rte    opposite of -e-acsl-O-rte

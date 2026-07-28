@@ -145,4 +145,4 @@ val preprocess_term:
   unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
-    even if -e-acsl-gmp-only is set. *)
+    even if -e-acsl-O-gmp-only is set. *)

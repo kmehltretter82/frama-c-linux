@@ -535,7 +535,7 @@ Since the assertion is valid, there is no output in this case.
 
 Note that it is possible to use \gmp arithmetic in all cases (even if not
 required). This option is controlled through \shortopt{g} switch of \eacslgcc
-which passes the \shortopt{e-acsl-gmp-only} option to the \eacsl
+which passes the \shortopt{e-acsl-O-gmp-only} option to the \eacsl
 plug-in. However it could slow down the execution of the instrumented program
 significantly.
 
@@ -1220,7 +1220,7 @@ with \eacsl directly and use \eacslgcc to compile the generated code.
 
 In this context, the \eacsl plug-in does not generate code for annotations
 proven valid by another plug-in, except if you explicitly set the option
-\shortopt{e-acsl-valid}. For instance, \Eva~\cite{eva} is able to
+\shortopt{e-acsl-O-valid}. For instance, \Eva~\cite{eva} is able to
 prove that there is no potential overflow in the previous program, so the \eacsl
 plug-in does not generate additional code for checking them if you run the
 following command.
@@ -1231,7 +1231,7 @@ following command.
 The additional code will be generated with the two following command.
 \begin{frama-c-commands}
 \$ frama-c -rte combine.i -then -eva -then -e-acsl \
-  -e-acsl-valid -then-last -print -ocode monitored_combine.i
+  -e-acsl-O-valid -then-last -print -ocode monitored_combine.i
 \end{frama-c-commands}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

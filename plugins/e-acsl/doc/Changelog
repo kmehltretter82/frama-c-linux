@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-  E-ACSL     [2026-07-25] Rename flag -e-acsl-gmp-only to -e-acsl-O-gmp-only
 -  E-ACSL     [2026-07-15] Rename flag -e-acsl-assert-print-data to
                            -e-acsl-O-print-values
 -  E-ACSL     [2026-07-15] Rename flag -e-acsl-valid to -e-acsl-O-valid
@@ -32,6 +33,8 @@ Plugin E-ACSL <next-release>
                            aliasing is possible
 -* E-ACSL     [2026-06-22] Hide developers-only command-line flags:
                            -e-acsl-interlang and -e-acsl-interlang-force
+-  E-ACSL     [2026-06-30] Hide developers-only flags: -e-acsl-interlang and
+                           -e-acsl-interlang-force
 -  E-ACSL     [2026-06-11] Add optimisation flag for omitting RTE generation
 -  E-ACSL     [2026-06-09] Add optimisation flag for hypothesis gathering
 -  E-ACSL     [2026-06-16] Reduce costs for checking “memory access” RTEs at
@@ -40,7 +43,8 @@ Plugin E-ACSL <next-release>
 -  E-ACSL     [2026-05-20] New option -e-acsl-O <n> that configures the level
                            of optimization. Default is 2. Replaces
                            -e-acsl-interlang-opt.
--  E-ACSL     [2026-05-17] Slightly extend support of inductive predicates.
+-  E-ACSL     [2026-05-17] Slightly extend support of inductive predicates by
+                           supporting substitutions of lvals with an offset
 
 ###############################################################################
 Plugin E-ACSL 33.0 (Arsenic)

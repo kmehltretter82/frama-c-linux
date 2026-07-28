@@ -39,13 +39,6 @@ module Project_name =
       let arg_name = "prj"
     end)
 
-module Gmp_only =
-  False
-    (struct
-      let option_name = "-e-acsl-gmp-only"
-      let help = "always use GMP integers instead of C integral types"
-    end)
-
 module Temporal_validity =
   False
     (struct
@@ -116,6 +109,7 @@ module Interlang =
       let () = Parameter_customize.is_invisible ()
       let option_name = "-e-acsl-interlang"
       let help = "try compilation based on intermediate language"
+      let () = Parameter_customize.is_invisible ()
     end)
 
 module Interlang_force =
@@ -124,6 +118,7 @@ module Interlang_force =
       let () = Parameter_customize.is_invisible ()
       let option_name = "-e-acsl-interlang-force"
       let help = "crash if interlang compilation fails"
+      let () = Parameter_customize.is_invisible ()
     end)
 
 module O = Int (struct
@@ -210,6 +205,8 @@ module Optimisations = struct
       let level = Eq 0
       let descr = "verify annotations which have been proven valid"
     end)
+  let () = Verify_valid.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-valid"]
 
   module Print_values =
     Make (struct
@@ -218,6 +215,16 @@ module Optimisations = struct
       let descr = "print values of variables involved in a failed \
                    verification along with the runtime error message"
     end)
+  let () = Verify_valid.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-assert-print-data"]
+
+  module Gmp_only = Make (struct
+      let name = "gmp-only"
+      let level = Leq 1
+      let descr = "always use GMP integers instead of C integral types"
+    end)
+  let () = Gmp_only.add_aliases ~deprecated:true ~visible:false
+      ["-e-acsl-gmp-only"]
 
 end
 
@@ -277,7 +284,7 @@ module Widening_output =
 
 let parameter_states =
   [ Optimisations.Verify_valid.self;
-    Gmp_only.self;
+    Optimisations.Gmp_only.self;
     Full_mtracking.self;
     Builtins.self;
     Temporal_validity.self;
@@ -297,7 +304,7 @@ let emitter =
                    Instrument.parameter;
                    Validate_format_strings.parameter;
                    Temporal_validity.parameter ]
-    ~tuning:[ Gmp_only.parameter;
+    ~tuning:[ Optimisations.Gmp_only.parameter;
               Optimisations.Verify_valid.parameter;
               Replace_libc_functions.parameter;
               Full_mtracking.parameter;

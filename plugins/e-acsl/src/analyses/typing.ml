@@ -78,14 +78,14 @@ let join ty1 ty2 =
     | C_integer n, C_float f ->
       join_cty (Cil_const.mk_tfloat f) (Cil_const.mk_tint n)
     | C_integer i1, C_integer i2 ->
-      if Options.Gmp_only.get () then Gmpz
+      if Options.Optimisations.Gmp_only.get () then Gmpz
       else join_cty (Cil_const.mk_tint i1) (Cil_const.mk_tint i2)
 
 exception Not_a_number
 let typ_of_number_ty = function
-  | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t ()
+  | C_integer _ when Options.Optimisations.Gmp_only.get () -> Gmp_types.Z.t ()
   | C_integer ik -> Cil_const.mk_tint ik
-  | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t ()
+  | C_float _ when Options.Optimisations.Gmp_only.get () -> Gmp_types.Q.t ()
   | C_float fk -> Cil_const.mk_tfloat fk
   | Gmpz -> Gmp_types.Z.t ()
   (* for the time being, no reals but rationals instead *)
@@ -271,7 +271,7 @@ let ty_of_logic_ty ?term ~profile lty =
   match term with
   | None -> get_ty lty
   | Some t ->
-    if Options.Gmp_only.get () && lty = Linteger then Gmpz
+    if Options.Optimisations.Gmp_only.get () && lty = Linteger then Gmpz
     else
       let i = Interval.get_from_profile ~profile t in
       ty_of_interv i
@@ -280,14 +280,14 @@ let ty_of_logic_ty ?term ~profile lty =
 (** {2 Type system} *)
 (******************************************************************************)
 
-(* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
-   is true. *)
+(* generate a context [c]. Take --e-acsl-O-gmp-only into account iff
+   [use_gmp_opt] is true. *)
 let mk_ctx ~use_gmp_opt = function
   | C_float _ as f ->
-    if use_gmp_opt && Options.Gmp_only.get () then Rational
+    if use_gmp_opt && Options.Optimisations.Gmp_only.get () then Rational
     else f
   | C_integer _ as c ->
-    if use_gmp_opt && Options.Gmp_only.get () then Gmpz
+    if use_gmp_opt && Options.Optimisations.Gmp_only.get () then Gmpz
     else c
   | Gmpz | Rational | Real | Nan as c -> c
 
@@ -318,7 +318,7 @@ let type_offset ~profile t =
   | Gmpz -> C_integer ILongLong (* largest possible type *)
   | ty -> ty
 
-(* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
+(* type the term [t] in a context [ctx] by taking --e-acsl-O-gmp-only into account
    iff [use_gmp_opt] is true. *)
 let rec type_term
     ~use_gmp_opt
@@ -504,7 +504,7 @@ let rec type_term
                always see integer here.*)
             begin match x.term_node with
               | TCast (true,_,_) -> None
-              |_ -> if Options.Gmp_only.get() then Some Gmpz else None
+              |_ -> if Options.Optimisations.Gmp_only.get() then Some Gmpz else None
             end
           | Lreal -> Some Real
           | Lboolean | Ctype _ | Ltype _ | Larrow _ | Lvar _ -> None
@@ -571,7 +571,7 @@ let rec type_term
             | Some (Ctype typ) ->
               false, Some (number_ty_of_typ ~post:false typ)
             | _ ->
-              true, if Options.Gmp_only.get() then Some Gmpz else ctx
+              true, if Options.Optimisations.Gmp_only.get() then Some Gmpz else ctx
           in
           Stack.push
             (fun () ->
@@ -761,7 +761,7 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
 and type_bound_variables ~profile (t1, lv, t2) =
   let ctx = number_ty_bound_variable ~profile (t1, lv, t2) in
   (* forcing when typing bounds prevents to generate an extra useless
-     GMP variable when --e-acsl-gmp-only *)
+     GMP variable when --e-acsl-O-gmp-only *)
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t1);
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t2)
 
