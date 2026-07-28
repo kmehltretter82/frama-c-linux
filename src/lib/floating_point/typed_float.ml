@@ -521,6 +521,3 @@ let parse str =
              Use flag -pow-limit to raise the upper limit of accepted exponents."
         in
         unparsable_error ~reason ()
-
-let parse_exn str =
-  Result.value_or_else ~error:failwith (parse str)

@@ -164,5 +164,3 @@ let classify env vi =
   end else
     None
 
-(* Deprecated *)
-let is_variadic_function vi = Ast_types.C.is_variadic vi.vtype

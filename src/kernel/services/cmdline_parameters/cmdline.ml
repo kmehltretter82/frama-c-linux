@@ -456,11 +456,6 @@ let configure_ocaml_gc n =
     if space_overhead <> gc_control.space_overhead then
       Gc.set { gc_control with space_overhead }
 
-let deprecated_deterministic () =
-  Kernel_log.warning
-    "'-deterministic' is deprecated and does nothing, use environment \
-     variable 'FRAMAC_DETERMINISTIC=yes' instead."
-
 let () =
   let first_parsing_stage () =
     parse
@@ -473,7 +468,6 @@ let () =
         "-debug", Int (fun n -> Debug_level.set n);
         "-kernel-verbose", Int (fun n -> Kernel_log.Verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_log.Debug_level.set n);
-        "-deterministic", Unit (fun () -> deprecated_deterministic ());
         "-tty", Unit (fun () -> set_tty true);
         "-no-tty", Unit (fun () -> set_tty false);
         "-permissive", Unit (fun () -> permissive := true);
@@ -955,27 +949,6 @@ let play_in_toplevel_one_shot nb_used play options =
   play ();
   then_options_extended
 
-type project_functions = {
-  current: unit -> int;
-  on_from_pid: 'a. int -> (unit -> 'a) -> 'a;
-  pid_to_name: int -> string;
-  name_to_pid: string -> int;
-}
-
-let project_functions =
-  let current = Project.get_current_pid in
-  let on_from_pid pid f =
-    try Project.on_from_pid pid f ()
-    with Project.Unknown_project ->
-      Kernel_log.abort "no project with id `%d'." pid
-  in
-  let pid_to_name = Project.pid_to_name in
-  let name_to_pid name =
-    let none () = Kernel_log.abort "no project named `%s'" name in
-    Option.value_or_else ~none (Project.name_to_pid name)
-  in
-  ref { current; on_from_pid; pid_to_name; name_to_pid }
-
 let play_in_toplevel nb_used play options =
   (* [aux then_opts] handles the following "-then" options *)
   let rec aux current = function
@@ -1258,27 +1231,3 @@ let explain_cmdline () =
        Format.fprintf fmt "[kernel] Explaining command-line options:@.");
   List.iter pp_option_help (List.rev option_names);
   raise Exit
-
-(* deprecated *)
-
-module type Level = Log.Level
-
-module Kernel_debug_level = Kernel_log.Debug_level
-
-module Kernel_verbose_level = Kernel_log.Verbose_level
-
-module Kernel_log = Kernel_log
-let kernel_debug_atleast_ref =
-  Kernel_log.kernel_debug_atleast_ref
-[@@alert "-kernel_log"]
-
-let kernel_verbose_atleast_ref =
-  Kernel_log.kernel_verbose_atleast_ref
-[@@alert "-kernel_log"]
-
-let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
-let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]
-
-let compress_saved_session = !Project.compress_saved_session
-
-let last_project_created_by_copy = ref Project.last_project_created_by_copy

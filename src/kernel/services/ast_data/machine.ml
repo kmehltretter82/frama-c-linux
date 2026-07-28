@@ -75,7 +75,6 @@ let the_machine = create_machine ()
 
 let use_logical_operators () = the_machine.useLogicalOperators
 let get_machdep () = the_machine.machdep
-let lower_constants () = Kernel.Constfold.get ()
 let insert_implicit_casts () = the_machine.insertImplicitCasts
 let string_literal_type () = the_machine.stringLiteralType
 let uintptr_type () = the_machine.upointType

@@ -423,6 +423,3 @@ let set_error (_:Log.event) = hadErrors := true
 let () =
   Kernel.register Log.Error set_error;
   Kernel.register Log.Failure set_error
-
-(* Deprecated *)
-let pp_location = Fileloc.pretty_long

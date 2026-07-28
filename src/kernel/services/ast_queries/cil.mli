@@ -869,19 +869,6 @@ val mkBinOp: ?constfold:bool -> loc:Fileloc.t -> binop -> exp -> exp ->
 *)
 val mkBinOp_exn: ?constfold:bool -> loc:Fileloc.t -> binop -> exp -> exp -> exp
 
-(** Same as {!mkBinOp_exn}
-    @before 33.0-Arsenic Performed a systematic cast (unless one of the
-    arguments was [0]) of pointers into [uintptr_t] during comparisons,
-    making such operation defined even if the pointers do not share
-    the same base. This was the behavior of {!mkBinOp} prior to the
-    introduction of this function.
-    @since Chlorine-20180501
-*)
-val mkBinOp_safe_ptr_cmp: loc:Fileloc.t -> binop -> exp ->
-  exp -> exp
-[@@deprecated "Use mkBinOp_exn instead, which is now safe to use."]
-[@@migrate { repl = Rel.mkBinOp_exn }]
-
 (** Equivalent to [mkMem] for terms. *)
 val mkTermMem: addr:term -> off:term_offset -> term_lval
 

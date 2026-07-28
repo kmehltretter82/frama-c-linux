@@ -245,38 +245,3 @@ val remove_symbolic_dir: t -> unit
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
     @since 22.0-Titanium *)
 val all_symbolic_dirs: unit -> (string * t) list
-
-
-(* ************************************************************************* *)
-(** {2 Position in source file} *)
-(* ************************************************************************* *)
-
-(** Describes a position in a source file.
-    @since 18.0-Argon *)
-type position = {
-  pos_path : t;   [@deprecated "use Filepos.path instead."]
-  pos_lnum : int; [@deprecated "use Filepos.line instead."]
-  pos_bol : int;  [@deprecated "use Filepos.offset - Filepos.input_column instead."]
-  pos_cnum : int; [@deprecated "use Filepos.offset instead."]
-}
-[@@deprecated "use Filepos.t instead"]
-
-[@@@alert "-deprecated"]
-
-(** Empty position, used as 'dummy' for [Cil_datatype.Position].
-    @since 30.0-Zinc *)
-val empty_pos : position
-[@@deprecated "use generated location, either from your plug-in via Self.gen_loc or Kernel.gen_loc."]
-[@@migrate { repl = Kernel.gen_loc } ]
-
-(** Pretty-prints a position, in the format file:line.
-    @since 18.0-Argon *)
-val pp_pos : Format.formatter -> position -> unit
-[@@deprecated "use Filepos.pretty instead"]
-[@@migrate { repl = Filepos.pretty } ]
-
-(** Return true if the given position is the empty position.
-    @since 30.0-Zinc *)
-val is_empty_pos : position -> bool
-[@@deprecated "use Filepos.is_empty instead"]
-[@@migrate { repl = Filepos.is_empty } ]

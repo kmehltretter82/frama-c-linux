@@ -1452,30 +1452,6 @@ module Formatter =
     end)
 let formatter = Formatter.ty
 
-(* The module {!Z} is now a Datatype and should be used instead of {!Integer}.
-   To avoid circular dependencies, we cannot define it directly with {!Z}, so
-   we define it from scratch using {!Fc_internal_z}. *)
-module Integer =
-  Make_with_collections
-    (struct
-      [@@@alert "-fc_internal_z"]
-      type t = Fc_internal_z.t
-      let name = "Datatype.Integer"
-      let reprs = [ Fc_internal_z.zero ]
-      let structural_descr = Structural_descr.t_abstract
-      let equal = Fc_internal_z.equal
-      let compare = Fc_internal_z.compare
-      let hash = Fc_internal_z.hash
-      let rehash = identity
-      let copy = identity
-      let pretty fmt v =
-        (* This version is an old version of {!Z.pretty}. It is a temporary
-           solution until this module is removed. *)
-        Format.pp_print_string fmt (Fc_internal_z.to_string v)
-      let mem_project = never_any_project
-    end)
-let integer = Integer.ty
-
 module Rational =
   Make_with_collections
     (struct

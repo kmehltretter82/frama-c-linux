@@ -316,42 +316,11 @@ val replace_option_help:
 
     They should not be used directly by a standard plug-in developer. *)
 
-(** @since Fluorine-20130401 *)
-module type Level = sig
-  val value_if_set: int option ref
-  val get: unit -> int
-  val set: int -> unit
-end
-[@@deprecated "use Log.Level instead."]
-
 module Debug_level: Log.Level
 (** @since Fluorine-20130401 *)
 
 module Verbose_level: Log.Level
 (** @since Fluorine-20130401 *)
-
-module Kernel_debug_level: Log.Level
-(** @since Fluorine-20130401 *)
-[@@deprecated "Use Kernel_log.Debug_level instead."]
-
-module Kernel_verbose_level: Log.Level
-(** @since Fluorine-20130401 *)
-[@@deprecated "Use Kernel_log.Verbose_level instead."]
-
-val kernel_debug_atleast_ref: (int -> bool) ref
-(** @since Boron-20100401 *)
-[@@deprecated "Use Kernel_log.kernel_debug_atleast_ref instead." ]
-[@@migrate { repl = Kernel_log.kernel_debug_atleast_ref }]
-
-val kernel_verbose_atleast_ref: (int -> bool) ref
-(** @since Boron-20100401 *)
-[@@deprecated "Use Kernel_log.kernel_verbose_atleast_ref instead." ]
-[@@migrate { repl = Kernel_log.kernel_verbose_atleast_ref }]
-
-module Kernel_log: Log.Messages
-[@@deprecated "Use Kernel_log module instead." ]
-[@@migrate { repl = Kernel_log }]
-(** @since Neon-20140301 *)
 
 val quiet: bool
 (** Must not be used for something else that initializing values
@@ -381,27 +350,6 @@ val permissive: bool
     (e.g. non-existent function names).
 
     @since 22.0-Titanium *)
-
-val compress_saved_session: bool
-(** Indicates whether the saved sessions should be compressed or not.
-
-    @since 31.0-Gallium *)
-[@@deprecated "Use Project.compress_saved_session instead."]
-[@@migrate { repl = Project.compress_saved_session } ]
-
-val last_project_created_by_copy: (unit -> int option) ref
-[@@deprecated "Use Project.last_project_created_by_copy instead."]
-[@@migrate { repl = Project.last_project_created_by_copy } ]
-
-type project_functions = {
-  current: unit -> int;
-  on_from_pid: 'a. int -> (unit -> 'a) -> 'a;
-  pid_to_name: int -> string;
-  name_to_pid: string -> int;
-}
-
-val project_functions : project_functions ref
-[@@deprecated "Use Project functions instead. 'current' was renamed 'get_current_pid'."]
 
 val load_all_plugins: (unit -> unit) ref
 

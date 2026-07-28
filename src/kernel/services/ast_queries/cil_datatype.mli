@@ -45,67 +45,6 @@ end
 (** {3 Localisations} *)
 (**************************************************************************)
 
-
-(** Single position in a file.
-    @since Nitrogen-20111001
-*)
-module Position: sig
-  include S_with_collections with type t = Filepos.t
-  val unknown : t
-  val pp_with_col : Format.formatter -> t -> unit
-  val of_lexing_pos : Lexing.position -> t
-  val to_lexing_pos : t -> Lexing.position
-
-  (** Pretty-print file, line and character offset.
-      @since 25.0-Manganese
-  *)
-  val pretty_debug: t Pretty_utils.formatter
-end
-[@@deprecated "Use Filepos module directly, which is its own datatype."]
-
-(** Cil locations. *)
-module Location: sig
-  include S_with_collections with type t = Fileloc.t
-  val unknown: t
-  [@@migrate { repl = Kernel.gen_loc }]
-
-  val is_unknown : t -> bool
-  [@@migrate { repl = fun loc -> not (Fileloc.is_known loc) }]
-
-  (** Pretty prints a position in the format ["<file>", line <line>-<line>] or,
-      if on one line and the column number is available, in the format
-      ["<file>", line <line>, character <char1>-<char2>]. *)
-  val pretty_long : t Pretty_utils.formatter
-  [@@migrate { repl = Fileloc.pretty_long }]
-
-  (** Pretty prints a position in the format ["<file>", line <line>] or, if the
-      column number is available, in the format
-      ["<file>", line <line>, character <char>] *)
-  val pretty_line: t Pretty_utils.formatter
-  [@@migrate { repl = fun fmt loc -> Filepos.pretty_long fmt (Fileloc.loc_start loc) }]
-
-  (** Pretty prints the ocaml internal representation of a location, for debug
-      purposes.
-
-      @since 22.0-Titanium
-  *)
-  val pretty_debug: t Pretty_utils.formatter
-  [@@migrate { repl = Fileloc.pretty_debug }]
-
-  val of_lexing_loc : Lexing.position * Lexing.position -> t
-  [@@migrate { repl = Fileloc.of_lexing_loc }]
-
-  val to_lexing_loc : t -> Lexing.position * Lexing.position
-  [@@migrate { repl = Fileloc.to_lexing_loc }]
-
-  val compare_start_semantic : Fileloc.t -> Fileloc.t -> int
-  [@@migrate { repl = Fileloc.Original.compare }]
-
-  val equal_start_semantic : Fileloc.t -> Fileloc.t -> bool
-  [@@migrate { repl = Fileloc.Original.equal }]
-end
-[@@deprecated "Use Fileloc module directly, which is its own datatype."]
-
 module Syntactic_scope: S_with_collections with type t = syntactic_scope
 
 (**************************************************************************)

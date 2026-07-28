@@ -307,22 +307,3 @@ module Datatype_Input = struct
 end
 
 include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
-
-(* Deprecated alias *)
-
-type location = t
-
-let loc_top = top
-let loc_bottom = bottom
-let is_bottom_loc = is_bottom
-let make_loc = make
-let loc_size = size
-let loc_equal = equal
-let loc_of_varinfo = of_varinfo
-let loc_of_base = of_base
-let loc_of_typoffset = of_type_offset
-
-let loc_bytes_to_loc_bits x = Addresses.Bits.of_bytes x
-let loc_bits_to_loc_bytes x = Addresses.Bits.to_bytes x
-let loc_bits_to_loc_bytes_under x = Addresses.Bits.to_bytes_under x
-let loc_to_loc_without_size { addr } = Addresses.Bits.to_bytes addr

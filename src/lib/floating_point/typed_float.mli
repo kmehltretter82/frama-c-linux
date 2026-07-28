@@ -156,13 +156,6 @@ type parsed_result =
     [Error msg] if the parsing fails, where [msg] is the error message. *)
 val parse : string -> (parsed_result, string) result
 
-(** Calls {!parse} and evaluates the result type.
-    @raise Failure if the parsing fails.
-    @before 33.0-Arsenic emitted a {!Kernel.failure} instead
-*)
-val parse_exn : string -> parsed_result
-[@@deprecated "Use parse function instead and handle the error if any."]
-
 (** Returns the floating-point kind parsed by [parse]. *)
 val parsed_fkind : ('k, 'f) parsed_format -> Floating_point.fkind
 

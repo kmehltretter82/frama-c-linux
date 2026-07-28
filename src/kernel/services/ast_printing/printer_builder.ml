@@ -128,9 +128,6 @@ struct
     pick Cil_types.pp_logic_constant (printer ())#logic_constant fmt x
   let pp_term_lhost fmt x = pick Cil_types.pp_term_lhost (printer ())#term_lhost fmt x
   let pp_fundec fmt x = pick Cil_types.pp_fundec (printer ())#fundec fmt x
-
-  (* Deprecated function *)
-  let pp_location fmt x = Fileloc.pretty fmt x
 end
 
 
