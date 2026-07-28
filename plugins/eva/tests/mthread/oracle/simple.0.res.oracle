@@ -100,8 +100,12 @@
   Thread job2, fun f2, parent <main>, args {{ &a }}: potential shared vars
     changed
 [eva:shared-memory:zone] Shared memory: \nothing
-[eva:shared-memory:mutex] Mutexes protecting access to shared memory:
-[eva:shared-memory:mutex-details] Detailed shared memory protections:
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
+    none
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections:
+    none
 [eva:data-races] 
   Possible read/write data races:
     none

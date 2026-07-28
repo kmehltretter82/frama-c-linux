@@ -130,8 +130,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] Analysis performed in 1 iterations
 [eva:shared-memory:zone] Shared memory: \nothing
-[eva:shared-memory:mutex] Mutexes protecting access to shared memory:
-[eva:shared-memory:mutex-details] Detailed shared memory protections:
+[eva:shared-memory:mutex] 
+  Mutexes protecting access to shared memory:
+    none
+[eva:shared-memory:mutex-details] 
+  Detailed shared memory protections:
+    none
 [eva:data-races] 
   Possible read/write data races:
     none
