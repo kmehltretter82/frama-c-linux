@@ -1,0 +1,46 @@
+# frama-c -wp [...]
+[kernel] Parsing string.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function main
+------------------------------------------------------------
+
+Goal Check 'A' ("string.c", line 16):
+Let x = a[0].
+Assume {
+  Type: is_sint8(x) /\ is_sint8(a[3]).
+  (* Heap *)
+  Type: IsArray_sint8(a).
+  (* Initializer *)
+  Init: forall i : Z. ((3 <= i) -> ((i <= 7) -> (a[i] = 0))).
+  (* Initializer *)
+  Init: x = 65.
+  (* Initializer *)
+  Init: a[1] = 98.
+  (* Initializer *)
+  Init: a[2] = 99.
+}
+Prove: x = 65.
+
+------------------------------------------------------------
+
+Goal Check 'Z' ("string.c", line 17):
+Let x = a[0].
+Let x_1 = a[3].
+Assume {
+  Type: is_sint8(x) /\ is_sint8(x_1).
+  (* Heap *)
+  Type: IsArray_sint8(a).
+  (* Initializer *)
+  Init: forall i : Z. ((3 <= i) -> ((i <= 7) -> (a[i] = 0))).
+  (* Initializer *)
+  Init: x = 65.
+  (* Initializer *)
+  Init: a[1] = 98.
+  (* Initializer *)
+  Init: a[2] = 99.
+}
+Prove: x_1 = 0.
+
+------------------------------------------------------------

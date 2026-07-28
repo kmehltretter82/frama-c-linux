@@ -605,21 +605,21 @@ struct
     let len = Option.bind (Cil.constFoldToInt ~machdep:true) len in
     match s with
     | Str s ->
-      let lit_len = Z.of_int (String.length s) in
-      let rest = init_end_array ~sigma v telt lit_len len in
-      Seq.fold_lefti (init_one_char ~sigma v telt) rest (String.to_seq s)
+      let size = Z.of_int (String.length s) in
+      let rest = init_end_array ~sigma v telt size len in
+      if Wp_parameters.Literals.get () then
+        Seq.fold_lefti (init_one_char ~sigma v telt) rest (String.to_seq s)
+      else rest
     | Wstr l ->
-      let lit_len = Z.of_int (List.length l) in
-      let rest = init_end_array ~sigma v telt lit_len len in
-      Seq.fold_lefti (init_one_wchar ~sigma v telt) rest (List.to_seq l)
+      let size = Z.of_int (List.length l) in
+      let rest = init_end_array ~sigma v telt size len in
+      if Wp_parameters.Literals.get () then
+        Seq.fold_lefti (init_one_wchar ~sigma v telt) rest (List.to_seq l)
+      else rest
 
   let init ~sigma v = function
     | None -> [init_value ~sigma (Cil.var v) v.vtype None]
     | Some (CInit init) -> List.rev (init_variable ~sigma (Cil.var v) init [])
-    | Some (StrInit s) ->
-      if Wp_parameters.Literals.get () then
-        init_string_literal ~sigma v s
-      else
-        [init_value ~sigma (Cil.var v) v.vtype None]
+    | Some (StrInit s) -> init_string_literal ~sigma v s
 
 end
