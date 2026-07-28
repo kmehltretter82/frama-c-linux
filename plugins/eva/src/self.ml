@@ -319,8 +319,7 @@ let dkey_data_races =
 
 (* Created for documentation. *)
 let _dkey_shared_memory =
-  register_category "shared-memory" ~level:11
-    ~help:"messages about shared memory"
+  register_category "shared-memory" ~help:"all messages about shared memory"
 
 let dkey_shared_memory_zone =
   register_category "shared-memory:zone" ~level:3

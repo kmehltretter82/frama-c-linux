@@ -139,7 +139,7 @@ Help message about message categories.
                                   code
     queue                       : show each operation on message queues
                                   interpreted by the analysis
-    shared-memory               : messages about shared memory
+    shared-memory               : all messages about shared memory
     shared-memory:iteration     : evolution of shared memory detected at each
                                   analysis iteration
     shared-memory:mutex         : list of mutexes protecting access to each
@@ -196,5 +196,5 @@ Help message about message categories.
      8: nonlin shared-memory:values queue mutex
      9: callstack-hash callstacks
     10: progress
-    11: cardinal global-accesses shared-memory include-string-literals
+    11: cardinal global-accesses include-string-literals
   -eva-verbose N automatically enables all message categories with a verbosity equal to or less than N. Default to 5.
