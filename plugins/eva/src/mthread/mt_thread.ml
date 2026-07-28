@@ -268,7 +268,7 @@ let pop_function_call analysis =
     on_current_trace analysis (fun cur _ -> Trace.add_prefix top cur);
   | _ :: _ ->
     match analysis.curr_events_stack with
-    | [] | [_] -> Self.fatal "Invalid analysis stack when popping calling"
+    | [] | [_] -> Self.fatal "Invalid analysis stack when popping function call"
     | trace_callee :: trace_caller :: q ->
       let trace_callee' = Trace.add_prefix top trace_callee in
       let new_trace = Trace.union trace_caller trace_callee' in

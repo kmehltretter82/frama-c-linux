@@ -741,7 +741,7 @@ module Precise = struct
       try
         let offsm' = Cvalue.Model.find_base base m in
         match offsm' with
-        | `Top -> Self.fatal "Top state"
+        | `Top -> Self.fatal "Cannot compute shared values with top state"
         | `Bottom -> m (* base invalid. Probably impossible case *)
         | `Value offsm' ->
           let join = Cvalue.V_Offsetmap.join offsm offsm' in
