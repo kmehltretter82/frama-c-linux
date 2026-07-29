@@ -188,12 +188,12 @@ Help message about message categories.
   [eva] Message categories by verbosity:
      1: summary
      2: show
-     3: malloc:new shared-memory:zone data-races thread-fixpoint precision-settings
-     4: malloc:automatic-free shared-memory:mutex thread split-return partition
+     3: data-races malloc:new precision-settings shared-memory:zone thread-fixpoint
+     4: malloc:automatic-free partition shared-memory:mutex split-return thread
      5: final-states initial-state
      6: imprecision malloc shared-memory:mutex-details
-     7: widen-hints shared-memory:iteration widening pointer-comparison
-     8: nonlin shared-memory:values message-queue mutex
+     7: pointer-comparison shared-memory:iteration widen-hints widening
+     8: message-queue mutex nonlin shared-memory:values
      9: callstack-hash callstacks
     10: progress
     11: cardinal global-accesses include-string-literals
