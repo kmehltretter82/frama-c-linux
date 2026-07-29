@@ -34,11 +34,15 @@ val dkey_initial_state : category
 val dkey_final_states : category
 val dkey_summary : category
 
-(** {2 Debug categories.} *)
+(** {2 Message categories.} *)
 
-(** Same as Log's {!register_category}, but [help] is mandatory, and a verbosity
-    level can be associated to the category. *)
-val register_category: ?level:int -> help:string -> string -> category
+(** The help message of -eva-msg-key lists message categories by group.
+    Categories without group are standard messages listed first. *)
+type group = Concurrency | Domain | Debug
+
+(** Same as Log's {!register_category}, but [help] is mandatory, and a group and
+    verbosity level can be associated to the category. *)
+val register_category: ?group:group -> ?level:int -> help:string -> string -> category
 
 val dkey_show: category
 val dkey_pointer_comparison: category

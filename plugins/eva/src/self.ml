@@ -137,11 +137,21 @@ let configure_verbosity () =
      which may have been erased by operations above.  *)
   reset_user_categories ()
 
-(* Makes the help message mandatory and adds an optional verbosity level. *)
-let register_category ?level ~help name =
+(* ----- Keys registration -------------------------------------------------- *)
+
+(* The help message of -eva-msg-key lists message categories by group. *)
+type group = Concurrency | Domain | Debug
+
+(* Eva message category can be bound to a group. *)
+let dkey_group : (category, group) Hashtbl.t = Hashtbl.create 11
+
+(* Makes the help message mandatory and adds an optional verbosity level
+   and an optional group. *)
+let register_category ?group ?level ~help name =
   let default = Option.fold ~none:false ~some:((>=) default_verbosity) level in
   let category = register_category ~help ~default name in
   Option.iter (Hashtbl.replace dkey_verbosity category) level;
+  Option.iter (Hashtbl.replace dkey_group category) group;
   category
 
 (* Default status of warning categories: feedback is associated to a verbosity
@@ -164,30 +174,34 @@ let register_warn_category ~help ?default name =
 
 (* ----- Help message about categories -------------------------------------- *)
 
-let is_domain_category name = Stdlib.String.starts_with ~prefix:"d-" name
-
 let print_all_categories () =
-  let get_info category = dkey_name category, get_category_help category in
+  let get_group = Hashtbl.find_opt dkey_group in
+  let get_info category =
+    dkey_name category, get_group category, get_category_help category
+  in
   let list = get_all_categories () |> List.map get_info in
   let length = Stdlib.String.length in
-  let max = List.fold_left (fun m (name, _) -> max m (length name)) 0 list in
-  let print_one_elt fmt (name, help) =
-    Format.fprintf fmt "%-*s : @[<hov>%a@]" max name Format.pp_print_text help
+  let max = List.fold_left (fun m (name, _, _) -> max m (length name)) 0 list in
+  let pp_group (group_opt, header) =
+    let print_one_elt fmt (name, group, help) =
+      if group = group_opt then
+        Format.fprintf fmt "%-*s : @[<hov>%a@]@;"
+          max name Format.pp_print_text help
+    in
+    feedback ~level:0 "@[<v>%s:@;%a@]"
+      header (Pretty_utils.pp_list ~sep:"" print_one_elt) list;
   in
-  let is_domain (name, _) = is_domain_category name in
-  let domains, others = List.partition is_domain list in
-  feedback ~level:0 "@[<v>Standard Eva message categories are:@;%a@]"
-    (Format.pp_print_list print_one_elt) others;
-  feedback ~level:0
-    "@[<v>Additional message categories for printing domain states \
-     on user directives:@;%a@]"
-    (Format.pp_print_list print_one_elt) domains
+  List.iter pp_group
+    [ None, "Standard Eva message categories";
+      Some Concurrency, "Message categories about concurrency (with option -mthread)";
+      Some Domain, "Additional message categories for printing domain states \
+                    on user directives";
+      Some Debug, "Message categories for debug purposes" ]
 
 let print_categories_by_verbosity () =
   let category_list = sorted_list dkey_name dkey_verbosity in
   let pp_level level =
-    let is_no_domain c = not (is_domain_category (dkey_name c)) in
-    let keep (c, i) = if level = i && is_no_domain c then Some c else None in
+    let keep (c, i) = if level = i then Some c else None in
     let list = List.filter_map keep category_list in
     printf ~level:0 "  %2i: %a" level
       (Pretty_utils.pp_list ~sep:" " pp_category) list
@@ -248,15 +262,6 @@ let dkey_pointer_comparison =
   register_category "pointer-comparison" ~level:7
     ~help:"messages about the evaluation of pointer comparisons"
 
-let dkey_cvalue_domain =
-  register_category "d-cvalue" ~level:0
-    ~help:"print states of the cvalue domain"
-
-let dkey_iterator =
-  register_category "iterator"
-    ~help:"debug messages about the fixpoint engine on the control-flow graph \
-           of functions"
-
 let dkey_widening =
   register_category "widening" ~level:7
     ~help:"print a message at each point where the analysis applies a widening"
@@ -286,60 +291,72 @@ let dkey_callstack_hash =
   register_category "callstack-hash" ~level:9
     ~help:"additionally print the current callstack hash in some messages"
 
-let dkey_include_string_literal =
-  register_category "include-string-literals" ~level:11
-    ~help:"when printing a state, \
-           also include globals representing string literals"
-
 (* ----- Mthread message categories ----------------------------------------- *)
 
 let dkey_thread_fixpoint =
-  register_category "thread-fixpoint" ~level:3
+  register_category "thread-fixpoint" ~group:Concurrency ~level:3
     ~help:"progress of the analysis fixpoint on threads"
 
 let dkey_thread =
-  register_category "thread" ~level:4
+  register_category "thread" ~group:Concurrency ~level:4
     ~help:"show each operation on threads interpreted by the analysis"
 
 let dkey_mutex =
-  register_category "mutex" ~level:8
+  register_category "mutex" ~group:Concurrency ~level:8
     ~help:"show each operation on mutexes interpreted by the analysis"
 
 let dkey_queue =
-  register_category "message-queue" ~level:8
+  register_category "message-queue" ~group:Concurrency ~level:8
     ~help:"show each operation on message queues interpreted by the analysis"
 
 let dkey_data_races =
-  register_category "data-races" ~level:3
+  register_category "data-races" ~group:Concurrency ~level:3
     ~help:"list of possible data-races detected by the analysis"
 
 (* Created for documentation. *)
 let _dkey_shared_memory =
-  register_category "shared-memory" ~help:"all messages about shared memory"
+  register_category "shared-memory" ~group:Concurrency
+    ~help:"all messages about shared memory"
 
 let dkey_shared_memory_zone =
-  register_category "shared-memory:zone" ~level:3
+  register_category "shared-memory:zone" ~group:Concurrency ~level:3
     ~help:"list of shared memory locations detected by the analysis"
 
 let dkey_shared_memory_mutex =
-  register_category "shared-memory:mutex" ~level:4
+  register_category "shared-memory:mutex" ~group:Concurrency ~level:4
     ~help:"list of mutexes protecting access to each shared memory location"
 
 let dkey_shared_memory_mutex_details =
-  register_category "shared-memory:mutex-details" ~level:6
+  register_category "shared-memory:mutex-details" ~group:Concurrency ~level:6
     ~help:"more details about mutexes protecting access to shared memory"
 
 let dkey_shared_memory_by_iteration =
-  register_category "shared-memory:iteration" ~level:7
+  register_category "shared-memory:iteration" ~group:Concurrency ~level:7
     ~help:"evolution of shared memory detected at each analysis iteration"
 
 let dkey_shared_memory_values =
-  register_category "shared-memory:values" ~level:8
+  register_category "shared-memory:values" ~group:Concurrency ~level:8
     ~help:"values read and written in shared memory during the analysis"
 
 let dkey_global_accesses =
-  register_category "global-accesses" ~level:11
+  register_category "global-accesses" ~group:Concurrency ~level:11
     ~help:"print all accesses to global variables during the analysis"
+
+(* ----- Other message categories ------------------------------------------- *)
+
+let dkey_cvalue_domain =
+  register_category "d-cvalue" ~group:Domain ~level:0
+    ~help:"print states of the cvalue domain"
+
+let dkey_iterator =
+  register_category "iterator" ~group:Debug
+    ~help:"debug messages about the fixpoint engine on the control-flow graph \
+           of functions"
+
+let dkey_include_string_literal =
+  register_category "include-string-literals" ~group:Debug ~level:11
+    ~help:"when printing a state, \
+           also include globals representing string literals"
 
 (* ----- Warning categories ------------------------------------------------- *)
 

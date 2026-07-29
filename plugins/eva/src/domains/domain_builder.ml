@@ -93,7 +93,7 @@ module Complete (Domain: InputDomain) = struct
       Format.asprintf
         "print states of the %s domain" Domain.name
     in
-    Self.register_category ("d-" ^ Domain.name) ~help
+    Self.register_category ~group:Domain ("d-" ^ Domain.name) ~help
 
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name
