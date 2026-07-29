@@ -2,7 +2,7 @@
     "combinetura": {
         "branch": "master",
         "repo": "git@git.frama-c.com:dev/combinetura.git",
-        "rev": "a39f2f8da4a2114d8bda2bdd933d566921f3db8c",
+        "rev": "7a661b093831c3e7dbc0cae21cb0197df281f08f",
         "type": "git",
         "version": "0.0"
     },
