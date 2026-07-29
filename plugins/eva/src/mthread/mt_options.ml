@@ -187,7 +187,7 @@ let () =
 
 let deprecate (module Param: Parameter_sig.S) msg_key_name =
   Param.add_set_hook (fun _ _ ->
-      Self.warning "Option %s is deprecated: use %s instead."
+      Self.warning "Deprecated option %s is ignored: use %s instead."
         Param.name msg_key_name)
 
 let () = Parameter_customize.is_invisible ()
