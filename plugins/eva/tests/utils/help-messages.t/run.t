@@ -179,7 +179,8 @@ Help message about message categories.
     d-traces                    : print states of the traces domain
     d-unit                      : print states of the unit domain
   [eva] Message categories for debug purposes:
-    d-taint-debug               : debug print of the taint domain
+    d-taint-debug               : print debug states of the taint domain on user
+                                  directives
     domain_product              : inactive category
     include-string-literals     : when printing a state, also include globals
                                   representing string literals
