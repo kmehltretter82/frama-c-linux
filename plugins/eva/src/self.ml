@@ -174,54 +174,78 @@ let register_warn_category ~help ?default name =
 
 (* ----- Help message about categories -------------------------------------- *)
 
-let print_all_categories () =
+let pp_header fmt header = Format.fprintf fmt "@,@{<bold># %s:@}@," header
+let pp_paragraph fmt = Format.fprintf fmt "@[<hov>%a@]@," Format.pp_print_text
+let pp_list ?sep = List.pretty_text ?sep ?last:sep
+
+let print_message_categories fmt =
   let get_group = Hashtbl.find_opt dkey_group in
   let get_info category =
     dkey_name category, get_group category, get_category_help category
   in
   let list = get_all_categories () |> List.map get_info in
-  let length = Stdlib.String.length in
-  let max = List.fold_left (fun m (name, _, _) -> max m (length name)) 0 list in
+  let name_length (name, _, _) = Stdlib.String.length name in
+  let max_length = List.fold_left (fun acc x -> max acc (name_length x)) 0 in
   let pp_group (group_opt, header) =
-    let print_one_elt fmt (name, group, help) =
-      if group = group_opt then
-        Format.fprintf fmt "%-*s : @[<hov>%a@]@;"
-          max name Format.pp_print_text help
+    let list = List.filter (fun (_, group, _) -> group = group_opt) list in
+    let max = max_length list in
+    let print_category fmt (name, _group, help) =
+      Format.fprintf fmt "  %-*s : %a"
+        max name pp_paragraph help;
     in
-    feedback ~level:0 "@[<v>%s:@;%a@]"
-      header (Pretty_utils.pp_list ~sep:"" print_one_elt) list;
+    Format.fprintf fmt "%a%a"
+      pp_header header (pp_list ~sep:"" print_category) list;
   in
   List.iter pp_group
     [ None, "Standard Eva message categories";
-      Some Concurrency, "Message categories about concurrency (with option -mthread)";
-      Some Domain, "Additional message categories for printing domain states \
-                    on user directives";
+      Some Concurrency,
+      "Message categories about concurrency (with option -mthread)";
+      Some Domain,
+      "Message categories for printing domain states on user directives";
       Some Debug, "Message categories for debug purposes" ]
 
-let print_categories_by_verbosity () =
-  let category_list = sorted_list dkey_name dkey_verbosity in
-  let pp_level level =
-    let keep (c, i) = if level = i then Some c else None in
-    let list = List.filter_map keep category_list in
-    printf ~level:0 "  %2i: %a" level
-      (Pretty_utils.pp_list ~sep:" " pp_category) list
-  in
-  feedback ~level:0 "Message categories by verbosity:";
-  for i = 1 to 11 do pp_level i done;
-  printf ~level:0
-    "-eva-verbose N automatically enables all message categories \
-     with a verbosity equal to or less than N. Default to %i."
-    default_verbosity
+let print_verbose_help fmt =
+  Format.fprintf fmt "  %a  %a"
+    pp_paragraph
+    "Message categories are automatically enabled or disabled according to \
+     the verbosity level. Default verbosity is 5 and can be changed with \
+     -eva-verbose from 0 (no message is printed) to 11 (most categories are \
+     enabled). Option -eva-msg-key can also be used to enable or disable \
+     specific message categories."
+    pp_paragraph
+    "The verbosity level also enables some warning categories as feedback \
+     messages by default. Warning categories are controlled by option \
+     -eva-warn-key."
 
-let print_categories () =
-  print_all_categories ();
-  print_categories_by_verbosity ();
+let print_categories_by_verbosity fmt =
+  let category_list = sorted_list dkey_name dkey_verbosity in
+  let warning_list = sorted_list wkey_name wkey_verbosity in
+  let pp_level level list pp_category =
+    let keep (c, i) = if level = i then Some c else None in
+    let list = List.filter_map keep list in
+    if not (List.is_empty list) then
+      Format.fprintf fmt "   %2i: @[<hov>%a@]@,"
+        level (pp_list ~sep:"@ " pp_category) list
+  in
+  pp_header fmt "Message categories by verbosity";
+  print_verbose_help fmt;
+  Format.fprintf fmt
+    "@,  Message categories enabled by verbosity level:@,";
+  for i = 1 to 11 do pp_level i category_list pp_category done;
+  Format.fprintf fmt
+    "@,  Warning categories enabled as feedback message by verbosity level:@,";
+  for i = 1 to 11 do pp_level i warning_list pp_warn_category done
+
+let print_help_message () =
+  let header fmt = Format.fprintf fmt "List of message categories." in
+  printf ~header "@[<v>%t%t@]"
+    print_message_categories print_categories_by_verbosity;
   raise Cmdline.Exit
 
 (* Hook to register categories set by the user. *)
 let () =
   Message_category.add_set_hook
-    (fun _ s -> if s = "help" then print_categories ())
+    (fun _ s -> if s = "help" then print_help_message ())
 
 
 (* ----- Message categories ------------------------------------------------- *)

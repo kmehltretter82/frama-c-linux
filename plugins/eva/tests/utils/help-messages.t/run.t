@@ -93,48 +93,47 @@ Help message about Eva builtins.
 
 Help message about message categories.
   $ frama-c -no-autoload-plugins -load-module eva,eva.apron -eva-msg-key help
-  [eva] Standard Eva message categories:
-    *                           : All categories
-    callstack-hash              : additionally print the current callstack hash
-                                  in some messages
-    callstacks                  : print the current callstack alongside some
-                                  messages
-    cardinal                    : estimate the number of concrete states
-                                  approximated by the analysis at the end of each
-                                  function
-    final-states                : at the end of the analysis, print final values
-                                  inferred at the return point of each analyzed
-                                  function 
-    imprecision                 : messages related to possible imprecision of
-                                  builtins interpreting memcpy, memmove and
-                                  memset
-    initial-state               : at the start of the analysis, print the initial
-                                  value of global variables
-    malloc                      : messages from the builtins interpreting dynamic
-                                  allocations
-    malloc:automatic-free       : messages emitted when bases are automatically
-                                  freed (alloca or VLA)
-    malloc:new                  : messages emitted at the creation of new bases
-    nonlin                      : messages about evaluation of subdivisions
-                                  enabled by -eva-subdivide-non-linear
-    partition                   : messages about states partitioning
-    pointer-comparison          : messages about the evaluation of pointer
-                                  comparisons
-    precision-settings          : messages about the automatic configuration of
-                                  the analysis by option -eva-precision
-    progress                    : messages about the analysis progress in the C
-                                  code
-    show                        : show values/states inferred by the analysis on
-                                  directives such as Frama_C_show_each and
-                                  Frama_C_dump_each
-    split-return                : messages related to option -eva-split-return
-    summary                     : print a summary of the analysis at the end,
-                                  including coverage and alarm numbers
-    widen-hints                 : debug messages when failing to use widen_hints
-                                  annotations
-    widening                    : print a message at each point where the
-                                  analysis applies a widening
-  [eva] Message categories about concurrency (with option -mthread):
+  [eva] List of message categories.
+  
+  # Standard Eva message categories:
+    *                     : All categories
+    callstack-hash        : additionally print the current callstack hash in
+                            some messages
+    callstacks            : print the current callstack alongside some messages
+    cardinal              : estimate the number of concrete states approximated
+                            by the analysis at the end of each function
+    final-states          : at the end of the analysis, print final values
+                            inferred at the return point of each analyzed
+                            function 
+    imprecision           : messages related to possible imprecision of
+                            builtins interpreting memcpy, memmove and memset
+    initial-state         : at the start of the analysis, print the initial
+                            value of global variables
+    malloc                : messages from the builtins interpreting dynamic
+                            allocations
+    malloc:automatic-free : messages emitted when bases are automatically freed
+                            (alloca or VLA)
+    malloc:new            : messages emitted at the creation of new bases
+    nonlin                : messages about evaluation of subdivisions enabled
+                            by -eva-subdivide-non-linear
+    partition             : messages about states partitioning
+    pointer-comparison    : messages about the evaluation of pointer
+                            comparisons
+    precision-settings    : messages about the automatic configuration of the
+                            analysis by option -eva-precision
+    progress              : messages about the analysis progress in the C code
+    show                  : show values/states inferred by the analysis on
+                            directives such as Frama_C_show_each and
+                            Frama_C_dump_each
+    split-return          : messages related to option -eva-split-return
+    summary               : print a summary of the analysis at the end,
+                            including coverage and alarm numbers
+    widen-hints           : debug messages when failing to use widen_hints
+                            annotations
+    widening              : print a message at each point where the analysis
+                            applies a widening
+  
+  # Message categories about concurrency (with option -mthread):
     data-races                  : list of possible data-races detected by the
                                   analysis
     global-accesses             : print all accesses to global variables during
@@ -148,56 +147,76 @@ Help message about message categories.
                                   analysis iteration
     shared-memory:mutex         : list of mutexes protecting access to each
                                   shared memory location
-    shared-memory:mutex-details : more details about mutexes protecting access to
-                                  shared memory
-    shared-memory:values        : values read and written in shared memory during
+    shared-memory:mutex-details : more details about mutexes protecting access
+                                  to shared memory
+    shared-memory:values        : values read and written in shared memory
+                                  during the analysis
+    shared-memory:zone          : list of shared memory locations detected by
                                   the analysis
-    shared-memory:zone          : list of shared memory locations detected by the
-                                  analysis
     thread                      : show each operation on threads interpreted by
                                   the analysis
     thread-fixpoint             : progress of the analysis fixpoint on threads
-  [eva] Additional message categories for printing domain states on user directives:
-    d-apron-box                 : print states of the apron-box domain
-    d-apron-octagon             : print states of the apron-octagon domain
-    d-apron-polka-equality      : print states of the apron-polka-equality domain
-    d-apron-polka-loose         : print states of the apron-polka-loose domain
-    d-apron-polka-strict        : print states of the apron-polka-strict domain
-    d-bitwise                   : print states of the bitwise domain
-    d-cvalue                    : print states of the cvalue domain
-    d-equality                  : print states of the equality domain
-    d-gauges                    : print states of the gauges domain
-    d-inout                     : print states of the inout domain
-    d-mthread                   : print states of the mthread domain
-    d-multidim                  : print states of the multidim domain
-    d-numerors                  : print states of the numerors domain
-    d-octagon                   : print states of the octagon domain
-    d-printer                   : print states of the printer domain
-    d-sign                      : print states of the sign domain
-    d-symbolic-locations        : print states of the symbolic-locations domain
-    d-taint                     : print states of the taint domain
-    d-traces                    : print states of the traces domain
-    d-unit                      : print states of the unit domain
-  [eva] Message categories for debug purposes:
-    d-taint-debug               : print debug states of the taint domain on user
-                                  directives
-    domain_product              : inactive category
-    include-string-literals     : when printing a state, also include globals
-                                  representing string literals
-    interferences               : debug messages about interferences from other
-                                  threads injected in Eva analysis with Mthread
-    iterator                    : debug messages about the fixpoint engine on the
-                                  control-flow graph of functions
-  [eva] Message categories by verbosity:
-     1: summary
-     2: show
-     3: data-races malloc:new precision-settings shared-memory:zone thread-fixpoint
-     4: malloc:automatic-free partition shared-memory:mutex split-return thread
-     5: final-states initial-state
-     6: imprecision malloc shared-memory:mutex-details
-     7: pointer-comparison shared-memory:iteration widen-hints widening
-     8: message-queue mutex nonlin shared-memory:values
-     9: callstack-hash callstacks
-    10: progress
-    11: cardinal global-accesses include-string-literals
-  -eva-verbose N automatically enables all message categories with a verbosity equal to or less than N. Default to 5.
+  
+  # Message categories for printing domain states on user directives:
+    d-apron-box            : print states of the apron-box domain
+    d-apron-octagon        : print states of the apron-octagon domain
+    d-apron-polka-equality : print states of the apron-polka-equality domain
+    d-apron-polka-loose    : print states of the apron-polka-loose domain
+    d-apron-polka-strict   : print states of the apron-polka-strict domain
+    d-bitwise              : print states of the bitwise domain
+    d-cvalue               : print states of the cvalue domain
+    d-equality             : print states of the equality domain
+    d-gauges               : print states of the gauges domain
+    d-inout                : print states of the inout domain
+    d-mthread              : print states of the mthread domain
+    d-multidim             : print states of the multidim domain
+    d-numerors             : print states of the numerors domain
+    d-octagon              : print states of the octagon domain
+    d-printer              : print states of the printer domain
+    d-sign                 : print states of the sign domain
+    d-symbolic-locations   : print states of the symbolic-locations domain
+    d-taint                : print states of the taint domain
+    d-traces               : print states of the traces domain
+    d-unit                 : print states of the unit domain
+  
+  # Message categories for debug purposes:
+    d-taint-debug           : print debug states of the taint domain on user
+                              directives
+    domain_product          : inactive category
+    include-string-literals : when printing a state, also include globals
+                              representing string literals
+    interferences           : debug messages about interferences from other
+                              threads injected in Eva analysis with Mthread
+    iterator                : debug messages about the fixpoint engine on the
+                              control-flow graph of functions
+  
+  # Message categories by verbosity:
+    Message categories are automatically enabled or disabled according to the
+    verbosity level. Default verbosity is 5 and can be changed with
+    -eva-verbose from 0 (no message is printed) to 11 (most categories are
+    enabled). Option -eva-msg-key can also be used to enable or disable
+    specific message categories.
+    The verbosity level also enables some warning categories as feedback
+    messages by default. Warning categories are controlled by option
+    -eva-warn-key.
+  
+    Message categories enabled by verbosity level:
+      1: summary
+      2: show
+      3: data-races malloc:new precision-settings shared-memory:zone
+         thread-fixpoint
+      4: malloc:automatic-free partition shared-memory:mutex split-return
+         thread
+      5: final-states initial-state
+      6: imprecision malloc shared-memory:mutex-details
+      7: pointer-comparison shared-memory:iteration widen-hints widening
+      8: message-queue mutex nonlin shared-memory:values
+      9: callstack-hash callstacks
+     10: progress
+     11: cardinal global-accesses include-string-literals
+  
+    Warning categories enabled as feedback message by verbosity level:
+      2: watchpoint
+      3: garbled-mix:assigns garbled-mix:summary garbled-mix:write recursion
+      4: acsl acsl:unsupported assigns:invalid-location loop-unroll:auto
+         loop-unroll:partial
