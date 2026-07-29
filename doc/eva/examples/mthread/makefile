@@ -1,11 +1,11 @@
 FRAMAC=../../../../bin/frama-c
-MTSHARE=../../../../plugins/eva/share/mthread
+EVASHARE=../../../../plugins/eva/share/eva
 
 TARGETS = \
   ccfg.log \
   philo.noslevel.log \
 	philo.slevel5.log \
-	philo.mtverbose2.log \
+	philo.verbose.log \
 	init.log \
 
 CFG_TARGETS = \
@@ -24,14 +24,15 @@ clean:
 	$(RM) *.pdf
 	$(RM) -r html_summary
 
-MT_QUEUE = ${MTSHARE}/mthread_queue.c
+MT_QUEUE = ${EVASHARE}/mthread_queue.c
 
 MT_COMMON_FLAGS = \
   -eva \
   -mthread \
 	-mt-threads-lib pthreads \
-	-eva-verbose 0 \
-	-add-symbolic-path=${MTSHARE}:MTSHARE \
+	-eva-verbose 4 \
+	-eva-msg-key mutex \
+	-add-symbolic-path=${EVASHARE}:EVASHARE \
 
 
 %.log: SOURCE = $(word 1,$(subst ., ,$*)).c
@@ -52,5 +53,5 @@ $(PDF_CFG_TARGETS) : %.pdf: $$(SOURCE) $(MAKEFILE_LIST)
 ccfg.log: FCFLAGS += -eva-slevel 15 -mt-extract html -mt-keep-dot-files
 philo.noslevel.log: FCFLAGS += ${MT_QUEUE}
 philo.slevel5.log: FCFLAGS += ${MT_QUEUE} -eva-slevel 5
-philo.mtverbose2.log: FCFLAGS += ${MT_QUEUE} -eva-slevel 5 -mt-verbose 2
+philo.verbose.log: FCFLAGS += ${MT_QUEUE} -eva-slevel 5 -eva-msg-key message-queue,shared-memory:iteration
 init.log: FCFLAGS += -eva-slevel 3

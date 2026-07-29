@@ -53,7 +53,7 @@ let register_no_hooks () =
   ref_hook_end_function := no_hook;
   let register (name, _builtin) =
     let builtin _state _args =
-      Mt_self.abort
+      Self.abort
         "Builtin %s requires -mthread parameter \
          for the analysis of concurrent programs." name
     in
@@ -69,7 +69,7 @@ let () = register_no_hooks ()
 let check_options () =
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
-    Mt_self.error "Option %S needs option \"%s html\" to work."
+    Self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name
 
@@ -101,31 +101,99 @@ let make_analysis_state () =
 let pre_analysis () =
   if Mt_options.Enabled.get ()
   then begin
-    Mt_self.warning
-      "Mthread is an experimental plugin and is still in development.";
+    Self.warning ~wkey:Self.wkey_experimental
+      "Analysis of concurrent programs is an experimental feature.";
     Mt_lib.check_mthread_library ();
     check_options ();
     let analysis = make_analysis_state () in
     register_hooks analysis;
     (* Let Eva know about interrupt handlers. *)
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-    Mt_self.feedback "******* Starting mthread";
     Some analysis
   end else begin
     register_no_hooks ();
     None
   end
 
+(* Print information about shared memory detected by the analysis. *)
+let print_shared_memory analysis =
+  Self.result ~dkey:Self.dkey_shared_memory_zone
+    "@[<hov 2>Shared memory:@ %a@]"
+    Memory_zone.pretty analysis.precise_concurrent_accesses;
+  let precise_accesses = analysis.concurrent_accesses_by_nodes in
+  let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
+  Self.result ~dkey:Self.dkey_shared_memory_mutex
+    "@[<v 2>Mutexes protecting access to shared memory:@ %a@]"
+    Mt_mutexes_types.MutexesByZone.pretty mutexes;
+  if Self.(is_debug_key_enabled dkey_shared_memory_mutex_details) then
+    let protections = Mt_mutexes.check_protection analysis precise_accesses in
+    Self.result ~dkey:Self.dkey_shared_memory_mutex_details
+      "@[<v 2>Detailed shared memory protections:@ %a@]"
+      Mt_mutexes.pretty_protections protections;
+    let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
+    let need_sync = Mt_mutexes.need_sync ill_protected in
+    if need_sync <> [] then
+      (* Sort statements before printing *)
+      let cmp (stmt1, _) (stmt2, _) = Cil_datatype.Stmt.compare stmt1 stmt2 in
+      let need_sync = List.sort cmp need_sync in
+      let pp fmt (stmt, z) =
+        Format.fprintf fmt "@[%a (for %a)@]"
+          Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
+          Memory_zone.pretty z
+      in
+      Self.result ~dkey:Self.dkey_shared_memory_mutex_details
+        "Statements needing manual synchronisation@.%a"
+        (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
+
+(* Does at least one mutex protects all accesses from [access_set]? *)
+let is_protected access_set =
+  let exception Unprotected in
+  (* Computes the intersection of surely locked mutexes for all accesses.
+     If it is empty, then [access_set] is not guaranteed to be protected. *)
+  let inter_locked_mutex (_rw, node, _thread) acc =
+    let mutexes = Mt_cfg_types.(node.cfgn_context.locked_mutexes) in
+    let locked = Mt_types.MutexPresence.only_present mutexes in
+    let acc = Option.fold ~none:locked ~some:(Mutex.Set.inter locked) acc in
+    if Mutex.Set.is_empty acc then raise Unprotected;
+    Some acc
+  in
+  let fold = Mt_cfg_types.SetNodeIdAccess.fold in
+  try ignore (fold inter_locked_mutex access_set None); true
+  with Unprotected -> false
+
+(* List data races detected by the analysis. *)
+let print_data_races analysis =
+  let concurrent_accesses = analysis.concurrent_accesses_by_nodes in
+  let is_unprotected (_zone, access_set) = not (is_protected access_set) in
+  let unprotected_accesses = List.filter is_unprotected concurrent_accesses in
+  let is_write_only (_zone, access_set) =
+    let is_read (rw, _, _) = Mt_types.RW.is_read rw in
+    not (Mt_cfg_types.SetNodeIdAccess.exists is_read access_set)
+  in
+  let ww_accesses, rw_accesses =
+    List.partition is_write_only unprotected_accesses
+  in
+  Self.result ~dkey:Self.dkey_data_races
+    "@[<v 2>Possible read/write data races:@ %a@]"
+    Mt_mutexes.pretty_with_mutexes rw_accesses;
+  if Mt_options.WriteWriteRaces.get () then
+    Self.result ~dkey:Self.dkey_data_races
+      "@[<v 2>Possible write/write data races:@ %a@]"
+      Mt_mutexes.pretty_with_mutexes ww_accesses
+
 
 let post_analysis analysis =
   if not (Mt_thread.needs_recomputation analysis) then
-    Mt_self.feedback "******* Analysis performed, %d iterations"
-      analysis.iteration
+    Self.feedback ~dkey:Self.dkey_thread_fixpoint
+      "Analysis performed in %d iterations" analysis.iteration
   else
-    Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
+    Self.warning
+      "@[<hov>Analysis stopped after %d iterations.@ %a@]"
       analysis.iteration
       Mt_thread.pretty_recompute_reasons analysis;
+
+  print_shared_memory analysis;
+  print_data_races analysis;
 
   (* In the cfgs, mark whether the accesses are concurrent or not,
       and remove superfluous node *)
@@ -134,13 +202,12 @@ let post_analysis analysis =
   (* Printing results to files *)
   Mt_options.ExtractModels.iter
     (fun s ->
-       Mt_self.feedback "******* Outputting model for %s" s;
+       Self.debug "Outputting model for %s." s;
        (match s with
         | "html" -> Mt_outputs.Html.output_threads analysis;
-        | _ -> Mt_self.error "Unknown model %s specified" s;
+        | _ -> Self.error "Unknown model %s specified" s;
        );
-       Mt_self.feedback "******* %s output done."
-         (String.capitalize_ascii s);
+       Self.debug "%s output done." (String.capitalize_ascii s);
     );
 
   Mt_summary.compute analysis
@@ -163,6 +230,6 @@ let () =
   Mt_options.ThreadsLib.add_set_hook
     (fun old_value new_value ->
        if old_value <> new_value && Ast.is_computed () then
-         Mt_self.warning
-           "ignoring option %s specified after parsing"
+         Self.warning
+           "Ignoring option %s specified after parsing."
            Mt_options.ThreadsLib.option_name)

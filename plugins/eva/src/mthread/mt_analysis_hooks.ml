@@ -38,22 +38,27 @@ let log_arg analysis =
   let stack = Option.value (Callstack.pop stack) ~default:stack in
   let source = kinstr_to_source (Callstack.top_callsite stack) in
   let append fmt =
-    if Mt_options.PrintCallstacks.get () || Mt_self.Debug.get () > 1
+    if Self.(is_debug_key_enabled dkey_callstacks)
     then Format.fprintf fmt "@.%a" Callstack.pretty stack
   in
   source, append
 
-let result analysis =
+let feedback analysis =
   let source, append = log_arg analysis in
-  Mt_self.result ~once:true ?source ~append
+  Self.feedback ~once:true ?source ~append
+
+let thread_feedback = feedback ~dkey:Self.dkey_thread
+let mutex_feedback = feedback ~dkey:Self.dkey_mutex
+let queue_feedback = feedback ~dkey:Self.dkey_queue
+let show_feedback = feedback ~dkey:Self.dkey_show
 
 let warning analysis =
   let source, append = log_arg analysis in
-  Mt_self.warning ~once:true ?source ~append
+  Self.warning ~once:true ?source ~append
 
 let error analysis =
   let source, append = log_arg analysis in
-  Mt_self.error ?source ~append
+  Self.error ~once:true ?source ~append
 
 exception Hook_failure of int
 let default_err_code = -255
@@ -236,7 +241,8 @@ let sync_values analysis state =
       (fun b offsm state ->
          let offsm' = Cvalue.Model.find_base_or_default b state in
          match offsm' with
-         | `Top -> Mt_self.fatal "Top state"
+         | `Top ->
+           Self.fatal ~current:true "Cannot synchronize values with top state"
          | `Bottom -> state
          | `Value offsm' ->
            let offsm'' = Cvalue.V_Offsetmap.join offsm offsm' in
@@ -327,21 +333,23 @@ let spawn_thread analysis eva_thread stack func state params parent =
       if ra  then ThreadState.recompute_because th' InitialArgsChanged;
       let text =
         if ris || ra then "New context for" else "Thread" in
-      result analysis "@[<hov 2>%s@ %a@]" text ThreadState.pretty_detailed th';
+      thread_feedback analysis "@[<hov 2>%s@ %a@]"
+        text ThreadState.pretty_detailed th';
       th'
     )
   with Not_found ->
     let th = basic_thread eva_thread stack func state params parent in
     th.th_to_recompute <- SetRecomputeReason.singleton FirstIteration;
     Thread.Hashtbl.add analysis.all_threads eva_thread th;
-    result analysis "@[<hov>New thread: %a@]" ThreadState.pretty_detailed th;
+    thread_feedback analysis "@[<hov>New thread: %a@]"
+      ThreadState.pretty_detailed th;
     th
 
 let check_thread_analysis thread kf =
   match Function_calls.analysis_target kf Kglobal with
   | `Body _ -> ()
   | `Builtin _ | `Spec _ ->
-    Mt_self.not_yet_implemented
+    Self.not_yet_implemented
       "Using an ACSL specification or a builtin to interpret entry point %a \
        of thread %a is not supported."
       Kernel_function.pretty kf Thread.pretty thread
@@ -381,12 +389,11 @@ let hook_thread_creation analysis state : hook_sig = function
       | [], [] -> []
       | _formal :: qf, param :: qp -> param :: trunc_params (qf, qp)
       | [], (_ :: _ as params) ->
-        if Mt_options.ModerateWarnings.get () then
-          warning analysis
-            "During thread creation, mismatch between function \
-             '%s' signature and actual arguments. Ignoring last \
-             %d argument(s) and continuing."
-            (Kernel_function.get_name kf) (List.length params);
+        warning analysis
+          "During thread creation, mismatch between function \
+           '%s' signature and actual arguments. Ignoring last \
+           %d argument(s) and continuing."
+          (Kernel_function.get_name kf) (List.length params);
         []
       | _ :: _, [] ->
         error analysis
@@ -409,9 +416,9 @@ let hook_thread_creation analysis state : hook_sig = function
     Mt_ids.write_id_state state (Mt_ids.of_thread eva_thread) 2,
     wrap_res (Thread.id eva_thread)
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread creation"
-(* By typing, Frama_C_thread_create must receive at least those
-   arguments *)
+  | _ ->
+    (* By typing, Frama_C_thread_create must receive at least those arguments *)
+    Self.fatal ~current:true "Incorrect mthread binding for thread creation"
 
 
 let update_initial_state analysis th state =
@@ -426,7 +433,7 @@ let update_initial_state analysis th state =
   if changed then (
     ThreadState.recompute_because th Mt_thread.InitialEnvChanged;
     if Cvalue.Model.is_reachable th.th_init_state then
-      result analysis "@[<hov 2>New context for@ %a@]"
+      thread_feedback analysis "@[<hov 2>New context for@ %a@]"
         ThreadState.pretty_detailed th;
   );
   th.th_init_state <- initial;
@@ -443,7 +450,7 @@ let hook_thread_start_suspend operation aux_state evt analysis state : hook_sig 
       let th = conv (find_thread offset) "unknown thread" in
       let state = ThreadOp.check_and_write analysis state th operation in
       let evt = evt th in
-      result analysis "@[%a@]" Event.pretty evt;
+      thread_feedback analysis "@[%a@]" Event.pretty evt;
       register_event analysis evt;
       let state = aux_state analysis th (state:state) in
       state, wrap_res 0
@@ -451,7 +458,9 @@ let hook_thread_start_suspend operation aux_state evt analysis state : hook_sig 
       warning analysis "Trying to %s unknown thread. Ignoring." operation.name;
       hook_fail ~code:(-1) ())
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread %s" operation.name
+  | _ ->
+    Self.fatal ~current:true
+      "Incorrect mthread binding for thread %s" operation.name
 
 (** Hook registered in the value analysis when a thread is started *)
 let hook_thread_start =
@@ -478,8 +487,10 @@ let hook_thread_cancellation analysis state : hook_sig = function
       warning analysis "Trying to cancel unknown thread. Ignoring.";
       hook_fail ~code:(-1) ())
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread cancellation \
-                        (only the thread id is expected)"
+  | _ ->
+    Self.fatal ~current:true
+      "Incorrect mthread binding for thread cancellation \
+       (only the thread id is expected)"
 
 let hook_thread_exit analysis (_state: state) : hook_sig = function
   | [_, v]  ->
@@ -489,11 +500,13 @@ let hook_thread_exit analysis (_state: state) : hook_sig = function
       hook_fail ())
     else (
       register_event analysis (ThreadExit v);
-      result analysis "Thread exiting with value %a" Cvalue.V.pretty v;
+      thread_feedback analysis "Thread exiting with value %a" Cvalue.V.pretty v;
       Cvalue.Model.bottom, no_res)
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread exit \
-                        (only the return value is expected)"
+  | _ ->
+    Self.fatal ~current:true
+      "Incorrect mthread binding for thread exit \
+       (only the return value is expected)"
 
 let hook_thread_id analysis state : hook_sig = fun _ ->
   state, wrap_res (Thread.id analysis.curr_thread.th_eva_thread)
@@ -521,13 +534,15 @@ let hook_thread_priority analysis state : hook_sig = function
           end
         | PUnknown -> ()
         | PDefault ->
-          result analysis "Setting priority to %d" p;
+          thread_feedback analysis "Setting priority to %d" p;
           analysis.curr_thread.th_priority <- PPriority p;
       end;
       state, wrap_res 0
     end
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread priority \
-                        (only a non negative integer is expected)"
+  | _ ->
+    Self.fatal ~current:true
+      "Incorrect mthread binding for thread priority \
+       (only a non negative integer is expected)"
 
 (* -------------------------------------------------------------------------- *)
 (** --- Hook registered in the value analysis related to messages         --- *)
@@ -547,7 +562,8 @@ let hook_queue_init analysis state : hook_sig = function
     register_event analysis (CreateQueue (q, size));
     state, wrap_res (Mqueue.id q)
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for queue creation"
+  | _ ->
+    Self.fatal ~current:true "Incorrect mthread binding for queue creation"
 
 let hook_send_msg analysis state : hook_sig = function
   | [(_, offset); (_exp_content, content); (_exp_size, size)] ->
@@ -561,7 +577,7 @@ let hook_send_msg analysis state : hook_sig = function
       let content = Mt_memory.read_slice ~p:content ~sbytes state in
       let state = QueueOp.check_and_write analysis state q QueueOp.send in
       let action = SendMsg (q, (content, sbytes)) in
-      result analysis "@[%a@]" Event.pretty action;
+      queue_feedback analysis "@[%a@]" Event.pretty action;
       register_event analysis action;
       state, wrap_res 0
     else (
@@ -569,7 +585,8 @@ let hook_send_msg analysis state : hook_sig = function
         "Trying to send message on uninitialized queue. Ignoring.";
       state, wrap_res (-1))
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for message sending"
+  | _ ->
+    Self.fatal ~current:true "Incorrect mthread binding for message sending"
 
 
 let find_msg_content analysis q =
@@ -643,14 +660,15 @@ let hook_receive_msg analysis state : hook_sig = function
           no_res,
           (fun fmt -> Format.fprintf fmt "No value to receive (yet?).")
       in
-      result analysis "@[<hov>%a@ %t@]" Event.pretty action pp;
+      queue_feedback analysis "@[<hov>%a@ %t@]" Event.pretty action pp;
       state, res
     else (
       warning analysis
         "Trying to receive value on non-initialized queue. Ignoring.";
       state, wrap_res (-2))
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for message reception"
+  | _ ->
+    Self.fatal ~current:true "Incorrect mthread binding for message reception"
 
 
 (* Auxiliary functions for the functions that act on mutexes (currently
@@ -670,7 +688,7 @@ let aux_mutex ~operation:op ~event analysis state : hook_sig = function
       let m = conv (find_mutex offset) "unknown mutex" in
       let state = MutexOp.check_and_write analysis state m op in
       let evt : event = event m in
-      result analysis "%a" Event.pretty evt;
+      mutex_feedback analysis "%a" Event.pretty evt;
       register_event analysis evt;
       (* XXX: take which mutex is locked into account, and update only
          those values *)
@@ -682,7 +700,7 @@ let aux_mutex ~operation:op ~event analysis state : hook_sig = function
 
   | _ -> (* really unlikely unless the code and/or the C binding
             are really strange *)
-    Mt_self.fatal "Incorrect mthread binding for mutex function"
+    Self.fatal ~current:true "Incorrect mthread binding for mutex function"
 
 let hook_init_mutex analysis state : hook_sig = function
   | [_, name] ->
@@ -691,12 +709,12 @@ let hook_init_mutex analysis state : hook_sig = function
     let mutex = Mutex.create pos name in
     analysis.all_mutexes <- Mutex.Set.add mutex analysis.all_mutexes;
     let state = MutexOp.check_and_write analysis state mutex MutexOp.initialize in
-    result analysis "Initializing mutex %a" Mutex.pretty mutex;
+    mutex_feedback analysis "Initializing mutex %a" Mutex.pretty mutex;
     state, wrap_res (Mutex.id mutex)
 
   | _ -> (* really unlikely unless the code and/or the C binding
             are really strange *)
-    Mt_self.fatal "Incorrect mthread binding for mutex function"
+    Self.fatal ~current:true "Incorrect mthread binding for mutex function"
 
 
 let hook_lock_mutex =
@@ -717,10 +735,10 @@ let hook_dummy_message analysis state : hook_sig = function
     let name = conv name "invalid event name" in
     let evt = Dummy (name, List.map snd args) in
     register_event analysis evt;
-    result analysis "Monitored event: %a" Event.pretty evt;
+    show_feedback analysis "Monitored event: %a" Event.pretty evt;
     state, no_res
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for unknown event"
+  | _ -> Self.fatal ~current:true "Incorrect mthread binding for unknown event"
 
 
 (* -------------------------------------------------------------------------- *)
@@ -768,7 +786,7 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
      has only one element (i.e. pthread_* has been called as main), but the error
      message arrives too late, and is not really readable *)
   if is_mthread_builtin f && Option.is_none (Callstack.pop stack) then
-    Mt_self.abort "Thread function %s called as starting thread function" f;
+    Self.abort "Thread function %s called as starting thread function" f;
   (* Warn on concurrency library functions without stubs. *)
   if kind = `Spec then
     Mt_lib.warn_on_unsupported_library_function kf;

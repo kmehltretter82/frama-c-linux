@@ -130,9 +130,11 @@ end
 module MutexesByZone = struct
   include Lmap_bitwise.Make_bitwise(LatticeMutexes)
 
-  let pretty =
-    pretty_generic_printer ~pretty_v:LatticeMutexes.pretty
-      ~skip_v:(fun v -> LatticeMutexes.(equal v bottom))
-      ~sep:""
-      ()
+  let pretty fmt lmap =
+    if is_empty lmap then
+      Format.pp_print_string fmt "none"
+    else
+      let pretty_v = LatticeMutexes.pretty in
+      let skip_v = LatticeMutexes.(equal bottom) in
+      pretty_generic_printer ~pretty_v ~skip_v ~sep:"" () fmt lmap
 end

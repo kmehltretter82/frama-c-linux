@@ -52,6 +52,18 @@ val dkey_progress : category
 val dkey_callstacks : category
 val dkey_include_string_literal: category
 
+val dkey_thread_fixpoint : category
+val dkey_thread : category
+val dkey_mutex : category
+val dkey_queue : category
+val dkey_data_races : category
+val dkey_shared_memory_zone : category
+val dkey_shared_memory_mutex : category
+val dkey_shared_memory_mutex_details : category
+val dkey_shared_memory_by_iteration : category
+val dkey_shared_memory_values : category
+val dkey_global_accesses : category
+
 (** {2 Warning categories.} *)
 
 (* Default status of warning categories: feedback is associated to a verbosity

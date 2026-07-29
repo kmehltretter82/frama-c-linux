@@ -58,9 +58,9 @@ let remove_uninteresting_variables_loc loc =
   Locations.filter_base keep_base loc
 
 let error_io_whole_memory op =
-  Mt_self.error ~source:(RW.loc op) ~once:true
-    "@[%a of the whole memory.@ Ignoring to allow Mthread to continue, \
-     but the analysis will not be correct.@]"
+  Self.error ~current:true ~once:true
+    "%a of the whole memory. Ignoring to allow Mthread to continue, \
+     but the analysis is unsound."
     RW.pretty op
 
 let filter_inout_access =
@@ -169,14 +169,11 @@ class do_it cp =
           | AccessesByZone.Top -> assert false (* Top is checked above *)
           | AccessesByZone.Map m -> result <- m
       ) else
-        Mt_self.error ~current:true ~once:true
-          "@[%a@ of@ the@ whole@ memory.@ Ignoring@ to@ allow@ Mthread@ to@ \
-           continue,@ but@ the@ analysis@ will@ not@ be@ correct.@]"
-          RW.pretty op
+        error_io_whole_memory op
 
     method private cur_stmt =
       match super#current_stmt with
-      | None -> Mt_self.abort "visiting without current statement"
+      | None -> Self.fatal "visiting without current statement"
       | Some s -> s
 
     method! vstmt_aux s =
@@ -204,7 +201,7 @@ class do_it cp =
            self#add_access Read deps;
            let loc = Results.(eval_address lv request |> as_location) in
            if Addresses.Bits.(equal loc.addr top) then
-             Mt_self.warning ~current:true ~once:true
+             Self.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
                Printer.pp_lval lv;
            let loc = remove_uninteresting_variables_loc loc in
@@ -303,7 +300,7 @@ class do_it cp =
                let z = Locations.(enumerate_valid_bits Write loc) in
                self#add_access (Write loc) z
              with Eval_terms.LogicEvalError _ ->
-               Mt_self.warning ~once:true
+               Self.warning ~once:true
                  "Unsupported assigns clause for function %a. Ignoring it."
                  Kernel_function.pretty kf;
            in
@@ -489,19 +486,13 @@ struct
     X.Set.fold
       (fun o1 acc -> X.Set.fold
           (fun o2 s ->
-             Mt_self.debug ~level:2
-               "@[<hov>Possible concurrent access@ %a@ and %a@]"
-               X.Access.pretty o1 X.Access.pretty o2;
              let is_concurrent = consider o1 o2 in
-             if is_concurrent then (
-               Mt_self.debug ~level:2 "@[Above access is concurrent@]";
+             if is_concurrent then
                X.Set.join s
                  (X.Set.join (X.Set.inject_singleton o1)
                     (X.Set.inject_singleton o2))
-             ) else (
-               Mt_self.debug ~level:2 "@[Above access is not concurrent@]";
-               s)
-          ) s2 acc
+             else s)
+          s2 acc
       ) s1 X.Set.bottom
   ;;
 
@@ -510,7 +501,7 @@ struct
      removing those that are not really concurrent (using
      [concurrent_accesses_sets] above) *)
   let concurrent_accesses_two_threads th1 th2 =
-    Mt_self.debug ~level:2 "Concurrent accesses in threads %a and %a"
+    Self.debug ~level:2 "Concurrent accesses in threads %a and %a"
       ThreadState.pretty th1 ThreadState.pretty th2;
     let consider = consider_vars_accesses th1 th2 in
     (* not a global cache: we have a dependency on [Thread.one_creates_other],
@@ -654,7 +645,7 @@ module Precise = struct
   let extract_shared_value node op (loc : Locations.t) state =
     match loc.size with
     | `Top ->
-      Mt_self.warning ?source:(CfgNode.node_first_loc node)
+      Self.warning ?source:(CfgNode.node_first_loc node) ~once:true
         "Ignoring imprecise %a at %a"
         Mt_types.RW.pretty op Locations.pretty loc;
       []
@@ -682,35 +673,36 @@ module Precise = struct
 
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
-    if Mt_options.DumpSharedVarsValues.get () > 1 then
+    if Self.(is_debug_key_enabled dkey_callstacks) then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, th) base offsm =
-    if Mt_options.DumpSharedVarsValues.get () > 0 then
-      Mt_self.result ~once:true "@[%a %as @ @[%a%a@]@ %a@]"
-        Thread.pretty th Mt_types.RW.pretty op Base.pretty base
-        (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
-        pp_stack node
+    Self.feedback ~dkey:Self.dkey_shared_memory_values ~once:true
+      "@[%a %as @ @[%a%a@]@ %a@]"
+      Thread.pretty th Mt_types.RW.pretty op Base.pretty base
+      (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
+      pp_stack node
 
 
   let display_shared_vars_value m =
-    fold_location
-      (fun loc s () ->
-         SetNodeIdAccess.fold
-           (fun (op, node, _thid as access) () ->
-              match op with
-              | ReadPos _ | WritePos _ ->
-                Mt_self.not_yet_implemented ~current:true ~once:true
-                  "MtSharedVars.Precise.display_shared_vars_value for ALoc"
-              | Write _ -> ()
-              | Read ->
-                let state = node.cfgn_value_state.state_before in
-                let shared =  extract_shared_value node op loc state in
-                List.iter (fun (base, offsm) -> pp_access access base offsm) shared)
-           s
-           ())
-      m
-      ()
+    if Self.(is_debug_key_enabled dkey_shared_memory_values) then
+      fold_location
+        (fun loc s () ->
+           SetNodeIdAccess.fold
+             (fun (op, node, _thid as access) () ->
+                match op with
+                | ReadPos _ | WritePos _ ->
+                  Self.not_yet_implemented ~current:true
+                    "Mt_shared_vars.Precise.display_shared_vars_value on positions"
+                | Write _ -> ()
+                | Read ->
+                  let state = node.cfgn_value_state.state_before in
+                  let shared =  extract_shared_value node op loc state in
+                  List.iter (fun (base, offsm) -> pp_access access base offsm) shared)
+             s
+             ())
+        m
+        ()
 
   module WriteSeen =
     Datatype.Triple_with_collections (CfgNode) (Thread) (Locations)
@@ -720,8 +712,8 @@ module Precise = struct
       let aux_nodes (op, node, th as access) (seen, _wr as acc) =
         match op with
         | ReadPos _ | WritePos _ ->
-          Mt_self.not_yet_implemented ~current:true ~once:true
-            "MtSharedVars.Precise.enumerate_written_vars_value for ALoc"
+          Self.not_yet_implemented ~current:true
+            "Mt_shared_vars.Precise.enumerate_written_vars_value on positions"
         | Read -> acc
         | Write loc ->
           if not (WriteSeen.Set.mem (node, th, loc) seen) then
@@ -749,7 +741,7 @@ module Precise = struct
       try
         let offsm' = Cvalue.Model.find_base base m in
         match offsm' with
-        | `Top -> Mt_self.fatal "Top state"
+        | `Top -> Self.fatal "Cannot compute shared values with top state"
         | `Bottom -> m (* base invalid. Probably impossible case *)
         | `Value offsm' ->
           let join = Cvalue.V_Offsetmap.join offsm offsm' in

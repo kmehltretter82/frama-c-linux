@@ -191,7 +191,7 @@ module Html = struct
             Hashtbl.find table.rows.from_id i
           with
           | Not_found ->
-            Mt_self.fatal "@[Row %d not found@]@." i
+            Self.fatal "@[Row %d not found@]@." i
         in
 
         let pp_cells fmt cell_array =
@@ -314,7 +314,6 @@ module Html = struct
         List.map snd
       in
       assert ((Thread.Hashtbl.length mq_table) > 0);
-      Mt_self.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
       Some (mq_table, QueueTable.mk queue_olist (List.map (fun th -> th.th_eva_thread) th_list));
     end
   ;;
@@ -461,7 +460,7 @@ module Html = struct
       let$ cin = Filesystem.with_open_in_exn input in
       copy cin cout
     with e ->
-      Mt_self.error
+      Self.error
         "Error while appending dot file %a to %a: %s"
         Filepath.pretty input
         Filepath.pretty output
@@ -476,13 +475,12 @@ module Html = struct
     in
     try
       let open Filesystem.Operators in
-      Mt_self.debug "Open %a for writing@." Filepath.pretty tmp_file;
       let$ otmp = Filesystem.with_open_out_exn tmp_file in
       let fmt = Format.formatter_of_out_channel otmp in
       generator fmt;
       tmp_file
     with Sys_error s ->
-      Mt_self.abort
+      Self.abort
         "Unable to open file %a to generate dot graph.@ %s"
         Filepath.pretty tmp_file
         s
@@ -504,7 +502,7 @@ module Html = struct
       (Format.asprintf "%s.%s" filename dot_output_format) in
     let output = Filepath.(default_dir / link_fname) in
     let fail s =
-      Mt_self.error "%s when generating graph for thread %a."
+      Self.error "%s when generating graph for thread %a."
         s ThreadState.pretty th
     in
     begin
@@ -565,7 +563,7 @@ module Html = struct
     let async = System_config.is_gui () in
     let status = Command.Dot.(spawn ~async ~format ~output dot_file) in
     if status <> Unix.WEXITED 0 then
-      Mt_self.error "Something bad happened when running dot";
+      Self.error "Something bad happened when running dot";
     Kernel.Unicode.set unicode;
     link_fname
   ;;
@@ -620,7 +618,7 @@ module Html = struct
      not needed *)
   let css_content =
     lazy (
-      let css_file = Mt_self.Share.get_file "mthread.css" in
+      let css_file = Self.Share.get_file "mthread.css" in
       try
         let open Filesystem.Operators in
         let b =
@@ -632,7 +630,7 @@ module Html = struct
         in
         Buffer.contents b
       with Sys_error _ ->
-        Mt_self.warning "Cannot open mthread css '%a'" Filepath.pretty css_file;
+        Self.warning "Cannot open mthread css '%a'" Filepath.pretty css_file;
         ""
     )
   ;;
@@ -641,7 +639,6 @@ module Html = struct
   let pp_page page =
     let open Filesystem.Operators in
     let file = Filepath.(default_dir / (page.page_name ^ ".html")) in
-    Mt_self.debug "Open %a@." Filepath.pretty_abs file;
     let$ ofile = Filesystem.with_open_out_exn file in
     let fmt = Format.formatter_of_out_channel ofile in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;

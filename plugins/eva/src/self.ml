@@ -8,6 +8,7 @@
 
 let default_verbosity = 5
 let () = Plugin.set_default_verbose_level default_verbosity
+let () = Plugin.is_share_visible ()
 
 include Plugin.Register
     (struct
@@ -294,6 +295,55 @@ let dkey_include_string_literal =
     ~help:"when printing a state, \
            also include globals representing string literals"
 
+(* ----- Mthread message categories ----------------------------------------- *)
+
+let dkey_thread_fixpoint =
+  register_category "thread-fixpoint" ~level:3
+    ~help:"progress of the analysis fixpoint on threads"
+
+let dkey_thread =
+  register_category "thread" ~level:4
+    ~help:"show each operation on threads interpreted by the analysis"
+
+let dkey_mutex =
+  register_category "mutex" ~level:8
+    ~help:"show each operation on mutexes interpreted by the analysis"
+
+let dkey_queue =
+  register_category "message-queue" ~level:8
+    ~help:"show each operation on message queues interpreted by the analysis"
+
+let dkey_data_races =
+  register_category "data-races" ~level:3
+    ~help:"list of possible data-races detected by the analysis"
+
+(* Created for documentation. *)
+let _dkey_shared_memory =
+  register_category "shared-memory" ~help:"all messages about shared memory"
+
+let dkey_shared_memory_zone =
+  register_category "shared-memory:zone" ~level:3
+    ~help:"list of shared memory locations detected by the analysis"
+
+let dkey_shared_memory_mutex =
+  register_category "shared-memory:mutex" ~level:4
+    ~help:"list of mutexes protecting access to each shared memory location"
+
+let dkey_shared_memory_mutex_details =
+  register_category "shared-memory:mutex-details" ~level:6
+    ~help:"more details about mutexes protecting access to shared memory"
+
+let dkey_shared_memory_by_iteration =
+  register_category "shared-memory:iteration" ~level:7
+    ~help:"evolution of shared memory detected at each analysis iteration"
+
+let dkey_shared_memory_values =
+  register_category "shared-memory:values" ~level:8
+    ~help:"values read and written in shared memory during the analysis"
+
+let dkey_global_accesses =
+  register_category "global-accesses" ~level:11
+    ~help:"print all accesses to global variables during the analysis"
 
 (* ----- Warning categories ------------------------------------------------- *)
 

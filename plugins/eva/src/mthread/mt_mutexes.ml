@@ -52,7 +52,7 @@ let pretty_with_mutexes =
         else
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
             MutexPresence.pretty mutexes ;
-        if Mt_options.PrintCallstacks.get ()
+        if Self.(is_debug_key_enabled dkey_callstacks)
         then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;
@@ -133,7 +133,7 @@ let check_protection analysis (l: Mt_shared_vars.Precise.list_accesses) : zone_p
 
 let pretty_protections fmt l =
   Pretty_utils.pp_list
-    ~pre:"@[<v>" ~suf:"@]" ~sep:"@ " pretty_zone_protection fmt l
+    ~pre:"@[<v>" ~suf:"@]" ~sep:"@ " ~empty:"none" pretty_zone_protection fmt l
 
 let ill_protected (accesses: Mt_shared_vars.Precise.list_accesses) (protections: zone_protection) =
   let res = Cil_datatype.Stmt.Hashtbl.create 16 in

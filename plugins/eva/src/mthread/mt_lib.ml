@@ -12,8 +12,8 @@
 let find_mthread_global_var name =
   try Globals.Vars.find_from_astinfo name Global
   with Not_found ->
-    let mthread_c = Mt_self.Share.get_file "mthread.c" in
-    Mt_self.abort
+    let mthread_c = Self.Share.get_file "mthread.c" in
+    Self.abort
       "Variable %S not found. \
        It should be in file %a, required for the Mthread analysis. \
        Use parameter -mt-threads-lib to include this file in the parsing phase."
@@ -51,20 +51,21 @@ let pp_threads_lib fmt lib =
   | Pthreads -> Format.pp_print_string fmt "lib pthreads"
 
 let threads_lib_files lib =
-  let mthread_c = Mt_self.Share.get_file "mthread.c" in
+  let mthread_c = Self.Share.get_file "mthread.c" in
   match lib with
   | BuiltinsOnly ->
     Filepath.Set.singleton mthread_c
   | Pthreads ->
-    let mthread_pthread_c = Mt_self.Share.get_file "mthread_pthread.c" in
+    let mthread_pthread_c = Self.Share.get_file "mthread_pthread.c" in
     Filepath.Set.of_list [ mthread_c ; mthread_pthread_c ]
 
 let load_threads_library lib =
-  Mt_self.feedback "Preparing sources for Mthread with %a" pp_threads_lib lib;
+  Self.feedback
+    "Preparing sources for the analysis of concurrent program with %a"
+    pp_threads_lib lib;
   (* Add Mthread folder to the include path. *)
   let mt_include_dir =
-    Format.asprintf "-I%a"
-      Filepath.pretty_abs (Mt_self.Share.get_dir ".")
+    Format.asprintf "-I%a" Filepath.pretty_abs (Self.Share.get_dir ".")
   in
   Kernel.CppExtraArgs.add mt_include_dir;
   (* Add the stubbed library files to the list of files to parse. *)
@@ -89,12 +90,12 @@ let has_been_parsed lib =
 let warn_on_unsupported_library_function kf =
   if is_pthread_function kf then
     if has_been_parsed Pthreads then
-      Mt_self.error ~current:true ~once:true
+      Self.error ~current:true ~once:true
         "Unsupported function %a from the pthreads library: \
          its analysis is probably unsound."
         Kernel_function.pretty kf
     else
-      Mt_self.abort ~current:true
+      Self.abort ~current:true
         "Call to %a from the pthreads library, whose Mthread files are missing. \
          Use '-mt-threads-lib pthreads' to enable the support of pthreads, \
          or write a C stub for this function using Mthread primitives."

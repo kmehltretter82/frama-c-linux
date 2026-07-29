@@ -100,7 +100,7 @@ let pre_analysis () =
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
-let post_analysis (type t) (engine: t engine) final_state =
+let post_analysis (type t) (engine: t engine) mthread_analysis final_state =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
@@ -120,10 +120,16 @@ let post_analysis (type t) (engine: t engine) final_state =
   (* The above functions may have changed the status of alarms. *)
   Summary.FunctionStats.recompute_all ();
   Red_statuses.report ();
-  (* Print results *)
+  (* Domains [post_analysis]. By default, the cvalue domain prints values
+     inferred at the end of each function.  *)
   let module Engine = (val engine) in
   Engine.Dom.post_analysis final_state;
+  (* Mthread [post_analysis]: prints shared memory protections and possible
+     data-races, exports results to file and computes a concurrency summary. *)
+  Option.iter Mt_main.post_analysis mthread_analysis;
+  (* Print global summary. *)
   Summary.print ();
+  (* Export after summary, as some stats are computed for the summary. *)
   Statistics.export_as_csv ()
 
 
@@ -167,9 +173,6 @@ let compute_from_entry_point  (type t) (engine: t engine)
     ?(thread=Thread.main) ?cvalue_state ?arguments entry_point =
   let module Engine = (val engine) in
   let lib_entry = Kernel.LibEntry.get () in
-  Self.feedback "Analyzing a%scomplete application starting at %a"
-    (if lib_entry then "n in" else " ")
-    Kernel_function.pretty entry_point;
   match Engine.Initialization.initial_state_with_formals
           ?cvalue_state ?arguments ~lib_entry entry_point with
   | `Bottom ->
@@ -213,14 +216,14 @@ let mthread_fixpoint engine analysis =
   let final_states = Thread.Hashtbl.create 1 in
 
   (* We analyse the main thread *)
-  Mt_self.feedback "*** Computing value analysis for main thread";
+  Self.feedback ~dkey:Self.dkey_thread_fixpoint "First analysis of main thread";
   let final_state = compute_thread engine Thread.main in
   Thread.Hashtbl.replace final_states Thread.main final_state;
-  Mt_self.feedback "*** First value analysis for main thread done." ;
+  Self.debug "First Eva analysis for main thread done." ;
   Mt_analysis_fixpoint.post_thread_analysis analysis;
 
   (* We perform the analysis iterations *)
-  Mt_self.feedback "******* Starting to iterate";
+  Self.debug "Starting to iterate.";
   let limit = Mt_options.StopAfter.get () in
   analysis.iteration <- 0;
   while
@@ -228,11 +231,10 @@ let mthread_fixpoint engine analysis =
     Mt_thread.needs_recomputation analysis
   do
     analysis.iteration <- analysis.iteration + 1;
-    Mt_self.feedback "***** Iteration %d" analysis.iteration;
+    Self.debug "Iteration %d" analysis.iteration;
     Mt_thread.iter_threads analysis
       (thread_analysis engine analysis final_states);
-    Mt_self.feedback "***** Threads computed for iteration %d."
-      analysis.iteration;
+    Self.debug "Threads computed for iteration %d." analysis.iteration;
     Mt_analysis_fixpoint.post_iteration analysis
   done;
 
@@ -248,6 +250,9 @@ let compute_from ?cvalue_state ?arguments entry_point =
   let mt_analysis = Mt_main.pre_analysis () in
   (* Prepare the analysis and build the engine. *)
   let module Engine = (val pre_analysis ()) in
+  Self.feedback "Analyzing a%scomplete application starting at %a"
+    (if Kernel.LibEntry.get () then "n in" else " ")
+    Kernel_function.pretty entry_point;
   try
     Self.ComputationState.set Computing;
     (* Run the analysis. *)
@@ -259,8 +264,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
           ?cvalue_state ?arguments entry_point
     in
     Self.(ComputationState.set Computed);
-    post_analysis (module Engine) final_state;
-    Option.iter Mt_main.post_analysis mt_analysis
+    post_analysis (module Engine) mt_analysis final_state
   with exn ->
     let backtrace = Printexc.get_raw_backtrace () in
     Self.(ComputationState.set Aborted);

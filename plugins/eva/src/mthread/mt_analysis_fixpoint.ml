@@ -8,7 +8,6 @@
 
 open Mt_types
 open Mt_shared_vars_types
-open Mt_mutexes_types
 open Mt_thread
 
 
@@ -27,7 +26,7 @@ let mark_new_messages_received analysis =
            | SendMsg (q, _) -> Mqueue.Set.add q queues
            | _ -> queues) diff Mqueue.Set.empty
     in
-    Mt_self.debug "@[New message(s) sent@ on@ queue(s) %a@]"
+    Self.debug "New message(s) sent on queue(s) %a"
       (Pretty_utils.pp_iter Mqueue.Set.iter Mqueue.pretty) queues;
     iter_threads analysis
       (fun th ->
@@ -36,7 +35,7 @@ let mark_new_messages_received analysis =
            | _ -> false
          in
          if Trace.exists th.th_amap should_recompute
-         then (Mt_self.debug "Marking %a as having received new message(s)"
+         then (Self.debug "Marking %a as having received new message(s)"
                  ThreadState.pretty th;
                ThreadState.recompute_because th NewMsgReceived)
       );
@@ -52,7 +51,7 @@ let post_thread_analysis analysis =
   mark_new_messages_received analysis;
 
   (* We compute the globals variables accessed by the thread *)
-  Mt_self.feedback ~level:2 "* Computing shared variables";
+  Self.debug "Computing shared variables.";
   let state_accesser = Mt_memory.Types.Global in
   let read_written =
     Mt_shared_vars.read_written_by_thread
@@ -60,9 +59,10 @@ let post_thread_analysis analysis =
       th.th_eva_thread
   in
   th.th_read_written <- read_written;
-  Mt_self.result ~level:3 "@[<v 0>Globals accessed by thread:@ %a@]"
+  Self.feedback ~dkey:Self.dkey_global_accesses
+    "@[<v 2>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
-  Mt_self.feedback ~level:2 "* shared variables computed";
+  Self.debug "Shared variables computed.";
 
   (* We compute interferences *)
   Mt_interferences.add_last_analysis analysis;
@@ -71,28 +71,28 @@ let post_thread_analysis analysis =
   th.th_amap <- curr_events analysis;
 
   (* Compute the concurrent graph of this thread *)
-  Mt_self.feedback ~level:2 "* Computing cfg";
+  Self.debug "Computing cfg.";
   th.th_cfg <- Mt_cfg.make_cfg th;
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
-  Mt_self.feedback ~level:2 "* Cfg computed";
+  Self.debug "Cfg computed.";
 
-  Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+  Self.debug "Thread %a computed." ThreadState.pretty th;
 
   (* (Temporary) hack to be able to retrieve temporary analysis results *)
   Self.ComputationState.set previous_computation_state
 
 (* We compute a value analysis for the given thread *)
 let pre_thread_analysis analysis th =
-  Mt_self.feedback
-    "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-    ThreadState.pretty th analysis.iteration
+  let entry_point = Thread.entry_point th.th_eva_thread in
+  Self.feedback ~dkey:Self.dkey_thread_fixpoint
+    "@[<hov 2>Analyzing thread %a starting at %a,@ iteration %d@ (%a).@]"
+    ThreadState.pretty th Kernel_function.pretty entry_point analysis.iteration
     SetRecomputeReason.pretty th.th_to_recompute;
 
-  Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
-    Thread.pretty th.th_eva_thread;
-  Mt_self.debug "@[<hov>Arguments@ %a@]"
+  Self.debug "Computing Eva analysis for thread %a with arguments %a."
+    Thread.pretty th.th_eva_thread
     (Pretty_utils.pp_list Cvalue.V.pretty) th.th_params;
-  Mt_self.debug ~level:2 "Initial state %a"
+  Self.debug ~level:2 "Initial state: %a"
     Cvalue.Model.pretty th.th_init_state;
 
   (* We set the values that depend on the thread analysed *)
@@ -160,23 +160,22 @@ let recompute_shared_vars_values_changed analysis th before now =
 
 let compute_shared_vars analysis =
   let _imprecise =
-    Mt_self.feedback "***** Computing shared variables";
+    Self.debug "Computing shared variables.";
     let (ww_accesses, rw_accesses), _ =
       Mt_shared_vars.Global.concurrent_accesses_all_threads
         (threads analysis) in
     let accesses = ww_accesses @ rw_accesses in
-    Mt_self.debug ~level:2 "Global concurrent var accesses:@.%a"
+    Self.debug ~level:2 "Global concurrent var accesses:@.%a"
       (Mt_shared_vars.Global.pretty_concurrent_accesses ()) accesses;
     let all_zones = Mt_shared_vars.Global.all_zones_accessed accesses in
-    Mt_self.result ~level:3 "@[<hov 2>Imprecise locations to watch: %a@]"
-      Memory_zone.pretty all_zones;
 
     (* Detect changes *)
     if not (Memory_zone.equal all_zones analysis.concurrent_accesses)
     then (
       let before = analysis.concurrent_accesses in
-      Mt_self.feedback ~level:2 "@[<v>Concurrent imprecise accesses have \
-                                 changed: before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
+      Self.feedback ~dkey:Self.dkey_shared_memory_by_iteration
+        "@[<v>Concurrent imprecise accesses have changed: \
+         before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
       let after = Memory_zone.join before all_zones in
       analysis.concurrent_accesses <- after;
@@ -190,31 +189,17 @@ let compute_shared_vars analysis =
     let (ww_accesses, rw_accesses), zmap =
       Mt_shared_vars.Precise.concurrent_accesses_all_threads
         (threads analysis) in
-    if Mt_options.DumpSharedVarsValues.get () > 0 then
-      Mt_shared_vars.Precise.display_shared_vars_value zmap;
+    Mt_shared_vars.Precise.display_shared_vars_value zmap;
     let written = Mt_shared_vars.Precise.enumerate_written_vars_value zmap in
     let all_accesses = ww_accesses @ rw_accesses in
-    let header fmt = Format.fprintf fmt "Possible read/write data races:" in
-    Mt_self.printf ~level:1 ~header "  @[<v 0>%a@]"
-      Mt_mutexes.pretty_with_mutexes rw_accesses;
-    if Mt_options.WriteWriteRaces.get () then begin
-      let header fmt = Format.fprintf fmt "Possible write/write data races:" in
-      Mt_self.printf ~level:1 ~header "  @[<v 0>%a@]"
-        Mt_mutexes.pretty_with_mutexes ww_accesses;
-    end;
     let all_zones = Mt_shared_vars.Precise.all_zones_accessed (ww_accesses @ rw_accesses) in
-    Mt_self.result ~level:2 "@[<hov 2>Shared memory:@ %a@]"
-      Memory_zone.pretty all_zones;
-
     (* Detect changes *)
     if not (Memory_zone.equal all_zones analysis.precise_concurrent_accesses)
     then (
       let before = analysis.precise_concurrent_accesses in
-      Mt_self.feedback ~level:2
+      Self.feedback ~dkey:Self.dkey_shared_memory_by_iteration
         "@[<v>Concurrent precise var accesses have changed: before@ \
-         @[<hov 2>  %a@]@ \
-         vs.@ \
-         @[<hov 2>  %a@]@]"
+         @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
       (* let after = Memory_zone.join before all_zones in *)
       analysis.precise_concurrent_accesses <- all_zones;
@@ -244,10 +229,9 @@ let store_written_value analysis lw =
     let changed = not (Cvalue.Model.equal written old_written) in
     if changed then
       recompute_shared_vars_values_changed analysis th old_written written;
-    if Mt_options.DumpSharedVarsValues.get () > 0 &&
-       not (Cvalue.Model.equal Cvalue.Model.empty_map written)
-    then
-      Mt_self.result "@[Write summary for %a%t:@ %a@]"
+    if not Cvalue.Model.(equal Cvalue.Model.empty_map written) then
+      Self.feedback ~dkey:Self.dkey_shared_memory_values
+        "@[Write summary for %a%t:@ %a@]"
         ThreadState.pretty th
         (fun fmt -> if changed then Format.fprintf fmt " (updated)")
         Cvalue.Model.pretty written;
@@ -262,7 +246,7 @@ let save_to_disk analysis =
       Filepath.of_format "%siteration_%d.sav" prefix analysis.iteration
     in
     Project.save filepath;
-    Mt_self.feedback "* Saved iteration %d to file %S" analysis.iteration
+    Self.feedback "Saved iteration %d to file %S" analysis.iteration
       (Filepath.to_string_rel filepath);
   end
 
@@ -272,37 +256,15 @@ let post_iteration analysis =
      but it supposes the thread creation structure is completely known.
      Hence, it is safer to do this at the end of a full iteration, instead
      of at the end of a thread *)
-  Mt_self.feedback ~level:2 "* Computing live threads and locked mutexes";
+  Self.debug "Computing live threads and locked mutexes.";
   iter_threads analysis (Mt_cfg.update_cfg_contexts analysis);
-  Mt_self.feedback ~level:2 "* threads and mutexes computed";
+  Self.debug "Threads and mutexes computed.";
 
   let precise_accesses, written = compute_shared_vars analysis in
   analysis.concurrent_accesses_by_nodes <- precise_accesses;
   store_written_value analysis written;
 
-  let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
-  Mt_self.result "@[<v 0>Mutexes for concurrent accesses:@ %a@]"
-    MutexesByZone.pretty mutexes;
-  if Mt_options.CheckProtections.get () then begin
-    let protections = Mt_mutexes.check_protection analysis precise_accesses in
-    Mt_self.result "Detailed shared zones protections@.%a"
-      Mt_mutexes.pretty_protections protections;
-    let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
-    let need_sync = Mt_mutexes.need_sync ill_protected in
-    if need_sync <> [] then begin
-      (* Sort statements before printing *)
-      let cmp (stmt1, _) (stmt2, _) = Cil_datatype.Stmt.compare stmt1 stmt2 in
-      let need_sync = List.sort cmp need_sync in
-      let pp fmt (stmt, z) =
-        Format.fprintf fmt "@[%a (for %a)@]"
-          Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
-          Memory_zone.pretty z
-      in
-      Mt_self.result "Statements needing manual synchronisation@.%a"
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
-    end;
-  end;
-  Mt_self.feedback "***** Shared variables computed";
+  Self.debug "Shared variables computed.";
 
   save_to_disk analysis
 
@@ -338,9 +300,9 @@ let mark_shared_nodes_kind analysis =
            | false, true  -> Mt_cfg_types.SharedVarNonConcurrentAccess
            | true,  true  -> Mt_cfg_types.NotReallySharedVar
            | true,  false ->
-             Mt_self.warning ~once:true
-               "Incoherent@ combination@ of@ options@ %s@ \
-                and@ %s.@ Only@ non-shared@ variables@ will@ be@ removed."
+             Self.warning ~once:true
+               "Incoherent combination of options %s and %s. \
+                Only non-shared variables will be removed."
                Mt_options.KeepWhiteNodes.option_name
                Mt_options.KeepGreenNodes.option_name;
              Mt_cfg_types.SharedVarNonConcurrentAccess

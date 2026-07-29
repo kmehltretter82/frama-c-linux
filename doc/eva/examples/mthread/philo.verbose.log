@@ -25,6 +25,9 @@
 [eva:thread] philo.c:51: Start thread jobs[3]
 [eva:thread] philo.c:51: New thread: jobs[4], fun job, parent <main>, args {4}
 [eva:thread] philo.c:51: Start thread jobs[4]
+[eva:message-queue] philo.c:54: 
+  Receiving message on queue, max size 2, stored in &end.
+  No value to receive (yet?).
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
 [eva:mutex] philo.c:19: Lock locks[4]
@@ -33,6 +36,9 @@
   Neither code nor specification for function random, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
+[eva:message-queue] philo.c:25: 
+  Sending message on queue, content [0] ∈ {1}
+                                    [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:27: Release locks[1]
 [eva:mutex] philo.c:28: Release locks[4]
 [eva:thread-fixpoint] 
@@ -45,18 +51,27 @@
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
 [eva:mutex] philo.c:19: Lock locks[1]
 [eva:mutex] philo.c:20: Lock locks[3]
+[eva:message-queue] philo.c:25: 
+  Sending message on queue, content [0] ∈ {3}
+                                    [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:27: Release locks[3]
 [eva:mutex] philo.c:28: Release locks[1]
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
 [eva:mutex] philo.c:19: Lock locks[2]
 [eva:mutex] philo.c:20: Lock locks[4]
+[eva:message-queue] philo.c:25: 
+  Sending message on queue, content [0] ∈ {4}
+                                    [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:27: Release locks[4]
 [eva:mutex] philo.c:28: Release locks[2]
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
 [eva:mutex] philo.c:19: Lock locks[3]
 [eva:mutex] philo.c:20: Lock locks[0]
+[eva:message-queue] philo.c:25: 
+  Sending message on queue, content [0] ∈ {5}
+                                    [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:27: Release locks[0]
 [eva:mutex] philo.c:28: Release locks[3]
 [eva:thread-fixpoint] 
@@ -67,6 +82,21 @@
 [eva:thread] philo.c:51: Thread jobs[2], fun job, parent <main>, args {2}
 [eva:thread] philo.c:51: Thread jobs[3], fun job, parent <main>, args {3}
 [eva:thread] philo.c:51: Thread jobs[4], fun job, parent <main>, args {4}
+[eva:message-queue] philo.c:54: 
+  Receiving message on queue, max size 2, stored in &end. Possible  values:
+  From thread jobs[0]: [0] ∈ {1}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[2]: [0] ∈ {3}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[3]: [0] ∈ {4}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[4]: [0] ∈ {5}
+                       [1] ∈ UNINITIALIZED
+[eva:shared-memory:iteration] 
+  Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    end2
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (potential shared vars
     changed).
@@ -85,6 +115,11 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
+[eva:shared-memory:iteration] 
+  Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    end2
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (shared vars values
     changed and interferences changed).
