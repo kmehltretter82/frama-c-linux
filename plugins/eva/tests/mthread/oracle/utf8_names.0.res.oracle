@@ -13,7 +13,7 @@
 [eva:thread] Start thread job / "𐍅" f1
 [eva:thread] New thread: job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:thread] Start thread job / "𐍅" f2
-[eva:queue] 
+[eva:message-queue] 
   Receiving message on queue / "𐍅", max size 20, stored in &buf.
   No value to receive (yet?).
 [eva:global-accesses] 
@@ -36,7 +36,7 @@
   assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:mutex] Lock mutex / "𐍅"
 [eva:mutex] Release mutex / "𐍅"
-[eva:queue] 
+[eva:message-queue] 
   Sending message on queue / "𐍅", content
   [0] ∈ {34}
   [1] ∈ {-16}
@@ -73,7 +73,7 @@
     interferences by mutexes:
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
-[eva:queue] 
+[eva:message-queue] 
   Sending message on queue / "𐍅", content
   [0] ∈ {34}
   [1] ∈ {-16}
@@ -116,7 +116,7 @@
 [eva:thread] Thread <main>, fun main
 [eva:thread] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
 [eva:thread] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
-[eva:queue] 
+[eva:message-queue] 
   Receiving message on queue / "𐍅", max size 20, stored in &buf.
   Possible  values:
   From thread job / "𐍅" f1:

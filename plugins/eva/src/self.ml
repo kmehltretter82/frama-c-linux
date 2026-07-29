@@ -310,7 +310,7 @@ let dkey_mutex =
     ~help:"show each operation on mutexes interpreted by the analysis"
 
 let dkey_queue =
-  register_category "queue" ~level:8
+  register_category "message-queue" ~level:8
     ~help:"show each operation on message queues interpreted by the analysis"
 
 let dkey_data_races =

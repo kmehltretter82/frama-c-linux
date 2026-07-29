@@ -126,6 +126,8 @@ Help message about message categories.
     malloc:automatic-free       : messages emitted when bases are automatically
                                   freed (alloca or VLA)
     malloc:new                  : messages emitted at the creation of new bases
+    message-queue               : show each operation on message queues
+                                  interpreted by the analysis
     mutex                       : show each operation on mutexes interpreted by
                                   the analysis
     nonlin                      : messages about evaluation of subdivisions
@@ -137,8 +139,6 @@ Help message about message categories.
                                   the analysis by option -eva-precision
     progress                    : messages about the analysis progress in the C
                                   code
-    queue                       : show each operation on message queues
-                                  interpreted by the analysis
     shared-memory               : all messages about shared memory
     shared-memory:iteration     : evolution of shared memory detected at each
                                   analysis iteration
@@ -193,7 +193,7 @@ Help message about message categories.
      5: final-states initial-state
      6: imprecision malloc shared-memory:mutex-details
      7: widen-hints shared-memory:iteration widening pointer-comparison
-     8: nonlin shared-memory:values queue mutex
+     8: nonlin shared-memory:values message-queue mutex
      9: callstack-hash callstacks
     10: progress
     11: cardinal global-accesses include-string-literals

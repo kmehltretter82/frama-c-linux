@@ -23,7 +23,7 @@
 [eva:thread] philo.c:70: Start thread jobs[3]
 [eva:thread] philo.c:70: New thread: jobs[4], fun job, parent <main>, args {4}
 [eva:thread] philo.c:70: Start thread jobs[4]
-[eva:queue] philo.c:73: 
+[eva:message-queue] philo.c:73: 
   Receiving message on queue, max size 2, stored in &end.
   No value to receive (yet?).
 [eva:global-accesses] 
@@ -48,7 +48,7 @@
   Neither code nor specification for function random, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
-[eva:queue] philo.c:44: 
+[eva:message-queue] philo.c:44: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[1]
@@ -105,7 +105,7 @@
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] philo.c:38: Lock locks[1]
 [eva:mutex] philo.c:39: Lock locks[3]
-[eva:queue] philo.c:44: 
+[eva:message-queue] philo.c:44: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[3]
@@ -136,7 +136,7 @@
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] philo.c:38: Lock locks[2]
 [eva:mutex] philo.c:39: Lock locks[4]
-[eva:queue] philo.c:44: 
+[eva:message-queue] philo.c:44: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[4]
@@ -167,7 +167,7 @@
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] philo.c:38: Lock locks[3]
 [eva:mutex] philo.c:39: Lock locks[0]
-[eva:queue] philo.c:44: 
+[eva:message-queue] philo.c:44: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
 [eva:mutex] philo.c:46: Release locks[0]
@@ -200,7 +200,7 @@
 [eva:thread] philo.c:70: Thread jobs[2], fun job, parent <main>, args {2}
 [eva:thread] philo.c:70: Thread jobs[3], fun job, parent <main>, args {3}
 [eva:thread] philo.c:70: Thread jobs[4], fun job, parent <main>, args {4}
-[eva:queue] philo.c:73: 
+[eva:message-queue] philo.c:73: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
                        [1] ∈ UNINITIALIZED
