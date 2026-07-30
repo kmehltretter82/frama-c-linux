@@ -167,7 +167,7 @@ Help message about message categories.
                             builtins interpreting memcpy, memmove and memset
     initial-state         : at the start of the analysis, print the initial
                             value of global variables
-    malloc                : messages from the builtins interpreting dynamic
+    malloc                : messages from builtins interpreting dynamic
                             allocations
     malloc:automatic-free : messages emitted when bases are automatically freed
                             (alloca or VLA)
@@ -243,6 +243,8 @@ Help message about message categories.
                             threads injected in Eva analysis with Mthread
     debug:iterator        : debug messages about the fixpoint engine on the
                             control-flow graph of functions
+    debug:malloc          : debug messages from builtins interpreting dynamic
+                            allocations
     debug:string-literals : when printing a state, also include globals
                             representing string literals
     debug:taint           : print debug states of the taint domain on user

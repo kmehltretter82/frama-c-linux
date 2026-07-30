@@ -14,7 +14,7 @@
 [eva:alarm] alloc-vla.c:7: Warning: 
   function free: precondition 'freeable' got status invalid.
 [eva:progress] alloc-vla.c:6: Call to builtin __fc_vla_free
-[eva:malloc] alloc-vla.c:6: strong free on bases: {__malloc_f_l6}
+[eva:debug:malloc] alloc-vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva:alarm] alloc-vla.c:8: Warning: 
   accessing left-value that contains escaping addresses. assert ¬\dangling(&a);
 [eva:progress] Recording results for f

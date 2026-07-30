@@ -12,13 +12,17 @@ open Cvalue
 open Lattice_bounds
 
 let dkey = Self.register_category "malloc" ~level:6
-    ~help:"messages from the builtins interpreting dynamic allocations"
+    ~help:"messages from builtins interpreting dynamic allocations"
 
 let dkey_new = Self.register_category "malloc:new" ~level:3
     ~help:"messages emitted at the creation of new bases"
 
 let dkey_auto_free = Self.register_category "malloc:automatic-free" ~level:4
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
+
+let debug_key =
+  Self.register_category "debug:malloc" ~group:Debug
+    ~help:"debug messages from builtins interpreting dynamic allocations"
 
 let _wkey_malloc =
   Self.register_warn_category "malloc"
@@ -621,11 +625,11 @@ let resolve_bases_to_free arg =
 let free_aux state ~strong bases_to_remove  =
   (* TODO: reduce on arg if it is an lval *)
   if strong then begin
-    Self.debug ~current:true ~dkey "strong free on bases: %a"
+    Self.debug ~current:true ~dkey:debug_key "strong free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:true bases_to_remove state
   end else begin
-    Self.debug ~current:true ~dkey "weak free on bases: %a"
+    Self.debug ~current:true ~dkey:debug_key "weak free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:false bases_to_remove state
   end
@@ -728,7 +732,7 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
    be created: if [Weak], convergence is ensured using a malloc builtin
    that converges.  If [Strong], a new base is created for each call. *)
 let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
-  Self.debug ~dkey "bases_to_realloc: %a"
+  Self.debug ~dkey:debug_key "bases_to_realloc: %a"
     Base.Hptset.pretty bases_to_realloc;
   assert (not (Model.(equal state bottom || equal state top)));
   let _size_valid, size_max = extract_size sizev in (* bytes everywhere *)

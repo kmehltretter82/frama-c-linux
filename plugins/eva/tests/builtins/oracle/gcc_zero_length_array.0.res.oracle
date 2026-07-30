@@ -15,7 +15,7 @@
 [eva:progress] gcc_zero_length_array.c:26: Call to builtin free
 [eva:progress] gcc_zero_length_array.c:26: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] gcc_zero_length_array.c:26: 
+[eva:debug:malloc] gcc_zero_length_array.c:26: 
   strong free on bases: {__malloc_make_fam_l15}
 [eva:progress] Recording results for main
 [eva:progress] Done for function main

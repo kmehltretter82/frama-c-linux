@@ -114,7 +114,6 @@ Verbose 8 should enable "malloc" but not "malloc:new" unset by user.
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
-  [eva:malloc] malloc.c:8: weak free on bases: {__malloc_main_l5}
   [eva] ====== VALUES COMPUTED ======
   [eva:final-states] Values at end of function main:
     __fc_heap_status ∈ [--..--]

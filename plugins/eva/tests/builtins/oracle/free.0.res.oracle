@@ -36,24 +36,24 @@
 [eva:progress] free.c:14: Call to builtin free
 [eva:progress] free.c:14: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] free.c:14: 
+[eva:debug:malloc] free.c:14: 
   weak free on bases: {__malloc_main1_l8, __malloc_main1_l10}
 [eva:progress] free.c:16: Call to builtin malloc
 [eva:malloc:new] free.c:16: allocating variable __malloc_main1_l16
 [eva:progress] free.c:18: Call to builtin free
 [eva:progress] free.c:18: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] free.c:18: strong free on bases: {__malloc_main1_l16}
+[eva:debug:malloc] free.c:18: strong free on bases: {__malloc_main1_l16}
 [eva:progress] free.c:21: Call to builtin free
 [eva:progress] free.c:21: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] free.c:21: strong free on bases: {}
+[eva:debug:malloc] free.c:21: strong free on bases: {}
 [eva:progress] free.c:23: Call to builtin malloc
 [eva:malloc:new] free.c:23: allocating variable __malloc_main1_l23
 [eva:progress] free.c:26: Call to builtin free
 [eva:progress] free.c:26: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] free.c:26: weak free on bases: {__malloc_main1_l23}
+[eva:debug:malloc] free.c:26: weak free on bases: {__malloc_main1_l23}
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
@@ -64,7 +64,7 @@
 [eva:progress] free.c:39: Call to builtin free
 [eva:progress] free.c:39: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] free.c:39: strong free on bases: {__malloc_main2_l35}
+[eva:debug:malloc] free.c:39: strong free on bases: {__malloc_main2_l35}
 [eva:progress] Recording results for main2
 [eva:progress] Done for function main2
 [eva:progress] Recording results for main

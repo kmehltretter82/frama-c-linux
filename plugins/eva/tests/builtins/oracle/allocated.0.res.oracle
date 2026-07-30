@@ -16,7 +16,7 @@
 [eva:progress] allocated.c:31: Call to builtin free
 [eva:progress] allocated.c:31: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:31: strong free on bases: {__malloc_main_l25}
+[eva:debug:malloc] allocated.c:31: strong free on bases: {__malloc_main_l25}
 [eva:show] allocated.c:32: Frama_C_show_each_p_after_free: ⊥
 [eva:progress] allocated.c:36: Call to builtin malloc
 [eva:malloc:new] allocated.c:36: allocating variable __malloc_main_l36
@@ -27,13 +27,13 @@
 [eva:progress] allocated.c:43: Call to builtin free
 [eva:progress] allocated.c:43: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:43: strong free on bases: {__malloc_main_l36}
+[eva:debug:malloc] allocated.c:43: strong free on bases: {__malloc_main_l36}
 [eva:alarm] allocated.c:44: Warning: 
   accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva:progress] allocated.c:45: Call to builtin free
 [eva:progress] allocated.c:45: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:45: strong free on bases: {__malloc_main_l36}
+[eva:debug:malloc] allocated.c:45: strong free on bases: {__malloc_main_l36}
 [eva:alarm] allocated.c:46: Warning: 
   accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] allocated.c:46: Warning: 
@@ -49,7 +49,7 @@
 [eva:progress] allocated.c:58: Call to builtin free
 [eva:progress] allocated.c:58: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:58: strong free on bases: {__malloc_main_l50}
+[eva:debug:malloc] allocated.c:58: strong free on bases: {__malloc_main_l50}
 [eva:progress] allocated.c:63: Call to builtin malloc
 [eva:malloc:new] allocated.c:63: allocating variable __malloc_main_l63
 [eva:progress] allocated.c:63: assertion got status valid.
@@ -58,22 +58,22 @@
 [eva:progress] allocated.c:67: Call to builtin free
 [eva:progress] allocated.c:67: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
+[eva:debug:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
 [eva:progress] allocated.c:63: Call to builtin malloc
 [eva:show] allocated.c:65: Frama_C_show_each_p: {{ &__malloc_main_l63 }}
 [eva:show] allocated.c:66: Frama_C_show_each_p0: {1}
 [eva:progress] allocated.c:67: Call to builtin free
-[eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
+[eva:debug:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
 [eva:progress] allocated.c:63: Call to builtin malloc
 [eva:show] allocated.c:65: Frama_C_show_each_p: {{ &__malloc_main_l63 }}
 [eva:show] allocated.c:66: Frama_C_show_each_p0: {2}
 [eva:progress] allocated.c:67: Call to builtin free
-[eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
+[eva:debug:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
 [eva:progress] allocated.c:63: Call to builtin malloc
 [eva:show] allocated.c:65: Frama_C_show_each_p: {{ &__malloc_main_l63 }}
 [eva:show] allocated.c:66: Frama_C_show_each_p0: {3}
 [eva:progress] allocated.c:67: Call to builtin free
-[eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
+[eva:debug:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
 [eva:progress] allocated.c:73: Call to builtin malloc
 [eva:malloc:new] allocated.c:73: allocating variable __malloc_main_l73
 [eva:show] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
@@ -81,30 +81,30 @@
 [eva:progress] allocated.c:77: Call to builtin free
 [eva:progress] allocated.c:77: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
+[eva:debug:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
 [eva:progress] allocated.c:73: Call to builtin malloc
 [eva:show] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
 [eva:show] allocated.c:76: Frama_C_show_each_p0: {1}
 [eva:progress] allocated.c:77: Call to builtin free
-[eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
+[eva:debug:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
 [eva:partition] allocated.c:72: starting to merge loop iterations
 [eva:progress] allocated.c:73: Call to builtin malloc
 [eva:show] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
 [eva:show] allocated.c:76: Frama_C_show_each_p0: {1; 2}
 [eva:progress] allocated.c:77: Call to builtin free
-[eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
+[eva:debug:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
 [eva:progress] allocated.c:73: Call to builtin malloc
 [eva:show] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
 [eva:show] allocated.c:76: Frama_C_show_each_p0: {1; 2; 3}
 [eva:progress] allocated.c:77: Call to builtin free
-[eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
+[eva:debug:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
 [eva:progress] allocated.c:82: Call to builtin malloc
 [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82
 [eva:progress] allocated.c:82: assertion got status valid.
 [eva:progress] allocated.c:87: Call to builtin free
 [eva:progress] allocated.c:87: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82}
+[eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82}
 [eva:progress] allocated.c:82: Call to builtin malloc
 [eva:malloc:weak] allocated.c:82: marking variable `__malloc_main_l82' as weak
 [eva:malloc] allocated.c:82: 
@@ -112,18 +112,18 @@
 [eva:alarm] allocated.c:85: Warning: out of bounds write. assert \valid(p + j);
 [eva:partition] allocated.c:84: starting to merge loop iterations
 [eva:progress] allocated.c:87: Call to builtin free
-[eva:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
+[eva:debug:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
 [eva:partition] allocated.c:81: starting to merge loop iterations
 [eva:progress] allocated.c:82: Call to builtin malloc
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1/31) to fit 0..31/63
 [eva:progress] allocated.c:87: Call to builtin free
-[eva:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
+[eva:debug:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
 [eva:progress] allocated.c:82: Call to builtin malloc
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1/63) to fit 0..31/95
 [eva:progress] allocated.c:87: Call to builtin free
-[eva:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
+[eva:debug:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
 [eva:progress] allocated.c:82: Call to builtin malloc
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1/95) to fit 0..31/95
@@ -133,7 +133,7 @@
 [eva:progress] allocated.c:92: Call to builtin free
 [eva:progress] allocated.c:92: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:92: strong free on bases: {__malloc_main_l91}
+[eva:debug:malloc] allocated.c:92: strong free on bases: {__malloc_main_l91}
 [eva:alarm] allocated.c:96: Warning: assertion 'Assume' got status unknown.
 [eva:progress] allocated.c:97: Call to builtin malloc
 [eva:malloc:new] allocated.c:97: allocating variable __malloc_main_l97
@@ -143,7 +143,7 @@
 [eva:progress] allocated.c:111: Call to builtin free
 [eva:progress] allocated.c:111: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:111: strong free on bases: {__malloc_main_l97}
+[eva:debug:malloc] allocated.c:111: strong free on bases: {__malloc_main_l97}
 [eva:alarm] allocated.c:113: Warning: assertion got status unknown.
 [eva:progress] allocated.c:114: Call to builtin malloc
 [eva:malloc:new] allocated.c:114: allocating variable __malloc_main_l114
@@ -153,7 +153,7 @@
 [eva:progress] allocated.c:118: Call to builtin free
 [eva:progress] allocated.c:118: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:118: strong free on bases: {__malloc_main_l114}
+[eva:debug:malloc] allocated.c:118: strong free on bases: {__malloc_main_l114}
 [eva:progress] allocated.c:120: Call to builtin malloc
 [eva:malloc:new] allocated.c:120: allocating variable __malloc_main_l120
 [eva:show] allocated.c:120: Frama_C_show_each: {{ &__malloc_main_l120 }}
@@ -161,13 +161,13 @@
 [eva:progress] allocated.c:125: Call to builtin free
 [eva:progress] allocated.c:125: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] allocated.c:125: strong free on bases: {__malloc_main_l120}
+[eva:debug:malloc] allocated.c:125: strong free on bases: {__malloc_main_l120}
 [eva:progress] allocated.c:127: assertion 'alloca_bounds' got status valid.
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc:new] allocated.c:127: allocating variable __malloc_main_l127
 [eva:show] allocated.c:131: Frama_C_show_each: {0}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31) to fit 0..63
@@ -175,38 +175,38 @@
 [eva:alarm] allocated.c:129: Warning: out of bounds write. assert \valid(a + j);
 [eva:show] allocated.c:131: Frama_C_show_each: {0; 1}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:partition] allocated.c:126: starting to merge loop iterations
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/63) to fit 0..63/95
 [eva:show] allocated.c:131: Frama_C_show_each: {0; 1; 2}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/95) to fit 0..63/127
 [eva:show] allocated.c:131: Frama_C_show_each: [0..2147483647]
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/127) to fit 0..63/159
 [eva:show] allocated.c:131: Frama_C_show_each: [0..2147483647]
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/159) to fit 0..63/191
 [eva:show] allocated.c:131: Frama_C_show_each: [0..2147483647]
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/191) to fit 0..63/319
 [eva:show] allocated.c:131: Frama_C_show_each: [0..2147483647]
 [eva:progress] allocated.c:127: Call to builtin __fc_vla_free
-[eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+[eva:debug:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] allocated.c:27: assertion 'Eva,mem_access' got final status invalid.
