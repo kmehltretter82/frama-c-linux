@@ -144,7 +144,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state =
 
 (* Copy the value at location [src_loc] to location [dst_loc] in [state]. *)
 let imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state =
-  Self.debug ~dkey ~once:true ~current:true
+  Self.feedback ~dkey ~once:true ~current:true
     "In %s builtin: too many sizes to enumerate, possible loss of precision"
     name;
   (* conflate_bottom:false as we want to copy padding bits *)
@@ -538,7 +538,7 @@ let frama_c_memset state actuals =
       let state, sure_output, over_output =
         try frama_c_memset_precise state dst_expr dst v (exp_size, size)
         with ImpreciseMemset reason ->
-          Self.debug ~dkey ~current:true ~stacktrace:true
+          Self.feedback ~dkey ~current:true ~stacktrace:true
             "Call to builtin precise_memset(%a) failed; %s"
             Eva_utils.pretty_actuals actuals (imprecision_descr reason);
           frama_c_memset_imprecise state dst_expr dst v size
