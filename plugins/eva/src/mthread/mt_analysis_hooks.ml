@@ -38,7 +38,7 @@ let log_arg analysis =
   let stack = Option.value (Callstack.pop stack) ~default:stack in
   let source = kinstr_to_source (Callstack.top_callsite stack) in
   let append fmt =
-    if Self.(is_debug_key_enabled dkey_callstacks)
+    if Self.is_debug_key_enabled Key.callstacks
     then Format.fprintf fmt "@.%a" Callstack.pretty stack
   in
   source, append
@@ -47,10 +47,10 @@ let feedback analysis =
   let source, append = log_arg analysis in
   Self.feedback ~once:true ?source ~append
 
-let thread_feedback = feedback ~dkey:Self.dkey_thread
-let mutex_feedback = feedback ~dkey:Self.dkey_mutex
-let queue_feedback = feedback ~dkey:Self.dkey_queue
-let show_feedback = feedback ~dkey:Self.dkey_show
+let thread_feedback = feedback ~dkey:Key.thread
+let mutex_feedback = feedback ~dkey:Key.mutex
+let queue_feedback = feedback ~dkey:Key.queue
+let show_feedback = feedback ~dkey:Key.show
 
 let warning analysis =
   let source, append = log_arg analysis in

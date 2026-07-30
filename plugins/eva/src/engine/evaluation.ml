@@ -445,7 +445,7 @@ module Make
     else
       let v = Value.rewrap_integer context range value in
       if warn && range.Eval_typ.i_signed && not (Value.equal value v) then
-        Self.warning ~wkey:Self.wkey_signed_overflow
+        Self.warning ~wkey:Key.warn_signed_overflow
           ~current:true ~once:true "2's complement assumed for overflow" ;
       return v
 
@@ -666,7 +666,7 @@ module Make
         if Ast_types.C.is_ptr typ_arg then
           Self.result
             ~current:true ~once:true
-            ~dkey:Self.dkey_pointer_comparison
+            ~dkey:Key.pointer_comparison
             "evaluating condition to {0; 1} instead of %a because of %s"
             (Bottom.pretty pretty_cvalue) result
             Parameters.UndefinedPointerComparisonPropagateAll.name;
@@ -1038,7 +1038,7 @@ module Make
            && not env.oracle_evaluation
            && Self.ComputationState.get () = Computing
         then
-          Self.warning ~wkey:Self.wkey_volatile ~once:true ~current:true
+          Self.warning ~wkey:Key.warn_volatile ~once:true ~current:true
             "Lvalue %a with non-volatile-qualified type \
              may refer to an object defined with a volatile-qualified type."
             Eva_ast.pp_lval lval;

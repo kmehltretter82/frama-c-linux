@@ -90,30 +90,30 @@ let print_builtins_and_exit () =
 
 let warn_incompatible_type ~source name kf =
   let kf_typ = Kernel_function.get_type kf in
-  Self.warning ~wkey:Self.wkey_builtins_override ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_override ~source ~once:true
     "Builtin %s will not be used for function %a of incompatible type %a."
     name Kernel_function.pretty kf Printer.pp_typ kf_typ
 
 let warn_no_specification ~source kf =
-  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_missing_spec ~source ~once:true
     "The builtin for function %a will not be used, as its frama-c libc \
      specification is not available."
     Kernel_function.pretty kf
 
 let warn_no_default_behavior ~source kf =
-  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_missing_spec ~source ~once:true
     "The builtin for function %a will not be used, as its specification \
      has no default behavior."
     Kernel_function.pretty kf
 
 let warn_no_assigns ~source kf =
-  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_missing_spec ~source ~once:true
     "The builtin for function %a will not be used, as its specification has \
      no assigns clause."
     Kernel_function.pretty kf
 
 let warn_user_specification ~source kf =
-  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_missing_spec ~source ~once:true
     "No Frama-C libc specification found for function %a, for which a \
      builtin is used; its soundness relies on the specification provided \
      by the user."
@@ -121,7 +121,7 @@ let warn_user_specification ~source kf =
 
 let warn_builtin_override ~source kf bname =
   let fname = Kernel_function.get_name kf in
-  Self.warning ~wkey:Self.wkey_builtins_override ~source ~once:true
+  Self.warning ~wkey:Key.warn_builtins_override ~source ~once:true
     "Definition of function %s is overridden by %s"
     fname (if fname = bname then "its builtin" else "builtin " ^ bname)
 

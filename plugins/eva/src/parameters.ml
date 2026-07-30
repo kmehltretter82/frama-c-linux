@@ -1059,8 +1059,8 @@ let () =
     warning "Option -eva-print-callstacks is now deprecated.@ \
              Use -eva-msg-key callstacks instead.";
     if enabled
-    then Self.(add_debug_keys dkey_callstacks)
-    else Self.(del_debug_keys dkey_callstacks)
+    then Self.(add_debug_keys key_callstacks)
+    else Self.(del_debug_keys key_callstacks)
   in
   PrintCallstacks.add_set_hook set_hook
 
@@ -1402,7 +1402,7 @@ let set (type t) (module P: Parameter_sig.S with type t = t) =
       | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
       | _ -> str
     in
-    let dkey = dkey_precision_settings in
+    let dkey = Key.precision_settings in
     printf ~dkey "    option %s %sset to %s%s." P.name
       (if already_set then "already " else "") str
       (if already_set && not (equal_current t) then " (not modified)"
@@ -1450,7 +1450,7 @@ let () =
   ()
 
 let set_analysis n =
-  let dkey = dkey_precision_settings in
+  let dkey = Key.precision_settings in
   feedback ~dkey "Option %s %i detected, \
                   automatic configuration of the analysis:" Precision.name n;
   List.iter ((|>) n) (List.rev !configures)

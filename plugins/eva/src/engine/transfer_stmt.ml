@@ -531,7 +531,7 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Frama_C_dump_each functions. *)
   let dump_state ~pos name state =
-    Self.result ~dkey:Self.dkey_show ~pos ~stacktrace:true
+    Self.result ~dkey:Key.show ~pos ~stacktrace:true
       "%s:@\n@[<v>%a@]==END OF DUMP=="
       name print_state state
 
@@ -559,7 +559,7 @@ module Make (Engine: Engine_Subset) = struct
       Format.fprintf fmt "%a : @[<h>%t@]" Eva_ast.pp_exp expr pp
     in
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
-    Self.result ~dkey:Self.dkey_show ~pos ~stacktrace:true
+    Self.result ~dkey:Key.show ~pos ~stacktrace:true
       "@[<v>%s:@ %a@]"
       name pp arguments
 
@@ -606,7 +606,7 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Frama_C_show_each functions. *)
   let show_each ~pos ~subdivnb name arguments state =
-    Self.result ~dkey:Self.dkey_show ~pos ~stacktrace:true
+    Self.result ~dkey:Key.show ~pos ~stacktrace:true
       "@[<hv>%s:@ %a@]"
       name (pretty_arguments ~subdivnb state) arguments
 
@@ -625,7 +625,7 @@ module Make (Engine: Engine_Subset) = struct
     let open Filesystem.Operators in
     let$ fmt = Filesystem.with_formatter_exn file in
     let loc = Current_loc.get () in
-    Self.feedback ~dkey:Self.dkey_show ~pos ~stacktrace:true
+    Self.feedback ~dkey:Key.show ~pos ~stacktrace:true
       "Dumping state in file '%a'" Filepath.pretty file;
     Format.fprintf fmt "DUMPING STATE at %a@."
       Fileloc.pretty_long loc;

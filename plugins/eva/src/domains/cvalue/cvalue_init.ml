@@ -29,7 +29,7 @@ let make_well hidden_base state loc =
 
 let warn_unknown_size_aux pp v (messt, t) =
   Self.warning ~once:true ~current:true
-    ~wkey:Self.wkey_unknown_size
+    ~wkey:Key.warn_unknown_size
     "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ computed@ \
      (%s)@]" pp v Printer.pp_typ t messt
 
@@ -69,7 +69,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
        | UnknownValidity -> Base.Unknown (a, None, b)
       )
     | Base.Unknown _ -> (* Unknown validity is caused by strange type *)
-      Self.result ~dkey:Self.dkey_initial_state
+      Self.result ~dkey:Key.initial_state
         "creating variable %s with imprecise size (type %a)"
         hidden_var_name Printer.pp_typ pointed_typ;
       validity
@@ -269,7 +269,7 @@ let initialize_var_using_type varinfo state =
           !state
         with
         | Cil.LenOfArray cause ->
-          Self.warning ~wkey:Self.wkey_unknown_size ~once:true ~current:true
+          Self.warning ~wkey:Key.warn_unknown_size ~once:true ~current:true
             "problem with array size (%a) for variable %a, assuming 0"
             Cil.pp_incorrect_array_length cause Printer.pp_varinfo varinfo;
           (* This is either a flexible array member (for which Cil

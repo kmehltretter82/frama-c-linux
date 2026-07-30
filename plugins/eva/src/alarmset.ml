@@ -242,7 +242,7 @@ let loc = function
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
 let report_alarm ~pos annot msg =
-  Self.warning ~wkey:Self.wkey_alarm ~pos ~stacktrace:true
+  Self.warning ~wkey:Key.warn_alarm ~pos ~stacktrace:true
     "@[%s.@ @[<hov 2>%a@]@]"
     msg pr_annot annot
 

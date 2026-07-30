@@ -53,8 +53,8 @@ struct
     | loop_kind :: _ ->
       let wkey =
         if loop_kind = "for"
-        then Self.wkey_missing_loop_unroll_for
-        else Self.wkey_missing_loop_unroll
+        then Key.warn_missing_loop_unroll_for
+        else Key.warn_missing_loop_unroll
       in
       Self.warning
         ~wkey ~source:(Cil_datatype.Stmt.loc stmt)

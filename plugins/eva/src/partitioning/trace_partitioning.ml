@@ -6,10 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let dkey = Key.partition
+let dkey_widening = Key.widening
+let dkey_iterator = Key.debug_iterator
+
 open Cil_types
 open Partition
-
-let dkey = Self.dkey_partition
 
 module Make
     (Abstract: Engine_abstractions_sig.S)
@@ -216,7 +218,7 @@ struct
   let partitioning_feedback dest flow stmt =
     output_slevel dest.incoming_states;
     (* Debug information. *)
-    Self.debug ~dkey:Self.dkey_iterator ~current:true
+    Self.debug ~dkey:dkey_iterator ~current:true
       "reached statement %d with %d incoming states, %d to propagate"
       stmt.sid dest.incoming_states (flow_size flow)
 
@@ -300,7 +302,7 @@ struct
           Some curr
           (* Apply widening *)
         else begin
-          Self.feedback ~once:true ~current:true ~dkey:Self.dkey_widening
+          Self.feedback ~once:true ~current:true ~dkey:dkey_widening
             "applying a widening at this point";
           (* We join the previous widening state with the previous iteration
              state so as to allow the intermediate(s) iteration(s) (between

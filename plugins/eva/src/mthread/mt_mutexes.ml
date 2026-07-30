@@ -52,7 +52,7 @@ let pretty_with_mutexes =
         else
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
             MutexPresence.pretty mutexes ;
-        if Self.(is_debug_key_enabled dkey_callstacks)
+        if Self.is_debug_key_enabled Key.callstacks
         then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;

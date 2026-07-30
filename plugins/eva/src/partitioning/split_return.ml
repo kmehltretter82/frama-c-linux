@@ -308,6 +308,6 @@ let pretty_strategies () =
   if not (Parameters.SplitReturnFunction.is_empty ()) ||
      (Parameters.SplitReturn.get () != Split_strategy.NoSplit)
   then
-    let dkey = Self.dkey_split_return in
+    let dkey = Key.split_return in
     Self.feedback ~dkey
       "@[<v 2>Splitting return states on:@;%t@]" pretty_strategies
