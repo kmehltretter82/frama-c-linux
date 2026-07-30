@@ -9,7 +9,7 @@
 open Eval
 
 let product_category =
-  Self.register_category "domain_product" ~help:"inactive category"
+  Self.register_category ~group:Debug "domain_product" ~help:"inactive category"
 
 module Make
     (Context  : Abstract_context.S)
