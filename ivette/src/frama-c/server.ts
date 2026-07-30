@@ -480,10 +480,11 @@ async function _launch(): Promise<void> {
   // We assume that frama-c-gui is installed in './lib/frama-c/ivette',
   // and frama-c is in './bin'.
   // If that fails, we try 'frama-c' in the PATH.
-  const framacGuiBin = window.electron.argv[0];
-  const commonAncestor =
-    Path.dirname(Path.dirname(Path.dirname(Path.dirname(framacGuiBin))));
-  let framacBin = Path.resolve(commonAncestor, "bin/frama-c");
+  const framacGuiDir = Path.dirname(window.electron.argv[0]);
+  const guiPathSuffix = Path.join("lib", "frama-c", "ivette");
+  const framacDirPrefix = framacGuiDir.endsWith(guiPathSuffix) ?
+    framacGuiDir.slice(0, -guiPathSuffix.length) : framacGuiDir;
+  let framacBin = Path.resolve(framacDirPrefix, "bin/frama-c");
   if (!Fs.existsSync(framacBin)) {
     // frama-c binary not in expected directory, assuming it is in PATH)
     framacBin = 'frama-c';
