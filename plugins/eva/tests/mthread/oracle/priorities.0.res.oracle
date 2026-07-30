@@ -48,7 +48,7 @@
         pthread_mutex_lock :: priorities.c:63 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:67 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -56,7 +56,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:thread] Setting priority to 0
 [eva:mutex] priorities.c:22: Lock m1
@@ -69,7 +69,7 @@
         pthread_mutex_lock :: priorities.c:22 <- f1
       read by jobs1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:24 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {}
@@ -77,7 +77,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:mutex] priorities.c:30: Lock m2
 [eva:mutex] priorities.c:31: Release m2
@@ -88,7 +88,7 @@
         pthread_mutex_lock :: priorities.c:30 <- f2
       read by jobs2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:31 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
@@ -96,12 +96,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at priorities.c:37 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
     shared bases: {}
@@ -109,7 +109,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:mutex] priorities.c:44: Lock m2
 [eva:mutex] priorities.c:46: Release m2
@@ -121,7 +121,7 @@
         pthread_mutex_lock :: priorities.c:44 <- f4
       read by jobs4 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:46 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
     shared bases: {}
@@ -166,7 +166,7 @@
         pthread_mutex_lock :: priorities.c:63 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:67 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       s1 = 1; priorities.c:64 <- main
@@ -182,7 +182,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] priorities.c:23: inject threads interferences at this point
+[eva:debug:interferences] priorities.c:23: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: read by jobs1 at priorities.c:23 <- f1
@@ -191,7 +192,7 @@
         pthread_mutex_lock :: priorities.c:22 <- f1
       read by jobs1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:24 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {s1, s2}
@@ -207,7 +208,7 @@
         pthread_mutex_lock :: priorities.c:30 <- f2
       read by jobs2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:31 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {s1, s2}
@@ -216,11 +217,12 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] priorities.c:37: inject threads interferences at this point
+[eva:debug:interferences] priorities.c:37: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at priorities.c:37 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       s2 = 3; priorities.c:37 <- f3
@@ -236,7 +238,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] priorities.c:45: inject threads interferences at this point
+[eva:debug:interferences] priorities.c:45: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs4 at priorities.c:45 <- f4
@@ -245,7 +248,7 @@
         pthread_mutex_lock :: priorities.c:44 <- f4
       read by jobs4 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:46 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s2 = 3; priorities.c:45 <- f4
@@ -280,8 +283,10 @@
   New context for jobs3, fun f3, parent <main>, args {0}
 [eva:thread] priorities.c:58: 
   New context for jobs4, fun f4, parent <main>, args {0}
-[eva:interferences] priorities.c:64: inject threads interferences at this point
-[eva:interferences] priorities.c:65: inject threads interferences at this point
+[eva:debug:interferences] priorities.c:64: 
+  inject threads interferences at this point
+[eva:debug:interferences] priorities.c:65: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s1: write by <main> at priorities.c:64 <- main
@@ -308,7 +313,7 @@
         pthread_mutex_lock :: priorities.c:63 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:67 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       s1 = 1; priorities.c:64 <- main
@@ -332,7 +337,7 @@
         pthread_mutex_lock :: priorities.c:22 <- f1
       read by jobs1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:24 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {s1, s2}
@@ -348,7 +353,7 @@
         pthread_mutex_lock :: priorities.c:30 <- f2
       read by jobs2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:31 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {s1, s2}
@@ -360,7 +365,7 @@
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at priorities.c:37 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       s2 = 3; priorities.c:37 <- f3
@@ -384,7 +389,7 @@
         pthread_mutex_lock :: priorities.c:44 <- f4
       read by jobs4 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:46 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s2 = 3; priorities.c:45 <- f4
@@ -432,7 +437,7 @@
         pthread_mutex_lock :: priorities.c:63 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:67 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       s1 = 1; priorities.c:64 <- main
@@ -455,7 +460,7 @@
         pthread_mutex_lock :: priorities.c:22 <- f1
       read by jobs1 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:24 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {s1, s2}
@@ -470,7 +475,7 @@
         pthread_mutex_lock :: priorities.c:30 <- f2
       read by jobs2 at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: priorities.c:31 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {s1, s2}
@@ -481,7 +486,7 @@
 [eva:global-accesses] 
   Globals accessed by thread:
     s2: write by jobs3 at priorities.c:37 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       s2 = 3; priorities.c:37 <- f3

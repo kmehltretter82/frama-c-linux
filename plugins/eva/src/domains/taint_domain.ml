@@ -51,7 +51,7 @@ let is_public_namespace = String.equal public_taint_namespace
 
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
-let dkey_debug = Self.register_category "d-taint-debug"
+let dkey_debug = Self.register_category "debug:taint"
     ~group:Debug ~help:"print debug states of the taint domain on user directives"
 
 let wkey =

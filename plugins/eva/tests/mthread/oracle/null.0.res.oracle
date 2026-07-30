@@ -15,7 +15,7 @@
   Globals accessed by thread:
     NULL[100..200]: read by <main> at null.c:27 <- main
     v: read by <main> at null.c:26 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -23,14 +23,14 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
 [eva:global-accesses] 
   Globals accessed by thread:
     NULL[100..200]: write by tjob0 at null.c:16 <- job0
     v: read by tjob0 at null.c:15 <- job0
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread tjob0
     concurrent writes:
     shared bases: {}
@@ -50,7 +50,7 @@
   Globals accessed by thread:
     NULL[100..200]: read by <main> at null.c:27 <- main
     v: read by <main> at null.c:26 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {NULL}
@@ -59,12 +59,12 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob0 starting at job0, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] null.c:16: inject threads interferences at this point
+[eva:debug:interferences] null.c:16: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     NULL[100..200]: write by tjob0 at null.c:16 <- job0
     v: read by tjob0 at null.c:15 <- job0
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread tjob0
     concurrent writes:
       /*@ assert Eva: mem_access: \valid((char *)i); */
@@ -90,12 +90,12 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva:interferences] null.c:27: inject threads interferences at this point
+[eva:debug:interferences] null.c:27: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     NULL[100..200]: read by <main> at null.c:27 <- main
     v: read by <main> at null.c:26 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {NULL}

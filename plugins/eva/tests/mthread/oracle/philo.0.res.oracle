@@ -32,7 +32,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: philo.c:70 <- main
     queue: read by <main> at philo.c:73 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -40,7 +40,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] philo.c:38: Lock locks[4]
 [eva:mutex] philo.c:39: Lock locks[1]
@@ -67,7 +67,7 @@
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
@@ -75,7 +75,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] philo.c:38: Lock locks[0]
 [eva:mutex] philo.c:39: Lock locks[2]
@@ -93,7 +93,7 @@
         pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
@@ -101,7 +101,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] philo.c:38: Lock locks[1]
 [eva:mutex] philo.c:39: Lock locks[3]
@@ -124,7 +124,7 @@
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {}
@@ -132,7 +132,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] philo.c:38: Lock locks[2]
 [eva:mutex] philo.c:39: Lock locks[4]
@@ -155,7 +155,7 @@
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
     shared bases: {}
@@ -163,7 +163,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] philo.c:38: Lock locks[3]
 [eva:mutex] philo.c:39: Lock locks[0]
@@ -186,7 +186,7 @@
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
@@ -217,7 +217,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: philo.c:70 <- main
     queue: read by <main> at philo.c:73 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -238,7 +238,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: philo.c:70 <- main
     queue: read by <main> at philo.c:73 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {end2}
@@ -247,7 +247,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva:interferences] philo.c:43: inject threads interferences at this point
+[eva:debug:interferences] philo.c:43: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -262,7 +262,7 @@
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -288,7 +288,7 @@
         pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {end2}
@@ -311,7 +311,7 @@
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -339,7 +339,7 @@
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -367,7 +367,7 @@
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -403,7 +403,7 @@
   New context for jobs[3], fun job, parent <main>, args {3}
 [eva:thread] philo.c:70: 
   New context for jobs[4], fun job, parent <main>, args {4}
-[eva:interferences] philo.c:72: inject threads interferences at this point
+[eva:debug:interferences] philo.c:72: inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     end2: read by <main> at philo.c:72 <- main
@@ -411,7 +411,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: philo.c:70 <- main
     queue: read by <main> at philo.c:73 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {end2}
@@ -434,7 +434,7 @@
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[0] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -460,7 +460,7 @@
         pthread_mutex_lock :: philo.c:39 <- aux :: philo.c:56 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {end2}
@@ -483,7 +483,7 @@
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[2] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -511,7 +511,7 @@
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:46 <- aux :: philo.c:56 <- job
     queue: read by jobs[3] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job
@@ -539,7 +539,7 @@
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: philo.c:47 <- aux :: philo.c:56 <- job
     queue: read by jobs[4] at philo.c:44 <- aux :: philo.c:56 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       end2 = 1; philo.c:43 <- aux :: philo.c:56 <- job

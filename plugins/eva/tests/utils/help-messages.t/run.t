@@ -238,15 +238,16 @@ Help message about message categories.
     d-unit                 : print states of the unit domain
   
   # Message categories for debug purposes:
-    d-taint-debug           : print debug states of the taint domain on user
-                              directives
-    domain_product          : inactive category
-    include-string-literals : when printing a state, also include globals
-                              representing string literals
-    interferences           : debug messages about interferences from other
-                              threads injected in Eva analysis with Mthread
-    iterator                : debug messages about the fixpoint engine on the
-                              control-flow graph of functions
+    debug                 : all debug messages
+    debug:interferences   : debug messages about interferences from other
+                            threads injected in Eva analysis with Mthread
+    debug:iterator        : debug messages about the fixpoint engine on the
+                            control-flow graph of functions
+    debug:string-literals : when printing a state, also include globals
+                            representing string literals
+    debug:taint           : print debug states of the taint domain on user
+                            directives
+    domain_product        : inactive category
   
   # Message categories by verbosity:
     Message categories are automatically enabled or disabled according to the
@@ -271,7 +272,7 @@ Help message about message categories.
       8: message-queue mutex nonlin shared-memory:values
       9: callstack-hash callstacks
      10: progress
-     11: cardinal global-accesses include-string-literals
+     11: cardinal debug:string-literals global-accesses
   
     Warning categories enabled as feedback message by verbosity level:
       2: watchpoint

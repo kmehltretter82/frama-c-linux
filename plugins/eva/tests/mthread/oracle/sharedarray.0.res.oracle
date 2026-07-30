@@ -45,7 +45,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedarray.c:60 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -53,13 +53,13 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:global-accesses] 
   Globals accessed by thread:
     t[1]: write by jobs1 at sharedarray.c:22 <- f1
     t[2]: write by jobs1 at sharedarray.c:23 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {}
@@ -67,12 +67,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:global-accesses] 
   Globals accessed by thread:
     t[1]: write by jobs2 at sharedarray.c:28 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
@@ -80,12 +80,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:global-accesses] 
   Globals accessed by thread:
     t[0..3]: write by jobs3 at sharedarray.c:33 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
     shared bases: {}
@@ -93,12 +93,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:global-accesses] 
   Globals accessed by thread:
     tt[0..25]: write by jobs4 at sharedarray.c:39 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
     shared bases: {}
@@ -106,12 +106,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs5 starting at f5, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
 [eva:global-accesses] 
   Globals accessed by thread:
     tt[0..25]: write by jobs5 at sharedarray.c:45 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
     shared bases: {}
@@ -119,10 +119,10 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs6 starting at f6, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
     shared bases: {}

@@ -156,7 +156,7 @@
     jobs[0..4]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: matrix.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -164,7 +164,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
 [eva:mutex] matrix.c:24: Lock locks[0]
@@ -193,7 +193,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
@@ -201,7 +201,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
 [eva:mutex] matrix.c:24: Lock locks[1]
@@ -226,7 +226,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
@@ -234,7 +234,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
 [eva:mutex] matrix.c:24: Lock locks[2]
@@ -259,7 +259,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {}
@@ -267,7 +267,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
 [eva:mutex] matrix.c:24: Lock locks[3]
@@ -292,7 +292,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
     shared bases: {}
@@ -300,7 +300,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
 [eva:mutex] matrix.c:24: Lock locks[4]
@@ -325,7 +325,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
@@ -469,7 +469,7 @@
     jobs[0..4]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: matrix.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       matrix[i][j] = (unsigned int)0; matrix.c:42 <- main
@@ -484,7 +484,8 @@
   Analyzing thread jobs[0] starting at job, iteration 2 (potential shared vars
     changed and interferences changed).
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[eva:interferences] matrix.c:28: inject threads interferences at this point
+[eva:debug:interferences] matrix.c:28: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     matrix[0][0..99]:
@@ -505,7 +506,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -639,7 +640,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -773,7 +774,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -907,7 +908,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1041,7 +1042,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1245,7 +1246,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva:interferences] matrix.c:42: inject threads interferences at this point
+[eva:debug:interferences] matrix.c:42: 
+  inject threads interferences at this point
 [eva:thread] matrix.c:45: 
   New context for jobs[0], fun job, parent <main>, args {0}
 [eva:thread] matrix.c:45: 
@@ -1256,7 +1258,8 @@
   New context for jobs[3], fun job, parent <main>, args {3}
 [eva:thread] matrix.c:45: 
   New context for jobs[4], fun job, parent <main>, args {4}
-[eva:interferences] matrix.c:58: inject threads interferences at this point
+[eva:debug:interferences] matrix.c:58: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -1381,7 +1384,7 @@
     jobs[0..4]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: matrix.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       matrix[i][j] = (unsigned int)0; matrix.c:42 <- main
@@ -1416,7 +1419,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1466,7 +1469,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1516,7 +1519,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1566,7 +1569,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1616,7 +1619,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1869,7 +1872,7 @@
     jobs[0..4]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: matrix.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       matrix[i][j] = (unsigned int)0; matrix.c:42 <- main
@@ -1904,7 +1907,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -1954,7 +1957,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job
@@ -2004,7 +2007,7 @@
         pthread_mutex_lock :: matrix.c:24 <- job
       read by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: matrix.c:29 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
       matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:28 <- job

@@ -19,7 +19,7 @@
 [eva:thread] messy_init.c:22: 
   New context for job, fun fjob, parent <main>, args {0}
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -27,7 +27,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread job starting at fjob, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of fjob for thread job
 [eva] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [eva] messy_init.c:10: Warning: 
@@ -39,7 +39,7 @@
     lock:
       read by job at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
         pthread_mutex_lock :: messy_init.c:10 <- fjob
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread job
     concurrent writes:
     shared bases: {}

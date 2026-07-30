@@ -19,7 +19,7 @@
     th2:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: join.c:22 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -27,11 +27,11 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread th1 starting at t1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of t1 for thread th1
 [eva:thread] join.c:10: Thread exiting with value {1}
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread th1
     concurrent writes:
     shared bases: {}
@@ -39,11 +39,11 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread th2 starting at t2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of t2 for thread th2
 [eva:thread] join.c:15: Thread exiting with value {2}
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread th2
     concurrent writes:
     shared bases: {}

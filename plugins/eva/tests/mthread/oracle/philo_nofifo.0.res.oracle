@@ -32,7 +32,7 @@
     jobs[0..4]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: philo_nofifo.c:37 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -40,7 +40,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] philo_nofifo.c:12: Lock locks[4]
 [eva:mutex] philo_nofifo.c:13: Lock locks[1]
@@ -66,7 +66,7 @@
         pthread_mutex_unlock :: philo_nofifo.c:15 <-
         aux :: philo_nofifo.c:24 <-
         job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
@@ -74,7 +74,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] philo_nofifo.c:12: Lock locks[0]
 [eva:mutex] philo_nofifo.c:13: Lock locks[2]
@@ -100,7 +100,7 @@
         pthread_mutex_unlock :: philo_nofifo.c:14 <-
         aux :: philo_nofifo.c:24 <-
         job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
@@ -108,7 +108,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:mutex] philo_nofifo.c:12: Lock locks[1]
 [eva:mutex] philo_nofifo.c:13: Lock locks[3]
@@ -134,7 +134,7 @@
         pthread_mutex_unlock :: philo_nofifo.c:14 <-
         aux :: philo_nofifo.c:24 <-
         job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {}
@@ -142,7 +142,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] philo_nofifo.c:12: Lock locks[2]
 [eva:mutex] philo_nofifo.c:13: Lock locks[4]
@@ -168,7 +168,7 @@
         pthread_mutex_unlock :: philo_nofifo.c:14 <-
         aux :: philo_nofifo.c:24 <-
         job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
     shared bases: {}
@@ -176,7 +176,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] philo_nofifo.c:12: Lock locks[3]
 [eva:mutex] philo_nofifo.c:13: Lock locks[0]
@@ -202,7 +202,7 @@
         pthread_mutex_unlock :: philo_nofifo.c:15 <-
         aux :: philo_nofifo.c:24 <-
         job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}

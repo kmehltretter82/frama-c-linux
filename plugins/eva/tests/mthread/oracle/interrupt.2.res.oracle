@@ -22,7 +22,7 @@
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0}
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -31,7 +31,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 1
     (thread initial memory state changed).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
 [eva:thread] Thread <main>, fun main_interrupt_cross_incr
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
@@ -42,7 +42,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -51,7 +51,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -61,7 +61,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
     shared bases: {}
@@ -70,7 +70,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -80,7 +80,7 @@
     interrupt_received_b:
       write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
         interrupt_cross_incr2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr2>
     concurrent writes:
     shared bases: {}
@@ -102,7 +102,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received_a, interrupt_received_b}
@@ -111,7 +111,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr1> starting at interrupt_cross_incr1,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva:interferences] interrupt.c:41: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:41: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -120,7 +121,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
       interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
@@ -137,7 +138,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_cross_incr2> starting at interrupt_cross_incr2,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva:interferences] interrupt.c:45: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:45: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received_a:
@@ -146,7 +148,7 @@
     interrupt_received_b:
       write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
         interrupt_cross_incr2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr2>
     concurrent writes:
       interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
@@ -190,9 +192,11 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_cross_incr, iteration 3
     (shared vars values changed and interferences changed).
-[eva:interferences] interrupt.c:58: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:58: 
+  inject threads interferences at this point
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0; 1}
-[eva:interferences] interrupt.c:59: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:59: 
+  inject threads interferences at this point
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2}
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -200,7 +204,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received_a, interrupt_received_b}
@@ -217,7 +221,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
       interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
@@ -244,7 +248,7 @@
     interrupt_received_b:
       write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
         interrupt_cross_incr2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr2>
     concurrent writes:
       interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
@@ -293,7 +297,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received_a, interrupt_received_b}
@@ -310,7 +314,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
       interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
@@ -337,7 +341,7 @@
     interrupt_received_b:
       write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
         interrupt_cross_incr2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr2>
     concurrent writes:
       interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
@@ -386,7 +390,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received_a, interrupt_received_b}
@@ -403,7 +407,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
       interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
@@ -432,7 +436,7 @@
     interrupt_received_b:
       write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
         interrupt_cross_incr2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr2>
     concurrent writes:
       /*@ assert Eva: signed_overflow: interrupt_received_a + 1 ≤ 2147483647;
@@ -483,7 +487,7 @@
       read by <main> at interrupt.c:58 <- main_interrupt_cross_incr
     interrupt_received_b:
       read by <main> at interrupt.c:59 <- main_interrupt_cross_incr
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received_a, interrupt_received_b}
@@ -502,7 +506,7 @@
     interrupt_received_b:
       read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
         interrupt_cross_incr1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_cross_incr1>
     concurrent writes:
       /*@ assert Eva: signed_overflow: interrupt_received_b + 1 ≤ 2147483647;

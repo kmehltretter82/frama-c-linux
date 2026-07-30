@@ -126,13 +126,16 @@ let cvalue_domain =
   register_category "d-cvalue" ~group:Domain ~level:0
     ~help:"print states of the cvalue domain"
 
+(* Created only for documentation. *)
+let _debug = register_category "debug" ~group:Debug ~help:"all debug messages"
+
 let debug_iterator =
-  register_category "iterator" ~group:Debug
+  register_category "debug:iterator" ~group:Debug
     ~help:"debug messages about the fixpoint engine on the control-flow graph \
            of functions"
 
 let debug_string_literal =
-  register_category "include-string-literals" ~group:Debug ~level:11
+  register_category "debug:string-literals" ~group:Debug ~level:11
     ~help:"when printing a state, \
            also include globals representing string literals"
 

@@ -27,7 +27,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -36,7 +36,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread joboneshot starting at fjoboneshot, iteration 1 (first
     iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
@@ -52,7 +52,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
     shared bases: {}
@@ -61,7 +61,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread joblooped starting at fjoblooped, iteration 1 (first
     iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0}, {1}
@@ -77,7 +77,7 @@
       read by joblooped at interferences.c:120 <- fjoblooped
       read by joblooped at interferences.c:121 <- fjoblooped
       write by joblooped at interferences.c:120 <- fjoblooped
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joblooped
     concurrent writes:
     shared bases: {}
@@ -102,7 +102,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
@@ -112,9 +112,9 @@
   Analyzing thread joboneshot starting at fjoboneshot, iteration 2 (potential
     shared vars changed and interferences changed).
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
-[eva:interferences] interferences.c:111: 
+[eva:debug:interferences] interferences.c:111: 
   inject threads interferences at this point
-[eva:interferences] interferences.c:112: 
+[eva:debug:interferences] interferences.c:112: 
   inject threads interferences at this point
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
 [eva:global-accesses] 
@@ -129,7 +129,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
       shared_a ++; interferences.c:112 <- fjoboneshot
@@ -146,9 +146,9 @@
   Analyzing thread joblooped starting at fjoblooped, iteration 2 (potential
     shared vars changed and interferences changed).
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
-[eva:interferences] interferences.c:119: 
+[eva:debug:interferences] interferences.c:119: 
   inject threads interferences at this point
-[eva:interferences] interferences.c:120: 
+[eva:debug:interferences] interferences.c:120: 
   inject threads interferences at this point
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
 [eva:global-accesses] 
@@ -163,7 +163,7 @@
       read by joblooped at interferences.c:120 <- fjoblooped
       read by joblooped at interferences.c:121 <- fjoblooped
       write by joblooped at interferences.c:120 <- fjoblooped
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joblooped
     concurrent writes:
       shared_b ++; interferences.c:120 <- fjoblooped
@@ -234,7 +234,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
@@ -257,7 +257,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
       shared_a ++; interferences.c:112 <- fjoboneshot
@@ -289,7 +289,7 @@
       read by joblooped at interferences.c:120 <- fjoblooped
       read by joblooped at interferences.c:121 <- fjoblooped
       write by joblooped at interferences.c:120 <- fjoblooped
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joblooped
     concurrent writes:
       shared_b ++; interferences.c:120 <- fjoblooped
@@ -336,7 +336,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
@@ -361,7 +361,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
       shared_a ++; interferences.c:112 <- fjoboneshot
@@ -393,7 +393,7 @@
       read by joblooped at interferences.c:120 <- fjoblooped
       read by joblooped at interferences.c:121 <- fjoblooped
       write by joblooped at interferences.c:120 <- fjoblooped
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joblooped
     concurrent writes:
       shared_b ++; interferences.c:120 <- fjoblooped
@@ -440,7 +440,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
@@ -465,7 +465,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
       shared_a ++; interferences.c:112 <- fjoboneshot
@@ -501,7 +501,7 @@
       read by joblooped at interferences.c:120 <- fjoblooped
       read by joblooped at interferences.c:121 <- fjoblooped
       write by joblooped at interferences.c:120 <- fjoblooped
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joblooped
     concurrent writes:
       /*@ assert Eva: signed_overflow: shared_b + 1 ≤ 2147483647; */
@@ -549,7 +549,7 @@
     nondet: read by <main> at interferences.c:129 <- main_thread_loop
     shared_a: read by <main> at interferences.c:135 <- main_thread_loop
     shared_b: read by <main> at interferences.c:135 <- main_thread_loop
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {shared_a, shared_b}
@@ -574,7 +574,7 @@
       read by joboneshot at interferences.c:110 <- fjoboneshot
       read by joboneshot at interferences.c:111 <- fjoboneshot
       read by joboneshot at interferences.c:113 <- fjoboneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
       shared_a ++; interferences.c:112 <- fjoboneshot

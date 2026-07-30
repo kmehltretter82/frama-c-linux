@@ -51,7 +51,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:118 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -59,7 +59,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -67,7 +67,7 @@
       read by jobs1 at sharedvars.c:45 <- f1
       read by jobs1 at sharedvars.c:46 <- f1
       write by jobs1 at sharedvars.c:46 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {}
@@ -75,10 +75,10 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
@@ -86,7 +86,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:thread] sharedvars.c:62: 
   New thread: jobs31, fun f31, parent jobs3, args {0}
@@ -97,7 +97,7 @@
     jobs31:
       write by jobs3 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:62 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
     shared bases: {}
@@ -105,7 +105,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -115,7 +115,7 @@
     s6:
       read by jobs4 at sharedvars.c:71 <- f4
       write by jobs4 at sharedvars.c:72 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
     shared bases: {}
@@ -123,7 +123,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs5 starting at f5, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
 [eva:thread] sharedvars.c:83: 
   New thread: jobs51, fun f51, parent jobs5, args {0}
@@ -134,7 +134,7 @@
     jobs51:
       write by jobs5 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:83 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
     shared bases: {}
@@ -142,14 +142,14 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs6 starting at f6, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
 [eva:global-accesses] 
   Globals accessed by thread:
     s6:
       read by jobs6 at sharedvars.c:90 <- f6
       write by jobs6 at sharedvars.c:91 <- f6
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
     shared bases: {}
@@ -196,7 +196,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:118 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       s4 = -1; sharedvars.c:113 <- main
@@ -222,7 +222,7 @@
       read by jobs1 at sharedvars.c:45 <- f1
       read by jobs1 at sharedvars.c:46 <- f1
       write by jobs1 at sharedvars.c:46 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {s4, s6}
@@ -231,7 +231,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 2 (interferences changed).
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {s4, s6}
@@ -249,7 +249,7 @@
     jobs31:
       write by jobs3 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:62 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
     shared bases: {s4, s6}
@@ -258,10 +258,14 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs4 starting at f4, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] sharedvars.c:68: inject threads interferences at this point
-[eva:interferences] sharedvars.c:69: inject threads interferences at this point
-[eva:interferences] sharedvars.c:71: inject threads interferences at this point
-[eva:interferences] sharedvars.c:72: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:68: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:69: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:71: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:72: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s4:
@@ -270,7 +274,7 @@
     s6:
       read by jobs4 at sharedvars.c:71 <- f4
       write by jobs4 at sharedvars.c:72 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s4 = 4; sharedvars.c:69 <- f4
@@ -299,7 +303,7 @@
     jobs51:
       write by jobs5 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:83 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
     shared bases: {s4, s6}
@@ -308,14 +312,16 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs6 starting at f6, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] sharedvars.c:90: inject threads interferences at this point
-[eva:interferences] sharedvars.c:91: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:90: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:91: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s6:
       read by jobs6 at sharedvars.c:90 <- f6
       write by jobs6 at sharedvars.c:91 <- f6
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
       s6 = 6; sharedvars.c:91 <- f6
@@ -330,14 +336,14 @@
                   s6 ∈ {0; 4; 6}
 [eva:thread-fixpoint] 
   Analyzing thread jobs31 starting at f31, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f31 for thread jobs31
 [eva:global-accesses] 
   Globals accessed by thread:
     u3:
       read by jobs31 at sharedvars.c:55 <- f31
       write by jobs31 at sharedvars.c:56 <- f31
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs31
     concurrent writes:
     shared bases: {s4, s6}
@@ -345,14 +351,14 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs51 starting at f51, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f51 for thread jobs51
 [eva:global-accesses] 
   Globals accessed by thread:
     s5:
       read by jobs51 at sharedvars.c:77 <- f51
       write by jobs51 at sharedvars.c:78 <- f51
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs51
     concurrent writes:
     shared bases: {s4, s6}
@@ -387,10 +393,12 @@
   New context for jobs2, fun f2, parent <main>, args {0}
 [eva:thread] sharedvars.c:111: 
   New context for jobs3, fun f3, parent <main>, args {0}
-[eva:interferences] sharedvars.c:113: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:113: 
+  inject threads interferences at this point
 [eva:thread] sharedvars.c:114: 
   New context for jobs4, fun f4, parent <main>, args {0}
-[eva:interferences] sharedvars.c:115: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:115: 
+  inject threads interferences at this point
 [eva:thread] sharedvars.c:117: 
   New context for jobs5, fun f5, parent <main>, args {0}
 [eva:thread] sharedvars.c:118: 
@@ -421,7 +429,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:118 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       u3 = 1; sharedvars.c:103 <- main
@@ -459,7 +467,7 @@
       read by jobs1 at sharedvars.c:45 <- f1
       read by jobs1 at sharedvars.c:46 <- f1
       write by jobs1 at sharedvars.c:46 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -469,7 +477,7 @@
   Analyzing thread jobs2 starting at f2, iteration 3 (thread initial memory
     state changed and interferences changed).
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -478,14 +486,15 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs3 starting at f3, iteration 3 (potential shared vars
     changed, thread initial memory state changed and interferences changed).
-[eva:interferences] sharedvars.c:61: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:61: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     u3: write by jobs3 at sharedvars.c:61 <- f3
     jobs31:
       write by jobs3 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:62 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       u3 = 3; sharedvars.c:61 <- f3
@@ -513,7 +522,7 @@
     s6:
       read by jobs4 at sharedvars.c:71 <- f4
       write by jobs4 at sharedvars.c:72 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s4 = 4; sharedvars.c:69 <- f4
@@ -539,14 +548,15 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs5 starting at f5, iteration 3 (potential shared vars
     changed, thread initial memory state changed and interferences changed).
-[eva:interferences] sharedvars.c:84: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:84: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s5: write by jobs5 at sharedvars.c:84 <- f5
     jobs51:
       write by jobs5 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:83 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
       s5 = 5; sharedvars.c:84 <- f5
@@ -571,7 +581,7 @@
     s6:
       read by jobs6 at sharedvars.c:90 <- f6
       write by jobs6 at sharedvars.c:91 <- f6
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
       s6 = 6; sharedvars.c:91 <- f6
@@ -591,14 +601,16 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs31 starting at f31, iteration 3 (potential shared vars
     changed, thread initial memory state changed and interferences changed).
-[eva:interferences] sharedvars.c:55: inject threads interferences at this point
-[eva:interferences] sharedvars.c:56: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:55: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:56: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     u3:
       read by jobs31 at sharedvars.c:55 <- f31
       write by jobs31 at sharedvars.c:56 <- f31
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs31
     concurrent writes:
       u3 = 31; sharedvars.c:56 <- f31
@@ -618,14 +630,16 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs51 starting at f51, iteration 3 (potential shared vars
     changed, thread initial memory state changed and interferences changed).
-[eva:interferences] sharedvars.c:77: inject threads interferences at this point
-[eva:interferences] sharedvars.c:78: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:77: 
+  inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:78: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     s5:
       read by jobs51 at sharedvars.c:77 <- f51
       write by jobs51 at sharedvars.c:78 <- f51
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs51
     concurrent writes:
       s5 = 51; sharedvars.c:78 <- f51
@@ -669,7 +683,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 4 (interferences
     changed).
-[eva:interferences] sharedvars.c:103: inject threads interferences at this point
+[eva:debug:interferences] sharedvars.c:103: 
+  inject threads interferences at this point
 [eva:thread] sharedvars.c:105: 
   New context for jobs1, fun f1, parent <main>, args {0}
 [eva:global-accesses] 
@@ -698,7 +713,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:118 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       u3 = 1; sharedvars.c:103 <- main
@@ -740,7 +755,7 @@
       read by jobs1 at sharedvars.c:45 <- f1
       read by jobs1 at sharedvars.c:46 <- f1
       write by jobs1 at sharedvars.c:46 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -750,7 +765,7 @@
   Analyzing thread jobs2 starting at f2, iteration 4 (thread initial memory
     state changed and interferences changed).
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -765,7 +780,7 @@
     jobs31:
       write by jobs3 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:62 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       u3 = 3; sharedvars.c:61 <- f3
@@ -795,7 +810,7 @@
     s6:
       read by jobs4 at sharedvars.c:71 <- f4
       write by jobs4 at sharedvars.c:72 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s4 = 4; sharedvars.c:69 <- f4
@@ -830,7 +845,7 @@
     jobs51:
       write by jobs5 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:83 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
       s5 = 5; sharedvars.c:84 <- f5
@@ -857,7 +872,7 @@
     s6:
       read by jobs6 at sharedvars.c:90 <- f6
       write by jobs6 at sharedvars.c:91 <- f6
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
       s6 = 6; sharedvars.c:91 <- f6
@@ -884,7 +899,7 @@
     u3:
       read by jobs31 at sharedvars.c:55 <- f31
       write by jobs31 at sharedvars.c:56 <- f31
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs31
     concurrent writes:
       u3 = 31; sharedvars.c:56 <- f31
@@ -911,7 +926,7 @@
     s5:
       read by jobs51 at sharedvars.c:77 <- f51
       write by jobs51 at sharedvars.c:78 <- f51
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs51
     concurrent writes:
       s5 = 51; sharedvars.c:78 <- f51
@@ -975,7 +990,7 @@
     jobs6:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:118 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       u3 = 1; sharedvars.c:103 <- main
@@ -1017,7 +1032,7 @@
       read by jobs1 at sharedvars.c:45 <- f1
       read by jobs1 at sharedvars.c:46 <- f1
       write by jobs1 at sharedvars.c:46 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -1026,7 +1041,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 5 (interferences changed).
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {u3, s4, s5, s6}
@@ -1040,7 +1055,7 @@
     jobs31:
       write by jobs3 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:62 <- f3
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs3
     concurrent writes:
       u3 = 3; sharedvars.c:61 <- f3
@@ -1070,7 +1085,7 @@
     s6:
       read by jobs4 at sharedvars.c:71 <- f4
       write by jobs4 at sharedvars.c:72 <- f4
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs4
     concurrent writes:
       s4 = 4; sharedvars.c:69 <- f4
@@ -1105,7 +1120,7 @@
     jobs51:
       write by jobs5 at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: sharedvars.c:83 <- f5
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs5
     concurrent writes:
       s5 = 5; sharedvars.c:84 <- f5
@@ -1131,7 +1146,7 @@
     s6:
       read by jobs6 at sharedvars.c:90 <- f6
       write by jobs6 at sharedvars.c:91 <- f6
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs6
     concurrent writes:
       s6 = 6; sharedvars.c:91 <- f6
@@ -1157,7 +1172,7 @@
     u3:
       read by jobs31 at sharedvars.c:55 <- f31
       write by jobs31 at sharedvars.c:56 <- f31
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs31
     concurrent writes:
       u3 = 31; sharedvars.c:56 <- f31
@@ -1184,7 +1199,7 @@
     s5:
       read by jobs51 at sharedvars.c:77 <- f51
       write by jobs51 at sharedvars.c:78 <- f51
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs51
     concurrent writes:
       s5 = 51; sharedvars.c:78 <- f51
