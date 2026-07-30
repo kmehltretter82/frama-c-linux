@@ -4751,30 +4751,30 @@ not tainted anymore.
 
 \subsubsection{Direct and indirect taints}
 Taint analysis distinguishes between direct and indirect taints. Accordingly, a
-location may be \emph{directly}, \emph{indirectly}, or both directly and
+memory location may be \emph{directly}, \emph{indirectly}, or both directly and
 indirectly tainted.
 
-Direct taints account for \emph{data dependencies} among program locations: a
+Direct taints account for \emph{data dependencies} among memory locations: a
 first location is said to be \emph{data-dependent} on a second location if the
 value of the former is computed from the value of the latter.
 In practice, direct taints are introduced by means of \acsl{} annotations
-\lstinline|//@taint <lvalues>;| or clauses \lstinline|taints <lvalues>;|. They
-are propagated through assignments \lstinline|lvalue = expr| whenever
-a location occurring in \lstinline|expr| is directly tainted or data-dependent
-on another location.
+\lstinline|//@taint <lvalues>;| or clauses \lstinline|taints <lvalues>;|, and
+they are propagated through assignments \lstinline|lvalue = expr|: the location
+\lstinline|lvalue| becomes directly tainted whenever a location read in
+\lstinline|expr| is directly tainted.
 
-Indirect taints account for \emph{control dependencies} among program locations:
+Indirect taints account for \emph{control dependencies} among memory locations:
 a first location is said to be \emph{control-dependent} on a second location if
 the value of the former may depend on a control-flow decision or an address
 computation based on the value of the latter. In practice, they are introduced
-and propagated through assignments of the form \lstinline|lvalue = expr|
-whenever one of the following applies:
+and propagated through assignments of the form \lstinline|lvalue = expr|: the
+location \lstinline|lvalue| becomes indirectly tainted whenever one of the
+following applies:
 \begin{enumerate}
   \item \lstinline|lvalue = expr| occurs in the scope of a conditional
-  statement, possibly through function calls, whose controlling expression is
+  statement (possibly through function calls) whose controlling expression is
   tainted;
-  \item the value of a location occurring in \lstinline|expr| depends on the
-  value of an indirectly tainted location;
+  \item a location read in \lstinline|expr| is indirectly tainted;
   \item the address computation of \lstinline|lvalue| depends on the value of
   a tainted location;
   \item the address computation of a location read to compute the value of
@@ -4808,11 +4808,11 @@ void fun(int t) {
 
   int buf[2] = {0};
 
-  // CASE 3.: 'buf[w]' becomes indirectly tainted as the address 'buf + w'
-  // depends on the value of the tainted location 'w'.
+  // CASE 3.: 'buf[w]' becomes indirectly tainted as its address depends on
+  // the value of the tainted location 'w'.
   buf[w] = buf[1] + 1;
 
-  // CASE 4.: 'buf[0]' becomes indirectly tainted as the address 'buf + w'
+  // CASE 4.: 'buf[0]' becomes indirectly tainted as the address of 'buf[w]'
   // depends on the value of the tainted location 'w'.
   buf[0] = buf[w] - 1;
 }
