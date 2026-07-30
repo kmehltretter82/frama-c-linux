@@ -1,6 +1,6 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@
-   STDOPT: #"-eva-msg-key widen-hints"
+   STDOPT: #"-eva-msg-key debug:widen-hints"
    OPT: -print
  */
 #include <stdlib.h>

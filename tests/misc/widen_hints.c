@@ -4,8 +4,8 @@ PLUGIN: @EVA_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DSYNTAX_ERRORS -kernel-warn-key=annot-error=warning
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DNONCONST
  EXIT:0
-   OPT: -eva @EVA_CONFIG@ -eva-slevel 1 -eva-msg-key widen-hints
-   OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DALLGLOBAL -eva-msg-key widen-hints
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 1 -eva-msg-key debug:widen-hints
+   OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DALLGLOBAL -eva-msg-key debug:widen-hints
 */
 #define N 2
 const int x = 9;

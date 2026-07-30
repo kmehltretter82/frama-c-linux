@@ -8,9 +8,6 @@
 
 open Cil_types
 
-let dkey = Self.register_category "widen-hints" ~level:7
-    ~help:"debug messages when failing to use widen_hints annotations"
-
 let error ?msg loc typing_context =
   typing_context.Logic_typing.error loc
     "invalid widen_hints annotation%a"
@@ -113,12 +110,12 @@ let widen_hint_terms_of_terms terms =
           in
           Some (hint_lval, hint_thresholds)
         | _ ->
-          Self.debug ~source:lval_term.term_loc ~dkey
+          Self.debug ~source:lval_term.term_loc ~dkey:Key.debug_widen_hints
             "invalid var_term: %a@." Printer.pp_term lval_term;
           raise Invalid_hint
       end
     | _ ->
-      Self.debug ~dkey "invalid terms: %a@."
+      Self.debug ~dkey:Key.debug_widen_hints "invalid terms: %a@."
         (Pretty_utils.pp_list ~sep:", " Printer.pp_term) terms;
       raise Invalid_hint
   with

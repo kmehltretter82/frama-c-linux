@@ -134,6 +134,10 @@ let debug_iterator =
     ~help:"debug messages about the fixpoint engine on the control-flow graph \
            of functions"
 
+let debug_widen_hints =
+  Self.register_category "debug:widen-hints" ~group:Debug
+    ~help:"debug messages for the interpretation of widen_hints annotations"
+
 let debug_string_literal =
   register_category "debug:string-literals" ~group:Debug ~level:11
     ~help:"when printing a state, \

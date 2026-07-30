@@ -10,8 +10,6 @@
 
 open Cil_types
 
-val dkey: Self.category
-
 type hint_vars =
   | HintAllVars (* "all" vars: static hint *)
   | HintVar of varinfo (* static hint *)

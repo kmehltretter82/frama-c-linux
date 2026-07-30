@@ -186,8 +186,6 @@ Help message about message categories.
     split-return          : messages related to option -eva-split-return
     summary               : print a summary of the analysis at the end,
                             including coverage and alarm numbers
-    widen-hints           : debug messages when failing to use widen_hints
-                            annotations
     widening              : print a message at each point where the analysis
                             applies a widening
   
@@ -249,6 +247,8 @@ Help message about message categories.
                             representing string literals
     debug:taint           : print debug states of the taint domain on user
                             directives
+    debug:widen-hints     : debug messages for the interpretation of
+                            widen_hints annotations
     domain_product        : inactive category
   
   # Message categories by verbosity:
@@ -270,7 +270,7 @@ Help message about message categories.
          thread
       5: final-states initial-state
       6: imprecision malloc shared-memory:mutex-details
-      7: pointer-comparison shared-memory:iteration widen-hints widening
+      7: pointer-comparison shared-memory:iteration widening
       8: message-queue mutex nonlin shared-memory:values
       9: callstack-hash callstacks
      10: progress

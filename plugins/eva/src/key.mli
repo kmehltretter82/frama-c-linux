@@ -41,6 +41,7 @@ val final_states : category
 (** {2 Debug categories.} *)
 
 val debug_iterator : category
+val debug_widen_hints : category
 val debug_string_literal: category
 
 (** {2 Warning categories.} *)

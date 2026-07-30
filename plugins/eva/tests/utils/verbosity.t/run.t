@@ -110,7 +110,6 @@ Verbose 8 should enable "malloc" but not "malloc:new" unset by user.
   $ frama-c -commands-file options.txt malloc.c -eva-verbose 8 -eva-msg-key=-malloc:new,-summary
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing malloc.c (with preprocessing)
-  [eva:widen-hints] computing global widen hints
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
