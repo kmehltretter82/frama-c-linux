@@ -140,9 +140,6 @@ val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
 (** Warnings. *)
 val warning : ?wkey:warn_category -> 'a pretty_printer
 
-(** Alarm emitted by the analysis. *)
-val alarm : 'a pretty_printer
-
 (** User error. *)
 val error : 'a pretty_printer
 

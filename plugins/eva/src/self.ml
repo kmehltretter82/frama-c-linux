@@ -585,9 +585,6 @@ let debug ?level ?dkey =
 let warning ?wkey : 'a pretty_printer =
   lift_printer (warning ?wkey)
 
-let alarm ?emitwith =
-  warning ~wkey:wkey_alarm ?emitwith
-
 let error ?emitwith =
   lift_printer error ?emitwith
 
