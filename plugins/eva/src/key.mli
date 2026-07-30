@@ -40,9 +40,9 @@ val final_states : category
 
 (** {2 Debug categories.} *)
 
-val debug_iterator : category
-val debug_widen_hints : category
-val debug_string_literal: category
+val debug_iterator : debug_category
+val debug_widen_hints : debug_category
+val debug_string_literal: debug_category
 
 (** {2 Warning categories.} *)
 

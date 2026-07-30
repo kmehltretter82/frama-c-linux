@@ -673,7 +673,7 @@ module Precise = struct
 
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
-    if Self.is_debug_key_enabled Key.callstacks then
+    if Self.is_category_enabled Key.callstacks then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, th) base offsm =
@@ -685,7 +685,7 @@ module Precise = struct
 
 
   let display_shared_vars_value m =
-    if Self.is_debug_key_enabled Key.shared_memory_values then
+    if Self.is_category_enabled Key.shared_memory_values then
       fold_location
         (fun loc s () ->
            SetNodeIdAccess.fold

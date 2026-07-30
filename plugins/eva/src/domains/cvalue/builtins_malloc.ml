@@ -21,7 +21,7 @@ let dkey_auto_free = Self.register_category "malloc:automatic-free" ~level:4
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
 
 let debug_key =
-  Self.register_category "debug:malloc" ~group:Debug
+  Self.register_debug_category "malloc"
     ~help:"debug messages from builtins interpreting dynamic allocations"
 
 let _wkey_malloc =

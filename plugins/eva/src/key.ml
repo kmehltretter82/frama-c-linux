@@ -24,6 +24,10 @@ open Self
 
 let callstacks = Self.key_callstacks
 
+let cvalue_domain =
+  register_category "d-cvalue" ~group:Domain ~level:0
+    ~help:"print states of the cvalue domain"
+
 let show =
   register_category "show" ~level:2
     ~help:"show values/states inferred by the analysis on directives \
@@ -120,26 +124,19 @@ let global_accesses =
   register_category "global-accesses" ~group:Concurrency ~level:11
     ~help:"print all accesses to global variables during the analysis"
 
-(* ----- Other message categories ------------------------------------------- *)
-
-let cvalue_domain =
-  register_category "d-cvalue" ~group:Domain ~level:0
-    ~help:"print states of the cvalue domain"
-
-(* Created only for documentation. *)
-let _debug = register_category "debug" ~group:Debug ~help:"all debug messages"
+(* ----- Debug categories ------------------------------------------- *)
 
 let debug_iterator =
-  register_category "debug:iterator" ~group:Debug
+  register_debug_category "iterator"
     ~help:"debug messages about the fixpoint engine on the control-flow graph \
            of functions"
 
 let debug_widen_hints =
-  Self.register_category "debug:widen-hints" ~group:Debug
+  Self.register_debug_category "widen-hints"
     ~help:"debug messages for the interpretation of widen_hints annotations"
 
 let debug_string_literal =
-  register_category "debug:string-literals" ~group:Debug ~level:11
+  register_debug_category "string-literals"
     ~help:"when printing a state, \
            also include globals representing string literals"
 

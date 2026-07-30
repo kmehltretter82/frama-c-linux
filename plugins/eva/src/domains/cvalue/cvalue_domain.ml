@@ -47,7 +47,7 @@ let print_final_state kf values =
       Format.fprintf fmt "@[  %a@]" Cvalue.Model.pretty values
   in
   let print_cardinal fmt =
-    if Self.is_debug_key_enabled dkey_cardinal then
+    if Self.is_category_enabled dkey_cardinal then
       Format.fprintf fmt " (~%a states)"
         Cvalue.CardinalEstimate.pretty (Cvalue.Model.cardinal_estimate values)
   in
@@ -59,7 +59,7 @@ let print_final_state kf values =
 
 let pretty_wo_string_literal fmt s =
   let filtered =
-    if Self.is_debug_key_enabled Key.debug_string_literal
+    if Self.is_debug_category_enabled Key.debug_string_literal
     then s
     else Cvalue.Model.filter_base (fun b -> not (Base.is_string_literal b)) s
   in
@@ -419,7 +419,7 @@ module State = struct
 
   let post_analysis _state =
     if Plugin.is_present "inout"
-    && Self.is_debug_key_enabled Key.final_states
+    && Self.is_category_enabled Key.final_states
     && Self.verbose_atleast 1
     && Parameters.Eva.get ()
     then display_results ();

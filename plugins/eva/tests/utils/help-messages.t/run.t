@@ -154,7 +154,6 @@ Help message about message categories.
   [eva] List of message categories.
   
   # Standard Eva message categories:
-    *                     : All categories
     callstack-hash        : additionally print the current callstack hash in
                             some messages
     callstacks            : print the current callstack alongside some messages
@@ -234,9 +233,9 @@ Help message about message categories.
     d-taint                : print states of the taint domain
     d-traces               : print states of the traces domain
     d-unit                 : print states of the unit domain
+    domain_product         : inactive category
   
   # Message categories for debug purposes:
-    debug                 : all debug messages
     debug:interferences   : debug messages about interferences from other
                             threads injected in Eva analysis with Mthread
     debug:iterator        : debug messages about the fixpoint engine on the
@@ -249,7 +248,6 @@ Help message about message categories.
                             directives
     debug:widen-hints     : debug messages for the interpretation of
                             widen_hints annotations
-    domain_product        : inactive category
   
   # Message categories by verbosity:
     Message categories are automatically enabled or disabled according to the
@@ -274,7 +272,7 @@ Help message about message categories.
       8: message-queue mutex nonlin shared-memory:values
       9: callstack-hash callstacks
      10: progress
-     11: cardinal debug:string-literals global-accesses
+     11: cardinal global-accesses
   
     Warning categories enabled as feedback message by verbosity level:
       2: watchpoint

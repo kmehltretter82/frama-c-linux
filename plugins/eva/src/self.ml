@@ -139,19 +139,33 @@ let configure_verbosity () =
 
 (* ----- Keys registration -------------------------------------------------- *)
 
-(* The help message of -eva-msg-key lists message categories by group. *)
-type group = Concurrency | Domain | Debug
+(* The help message of -eva-msg-key lists message categories by group. When
+   adding a new group, also update function [print_message_categories] below. *)
+type group = Concurrency | Domain
 
-(* Eva message category can be bound to a group. *)
-let dkey_group : (category, group) Hashtbl.t = Hashtbl.create 11
+(* Each category can be a message category (optionally in a group) or a
+   debug category. *)
+type kind = Message of group option | Debug
+
+(* Kind of each registered message or debug category. *)
+let key_kind_tbl : (category, kind) Hashtbl.t = Hashtbl.create 11
+
+type debug_category = category
+
+let register_debug_category ~help name =
+  let name = "debug:" ^ name in
+  let category = register_category ~help ~default:false name in
+  Hashtbl.replace key_kind_tbl category Debug;
+  category
 
 (* Makes the help message mandatory and adds an optional verbosity level
    and an optional group. *)
 let register_category ?group ?level ~help name =
+  assert (not (Stdlib.String.starts_with ~prefix:"debug" name));
   let default = Option.fold ~none:false ~some:((>=) default_verbosity) level in
   let category = register_category ~help ~default name in
   Option.iter (Hashtbl.replace dkey_verbosity category) level;
-  Option.iter (Hashtbl.replace dkey_group category) group;
+  Hashtbl.replace key_kind_tbl category (Message group);
   category
 
 (* Default status of warning categories: feedback is associated to a verbosity
@@ -172,6 +186,9 @@ let register_warn_category ~help ?default name =
   Option.iter (Hashtbl.replace wkey_verbosity category) level;
   category
 
+let is_category_enabled = is_debug_key_enabled
+let is_debug_category_enabled = is_debug_key_enabled
+
 (* ----- Help message about categories -------------------------------------- *)
 
 let pp_header fmt header = Format.fprintf fmt "@,@{<bold># %s:@}@," header
@@ -179,15 +196,12 @@ let pp_paragraph fmt = Format.fprintf fmt "@[<hov>%a@]@," Format.pp_print_text
 let pp_list ?sep = List.pretty_text ?sep ?last:sep
 
 let print_message_categories fmt =
-  let get_group = Hashtbl.find_opt dkey_group in
-  let get_info category =
-    dkey_name category, get_group category, get_category_help category
-  in
-  let list = get_all_categories () |> List.map get_info in
+  let get_info (key, kind) = dkey_name key, kind, get_category_help key in
+  let list = sorted_list dkey_name key_kind_tbl |> List.map get_info in
   let name_length (name, _, _) = Stdlib.String.length name in
   let max_length = List.fold_left (fun acc x -> max acc (name_length x)) 0 in
-  let pp_group (group_opt, header) =
-    let list = List.filter (fun (_, group, _) -> group = group_opt) list in
+  let pp_kind (kind, header) =
+    let list = List.filter (fun (_, k, _) -> k = kind) list in
     let max = max_length list in
     let print_category fmt (name, _group, help) =
       Format.fprintf fmt "  %-*s : %a"
@@ -196,13 +210,13 @@ let print_message_categories fmt =
     Format.fprintf fmt "%a%a"
       pp_header header (pp_list ~sep:"" print_category) list;
   in
-  List.iter pp_group
-    [ None, "Standard Eva message categories";
-      Some Concurrency,
+  List.iter pp_kind
+    [ Message None, "Standard Eva message categories";
+      Message (Some Concurrency),
       "Message categories about concurrency (with option -mthread)";
-      Some Domain,
+      Message (Some Domain),
       "Message categories for printing domain states on user directives";
-      Some Debug, "Message categories for debug purposes" ]
+      Debug, "Message categories for debug purposes" ]
 
 let print_verbose_help fmt =
   Format.fprintf fmt "  %a  %a"
@@ -270,11 +284,11 @@ type ('a,'b) pretty_aborter =
 
 let append_callstack ?(stacktrace=false) ?append ~callstack fmt =
   let pretty_hash fmt cs =
-    if is_debug_key_enabled key_callstack_hash then
+    if is_category_enabled key_callstack_hash then
       Format.fprintf fmt "<%a> " Callstack.pretty_hash cs
   in
   Option.iter (fun append -> append fmt) append;
-  if stacktrace && is_debug_key_enabled key_callstacks then
+  if stacktrace && is_category_enabled key_callstacks then
     match callstack with
     | None -> ()
     | Some cs ->

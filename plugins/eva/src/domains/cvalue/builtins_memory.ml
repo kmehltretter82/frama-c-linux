@@ -69,7 +69,7 @@ let warn_indeterminate_value ~name ?(precise = false) = function
 
 (*  Warns when the offsetmap contains an indeterminate value. *)
 let check_indeterminate_offsetmap ~name offsm =
-  if Self.is_debug_key_enabled dkey then
+  if Self.is_category_enabled dkey then
     let warn _ (v, _, _) = warn_indeterminate_value ~name ~precise:true v in
     V_Offsetmap.iter warn offsm
 

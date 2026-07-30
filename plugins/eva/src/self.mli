@@ -31,14 +31,29 @@ exception Abort
 
 (** The help message of -eva-msg-key lists message categories by group.
     Categories without group are standard messages listed first. *)
-type group = Concurrency | Domain | Debug
+type group = Concurrency | Domain
 
 (** Same as Log's {!register_category}, but [help] is mandatory, and a group and
     verbosity level can be associated to the category. *)
-val register_category: ?group:group -> ?level:int -> help:string -> string -> category
+val register_category:
+  ?group:group -> ?level:int -> help:string -> string -> category
+
+(** Is a given message category currently enabled? *)
+val is_category_enabled: category -> bool
 
 (** Use [Key.callstacks] instead. *)
 val key_callstacks : category
+
+(** {2 Debug categories.} *)
+
+(** Category for debug messages. *)
+type debug_category
+
+(** Registers a debug category. The name is prefixed by [debug:]. *)
+val register_debug_category: help:string -> string -> debug_category
+
+(** Is a given debug category currently enabled? *)
+val is_debug_category_enabled: debug_category -> bool
 
 (** {2 Warning categories.} *)
 
@@ -82,7 +97,7 @@ val result : ?level:int -> ?dkey:category -> 'a pretty_printer
 val feedback : ?ontty:Log.ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
 
 (** Debugging information. *)
-val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
+val debug : ?level:int -> ?dkey:debug_category -> 'a pretty_printer
 
 (** Warnings. *)
 val warning : ?wkey:warn_category -> 'a pretty_printer

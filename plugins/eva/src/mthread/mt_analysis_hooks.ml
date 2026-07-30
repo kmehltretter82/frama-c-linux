@@ -38,7 +38,7 @@ let log_arg analysis =
   let stack = Option.value (Callstack.pop stack) ~default:stack in
   let source = kinstr_to_source (Callstack.top_callsite stack) in
   let append fmt =
-    if Self.is_debug_key_enabled Key.callstacks
+    if Self.is_category_enabled Key.callstacks
     then Format.fprintf fmt "@.%a" Callstack.pretty stack
   in
   source, append

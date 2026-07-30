@@ -51,8 +51,8 @@ let is_public_namespace = String.equal public_taint_namespace
 
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
-let dkey_debug = Self.register_category "debug:taint"
-    ~group:Debug ~help:"print debug states of the taint domain on user directives"
+let dkey_debug = Self.register_debug_category "taint"
+    ~help:"print debug states of the taint domain on user directives"
 
 let wkey =
   Self.register_warn_category "taint"
@@ -179,7 +179,7 @@ module LatticeSingleTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        if Self.is_debug_key_enabled dkey_debug
+        if Self.is_debug_category_enabled dkey_debug
         then pp_state fmt t
         else pp_locs_only fmt t
 
@@ -277,7 +277,7 @@ module LatticeMultiTaint = struct
 
     let pretty fmt t =
       let pp =
-        if Self.is_debug_key_enabled dkey_debug
+        if Self.is_debug_category_enabled dkey_debug
         then LatticeSingleTaint.pp_state
         else LatticeSingleTaint.pp_locs_only
       in

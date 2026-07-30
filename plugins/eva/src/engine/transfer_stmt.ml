@@ -523,7 +523,7 @@ module Make (Engine: Engine_Subset) = struct
   let print_state =
     if Domain.log_category = Domain_product.product_category
     then Domain.pretty
-    else if Self.is_debug_key_enabled Domain.log_category
+    else if Self.is_category_enabled Domain.log_category
     then
       fun fmt state ->
         Format.fprintf fmt "# %s:@ @[<hv>%a@]@ " Domain.name Domain.pretty state
@@ -539,7 +539,7 @@ module Make (Engine: Engine_Subset) = struct
   let show_expr =
     if Domain.log_category = Domain_product.product_category
     then Domain.show_expr
-    else if Self.is_debug_key_enabled Domain.log_category
+    else if Self.is_category_enabled Domain.log_category
     then
       fun valuation state fmt exp ->
         Format.fprintf fmt "# %s: @[<hov>%a@]"

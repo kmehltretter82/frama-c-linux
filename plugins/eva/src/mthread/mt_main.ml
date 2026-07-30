@@ -125,7 +125,7 @@ let print_shared_memory analysis =
   Self.result ~dkey:Key.shared_memory_mutex
     "@[<v 2>Mutexes protecting access to shared memory:@ %a@]"
     Mt_mutexes_types.MutexesByZone.pretty mutexes;
-  if Self.is_debug_key_enabled Key.shared_memory_mutex_details then
+  if Self.is_category_enabled Key.shared_memory_mutex_details then
     let protections = Mt_mutexes.check_protection analysis precise_accesses in
     Self.result ~dkey:Key.shared_memory_mutex_details
       "@[<v 2>Detailed shared memory protections:@ %a@]"

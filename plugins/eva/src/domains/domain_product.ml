@@ -9,7 +9,7 @@
 open Eval
 
 let product_category =
-  Self.register_category ~group:Debug "domain_product" ~help:"inactive category"
+  Self.register_category ~group:Domain "domain_product" ~help:"inactive category"
 
 module Make
     (Context  : Abstract_context.S)
@@ -167,7 +167,7 @@ module Make
   let show_expr =
     let (|-) f g = fun fmt exp -> f fmt exp; g fmt exp in
     let show_expr_one_side category name show_expr = fun fmt exp ->
-      if Self.is_debug_key_enabled category
+      if Self.is_category_enabled category
       then Format.fprintf fmt "@,@]@[<v># %s: @[<hov>%a@]" name show_expr exp
     in
     let right_log = Right.log_category
@@ -197,7 +197,7 @@ module Make
 
   let pretty =
     let print_one_side fmt category name dump state =
-      if Self.is_debug_key_enabled category
+      if Self.is_category_enabled category
       then Format.fprintf fmt "# %s:@ @[<hv>%a@]@ " name dump state
     in
     let right_log = Right.log_category
