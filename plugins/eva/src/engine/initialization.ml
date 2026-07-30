@@ -440,7 +440,7 @@ module Make (Engine: Engine_Subset) = struct
       with Base.Not_a_C_variable -> true
     in
     let cvalue_state = Cvalue.Model.filter_base print_base cvalue_state in
-    Self.printf ~dkey:Key.initial_state
+    Self.printf ~mkey:Key.initial_state
       ~header:(fun fmt -> Format.pp_print_string fmt
                   "Values of globals at initialization")
       "@[  %a@]" Cvalue.Model.pretty cvalue_state
@@ -454,9 +454,9 @@ module Make (Engine: Engine_Subset) = struct
         let* state = global_state ~lib_entry in
         supplied_state state cvalue_state
       | None ->
-        Self.feedback ~dkey:Key.progress "Computing initial state";
+        Self.feedback ~mkey:Key.progress "Computing initial state";
         let state = global_state ~lib_entry in
-        Self.feedback ~dkey:Key.progress "Initial state computed";
+        Self.feedback ~mkey:Key.progress "Initial state computed";
         state
     in
     let thread = Thread.(id main) in

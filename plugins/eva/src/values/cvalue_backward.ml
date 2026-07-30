@@ -23,12 +23,12 @@ let backward_int_relation typ op v1 v2 =
     if not (Cvalue.V.equal v1 v1' || Cvalue.V.is_bottom v1') then
       Self.result
         ~current:true ~once:true
-        ~dkey:Key.pointer_comparison
+        ~mkey:Key.pointer_comparison
         "not reducing %a to %a because of UPCPA" V.pretty v1 V.pretty v1';
     if not (Cvalue.V.equal v2 v2' || Cvalue.V.is_bottom v2') then
       Self.result
         ~current:true ~once:true
-        ~dkey:Key.pointer_comparison
+        ~mkey:Key.pointer_comparison
         "not reducing %a to %a because of UPCPA" V.pretty v2 V.pretty v2';
     None
   end

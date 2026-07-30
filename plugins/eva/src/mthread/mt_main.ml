@@ -117,17 +117,17 @@ let pre_analysis () =
 
 (* Print information about shared memory detected by the analysis. *)
 let print_shared_memory analysis =
-  Self.result ~dkey:Key.shared_memory_zone
+  Self.result ~mkey:Key.shared_memory_zone
     "@[<hov 2>Shared memory:@ %a@]"
     Memory_zone.pretty analysis.precise_concurrent_accesses;
   let precise_accesses = analysis.concurrent_accesses_by_nodes in
   let mutexes = Mt_mutexes.mutexes_protecting_zones' precise_accesses in
-  Self.result ~dkey:Key.shared_memory_mutex
+  Self.result ~mkey:Key.shared_memory_mutex
     "@[<v 2>Mutexes protecting access to shared memory:@ %a@]"
     Mt_mutexes_types.MutexesByZone.pretty mutexes;
-  if Self.is_category_enabled Key.shared_memory_mutex_details then
+  if Self.is_message_category_enabled Key.shared_memory_mutex_details then
     let protections = Mt_mutexes.check_protection analysis precise_accesses in
-    Self.result ~dkey:Key.shared_memory_mutex_details
+    Self.result ~mkey:Key.shared_memory_mutex_details
       "@[<v 2>Detailed shared memory protections:@ %a@]"
       Mt_mutexes.pretty_protections protections;
     let ill_protected = Mt_mutexes.ill_protected precise_accesses protections in
@@ -141,7 +141,7 @@ let print_shared_memory analysis =
           Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
           Memory_zone.pretty z
       in
-      Self.result ~dkey:Key.shared_memory_mutex_details
+      Self.result ~mkey:Key.shared_memory_mutex_details
         "Statements needing manual synchronisation@.%a"
         (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync
 
@@ -173,18 +173,18 @@ let print_data_races analysis =
   let ww_accesses, rw_accesses =
     List.partition is_write_only unprotected_accesses
   in
-  Self.result ~dkey:Key.data_races
+  Self.result ~mkey:Key.data_races
     "@[<v 2>Possible read/write data races:@ %a@]"
     Mt_mutexes.pretty_with_mutexes rw_accesses;
   if Mt_options.WriteWriteRaces.get () then
-    Self.result ~dkey:Key.data_races
+    Self.result ~mkey:Key.data_races
       "@[<v 2>Possible write/write data races:@ %a@]"
       Mt_mutexes.pretty_with_mutexes ww_accesses
 
 
 let post_analysis analysis =
   if not (Mt_thread.needs_recomputation analysis) then
-    Self.feedback ~dkey:Key.thread_fixpoint
+    Self.feedback ~mkey:Key.thread_fixpoint
       "Analysis performed in %d iterations" analysis.iteration
   else
     Self.warning

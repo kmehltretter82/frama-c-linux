@@ -33,16 +33,19 @@ exception Abort
     Categories without group are standard messages listed first. *)
 type group = Concurrency | Domain
 
+(** Category for feedback, result or printf messages. *)
+type message_category
+
 (** Same as Log's {!register_category}, but [help] is mandatory, and a group and
     verbosity level can be associated to the category. *)
-val register_category:
-  ?group:group -> ?level:int -> help:string -> string -> category
+val register_message_category:
+  ?group:group -> ?level:int -> help:string -> string -> message_category
 
 (** Is a given message category currently enabled? *)
-val is_category_enabled: category -> bool
+val is_message_category_enabled: message_category -> bool
 
 (** Use [Key.callstacks] instead. *)
-val key_callstacks : category
+val key_callstacks : message_category
 
 (** {2 Debug categories.} *)
 
@@ -91,10 +94,11 @@ type ('a,'b) pretty_aborter =
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 (** Results of analysis. *)
-val result : ?level:int -> ?dkey:category -> 'a pretty_printer
+val result : ?level:int -> ?mkey:message_category -> 'a pretty_printer
 
 (** Progress and feedback. *)
-val feedback : ?ontty:Log.ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
+val feedback :
+  ?ontty:Log.ontty -> ?level:int -> ?mkey:message_category -> 'a pretty_printer
 
 (** Debugging information. *)
 val debug : ?level:int -> ?dkey:debug_category -> 'a pretty_printer
@@ -113,6 +117,12 @@ val failure : 'a pretty_printer
 
 (** Internal error stopping the plug-in. *)
 val fatal   : ('a,'b) pretty_aborter
+
+(** Output on [stdout]. *)
+val printf :
+  ?level:int -> ?mkey:message_category -> ?current:bool -> ?source:Fileloc.t ->
+  ?append:(Format.formatter -> unit) -> ?header:(Format.formatter -> unit) ->
+  ('a, Format.formatter,unit) format -> 'a
 
 
 (** Called at the beginning of the analysis to configure Eva verbosity,

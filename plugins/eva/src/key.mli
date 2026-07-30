@@ -10,33 +10,33 @@ open Self
 
 (** {2 Message categories.} *)
 
-val summary : category
-val show: category
-val pointer_comparison: category
-val widening : category
-val partition : category
-val split_return : category
-val precision_settings : category
-val progress : category
-val callstacks : category
+val summary : message_category
+val show: message_category
+val pointer_comparison: message_category
+val widening : message_category
+val partition : message_category
+val split_return : message_category
+val precision_settings : message_category
+val progress : message_category
+val callstacks : message_category
 
-val thread_fixpoint : category
-val thread : category
-val mutex : category
-val queue : category
-val data_races : category
-val shared_memory_zone : category
-val shared_memory_mutex : category
-val shared_memory_mutex_details : category
-val shared_memory_by_iteration : category
-val shared_memory_values : category
-val global_accesses : category
+val thread_fixpoint : message_category
+val thread : message_category
+val mutex : message_category
+val queue : message_category
+val data_races : message_category
+val shared_memory_zone : message_category
+val shared_memory_mutex : message_category
+val shared_memory_mutex_details : message_category
+val shared_memory_by_iteration : message_category
+val shared_memory_values : message_category
+val global_accesses : message_category
 
-val cvalue_domain: category
+val cvalue_domain: message_category
 
 (** Categories for printing initial and final states of cvalue domain. *)
-val initial_state : category
-val final_states : category
+val initial_state : message_category
+val final_states : message_category
 
 (** {2 Debug categories.} *)
 

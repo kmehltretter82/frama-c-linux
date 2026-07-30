@@ -158,9 +158,11 @@ let register_debug_category ~help name =
   Hashtbl.replace key_kind_tbl category Debug;
   category
 
+type message_category = category
+
 (* Makes the help message mandatory and adds an optional verbosity level
    and an optional group. *)
-let register_category ?group ?level ~help name =
+let register_message_category ?group ?level ~help name =
   assert (not (Stdlib.String.starts_with ~prefix:"debug" name));
   let default = Option.fold ~none:false ~some:((>=) default_verbosity) level in
   let category = register_category ~help ~default name in
@@ -186,7 +188,7 @@ let register_warn_category ~help ?default name =
   Option.iter (Hashtbl.replace wkey_verbosity category) level;
   category
 
-let is_category_enabled = is_debug_key_enabled
+let is_message_category_enabled = is_debug_key_enabled
 let is_debug_category_enabled = is_debug_key_enabled
 
 (* ----- Help message about categories -------------------------------------- *)
@@ -264,11 +266,11 @@ let () =
 (* ----- Log with positions ------------------------------------------------- *)
 
 let key_callstacks =
-  register_category "callstacks" ~level:9
+  register_message_category "callstacks" ~level:9
     ~help:"print the current callstack alongside some messages"
 
 let key_callstack_hash =
-  register_category "callstack-hash" ~level:9
+  register_message_category "callstack-hash" ~level:9
     ~help:"additionally print the current callstack hash in some messages"
 
 type 'a pretty_printer =
@@ -284,11 +286,11 @@ type ('a,'b) pretty_aborter =
 
 let append_callstack ?(stacktrace=false) ?append ~callstack fmt =
   let pretty_hash fmt cs =
-    if is_category_enabled key_callstack_hash then
+    if is_message_category_enabled key_callstack_hash then
       Format.fprintf fmt "<%a> " Callstack.pretty_hash cs
   in
   Option.iter (fun append -> append fmt) append;
-  if stacktrace && is_category_enabled key_callstacks then
+  if stacktrace && is_message_category_enabled key_callstacks then
     match callstack with
     | None -> ()
     | Some cs ->
@@ -318,11 +320,13 @@ let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
 let lift_printer (printer : 'a Log.pretty_printer) : 'a pretty_printer =
   fun ?emitwith ?once -> lift_aborter (printer ?emitwith ?once)
 
-let result ?level ?dkey =
-  lift_printer (result ?level ?dkey)
+let result ?level ?mkey =
+  lift_printer (result ?level ?dkey:mkey)
 
-let feedback ?ontty ?level ?dkey  =
-  lift_printer (feedback ?ontty ?level ?dkey )
+let feedback ?ontty ?level ?mkey  =
+  lift_printer (feedback ?ontty ?level ?dkey:mkey)
+
+let printf ?level ?mkey = printf ?level ?dkey:mkey
 
 let debug ?level ?dkey =
   lift_printer (debug ?level ?dkey)

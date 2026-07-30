@@ -1272,7 +1272,7 @@ module D = struct
 
   let output_dot (filename : Filepath.t) state =
     let out = open_out (Filepath.to_string_abs filename) in
-    Self.feedback ~dkey:log_category "@[Output dot produced to %a.@]"
+    Self.feedback ~mkey:log_category "@[Output dot produced to %a.@]"
       Filepath.pretty filename;
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
     close_out out
@@ -1284,7 +1284,7 @@ module D = struct
       | _ -> assert false in
     let header fmt = Format.fprintf fmt "Trace domains:" in
     let body = Bottom.pretty Traces.pretty in
-    Self.printf ~dkey:log_category ~header " @[%a@]" body state;
+    Self.printf ~mkey:log_category ~header " @[%a@]" body state;
     if Parameters.TracesProject.get () ||
        not (Parameters.TracesDot.is_default ()) then
       match state with

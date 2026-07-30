@@ -83,7 +83,7 @@ let emit_status ppt status =
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True
-  then Self.result ~dkey:Key.progress ?current ?once ?source fmt
+  then Self.result ~mkey:Key.progress ?current ?once ?source fmt
   else Self.warning ~wkey:Key.warn_alarm ?current ?once ?source ?stacktrace fmt
 
 let behavior_inactive fmt =

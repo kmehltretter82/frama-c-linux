@@ -47,7 +47,7 @@ module type LeafDomain = sig
 
   module Store: Domain_store.S with type t := t
 
-  val log_category: Self.category
+  val log_category: Self.message_category
 
   val key: t Abstract_domain.key
 end
@@ -93,7 +93,7 @@ module Complete (Domain: InputDomain) = struct
       Format.asprintf
         "print states of the %s domain" Domain.name
     in
-    Self.register_category ~group:Domain ("d-" ^ Domain.name) ~help
+    Self.register_message_category ~group:Domain ("d-" ^ Domain.name) ~help
 
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name

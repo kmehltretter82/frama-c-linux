@@ -59,7 +59,7 @@ let post_thread_analysis analysis =
       th.th_eva_thread
   in
   th.th_read_written <- read_written;
-  Self.feedback ~dkey:Key.global_accesses
+  Self.feedback ~mkey:Key.global_accesses
     "@[<v 2>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
   Self.debug "Shared variables computed.";
@@ -84,7 +84,7 @@ let post_thread_analysis analysis =
 (* We compute a value analysis for the given thread *)
 let pre_thread_analysis analysis th =
   let entry_point = Thread.entry_point th.th_eva_thread in
-  Self.feedback ~dkey:Key.thread_fixpoint
+  Self.feedback ~mkey:Key.thread_fixpoint
     "@[<hov 2>Analyzing thread %a starting at %a,@ iteration %d@ (%a).@]"
     ThreadState.pretty th Kernel_function.pretty entry_point analysis.iteration
     SetRecomputeReason.pretty th.th_to_recompute;
@@ -173,7 +173,7 @@ let compute_shared_vars analysis =
     if not (Memory_zone.equal all_zones analysis.concurrent_accesses)
     then (
       let before = analysis.concurrent_accesses in
-      Self.feedback ~dkey:Key.shared_memory_by_iteration
+      Self.feedback ~mkey:Key.shared_memory_by_iteration
         "@[<v>Concurrent imprecise accesses have changed: \
          before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
@@ -197,7 +197,7 @@ let compute_shared_vars analysis =
     if not (Memory_zone.equal all_zones analysis.precise_concurrent_accesses)
     then (
       let before = analysis.precise_concurrent_accesses in
-      Self.feedback ~dkey:Key.shared_memory_by_iteration
+      Self.feedback ~mkey:Key.shared_memory_by_iteration
         "@[<v>Concurrent precise var accesses have changed: before@ \
          @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
@@ -230,7 +230,7 @@ let store_written_value analysis lw =
     if changed then
       recompute_shared_vars_values_changed analysis th old_written written;
     if not Cvalue.Model.(equal Cvalue.Model.empty_map written) then
-      Self.feedback ~dkey:Key.shared_memory_values
+      Self.feedback ~mkey:Key.shared_memory_values
         "@[Write summary for %a%t:@ %a@]"
         ThreadState.pretty th
         (fun fmt -> if changed then Format.fprintf fmt " (updated)")

@@ -507,7 +507,7 @@ module type S = sig
 
   (** Category for the messages about the domain.
       Created by {!Domain_builder.Complete} using the domain name. *)
-  val log_category : Self.category
+  val log_category : Self.message_category
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can

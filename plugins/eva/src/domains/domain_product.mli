@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val product_category: Self.category
+val product_category: Self.message_category
 
 module Make
     (Context  : Abstract_context.S)

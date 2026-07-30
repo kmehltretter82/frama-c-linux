@@ -25,103 +25,103 @@ open Self
 let callstacks = Self.key_callstacks
 
 let cvalue_domain =
-  register_category "d-cvalue" ~group:Domain ~level:0
+  register_message_category "d-cvalue" ~group:Domain ~level:0
     ~help:"print states of the cvalue domain"
 
 let show =
-  register_category "show" ~level:2
+  register_message_category "show" ~level:2
     ~help:"show values/states inferred by the analysis on directives \
            such as Frama_C_show_each and Frama_C_dump_each"
 
 let initial_state =
-  register_category "initial-state" ~level:5
+  register_message_category "initial-state" ~level:5
     ~help:"at the start of the analysis, \
            print the initial value of global variables"
 
 let final_states =
-  register_category "final-states" ~level:5
+  register_message_category "final-states" ~level:5
     ~help:"at the end of the analysis, print final values inferred \
            at the return point of each analyzed function "
 
 let summary =
-  register_category "summary" ~level:1
+  register_message_category "summary" ~level:1
     ~help:"print a summary of the analysis at the end, including coverage \
            and alarm numbers"
 
 let pointer_comparison =
-  register_category "pointer-comparison" ~level:7
+  register_message_category "pointer-comparison" ~level:7
     ~help:"messages about the evaluation of pointer comparisons"
 
 let widening =
-  register_category "widening" ~level:7
+  register_message_category "widening" ~level:7
     ~help:"print a message at each point where the analysis applies a widening"
 
 let partition =
-  register_category "partition" ~level:4
+  register_message_category "partition" ~level:4
     ~help:"messages about states partitioning"
 
 let split_return =
-  register_category "split-return" ~level:4
+  register_message_category "split-return" ~level:4
     ~help:"messages related to option -eva-split-return"
 
 let precision_settings =
-  register_category "precision-settings" ~level:3
+  register_message_category "precision-settings" ~level:3
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
 
 let progress =
-  register_category "progress" ~level:10
+  register_message_category "progress" ~level:10
     ~help:"messages about the analysis progress in the C code"
 
 (* ----- Mthread message categories ----------------------------------------- *)
 
 let thread_fixpoint =
-  register_category "thread-fixpoint" ~group:Concurrency ~level:3
+  register_message_category "thread-fixpoint" ~group:Concurrency ~level:3
     ~help:"progress of the analysis fixpoint on threads"
 
 let thread =
-  register_category "thread" ~group:Concurrency ~level:4
+  register_message_category "thread" ~group:Concurrency ~level:4
     ~help:"show each operation on threads interpreted by the analysis"
 
 let mutex =
-  register_category "mutex" ~group:Concurrency ~level:8
+  register_message_category "mutex" ~group:Concurrency ~level:8
     ~help:"show each operation on mutexes interpreted by the analysis"
 
 let queue =
-  register_category "message-queue" ~group:Concurrency ~level:8
+  register_message_category "message-queue" ~group:Concurrency ~level:8
     ~help:"show each operation on message queues interpreted by the analysis"
 
 let data_races =
-  register_category "data-races" ~group:Concurrency ~level:3
+  register_message_category "data-races" ~group:Concurrency ~level:3
     ~help:"list of possible data-races detected by the analysis"
 
 (* Created for documentation. *)
 let _shared_memory =
-  register_category "shared-memory" ~group:Concurrency
+  register_message_category "shared-memory" ~group:Concurrency
     ~help:"all messages about shared memory"
 
 let shared_memory_zone =
-  register_category "shared-memory:zone" ~group:Concurrency ~level:3
+  register_message_category "shared-memory:zone" ~group:Concurrency ~level:3
     ~help:"list of shared memory locations detected by the analysis"
 
 let shared_memory_mutex =
-  register_category "shared-memory:mutex" ~group:Concurrency ~level:4
+  register_message_category "shared-memory:mutex" ~group:Concurrency ~level:4
     ~help:"list of mutexes protecting access to each shared memory location"
 
 let shared_memory_mutex_details =
-  register_category "shared-memory:mutex-details" ~group:Concurrency ~level:6
+  register_message_category "shared-memory:mutex-details" ~group:Concurrency ~level:6
     ~help:"more details about mutexes protecting access to shared memory"
 
 let shared_memory_by_iteration =
-  register_category "shared-memory:iteration" ~group:Concurrency ~level:7
+  register_message_category "shared-memory:iteration" ~group:Concurrency ~level:7
     ~help:"evolution of shared memory detected at each analysis iteration"
 
 let shared_memory_values =
-  register_category "shared-memory:values" ~group:Concurrency ~level:8
+  register_message_category "shared-memory:values" ~group:Concurrency ~level:8
     ~help:"values read and written in shared memory during the analysis"
 
 let global_accesses =
-  register_category "global-accesses" ~group:Concurrency ~level:11
+  register_message_category "global-accesses" ~group:Concurrency ~level:11
     ~help:"print all accesses to global variables during the analysis"
 
 (* ----- Debug categories ------------------------------------------- *)

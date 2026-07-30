@@ -630,7 +630,7 @@ module Make (Engine : Engine_Subset) = struct
     in
     let compute () =
       let results = Dataflow.compute () in
-      Self.feedback ~dkey:Key.progress
+      Self.feedback ~mkey:Key.progress
         "Recording results for %a" Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in

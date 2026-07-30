@@ -666,7 +666,7 @@ module Make
         if Ast_types.C.is_ptr typ_arg then
           Self.result
             ~current:true ~once:true
-            ~dkey:Key.pointer_comparison
+            ~mkey:Key.pointer_comparison
             "evaluating condition to {0; 1} instead of %a because of %s"
             (Bottom.pretty pretty_cvalue) result
             Parameters.UndefinedPointerComparisonPropagateAll.name;

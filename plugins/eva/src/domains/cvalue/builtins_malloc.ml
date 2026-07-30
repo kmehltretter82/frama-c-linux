@@ -11,16 +11,16 @@ open Abstract_interp
 open Cvalue
 open Lattice_bounds
 
-let dkey = Self.register_category "malloc" ~level:6
+let mkey = Self.register_message_category "malloc" ~level:6
     ~help:"messages from builtins interpreting dynamic allocations"
 
-let dkey_new = Self.register_category "malloc:new" ~level:3
+let key_new = Self.register_message_category "malloc:new" ~level:3
     ~help:"messages emitted at the creation of new bases"
 
-let dkey_auto_free = Self.register_category "malloc:automatic-free" ~level:4
+let key_auto_free = Self.register_message_category "malloc:automatic-free" ~level:4
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
 
-let debug_key =
+let dkey =
   Self.register_debug_category "malloc"
     ~help:"debug messages from builtins interpreting dynamic allocations"
 
@@ -325,7 +325,7 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
-  Self.result ~dkey:dkey_new ~current:true ~once:true ~stacktrace:true
+  Self.result ~mkey:key_new ~current:true ~once:true ~stacktrace:true
     "@[allocating %svariable %a@]"
     (if weak = Weak then "weak " else "") Printer.pp_varinfo var;
   let size_char = Bit_utils.sizeofchar () in
@@ -424,7 +424,7 @@ let update_variable_validity ?(make_weak=false) base sizev =
     if not (Z.equal variable_v.Base.min_alloc min_sure_bits) ||
        not (Z.equal variable_v.Base.max_alloc max_valid_bits)
     then begin
-      Self.result ~dkey ~current:true ~once:false
+      Self.result ~mkey ~current:true ~once:false
         "@[resizing variable `%a'@ (%a) to fit %a@]"
         Printer.pp_varinfo vi
         pp_validity (variable_v.Base.min_alloc, variable_v.Base.max_alloc)
@@ -625,11 +625,11 @@ let resolve_bases_to_free arg =
 let free_aux state ~strong bases_to_remove  =
   (* TODO: reduce on arg if it is an lval *)
   if strong then begin
-    Self.debug ~current:true ~dkey:debug_key "strong free on bases: %a"
+    Self.debug ~current:true ~dkey "strong free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:true bases_to_remove state
   end else begin
-    Self.debug ~current:true ~dkey:debug_key "weak free on bases: %a"
+    Self.debug ~current:true ~dkey "weak free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:false bases_to_remove state
   end
@@ -686,7 +686,7 @@ let free_automatic_bases stack state =
   in
   if Base.Hptset.is_empty bases_to_free then state
   else begin
-    Self.result ~dkey:dkey_auto_free ~current:true ~once:true
+    Self.result ~mkey:key_auto_free ~current:true ~once:true
       "freeing automatic bases: %a" Base.Hptset.pretty bases_to_free;
     let state', _changed = free_aux state ~strong:true bases_to_free in
     (* TODO: propagate 'freed' bases for From? *)
@@ -732,7 +732,7 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
    be created: if [Weak], convergence is ensured using a malloc builtin
    that converges.  If [Strong], a new base is created for each call. *)
 let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
-  Self.debug ~dkey:debug_key "bases_to_realloc: %a"
+  Self.debug ~dkey "bases_to_realloc: %a"
     Base.Hptset.pretty bases_to_realloc;
   assert (not (Model.(equal state bottom || equal state top)));
   let _size_valid, size_max = extract_size sizev in (* bytes everywhere *)
