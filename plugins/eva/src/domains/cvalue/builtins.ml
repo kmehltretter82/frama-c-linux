@@ -84,10 +84,6 @@ let print_builtins_and_exit () =
   Self.printf ~header "@[<v>%t@]" print_builtin_list;
   raise Cmdline.Exit
 
-let () =
-  Cmdline.run_after_configuring_stage
-    (fun () -> if Parameters.BuiltinsList.get () then print_builtins_and_exit ())
-
 (* -------------------------------------------------------------------------- *)
 (* --- Prepare builtins for an analysis                                   --- *)
 (* -------------------------------------------------------------------------- *)

@@ -52,7 +52,7 @@ Help message about Eva abstract domains.
                          traces that lead to a statement.
 
 Help message about Eva builtins.
-  $ frama-c -eva-builtins-list -no-autoload-plugins -load-module eva,eva.apron
+  $ frama-c -eva-help-builtins -no-autoload-plugins -load-module eva,eva.apron
   [eva] List of Eva builtins:
   
   ** Automatic replacements:

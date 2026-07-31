@@ -40,3 +40,6 @@ val find_builtin_override:
 val apply_builtin:
   builtin -> call -> pre:Cvalue.Model.t -> post:Cvalue.Model.t ->
   result list * cacheable
+
+(** Print help message about builtins. *)
+val print_builtins_and_exit: unit -> Cmdline.exit

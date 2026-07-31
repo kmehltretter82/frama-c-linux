@@ -919,16 +919,6 @@ module BuiltinsAuto =
 let () = add_correctness_dep BuiltinsAuto.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-let () = Parameter_customize.set_negative_option_name ""
-module BuiltinsList =
-  False
-    (struct
-      let option_name = "-eva-builtins-list"
-      let help = "List existing builtins, and which functions they \
-                  are automatically associated to (if any)"
-    end)
-
-let () = Parameter_customize.set_group precision_tuning
 module SubdivideNonLinear =
   Zero
     (struct
@@ -1348,7 +1338,6 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module ILevel), "-val-ilevel"
   ; (module BuiltinsOverrides), "-val-builtin"
   ; (module BuiltinsAuto), "-val-builtins-auto"
-  ; (module BuiltinsList), "-val-builtins-list"
   ; (module SubdivideNonLinear), "-val-subdivide-non-linear"
   ; (module UseSpec), "-val-use-spec"
   ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
