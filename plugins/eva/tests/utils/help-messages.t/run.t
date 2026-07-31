@@ -1,5 +1,59 @@
+Only load used plugins.
+  $ alias frama-c="frama-c -no-autoload-plugins -load-module eva,eva.apron"
+
+Main help message about Eva.
+  $ frama-c -eva-help
+  [eva] Help of the Eva plugin.
+  
+  Goal: Proving the absence of run-time errors. Eva emits an alarm at each
+    program point where it cannot prove the absence of an undefined behavior.
+    It can also prove some user-written annotations.
+  Domains: Eva uses abstract interpretation to infer various properties about
+    programs via analysis domains. The default domain computes the set of
+    possible values for each program variable. Additional domains can infer
+    relations between variables or more precise memory invariants.
+  Soundness: Eva captures all possible behaviors of the program execution. If
+    an analysis emits no alarm, then the analyzed program is free of the class
+    of undefined behaviors detected by Eva. However, false alarms may be issued
+    on correct code when the analysis is not precise enough to prove it.
+  Configuration: While the analysis is automatic, many options are available to
+    finely configure its behavior, guide the analysis towards better results
+    and reach a suitable balance between precision and efficiency.
+  
+  Main Eva parameters are:
+    -eva           : Run the Eva analysis.
+    -main          : Select the entry point of the analysis.
+    -lib-entry     : Treat the entry point as a library function and not a
+                     complete application.
+    -eva-domains   : Enable additional analysis domains.
+    -eva-precision : Quick configuration of the analysis precision from 0
+                     (fastest but rather imprecise analysis) to 11 (accurate
+                     but potentially slow analysis).
+    -eva-verbose   : Quick configuration of the analysis verbosity from 0 (no
+                     message) to 11 (most messages). Defaults to 5.
+    -mthread       : Enable analysis of concurrent programs (experimental).
+  
+  A typical invocation of Eva looks like: frama-c file.c -eva -eva-precision 2
+  Analysis results can be inspected in detail in the Frama-C GUI.
+  
+  More help is available:
+    -eva-help-domains  : list and description of available analysis domains
+    -eva-help-options  : list and description of all Eva parameters
+    -eva-help-messages : help about analysis verbosity and message categories
+    -eva-help-warnings : help about warnings emitted by Eva
+    -eva-help-builtins : list of builtins used to interpret some libc functions
+  
+  The complete user manual is available at https://frama-c.com/download/frama-c-eva-manual.pdf
+
+The rest of the file tests the output of each -eva-help-* parameters,
+except -eva-help-options which is tested by tests/misc/help-messages.i.
+
 Help message about Eva abstract domains.
-  $ frama-c -no-autoload-plugins -load-module eva,eva.apron -eva-domains help
+-eva-help-domains and -eva-domains help have the same output
+  $ frama-c -eva-help-domains > help-domains.txt
+  $ frama-c -eva-domains help > domains-help.txt
+  $ diff help-domains.txt domains-help.txt
+  $ cat help-domains.txt
   [eva] List of available domains:
     cvalue               Main analysis domain, enabled by default. Should not be
                          disabled.
@@ -52,7 +106,7 @@ Help message about Eva abstract domains.
                          traces that lead to a statement.
 
 Help message about Eva builtins.
-  $ frama-c -eva-help-builtins -no-autoload-plugins -load-module eva,eva.apron
+  $ frama-c -eva-help-builtins
   [eva] List of Eva builtins:
   
   ** Automatic replacements:
@@ -92,7 +146,11 @@ Help message about Eva builtins.
      Frama_C_wcslen, Frama_C_wmemchr
 
 Help message about message categories.
-  $ frama-c -no-autoload-plugins -load-module eva,eva.apron -eva-msg-key help
+-eva-help-messages and -eva-msg-key help have the same output.
+  $ frama-c -eva-help-messages > help-messages.txt
+  $ frama-c -eva-msg-key help > messages-help.txt
+  $ diff help-messages.txt messages-help.txt
+  $ cat help-messages.txt
   [eva] List of message categories.
   
   # Standard Eva message categories:
@@ -220,3 +278,49 @@ Help message about message categories.
       3: garbled-mix:assigns garbled-mix:summary garbled-mix:write recursion
       4: acsl acsl:unsupported assigns:invalid-location loop-unroll:auto
          loop-unroll:partial
+
+Help message about warning categories.
+-eva-help-warnings and -eva-warn-key help have the same output.
+  $ frama-c -eva-help-warnings > help-warnings.txt
+  $ frama-c -eva-warn-key help > warnings-help.txt
+  $ diff help-warnings.txt warnings-help.txt
+  $ cat help-warnings.txt
+  [eva] Warning categories for eva are
+      *                        : warning  : All warning categories
+      acsl                     : feedback : messages about evaluation of ACSL terms and predicates
+      acsl:unsupported         : feedback : messages about ACSL terms not supported by Eva
+      alarm                    : warning  : warnings for each possible undefined behavior detected by the analysis
+      assigns                  : warning  : warnings related to the interpretation of assigns clauses in ACSL specification
+      assigns:invalid-location : feedback : the memory location targeted by an assigns clause is invalid in at least one analysis state
+      assigns:missing          : error    : assigns clauses are missing or incomplete from an ACSL specification on which the analysis soundness relies
+      assigns:missing-result   : warning  : an assigns \result clause is missing from an ACSL specification on which the analysis soundness relies
+      builtins                 : warning  : warnings related to builtins used to interpret some libc functions
+      builtins:missing-spec    : warning  : the ACSL specification on which a builtin soundness relies is missing
+      builtins:override        : warning  : a builtin overrides a function definition, which is therefore not analyzed
+      ensures-false            : warning  : a post-condition evaluates to false; there might be an error in the specification
+      experimental             : warning  : an experimental feature of Eva is enabled
+      garbled-mix              : warning  : warnings about very imprecise values inferred for pointers, named garbled mix
+      garbled-mix:assigns      : feedback : the interpretation of a specification creates a garbled mix
+      garbled-mix:summary      : feedback : list the origins of garbled mix at the end of an analysis
+      garbled-mix:write        : feedback : the interpretation of an assignment creates a garbled mix
+      libc                     : warning  : warnings related to the interpretation of the standard C library
+      libc:unsupported-spec    : warning  : the ACSL specification of a libc function is not supported by Eva
+      locals-escaping          : warning  : a pointer p points to an out of scope local variable (any use of p also generates an alarm)
+      loop-unroll              : warning  : messages about loop unrolling
+      loop-unroll:auto         : feedback : a loop is automatically unrolled by -eva-auto-loop-unroll
+      loop-unroll:missing      : inactive : a loop has no unroll annotation
+      loop-unroll:missing:for  : inactive : a for loop has no unroll annotation
+      loop-unroll:partial      : feedback : a loop has been partially but not completely unrolled
+      malloc                   : warning  : warnings related to builtins interpreting dynamic allocation
+      malloc:imprecise         : warning  : a single "weak" variable is used to represent all dynamic allocations, which is very imprecise
+      malloc:weak              : inactive : a same "weak" variable is used to represent multiple dynamic allocations, which is rather imprecise
+      recursion                : feedback : a recursive call is analyzed
+      secure-flow              : warning  : warnings related to secure-flow analysis from "-eva-domains taint"
+      secure-flow:condition    : warning  : warnings related to interference on conditions when performing secure-flow analysis from "-eva-domains taint"
+      secure-flow:direct       : warning  : warnings related to direct interference when performing secure-flow analysis from "-eva-domains taint"
+      secure-flow:indirect     : warning  : warnings related to indirect interference when performing secure-flow analysis from "-eva-domains taint"
+      signed-overflow          : warning  : two's complement is used to interpret a signed overflow (when signed overflow alarms are disabled)
+      taint                    : warning  : warnings related to the taint analysis from "-eva-domains taint"
+      unknown-size             : warning  : the analysis cannot compute the size of a variable, which will thus be very imprecise
+      volatile                 : warning  : a non-volatile lvalue may point to a volatile memory location
+      watchpoint               : feedback : undocumented
