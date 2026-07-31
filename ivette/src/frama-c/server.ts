@@ -16,6 +16,7 @@
  @module frama-c/server
 */
 
+import * as Fs from 'fs';
 import { debounce } from 'lodash';
 import * as Path from 'path';
 import React from 'react';
@@ -247,7 +248,13 @@ export async function start(): Promise<void> {
       try {
         await _launch();
       } catch (error) {
-        buffer.append('[frama-c]', error, '\n');
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT'
+          && 'path' in error) {
+          buffer.append('Error: program "' + String(error.path) +
+            '" not found in PATH.\n');
+        } else {
+          buffer.append('[frama-c]', error, '\n');
+        }
         _exit(false);
       }
       return;
@@ -469,10 +476,24 @@ function rsplit(s: string, delim: string): string[] {
 }
 
 async function _launch(): Promise<void> {
+
+  // We assume that frama-c-gui is installed in './lib/frama-c/ivette',
+  // and frama-c is in './bin'.
+  // If that fails, we try 'frama-c' in the PATH.
+  const framacGuiDir = Path.dirname(window.electron.argv[0]);
+  const guiPathSuffix = Path.join("lib", "frama-c", "ivette");
+  const framacDirPrefix = framacGuiDir.endsWith(guiPathSuffix) ?
+    framacGuiDir.slice(0, -guiPathSuffix.length) : framacGuiDir;
+  let framacBin = Path.resolve(framacDirPrefix, "bin/frama-c");
+  if (!Fs.existsSync(framacBin)) {
+    // frama-c binary not in expected directory, assuming it is in PATH)
+    framacBin = 'frama-c';
+  }
+
   let {
     env,
     working,
-    command = 'frama-c',
+    command = framacBin,
     params,
     sockdomain,
     sockaddr,
