@@ -53,18 +53,36 @@ async function openSourceFile(
     .replace('%c', pos.column.toString())
     .split(' ');
   const prog = args.shift(); if (!prog) return;
-  System.spawn(prog, args).catch(() => {
-    const filename = Path.basename(file);
-    Dialogs.showMessageBox({
-      kind: 'error',
-      message: `File ${filename} could not be opened with ${prog}`,
-      details: (
-        `\nThe command "${prog} ${args}" failed.\n\n`
-        + 'This command can be changed in the preferences.'
-      ),
-      buttons: [{ label: "Ok" }],
+  System.spawn(prog, args)
+    .then(result => {
+      result.once("close", (code, _signal) => {
+        if (code !== 0) {
+          Dialogs.showMessageBox({
+            kind: 'error',
+            message: `Non-zero exit code in external command`,
+            details: (
+              `\nThe external command returned non-zero `
+                + `(${code}):\n\n`
+                + `${prog} ${args}\n\n`
+                + 'This command can be changed in the preferences.'
+            ),
+            buttons: [{ label: "Ok" }],
+          });
+        }
+      });
+    })
+    .catch(() => {
+      const filename = Path.basename(file);
+      Dialogs.showMessageBox({
+        kind: 'error',
+        message: `File ${filename} could not be opened with ${prog}`,
+        details: (
+          `\nThe command "${prog} ${args}" failed.\n\n`
+            + 'This command can be changed in the preferences.'
+        ),
+        buttons: [{ label: "Ok" }],
+      });
     });
-  });
 }
 
 // Toplevel Declaration Markers
