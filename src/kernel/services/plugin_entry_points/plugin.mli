@@ -78,6 +78,9 @@ module type S_no_log = sig
   *)
   module State_dir (): Parameter_sig.User_dir_opt
 
+  (** Parameter -*-help. *)
+  module Help: Parameter_sig.Bool
+
   val help: Cmdline.Group.t
   (** The group containing option -*-help.
       @since Boron-20100401 *)

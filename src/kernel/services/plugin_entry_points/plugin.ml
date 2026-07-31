@@ -37,6 +37,7 @@ module type S_no_log = sig
   module Cache_dir () : Parameter_sig.User_dir_opt
   module Config_dir () : Parameter_sig.User_dir_opt
   module State_dir () : Parameter_sig.User_dir_opt
+  module Help: Parameter_sig.Bool
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
   val grp_debug: Cmdline.Group.t
