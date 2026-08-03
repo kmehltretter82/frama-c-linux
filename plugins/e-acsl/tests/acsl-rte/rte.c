@@ -138,7 +138,7 @@ int main(void) {
   *p = malloc(sizeof(int *));
   **p = malloc(sizeof(int));
   ***p = 23;
-  /*@ assert ***p / i == 23; */ // infinite loop caused by the dereferencing sequence
+  /*@ assert ***p / i == 23; */
 
   struct s struct_s;
   struct_s.b = &c;

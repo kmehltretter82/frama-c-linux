@@ -25,3 +25,11 @@ val pand :
   predicate ->
   predicate
 (** create a conjunction. Optimisation depends on the [-e-acsl-O] option. *)
+
+val por :
+  ?loc:Fileloc.t ->
+  ?names:string list ->
+  predicate ->
+  predicate ->
+  predicate
+(** create a disjunction. Optimisation depends on the [-e-acsl-O] option. *)

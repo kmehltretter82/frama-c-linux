@@ -84,6 +84,8 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.c:145: Warning: assertion got status unknown.
 [eva:alarm] rte.c:31: Warning: 
+  assertion 'E_ACSL,invalid pointer' got status unknown.
+[eva:alarm] rte.c:31: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] rte.c:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
