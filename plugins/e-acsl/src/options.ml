@@ -192,6 +192,13 @@ module Optimisations = struct
       let descr = "generate trivial RTE guards"
     end)
 
+  module Rte_initialized =
+    Make (struct
+      let name = "rte-initialized"
+      let level = Leq 1
+      let descr = "generate 'initialization' RTE guards for all specifications"
+    end)
+
   module Smart_il =
     Make (struct
       let name = "smart-il"

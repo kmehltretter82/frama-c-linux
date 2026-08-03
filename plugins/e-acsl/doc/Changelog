@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-  E-ACSL     [2026-08-06] New option -e-acsl-O-rte-initialized that generates
+                           initialization guards for all annotations
 -  E-ACSL     [2026-07-25] Rename flag -e-acsl-gmp-only to -e-acsl-O-gmp-only
 -  E-ACSL     [2026-07-15] Rename flag -e-acsl-assert-print-data to
                            -e-acsl-O-print-values

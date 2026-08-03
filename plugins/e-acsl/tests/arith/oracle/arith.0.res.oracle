@@ -1,9 +1,9 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] arith.i:48: Warning: 
-  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__3;
+  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl_div_2;
 [eva:alarm] arith.i:48: Warning: 
-  signed overflow. assert 1 + __gen_e_acsl__3 <= 2147483647;
+  signed overflow. assert 1 + __gen_e_acsl_div_2 <= 2147483647;
 [eva:alarm] arith.i:48: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] arith.i:53: Warning: 

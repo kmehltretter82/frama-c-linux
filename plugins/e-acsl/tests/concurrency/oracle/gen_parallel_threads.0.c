@@ -418,127 +418,77 @@ void *read_value(void *arg)
     __e_acsl_store_block((void *)(& idx),4UL);
     __e_acsl_full_init((void *)(& idx));
     {
-      int __gen_e_acsl_initialized_2;
       int __gen_e_acsl_and_4;
       int __gen_e_acsl_aligned_4;
       int __gen_e_acsl_valid_read_3;
-      int __gen_e_acsl_initialized_3;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
         {.values = (void *)0};
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& idx),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&idx",
-                                   (void *)(& idx));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                   "uninitialized: \\initialized(&idx)",0,
-                                   __gen_e_acsl_initialized_2);
-      /*@ assert E_ACSL: uninitialized: \initialized(&idx); */
-      {
-        __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "RTE";
-        __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&idx)";
-        __gen_e_acsl_assert_data_9.file = "parallel_threads.c";
-        __gen_e_acsl_assert_data_9.fct = "read_value";
-        __gen_e_acsl_assert_data_9.line = 85;
-        __gen_e_acsl_assert_data_9.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_2,
-                        & __gen_e_acsl_assert_data_9);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"idx",0,idx);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"idx",0,idx);
       if (0 <= idx) {
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"idx",0,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"idx",0,
                                      idx);
         __gen_e_acsl_and_4 = idx < 10;
       }
       else __gen_e_acsl_and_4 = 0;
       /*@ assert E_ACSL: "index out of bounds": 0 <= idx < (int)10; */
       {
-        __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
-        __gen_e_acsl_assert_data_10.pred_txt = "0 <= idx < (int)10";
-        __gen_e_acsl_assert_data_10.file = "parallel_threads.c";
-        __gen_e_acsl_assert_data_10.fct = "read_value";
-        __gen_e_acsl_assert_data_10.line = 85;
-        __gen_e_acsl_assert_data_10.name = "index out of bounds";
-        __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_10);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+        __gen_e_acsl_assert_data_9.blocking = 1;
+        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.pred_txt = "0 <= idx < (int)10";
+        __gen_e_acsl_assert_data_9.file = "parallel_threads.c";
+        __gen_e_acsl_assert_data_9.fct = "read_value";
+        __gen_e_acsl_assert_data_9.line = 85;
+        __gen_e_acsl_assert_data_9.name = "index out of bounds";
+        __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_9);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
       }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
         {.values = (void *)0};
       __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)values[idx],4UL);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
                                    "values[idx]",(void *)values[idx]);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
                                    "\"pointer alignment\": \\aligned(values[idx],4)",
                                    0,__gen_e_acsl_aligned_4);
       /*@ assert E_ACSL: "pointer alignment": \aligned(values[idx],4); */
       {
-        __gen_e_acsl_assert_data_11.blocking = 1;
-        __gen_e_acsl_assert_data_11.kind = "RTE";
-        __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(values[idx],4)";
-        __gen_e_acsl_assert_data_11.file = "parallel_threads.c";
-        __gen_e_acsl_assert_data_11.fct = "read_value";
-        __gen_e_acsl_assert_data_11.line = 85;
-        __gen_e_acsl_assert_data_11.name = "pointer alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_11);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+        __gen_e_acsl_assert_data_10.blocking = 1;
+        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(values[idx],4)";
+        __gen_e_acsl_assert_data_10.file = "parallel_threads.c";
+        __gen_e_acsl_assert_data_10.fct = "read_value";
+        __gen_e_acsl_assert_data_10.line = 85;
+        __gen_e_acsl_assert_data_10.name = "pointer alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_10);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
       }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
         {.values = (void *)0};
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)values[idx],
                                                       sizeof(int),
                                                       (void *)values[idx],
                                                       (void *)(& values[idx]));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
                                    "values[idx]",(void *)values[idx]);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
                                      "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                    "\"memory access\": \\valid_read(values[idx])",
                                    0,__gen_e_acsl_valid_read_3);
       /*@ assert E_ACSL: "memory access": \valid_read(values[idx]); */
       {
-        __gen_e_acsl_assert_data_12.blocking = 1;
-        __gen_e_acsl_assert_data_12.kind = "RTE";
-        __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(values[idx])";
-        __gen_e_acsl_assert_data_12.file = "parallel_threads.c";
-        __gen_e_acsl_assert_data_12.fct = "read_value";
-        __gen_e_acsl_assert_data_12.line = 85;
-        __gen_e_acsl_assert_data_12.name = "memory access";
+        __gen_e_acsl_assert_data_11.blocking = 1;
+        __gen_e_acsl_assert_data_11.kind = "RTE";
+        __gen_e_acsl_assert_data_11.pred_txt = "\\valid_read(values[idx])";
+        __gen_e_acsl_assert_data_11.file = "parallel_threads.c";
+        __gen_e_acsl_assert_data_11.fct = "read_value";
+        __gen_e_acsl_assert_data_11.line = 85;
+        __gen_e_acsl_assert_data_11.name = "memory access";
         __e_acsl_assert(__gen_e_acsl_valid_read_3,
-                        & __gen_e_acsl_assert_data_12);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& idx),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"&idx",
-                                   (void *)(& idx));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
-                                   "uninitialized: \\initialized(&idx)",0,
-                                   __gen_e_acsl_initialized_3);
-      /*@ assert E_ACSL: uninitialized: \initialized(&idx); */
-      {
-        __gen_e_acsl_assert_data_13.blocking = 1;
-        __gen_e_acsl_assert_data_13.kind = "RTE";
-        __gen_e_acsl_assert_data_13.pred_txt = "\\initialized(&idx)";
-        __gen_e_acsl_assert_data_13.file = "parallel_threads.c";
-        __gen_e_acsl_assert_data_13.fct = "read_value";
-        __gen_e_acsl_assert_data_13.line = 85;
-        __gen_e_acsl_assert_data_13.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_3,
-                        & __gen_e_acsl_assert_data_13);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+                        & __gen_e_acsl_assert_data_11);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
       }
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "*(values[idx])",0,*(values[idx]));

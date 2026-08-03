@@ -108,15 +108,13 @@ struct
     then RteGen.Options.DoMemAccess.get ()
     else true
 
-  (** [needs_initialized ()] @return
-      - [true] if the option [-rte-initialized] from the RTE plugin has at least
-        one element in its set;
-      - [false] if the option [-rte-no-initialized] from the RTE plugin is used
-        (default); *)
-  let needs_initialized () =
+  (** [needs_initialized okf] firstly depends on [-rte-initialized] from the RTE
+      plugin. However, if it is not set, the function result depends on
+      [-e-acsl-O-rte-initialized], which is [true] if [O < 2]. *)
+  let needs_initialized okf =
     if RteGen.Options.DoInitialized.is_set ()
-    then not @@ RteGen.Options.DoInitialized.is_empty ()
-    else true
+    then Option.fold ~none:false ~some:RteGen.Options.DoInitialized.mem okf
+    else Options.Optimisations.Rte_initialized.get ()
 
   (** [needs_pointer_alignment ()] @return
       - [true] if the option [-warn-unaligned-pointer] is used (default);
@@ -213,6 +211,8 @@ let rte_visitor =
   object(self)
 
     inherit E_acsl_visitor.visitor dkey
+
+    val mutable current_func : kernel_function option = None
 
     method private trivially_aligned t typ ptyp: bool =
       if Ast_types.C.is_void ptyp || Ast_types.C.is_fun ptyp
@@ -329,7 +329,7 @@ let rte_visitor =
           not (Ast_types.C.is_struct_or_union typ)
         | _ -> false
       in
-      if Flags.needs_initialized () && needs_guard lv then
+      if Flags.needs_initialized current_func && needs_guard lv then
         Guards.add orig (Undefined_behaviours.initialized ~loc lv)
 
     (** [add_aligned ~orig t typ] adds an entry for [orig] if [t] has a pointer
@@ -403,6 +403,10 @@ let rte_visitor =
         self#add_array_comparison t1 t2;
         Cil.SkipChildren
       | _ -> (); Cil.DoChildren
+
+    method !vfunc f =
+      current_func <- Option.some @@ Globals.Functions.get f.svar;
+      Cil.DoChildrenPost (fun f -> current_func <- None; f)
   end
 
 let preprocess ast =
