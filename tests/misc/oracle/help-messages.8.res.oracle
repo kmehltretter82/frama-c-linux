@@ -157,6 +157,11 @@ Options taking a string as argument should preferably be written
 
 -eva-help           help of plug-in Eva
 -eva-h              alias for option -eva-help
+-eva-help-builtins  list of builtins used to interpret some libc functions
+-eva-help-domains   list and description of available analysis domains
+-eva-help-messages  help about analysis verbosity and message categories
+-eva-help-options   list and description of all Eva parameters
+-eva-help-warnings  help about warnings emitted by Eva
 
 *** INITIAL CONTEXT
 
@@ -245,8 +250,6 @@ Options taking a string as argument should preferably be written
 -eva-builtins-auto  When set, builtins will be used automatically to replace
                     known C functions (set by default, opposite option is
                     -eva-no-builtins-auto)
--eva-builtins-list  List existing builtins, and which functions they are
-                    automatically associated to (if any)
 -eva-default-loop-unroll <n>  Define the default limit for loop unroll
                     annotations that do not explicitly provide a limit.
 -eva-enumerate-cond  Activate reduce_by_cond_enumerate. (set by default,

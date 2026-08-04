@@ -159,3 +159,6 @@ val fatal   : ('a,'b) pretty_aborter
 (** Called at the beginning of the analysis to configure Eva verbosity,
     by automatically enabling/disabling message keys. *)
 val configure_verbosity : unit -> unit
+
+(** Prints help message about message categories. *)
+val print_categories_and_exit : unit -> Cmdline.exit

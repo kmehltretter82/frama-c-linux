@@ -108,7 +108,6 @@ module BuiltinsOverrides:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = string
 module BuiltinsAuto: Parameter_sig.Bool
-module BuiltinsList: Parameter_sig.Bool
 
 module AllocBuiltin: Parameter_sig.String
 module AllocFunctions: Parameter_sig.String_set
@@ -199,3 +198,6 @@ val unregister_builtin: string -> unit
 
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> priority:int -> unit
+
+(** Prints help message about available domains. *)
+val print_domains_and_exit: unit -> Cmdline.exit

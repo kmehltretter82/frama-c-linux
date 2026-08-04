@@ -236,7 +236,7 @@ let print_categories_by_verbosity fmt =
     "@,  Warning categories enabled as feedback message by verbosity level:@,";
   for i = 1 to 11 do pp_level i warning_list pp_warn_category done
 
-let print_help_message () =
+let print_categories_and_exit () =
   let header fmt = Format.fprintf fmt "List of message categories." in
   printf ~header "@[<v>%t%t@]"
     print_message_categories print_categories_by_verbosity;
@@ -245,7 +245,7 @@ let print_help_message () =
 (* Hook to register categories set by the user. *)
 let () =
   Message_category.add_set_hook
-    (fun _ s -> if s = "help" then print_help_message ())
+    (fun _ s -> if s = "help" then print_categories_and_exit ())
 
 
 (* ----- Message categories ------------------------------------------------- *)
