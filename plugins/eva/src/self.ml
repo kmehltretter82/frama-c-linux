@@ -153,6 +153,7 @@ let key_kind_tbl : (category, kind) Hashtbl.t = Hashtbl.create 11
 type debug_category = category
 
 let register_debug_category ~help name =
+  assert (not (Stdlib.String.starts_with ~prefix:"debug" name));
   let name = "debug:" ^ name in
   let category = register_category ~help ~default:false name in
   Hashtbl.replace key_kind_tbl category Debug;
