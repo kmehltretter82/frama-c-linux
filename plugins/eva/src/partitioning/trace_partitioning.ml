@@ -6,9 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let key_partition = Key.partition
-let key_widening = Key.widening
-let dkey_iterator = Key.debug_iterator
+let key_partition = Log_key.partition
+let key_widening = Log_key.widening
+let dkey_iterator = Log_key.debug_iterator
 
 open Cil_types
 open Partition

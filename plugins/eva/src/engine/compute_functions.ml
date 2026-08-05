@@ -67,7 +67,7 @@ module Make (Engine: Engine_sig.S) = struct
         let kinstr = Callstack.top_callsite call.callstack in
         ignore (Logic.check_fct_preconditions kinstr call.kf ab init_state);
       end;
-      Self.feedback ~current:true ~mkey:Key.progress
+      Self.feedback ~current:true ~mkey:Log_key.progress
         "Reusing old results for call to %a" Kernel_function.pretty call.kf;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
@@ -106,7 +106,7 @@ module Make (Engine: Engine_sig.S) = struct
   let compute_using_spec_or_body target call state =
     let pos = Eval.position_of_call call in
     if Position.is_local pos then
-      Self.feedback ~mkey:Key.progress
+      Self.feedback ~mkey:Log_key.progress
         "@[computing for function %a.@\nCalled from %a.@]"
         Callstack.pretty_short call.callstack
         Position.pretty_loc pos;
@@ -117,7 +117,7 @@ module Make (Engine: Engine_sig.S) = struct
     in
     apply_call_hooks call state kind;
     let resulting_states, cacheable = compute call state in
-    Self.feedback ~mkey:Key.progress
+    Self.feedback ~mkey:Log_key.progress
       "Done for function %a" Kernel_function.pretty call.kf;
     Engine_sig.{ states = resulting_states; cacheable; kind }
 
@@ -139,7 +139,7 @@ module Make (Engine: Engine_sig.S) = struct
      by using a cvalue builtin. *)
   let compute_builtin (name, builtin, spec) call state =
     let kf_name = Kernel_function.get_name call.kf in
-    Self.feedback ~current:true ~mkey:Key.progress
+    Self.feedback ~current:true ~mkey:Log_key.progress
       "Call to builtin %s%s"
       name (if kf_name = name then "" else " for function " ^ kf_name);
     apply_call_hooks call state `Builtin;

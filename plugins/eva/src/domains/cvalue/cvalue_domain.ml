@@ -55,11 +55,11 @@ let print_final_state kf values =
     Format.fprintf fmt "Values at end of function %a:%t"
       Kernel_function.pretty kf print_cardinal
   in
-  Self.printf ~mkey:Key.final_states ~header "%t" print_filtered_state
+  Self.printf ~mkey:Log_key.final_states ~header "%t" print_filtered_state
 
 let pretty_wo_string_literal fmt s =
   let filtered =
-    if Self.is_debug_category_enabled Key.debug_string_literal
+    if Self.is_debug_category_enabled Log_key.debug_string_literal
     then s
     else Cvalue.Model.filter_base (fun b -> not (Base.is_string_literal b)) s
   in
@@ -77,7 +77,7 @@ module State = struct
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
 
-  let log_category = Key.cvalue_domain
+  let log_category = Log_key.cvalue_domain
 
   include Datatype.Make_with_collections (
     struct
@@ -419,7 +419,7 @@ module State = struct
 
   let post_analysis _state =
     if Plugin.is_present "inout"
-    && Self.is_message_category_enabled Key.final_states
+    && Self.is_message_category_enabled Log_key.final_states
     && Self.verbose_atleast 1
     && Parameters.Eva.get ()
     then display_results ();

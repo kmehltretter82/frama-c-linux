@@ -99,7 +99,7 @@ let watch_hook _callstack stmt states =
          in
          if watching
          then begin
-           Self.warning ~wkey:Key.warn_watchpoint ~once:true ~current:true
+           Self.warning ~wkey:Log_key.warn_watchpoint ~once:true ~current:true
              ~stacktrace:true
              "%a %a"
              Eva_ast.pp_exp name

@@ -9,8 +9,8 @@
 open Lattice_bounds
 open Bottom.Operators
 
-let wkey_loop_unroll_auto = Key.warn_loop_unroll_auto
-let wkey_loop_unroll_partial = Key.warn_loop_unroll_partial
+let wkey_loop_unroll_auto = Log_key.warn_loop_unroll_auto
+let wkey_loop_unroll_partial = Log_key.warn_loop_unroll_partial
 
 (* Helper for comparison functions *)
 let (<?>) c lcmp =

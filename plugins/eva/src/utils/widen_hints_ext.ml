@@ -110,12 +110,12 @@ let widen_hint_terms_of_terms terms =
           in
           Some (hint_lval, hint_thresholds)
         | _ ->
-          Self.debug ~source:lval_term.term_loc ~dkey:Key.debug_widen_hints
+          Self.debug ~source:lval_term.term_loc ~dkey:Log_key.debug_widen_hints
             "invalid var_term: %a@." Printer.pp_term lval_term;
           raise Invalid_hint
       end
     | _ ->
-      Self.debug ~dkey:Key.debug_widen_hints "invalid terms: %a@."
+      Self.debug ~dkey:Log_key.debug_widen_hints "invalid terms: %a@."
         (Pretty_utils.pp_list ~sep:", " Printer.pp_term) terms;
       raise Invalid_hint
   with

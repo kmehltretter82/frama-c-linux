@@ -52,7 +52,7 @@ let pretty_with_mutexes =
         else
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
             MutexPresence.pretty mutexes ;
-        if Self.is_message_category_enabled Key.callstacks
+        if Self.is_message_category_enabled Log_key.callstacks
         then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;

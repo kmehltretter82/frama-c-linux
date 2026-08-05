@@ -38,7 +38,7 @@ let log_arg analysis =
   let stack = Option.value (Callstack.pop stack) ~default:stack in
   let source = kinstr_to_source (Callstack.top_callsite stack) in
   let append fmt =
-    if Self.is_message_category_enabled Key.callstacks
+    if Self.is_message_category_enabled Log_key.callstacks
     then Format.fprintf fmt "@.%a" Callstack.pretty stack
   in
   source, append
@@ -47,10 +47,10 @@ let feedback analysis =
   let source, append = log_arg analysis in
   Self.feedback ~once:true ?source ~append
 
-let thread_feedback = feedback ~mkey:Key.thread
-let mutex_feedback = feedback ~mkey:Key.mutex
-let queue_feedback = feedback ~mkey:Key.queue
-let show_feedback = feedback ~mkey:Key.show
+let thread_feedback = feedback ~mkey:Log_key.thread
+let mutex_feedback = feedback ~mkey:Log_key.mutex
+let queue_feedback = feedback ~mkey:Log_key.queue
+let show_feedback = feedback ~mkey:Log_key.show
 
 let warning analysis =
   let source, append = log_arg analysis in

@@ -37,7 +37,7 @@ let warn_unknown_size vi =
   with Cil.SizeOfError (s, t)->
     let pp fmt v = Format.fprintf fmt "variable '%a'" Printer.pp_varinfo v in
     Self.warning ~once:true ~current:true
-      ~wkey:Key.warn_unknown_size
+      ~wkey:Log_key.warn_unknown_size
       "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ \
        computed@ (%s)@]" pp vi Printer.pp_typ t s;
     true
@@ -440,7 +440,7 @@ module Make (Engine: Engine_Subset) = struct
       with Base.Not_a_C_variable -> true
     in
     let cvalue_state = Cvalue.Model.filter_base print_base cvalue_state in
-    Self.printf ~mkey:Key.initial_state
+    Self.printf ~mkey:Log_key.initial_state
       ~header:(fun fmt -> Format.pp_print_string fmt
                   "Values of globals at initialization")
       "@[  %a@]" Cvalue.Model.pretty cvalue_state
@@ -454,9 +454,9 @@ module Make (Engine: Engine_Subset) = struct
         let* state = global_state ~lib_entry in
         supplied_state state cvalue_state
       | None ->
-        Self.feedback ~mkey:Key.progress "Computing initial state";
+        Self.feedback ~mkey:Log_key.progress "Computing initial state";
         let state = global_state ~lib_entry in
-        Self.feedback ~mkey:Key.progress "Initial state computed";
+        Self.feedback ~mkey:Log_key.progress "Initial state computed";
         state
     in
     let thread = Thread.(id main) in

@@ -180,7 +180,7 @@ let assume_comparable comparison v1 v2 =
       if reason <> `Ok then
         Self.result
           ~current:true ~once:true
-          ~mkey:Key.pointer_comparison
+          ~mkey:Log_key.pointer_comparison
           "invalid pointer comparison: %a" pp_incomparable_reason reason;
       truth
     | Abstract_value.Subtraction ->

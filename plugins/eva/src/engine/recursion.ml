@@ -34,7 +34,7 @@ let check_spec kinstr kf =
   let funspec = Annotations.funspec kf in
   if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
   then
-    Self.warning ~current:true ~wkey:Key.warn_missing_assigns ~stacktrace:true
+    Self.warning ~current:true ~wkey:Log_key.warn_missing_assigns ~stacktrace:true
       "@[Recursive call to %a without assigns clause.@ \
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase the %s parameter \
@@ -89,7 +89,7 @@ let make_stack (kf, depth) =
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
 let make_recursion call depth =
-  let wkey = Key.warn_recursion in
+  let wkey = Log_key.warn_recursion in
   Self.warning ~wkey ~once:true ~current:true ~stacktrace:true
     "@[detected recursive call@ of function %a.@]"
     Kernel_function.pretty call.kf;

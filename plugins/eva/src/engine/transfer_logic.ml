@@ -83,8 +83,8 @@ let emit_status ppt status =
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True
-  then Self.result ~mkey:Key.progress ?current ?once ?source fmt
-  else Self.warning ~wkey:Key.warn_alarm ?current ?once ?source ?stacktrace fmt
+  then Self.result ~mkey:Log_key.progress ?current ?once ?source fmt
+  else Self.warning ~wkey:Log_key.warn_alarm ?current ?once ?source ?stacktrace fmt
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
@@ -383,7 +383,7 @@ module Make (Domain: LogicDomain) = struct
       let pp_behavior_inactive fmt =
         Format.fprintf fmt ",@ the behavior@ was@ inactive"
       in
-      Self.warning ~once:true ~source ~wkey:Key.warn_ensures_false
+      Self.warning ~once:true ~source ~wkey:Log_key.warn_ensures_false
         ~stacktrace:true
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \

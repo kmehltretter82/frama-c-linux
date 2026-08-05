@@ -199,8 +199,8 @@ let check_from pre_state asgn assigns_zone from found_assigns =
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True
-  then Self.result ~mkey:Key.progress ?current ?once ?source fmt
-  else Self.warning ~wkey:Key.warn_alarm ?current ?once ?source ?stacktrace fmt
+  then Self.result ~mkey:Log_key.progress ?current ?once ?source fmt
+  else Self.warning ~wkey:Log_key.warn_alarm ?current ?once ?source ?stacktrace fmt
 
 let pp_bhv fmt b =
   if not (Cil.is_default_behavior b)

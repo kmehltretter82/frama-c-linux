@@ -44,7 +44,7 @@ val register_message_category:
 (** Is a given message category currently enabled? *)
 val is_message_category_enabled: message_category -> bool
 
-(** Use [Key.callstacks] instead. *)
+(** Use [Log_key.callstacks] instead. *)
 val key_callstacks : message_category
 
 (** {2 Debug categories.} *)

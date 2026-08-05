@@ -26,7 +26,7 @@ let warn_imprecise_value ?prefix lval value =
   | Addresses.Bytes.Top (bases, origin) ->
     if Origin.register_write bases origin then
       let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
-      Self.warning ~wkey:Key.warn_garbled_mix_write ~once:true ~current:true
+      Self.warning ~wkey:Log_key.warn_garbled_mix_write ~once:true ~current:true
         ~stacktrace:true
         "@[%sssigning imprecise value to %a@ because of %s.@]"
         prefix Eva_ast.pp_lval lval (Origin.descr origin)

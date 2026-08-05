@@ -1399,7 +1399,7 @@ let set (type t) (module P: Parameter_sig.S with type t = t) =
       | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
       | _ -> str
     in
-    let mkey = Key.precision_settings in
+    let mkey = Log_key.precision_settings in
     printf ~mkey "    option %s %sset to %s%s." P.name
       (if already_set then "already " else "") str
       (if already_set && not (equal_current t) then " (not modified)"
@@ -1447,7 +1447,7 @@ let () =
   ()
 
 let set_analysis n =
-  let mkey = Key.precision_settings in
+  let mkey = Log_key.precision_settings in
   feedback ~mkey "Option %s %i detected, \
                   automatic configuration of the analysis:" Precision.name n;
   List.iter ((|>) n) (List.rev !configures)
