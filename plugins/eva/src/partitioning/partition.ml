@@ -9,9 +9,6 @@
 open Lattice_bounds
 open Bottom.Operators
 
-let wkey_loop_unroll_auto = Log_key.warn_loop_unroll_auto
-let wkey_loop_unroll_partial = Log_key.warn_loop_unroll_partial
-
 (* Helper for comparison functions *)
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp
@@ -170,7 +167,7 @@ struct
     if unrolling.current >= unrolling.limit then begin
       if unrolling.limit > 0 then
         Self.warning ~once:true ~current:true
-          ~wkey:wkey_loop_unroll_partial
+          ~wkey:Log_key.warn_loop_unroll_partial
           "loop not completely unrolled";
       unrolling
     end else begin
@@ -668,7 +665,7 @@ struct
               | None -> min_unroll
               | Some i ->
                 Self.warning ~once:true ~current:true
-                  ~wkey:wkey_loop_unroll_auto
+                  ~wkey:Log_key.warn_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i
             with

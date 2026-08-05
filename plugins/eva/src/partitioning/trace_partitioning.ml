@@ -6,10 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let key_partition = Log_key.partition
-let key_widening = Log_key.widening
-let dkey_iterator = Log_key.debug_iterator
-
 open Cil_types
 open Partition
 
@@ -210,7 +206,7 @@ struct
       if x >= !max_displayed + slevel_display_step
       then
         let rounded = x / slevel_display_step * slevel_display_step in
-        Self.feedback ~mkey:key_partition ~once:true ~current:true
+        Self.feedback ~mkey:Log_key.partition ~once:true ~current:true
           "Trace partitioning superposing up to %d states"
           rounded;
         max_displayed := rounded
@@ -218,7 +214,7 @@ struct
   let partitioning_feedback dest flow stmt =
     output_slevel dest.incoming_states;
     (* Debug information. *)
-    Self.debug ~dkey:dkey_iterator ~current:true
+    Self.debug ~dkey:Log_key.debug_iterator ~current:true
       "reached statement %d with %d incoming states, %d to propagate"
       stmt.sid dest.incoming_states (flow_size flow)
 
@@ -265,7 +261,7 @@ struct
             else begin
               (* Propagate the join of the two states *)
               if dest.store_is_loop_head then
-                Self.feedback ~mkey:key_partition ~once:true ~current:true
+                Self.feedback ~mkey:Log_key.partition ~once:true ~current:true
                   "starting to merge loop iterations";
               Some (Domain.join previous_state current_state)
             end
@@ -302,7 +298,7 @@ struct
           Some curr
           (* Apply widening *)
         else begin
-          Self.feedback ~once:true ~current:true ~mkey:key_widening
+          Self.feedback ~once:true ~current:true ~mkey:Log_key.widening
             "applying a widening at this point";
           (* We join the previous widening state with the previous iteration
              state so as to allow the intermediate(s) iteration(s) (between
