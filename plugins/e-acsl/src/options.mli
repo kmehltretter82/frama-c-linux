@@ -26,6 +26,7 @@ module Optimisations : sig
   module Rte_initialized : Parameter_sig.Bool
   module Trivial_rte : Parameter_sig.Bool
   module Smart_il : Parameter_sig.Bool
+  module Smart_cil : Parameter_sig.Bool
   module Verify_valid: Parameter_sig.Bool
   module Print_values: Parameter_sig.Bool
   module Gmp_only: Parameter_sig.Bool

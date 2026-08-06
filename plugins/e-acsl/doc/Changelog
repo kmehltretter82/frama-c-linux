@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-  E-ACSL     [2026-08-10] New option -e-acsl-O-smart-cil similar to
+                           -e-acsl-O-smart-il but for cil predicates and
+                           statements
 -  E-ACSL     [2026-08-10] Fix an infinite loop when using -warn-invalid-pointer
                            option
 -  E-ACSL     [2026-08-06] New option -e-acsl-O-rte-initialized that generates

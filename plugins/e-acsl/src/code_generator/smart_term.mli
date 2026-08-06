@@ -9,17 +9,19 @@
 open Cil_types
 
 val tsizeof : ?loc:Fileloc.t -> typ -> term
-(** make a [sizeof(ty)] term. Optimisation depends on the [-e-acsl-O] option. *)
+(** make a [sizeof(ty)] term. Optimisation depends on the [-e-acsl-O-smart-cil]
+    option. *)
 
 val talignof : ?loc:Fileloc.t -> typ -> term
-(** make a [alignof(ty)] term. Optimisation depends on the [-e-acsl-O] option. *)
+(** make a [alignof(ty)] term. Optimisation depends on the [-e-acsl-O-smart-cil]
+    option. *)
 
 val copy : term -> term
 (** copy a term using the [Terms.Id.deep_copy] function. Optimisation depends on
-    the [-e-acsl-O] option. *)
+    the [-e-acsl-O-smart-cil] option. *)
 
 val trange_array : ?loc:Fileloc.t -> term -> term_lval
 (** create the range for a given array and add it as an offset. For instance,
     using the function on [t] of type [int[3]] returns [t[0..2]]. In the case
     of a multi-dimensional array, it creates as many ranges as there are
-    dimensions. Optimisation depends on the [-e-acsl-O] option. *)
+    dimensions. Optimisation depends on the [-e-acsl-O-smart-cil] option. *)

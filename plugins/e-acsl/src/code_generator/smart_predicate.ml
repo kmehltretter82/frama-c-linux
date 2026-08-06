@@ -18,7 +18,7 @@ let prel
     rel
     t1
     t2 =
-  if Options.O.get () > 0 then try
+  if Options.Optimisations.Smart_cil.get () then try
       let z1 = Option.get @@ Terms.extract_integer t1 in
       let z2 = Option.get @@ Terms.extract_integer t2 in
       of_bool ~loc ~names @@
@@ -33,11 +33,11 @@ let prel
   else Logic_const.prel ~loc ~names (rel,t1,t2)
 
 let pand ?(loc = Options.gen_loc) ?(names = []) p1 p2 =
-  if Options.O.get () > 0
+  if Options.Optimisations.Smart_cil.get ()
   then Logic_const.pand ~loc ~names (p1,p2)
   else Logic_const.pred ~loc ~names (Pand (p1,p2))
 
 let por ?(loc = Options.gen_loc) ?(names = []) p1 p2 =
-  if Options.O.get () > 0
+  if Options.Optimisations.Smart_cil.get ()
   then Logic_const.por ~loc ~names (p1,p2)
   else Logic_const.pred ~loc ~names (Por (p1,p2))
