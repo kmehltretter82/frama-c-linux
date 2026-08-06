@@ -12,8 +12,6 @@ open Cil_datatype
 module IntSet = Z.Set
 module FloatSet = Datatype.Float.Set
 
-let dkey = Widen_hints_ext.dkey
-
 (* Note concerning all visitors and hints related to statements:
    currently, [stmt] is always [None]. Because our dataflow does not
    stabilize inner loop before the outer ones, we sometimes end up widening
@@ -300,7 +298,7 @@ class hints_visitor init_widen_hints global = object(self)
          let int_thresholds, float_thresholds =
            thresholds_of_threshold_terms wh_terms
          in
-         Self.feedback ~source:loc ~dkey
+         Self.debug ~source:loc ~dkey:Log_key.debug_widen_hints
            "adding%s hint from annotation: %a, %t (for all statements)"
            (if global then " global" else "")
            (Pretty_utils.pp_opt ~none:(format_of_string "for all variables")
@@ -331,7 +329,7 @@ end
 
 (* Precompute global widen hints, used for all functions *)
 let compute_global_static_hints () =
-  Self.debug ~dkey "computing global widen hints";
+  Self.debug ~dkey:Log_key.debug_widen_hints "computing global widen hints";
   let global_widen_hints = ref (Global_Static_Hints.get ()) in
   Globals.Functions.iter_on_fundecs (fun fd ->
       let visitor = new hints_visitor global_widen_hints true in
@@ -434,7 +432,7 @@ let dynamic_bases_of_lval states e offset =
 (* Find syntactically the dynamic hints on [stmt]. *)
 let extract_dynamic_hints stmt =
   let source = Stmt.loc stmt in
-  Self.debug ~source ~dkey
+  Self.debug ~source ~dkey:Log_key.debug_widen_hints
     "computing dynamic hints for statement %d" stmt.sid;
   let wh = Widen_hints_ext.get_stmt_widen_hint_terms stmt in
   let aux l (hlv, threshold_terms) =
@@ -505,7 +503,7 @@ let dynamic_widen_hints_hook _callstack stmt states =
             else
               let new_hints =
                 Base.Hptset.fold (fun base acc ->
-                    Self.debug ~source ~dkey
+                    Self.debug ~source ~dkey:Log_key.debug_widen_hints
                       "adding new base due to dynamic widen hint: %a, %t"
                       Base.pretty base
                       (fun fmt ->

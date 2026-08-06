@@ -453,6 +453,6 @@ let print_stats fmt stats =
 
 let print () =
   let stats = compute_stats () in
-  let dkey = Self.dkey_summary in
+  let mkey = Log_key.summary in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Self.printf ~header ~dkey "  @[<v>%a@]" print_stats stats
+  Self.printf ~header ~mkey "  @[<v>%a@]" print_stats stats

@@ -17,7 +17,7 @@
   Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:15: Warning: The mutex 0 is already registered.
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}

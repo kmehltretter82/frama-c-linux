@@ -19,7 +19,7 @@
     jobs2:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: assigns.c:31 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -27,14 +27,14 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva] using specification for function g1
 [eva:global-accesses] 
   Globals accessed by thread:
     a: write by jobs1 at assigns.c:20 <- f1
     b: read by jobs1 at assigns.c:20 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
     shared bases: {}
@@ -42,14 +42,14 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva] using specification for function g2
 [eva:global-accesses] 
   Globals accessed by thread:
     a: read by jobs2 at assigns.c:25 <- f2
     b: write by jobs2 at assigns.c:25 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
     shared bases: {}
@@ -74,7 +74,7 @@
     jobs2:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: assigns.c:31 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, b}
@@ -83,12 +83,13 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs1 starting at f1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] assigns.c:20: inject threads interferences at this point
+[eva:debug:interferences] assigns.c:20: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     a: write by jobs1 at assigns.c:20 <- f1
     b: read by jobs1 at assigns.c:20 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
       g1(); assigns.c:20 <- f1
@@ -104,12 +105,13 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs2 starting at f2, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] assigns.c:25: inject threads interferences at this point
+[eva:debug:interferences] assigns.c:25: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     a: read by jobs2 at assigns.c:25 <- f2
     b: write by jobs2 at assigns.c:25 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
       g2(); assigns.c:25 <- f2
@@ -146,7 +148,7 @@
     jobs2:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: assigns.c:31 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, b}
@@ -159,7 +161,7 @@
   Globals accessed by thread:
     a: write by jobs1 at assigns.c:20 <- f1
     b: read by jobs1 at assigns.c:20 <- f1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs1
     concurrent writes:
       g1(); assigns.c:20 <- f1
@@ -179,7 +181,7 @@
   Globals accessed by thread:
     a: read by jobs2 at assigns.c:25 <- f2
     b: write by jobs2 at assigns.c:25 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs2
     concurrent writes:
       g2(); assigns.c:25 <- f2
@@ -206,7 +208,7 @@
     jobs2:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: assigns.c:31 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, b}

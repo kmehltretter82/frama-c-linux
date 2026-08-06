@@ -167,7 +167,7 @@ struct
     if unrolling.current >= unrolling.limit then begin
       if unrolling.limit > 0 then
         Self.warning ~once:true ~current:true
-          ~wkey:Self.wkey_loop_unroll_partial
+          ~wkey:Log_key.warn_loop_unroll_partial
           "loop not completely unrolled";
       unrolling
     end else begin
@@ -665,7 +665,7 @@ struct
               | None -> min_unroll
               | Some i ->
                 Self.warning ~once:true ~current:true
-                  ~wkey:Self.wkey_loop_unroll_auto
+                  ~wkey:Log_key.warn_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i
             with

@@ -104,21 +104,21 @@ Verbose 1 should disable "malloc" key but not "malloc:new" set by user.
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing malloc.c (with preprocessing)
   [eva] Analyzing a complete application starting at main
-  [eva:malloc:new] malloc.c:5: allocating variable __malloc_main_l5
+  [eva:malloc:new] malloc.c:9: allocating variable __malloc_main_l9
 
 Verbose 8 should enable "malloc" but not "malloc:new" unset by user.
   $ frama-c -commands-file options.txt malloc.c -eva-verbose 8 -eva-msg-key=-malloc:new,-summary
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing malloc.c (with preprocessing)
-  [eva:widen-hints] computing global widen hints
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
-  [eva:malloc] malloc.c:8: weak free on bases: {__malloc_main_l5}
+  [eva:malloc] malloc.c:9: 
+    resizing variable `__malloc_w_main_l9' (0..-1) to fit 0..31
   [eva] ====== VALUES COMPUTED ======
   [eva:final-states] Values at end of function main:
     __fc_heap_status ∈ [--..--]
     __fc_errno ∈ [--..--]
-    p ∈ {{ NULL ; &__malloc_main_l5 }} or ESCAPINGADDR
-    __malloc_main_l5 ∈ {42} or UNINITIALIZED
+    p ∈ {{ NULL ; &__malloc_w_main_l9[0] }}
+    i ∈ {2}
 

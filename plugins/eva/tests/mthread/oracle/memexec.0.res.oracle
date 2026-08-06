@@ -13,7 +13,7 @@
   Globals accessed by thread:
     a: read by <main> at memexec.c:33 <- main
     c: read by <main> at memexec.c:33 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -21,7 +21,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread th1 starting at t1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of t1 for thread th1
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -32,7 +32,7 @@
     c:
       write by th1 at memexec.c:10 <-
         g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread th1
     concurrent writes:
     shared bases: {}
@@ -52,7 +52,7 @@
   Globals accessed by thread:
     a: read by <main> at memexec.c:33 <- main
     c: read by <main> at memexec.c:33 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, c}
@@ -61,8 +61,10 @@
 [eva:thread-fixpoint] 
   Analyzing thread th1 starting at t1, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] memexec.c:14: inject threads interferences at this point
-[eva:interferences] memexec.c:10: inject threads interferences at this point
+[eva:debug:interferences] memexec.c:14: 
+  inject threads interferences at this point
+[eva:debug:interferences] memexec.c:10: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     v:
@@ -72,7 +74,7 @@
     c:
       write by th1 at memexec.c:10 <-
         g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread th1
     concurrent writes:
       c = 2; memexec.c:10 <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
@@ -104,12 +106,13 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva:interferences] memexec.c:33: inject threads interferences at this point
+[eva:debug:interferences] memexec.c:33: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     a: read by <main> at memexec.c:33 <- main
     c: read by <main> at memexec.c:33 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {a, c}

@@ -11,7 +11,7 @@
 [eva:thread] model.c:20: Start thread job1
 [eva] using specification for function rand
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -19,10 +19,10 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread job1 starting at f1, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread job1
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread job1
     concurrent writes:
     shared bases: {}

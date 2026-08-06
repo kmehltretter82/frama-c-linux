@@ -673,11 +673,11 @@ module Precise = struct
 
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
-    if Self.(is_debug_key_enabled dkey_callstacks) then
+    if Self.is_message_category_enabled Log_key.callstacks then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, th) base offsm =
-    Self.feedback ~dkey:Self.dkey_shared_memory_values ~once:true
+    Self.feedback ~mkey:Log_key.shared_memory_values ~once:true
       "@[%a %as @ @[%a%a@]@ %a@]"
       Thread.pretty th Mt_types.RW.pretty op Base.pretty base
       (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
@@ -685,7 +685,7 @@ module Precise = struct
 
 
   let display_shared_vars_value m =
-    if Self.(is_debug_key_enabled dkey_shared_memory_values) then
+    if Self.is_message_category_enabled Log_key.shared_memory_values then
       fold_location
         (fun loc s () ->
            SetNodeIdAccess.fold

@@ -13,7 +13,7 @@
   New context for <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -22,7 +22,7 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 1
     (thread initial memory state changed).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of main_interrupt_one_shot for thread <main>
 [eva:thread] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
@@ -31,7 +31,7 @@
     interrupt_received:
       read by <main> at interrupt.c:18 <- main_interrupt_one_shot
       read by <main> at interrupt.c:19 <- main_interrupt_one_shot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -40,14 +40,14 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
     iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received:
       write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
         interrupt_oneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
     shared bases: {}
@@ -67,7 +67,7 @@
     interrupt_received:
       read by <main> at interrupt.c:18 <- main_interrupt_one_shot
       read by <main> at interrupt.c:19 <- main_interrupt_one_shot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {interrupt_received}
@@ -76,13 +76,14 @@
 [eva:thread-fixpoint] 
   Analyzing thread <interrupt_handler interrupt_oneshot> starting at interrupt_oneshot,
     iteration 2 (potential shared vars changed and interferences changed).
-[eva:interferences] interrupt.c:9: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:9: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     interrupt_received:
       write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
         interrupt_oneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
       interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
@@ -112,9 +113,11 @@
   Analyzing thread <main> starting at main_interrupt_one_shot, iteration 3
     (shared vars values changed and interferences changed).
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
-[eva:interferences] interrupt.c:19: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:19: 
+  inject threads interferences at this point
 [eva:show] interrupt.c:20: Frama_C_show_each: {1}
-[eva:interferences] interrupt.c:21: inject threads interferences at this point
+[eva:debug:interferences] interrupt.c:21: 
+  inject threads interferences at this point
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -124,7 +127,7 @@
       read by <main> at interrupt.c:20 <- main_interrupt_one_shot
       read by <main> at interrupt.c:22 <- main_interrupt_one_shot
       write by <main> at interrupt.c:21 <- main_interrupt_one_shot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
@@ -143,7 +146,7 @@
     interrupt_received:
       write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
         interrupt_oneshot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <interrupt_handler interrupt_oneshot>
     concurrent writes:
       interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
@@ -186,7 +189,7 @@
       read by <main> at interrupt.c:20 <- main_interrupt_one_shot
       read by <main> at interrupt.c:22 <- main_interrupt_one_shot
       write by <main> at interrupt.c:21 <- main_interrupt_one_shot
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot

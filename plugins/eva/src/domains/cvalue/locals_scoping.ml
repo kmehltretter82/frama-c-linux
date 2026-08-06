@@ -44,7 +44,7 @@ let warn_locals_escape is_block fundec k locals =
   let pretty_block fmt = Pretty_utils.pp_cond is_block fmt "a block of " in
   let sv = fundec.svar in
   Self.warning
-    ~wkey:Self.wkey_locals_escaping
+    ~wkey:Log_key.warn_locals_escaping
     ~current:true ~once:true
     "locals %a escaping the scope of %t%a through %a"
     Base.Hptset.pretty locals pretty_block Printer.pp_varinfo sv pretty_base k

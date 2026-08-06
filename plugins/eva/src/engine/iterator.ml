@@ -12,7 +12,7 @@ open Eva_automata
 open Lattice_bounds
 open Bottom.Operators
 
-let dkey = Self.dkey_iterator
+let dkey = Log_key.debug_iterator
 
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
@@ -630,7 +630,7 @@ module Make (Engine : Engine_Subset) = struct
     in
     let compute () =
       let results = Dataflow.compute () in
-      Self.feedback ~dkey:Self.dkey_progress
+      Self.feedback ~mkey:Log_key.progress
         "Recording results for %a" Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in

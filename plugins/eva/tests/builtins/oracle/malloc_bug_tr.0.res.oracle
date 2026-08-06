@@ -43,7 +43,7 @@
 [eva:progress] malloc_bug_tr.c:18: Call to builtin free
 [eva:progress] malloc_bug_tr.c:18: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc_bug_tr.c:18: strong free on bases: {__malloc_main_l12}
+[eva:debug:malloc] malloc_bug_tr.c:18: strong free on bases: {__malloc_main_l12}
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======

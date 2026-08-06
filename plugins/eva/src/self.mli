@@ -27,46 +27,36 @@ module ComputationState : State_builder.Ref with type data = computation_state
 (** Exception used to cleanly abort the analysis (without killing Frama-C). *)
 exception Abort
 
-(** Debug categories responsible for printing initial and final states of Value.
-    Enabled by default, but can be disabled via the command-line:
-    -value-msg-key="-initial_state,-final_state" *)
-val dkey_initial_state : category
-val dkey_final_states : category
-val dkey_summary : category
-
 (** {2 Message categories.} *)
 
 (** The help message of -eva-msg-key lists message categories by group.
     Categories without group are standard messages listed first. *)
-type group = Concurrency | Domain | Debug
+type group = Concurrency | Domain
+
+(** Category for feedback, result or printf messages. *)
+type message_category
 
 (** Same as Log's {!register_category}, but [help] is mandatory, and a group and
     verbosity level can be associated to the category. *)
-val register_category: ?group:group -> ?level:int -> help:string -> string -> category
+val register_message_category:
+  ?group:group -> ?level:int -> help:string -> string -> message_category
 
-val dkey_show: category
-val dkey_pointer_comparison: category
-val dkey_cvalue_domain: category
-val dkey_iterator : category
-val dkey_widening : category
-val dkey_partition : category
-val dkey_split_return : category
-val dkey_precision_settings : category
-val dkey_progress : category
-val dkey_callstacks : category
-val dkey_include_string_literal: category
+(** Is a given message category currently enabled? *)
+val is_message_category_enabled: message_category -> bool
 
-val dkey_thread_fixpoint : category
-val dkey_thread : category
-val dkey_mutex : category
-val dkey_queue : category
-val dkey_data_races : category
-val dkey_shared_memory_zone : category
-val dkey_shared_memory_mutex : category
-val dkey_shared_memory_mutex_details : category
-val dkey_shared_memory_by_iteration : category
-val dkey_shared_memory_values : category
-val dkey_global_accesses : category
+(** Use [Log_key.callstacks] instead. *)
+val key_callstacks : message_category
+
+(** {2 Debug categories.} *)
+
+(** Category for debug messages. *)
+type debug_category
+
+(** Registers a debug category. The name is prefixed by [debug:]. *)
+val register_debug_category: help:string -> string -> debug_category
+
+(** Is a given debug category currently enabled? *)
+val is_debug_category_enabled: debug_category -> bool
 
 (** {2 Warning categories.} *)
 
@@ -78,31 +68,6 @@ type warn_default = Inactive | Feedback of int | Error
     [Feedback] default status is associated to a verbosity level. *)
 val register_warn_category:
   help:string -> ?default:warn_default -> string -> warn_category
-
-val wkey_alarm: warn_category
-val wkey_volatile: warn_category
-val wkey_locals_escaping: warn_category
-val wkey_garbled_mix_write: warn_category
-val wkey_garbled_mix_assigns: warn_category
-val wkey_garbled_mix_summary: warn_category
-val wkey_builtins_missing_spec: warn_category
-val wkey_builtins_override: warn_category
-val wkey_libc_unsupported_spec : warn_category
-val wkey_loop_unroll_auto : warn_category
-val wkey_loop_unroll_partial : warn_category
-val wkey_missing_loop_unroll : warn_category
-val wkey_missing_loop_unroll_for : warn_category
-val wkey_signed_overflow : warn_category
-val wkey_invalid_assigns : warn_category
-val wkey_missing_assigns : warn_category
-val wkey_missing_assigns_result : warn_category
-val wkey_experimental : warn_category
-val wkey_unknown_size : warn_category
-val wkey_ensures_false : warn_category
-val wkey_watchpoint : warn_category
-val wkey_recursion : warn_category
-val wkey_acsl : warn_category
-val wkey_acsl_unsupported : warn_category
 
 (** {2 Logging.} *)
 
@@ -129,19 +94,17 @@ type ('a,'b) pretty_aborter =
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 (** Results of analysis. *)
-val result : ?level:int -> ?dkey:category -> 'a pretty_printer
+val result : ?level:int -> ?mkey:message_category -> 'a pretty_printer
 
 (** Progress and feedback. *)
-val feedback : ?ontty:Log.ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
+val feedback :
+  ?ontty:Log.ontty -> ?level:int -> ?mkey:message_category -> 'a pretty_printer
 
 (** Debugging information. *)
-val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
+val debug : ?level:int -> ?dkey:debug_category -> 'a pretty_printer
 
 (** Warnings. *)
 val warning : ?wkey:warn_category -> 'a pretty_printer
-
-(** Alarm emitted by the analysis. *)
-val alarm : 'a pretty_printer
 
 (** User error. *)
 val error : 'a pretty_printer
@@ -154,6 +117,12 @@ val failure : 'a pretty_printer
 
 (** Internal error stopping the plug-in. *)
 val fatal   : ('a,'b) pretty_aborter
+
+(** Output on [stdout]. *)
+val printf :
+  ?level:int -> ?mkey:message_category -> ?current:bool -> ?source:Fileloc.t ->
+  ?append:(Format.formatter -> unit) -> ?header:(Format.formatter -> unit) ->
+  ('a, Format.formatter,unit) format -> 'a
 
 
 (** Called at the beginning of the analysis to configure Eva verbosity,

@@ -81,10 +81,10 @@ let emit_status ppt status =
   Property_status.emit ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
 
 (* Display the message as result/warning depending on [status] *)
-let msg_status status ?current ?once ?source ?stacktrace fmt =
+let msg_status status =
   if status = Alarmset.True
-  then Self.result ~dkey:Self.dkey_progress ?current ?once ?source fmt
-  else Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt
+  then Self.result ?level:None ~mkey:Log_key.progress
+  else Self.warning ~wkey:Log_key.warn_alarm
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
@@ -383,7 +383,7 @@ module Make (Domain: LogicDomain) = struct
       let pp_behavior_inactive fmt =
         Format.fprintf fmt ",@ the behavior@ was@ inactive"
       in
-      Self.warning ~once:true ~source ~wkey:Self.wkey_ensures_false
+      Self.warning ~once:true ~source ~wkey:Log_key.warn_ensures_false
         ~stacktrace:true
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \

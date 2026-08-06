@@ -65,7 +65,7 @@
         pthread_mutex_lock :: manysharedvars.c:46 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -73,7 +73,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f for thread jobs
 [eva:mutex] manysharedvars.c:28: Lock lock
 [eva:mutex] manysharedvars.c:31: Release lock
@@ -132,7 +132,7 @@
         pthread_mutex_lock :: manysharedvars.c:28 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: manysharedvars.c:31 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
@@ -200,7 +200,7 @@
         pthread_mutex_lock :: manysharedvars.c:46 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s}
@@ -209,9 +209,9 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] manysharedvars.c:29: 
+[eva:debug:interferences] manysharedvars.c:29: 
   inject threads interferences at this point
-[eva:interferences] manysharedvars.c:30: 
+[eva:debug:interferences] manysharedvars.c:30: 
   inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -268,7 +268,7 @@
         pthread_mutex_lock :: manysharedvars.c:28 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: manysharedvars.c:31 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s[i].data) ++; manysharedvars.c:29 <- f
@@ -2102,9 +2102,9 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva:interferences] manysharedvars.c:47: 
+[eva:debug:interferences] manysharedvars.c:47: 
   inject threads interferences at this point
-[eva:interferences] manysharedvars.c:48: 
+[eva:debug:interferences] manysharedvars.c:48: 
   inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -2158,7 +2158,7 @@
         pthread_mutex_lock :: manysharedvars.c:46 <- main
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: manysharedvars.c:49 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s}

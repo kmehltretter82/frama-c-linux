@@ -13,7 +13,7 @@ open Abstract_interp
 
 let register_builtin = Builtins.register_builtin
 
-let dkey = Self.register_category "imprecision" ~level:6
+let mkey = Self.register_message_category "imprecision" ~level:6
     ~help:"messages related to possible imprecision of builtins interpreting \
            memcpy, memmove and memset"
 
@@ -63,13 +63,13 @@ let reduce_to_valid_loc dst size access =
 let warn_indeterminate_value ~name ?(precise = false) = function
   | V_Or_Uninitialized.C_init_noesc _ -> ()
   | _ ->
-    Self.result ~dkey ~current:true ~once:true ~stacktrace:true
+    Self.result ~mkey ~current:true ~once:true ~stacktrace:true
       "@[In %s builtin:@ %sprecise copy@ of indeterminate values.@]"
       name (if precise then "" else "im")
 
 (*  Warns when the offsetmap contains an indeterminate value. *)
 let check_indeterminate_offsetmap ~name offsm =
-  if Self.is_debug_key_enabled dkey then
+  if Self.is_message_category_enabled mkey then
     let warn _ (v, _, _) = warn_indeterminate_value ~name ~precise:true v in
     V_Offsetmap.iter warn offsm
 
@@ -144,7 +144,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state =
 
 (* Copy the value at location [src_loc] to location [dst_loc] in [state]. *)
 let imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state =
-  Self.debug ~dkey ~once:true ~current:true
+  Self.feedback ~mkey ~once:true ~current:true
     "In %s builtin: too many sizes to enumerate, possible loss of precision"
     name;
   (* conflate_bottom:false as we want to copy padding bits *)
@@ -538,7 +538,7 @@ let frama_c_memset state actuals =
       let state, sure_output, over_output =
         try frama_c_memset_precise state dst_expr dst v (exp_size, size)
         with ImpreciseMemset reason ->
-          Self.debug ~dkey ~current:true ~stacktrace:true
+          Self.feedback ~mkey ~current:true ~stacktrace:true
             "Call to builtin precise_memset(%a) failed; %s"
             Eva_utils.pretty_actuals actuals (imprecision_descr reason);
           frama_c_memset_imprecise state dst_expr dst v size

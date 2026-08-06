@@ -29,7 +29,7 @@
         pthread_mutex_unlock :: protect.c:30 <- main
     t[1]: write by <main> at protect.c:25 <- main
     t[3]: write by <main> at protect.c:29 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -37,12 +37,12 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread tjob starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread tjob
 [eva:global-accesses] 
   Globals accessed by thread:
     t[0..9]: read by tjob at protect.c:12 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {}
@@ -72,7 +72,7 @@
         pthread_mutex_unlock :: protect.c:30 <- main
     t[1]: write by <main> at protect.c:25 <- main
     t[3]: write by <main> at protect.c:29 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
       t[1] = 1; protect.c:25 <- main
@@ -103,11 +103,12 @@
 [eva:thread-fixpoint] 
   Analyzing thread tjob starting at job, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] protect.c:12: inject threads interferences at this point
+[eva:debug:interferences] protect.c:12: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     t[0..9]: read by tjob at protect.c:12 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}
@@ -131,7 +132,7 @@
 [eva:global-accesses] 
   Globals accessed by thread:
     t[0..9]: read by tjob at protect.c:12 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread tjob
     concurrent writes:
     shared bases: {t}

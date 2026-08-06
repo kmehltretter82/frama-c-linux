@@ -11,7 +11,7 @@
 [eva:thread] late_start.c:33: New thread: job2, fun f2, parent <main>, args {0}
 [eva:thread] Start thread job2
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -20,13 +20,13 @@
 [eva:thread-fixpoint] Thread job1 has been created but not started. Skipping.
 [eva:thread-fixpoint] 
   Analyzing thread job2 starting at f2, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f2 for thread job2
 [eva:thread] late_start.c:27: Start thread job1
 [eva:global-accesses] 
   Globals accessed by thread:
     job1: read by job2 at late_start.c:27 <- f2
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread job2
     concurrent writes:
     shared bases: {}
@@ -35,10 +35,10 @@
 [eva:thread-fixpoint] 
   Analyzing thread job1 starting at f1, iteration 2 (thread initial memory
     state changed).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f1 for thread job1
 [eva:global-accesses] Globals accessed by thread:
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread job1
     concurrent writes:
     shared bases: {}

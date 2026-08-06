@@ -28,7 +28,7 @@ let find_default_behavior spec =
   List.find (fun b' -> b'.b_name = Cil.default_behavior_name) spec.spec_behavior
 
 let warn_empty_assigns () =
-  Self.warning ~current:true ~once:true ~wkey:Self.wkey_missing_assigns
+  Self.warning ~current:true ~once:true ~wkey:Log_key.warn_missing_assigns
     "Cannot handle empty assigns clause. Assuming assigns \\nothing so that \
      the analysis can continue, but be aware this is probably incorrect."
 
@@ -50,7 +50,7 @@ let warn_empty_from list =
   | [] -> ()
   | (out, _) :: _ ->
     let source = out.it_content.term_loc in
-    Self.warning ~source ~once:true ~wkey:Self.wkey_missing_assigns
+    Self.warning ~source ~once:true ~wkey:Log_key.warn_missing_assigns
       "@[no \\from part for clause@ '%a'.@ Assuming \\from \\nothing so that \
        the analysis can continue, but be aware this is probably incorrect.@]"
       Printer.pp_assigns (Writes no_from)
@@ -124,7 +124,7 @@ let warn_on_missing_result_assigns kinstr kf spec =
   if return_used && not (List.for_all assigns_result spec.spec_behavior)
   then
     let source = Kernel_function.get_location kf in
-    Self.warning ~wkey:Self.wkey_missing_assigns_result  ~once:true ~source
+    Self.warning ~wkey:Log_key.warn_missing_assigns_result  ~once:true ~source
       "@[no 'assigns \\result \\from ...' clause specified for function %a@]"
       Kernel_function.pretty kf
 
@@ -143,7 +143,7 @@ let reduce_to_valid_location kind term loc =
       begin
         if kind = Assign && not (Locations.is_bottom loc) then
           Self.warning ~current:true ~once:true
-            ~wkey:Self.wkey_invalid_assigns
+            ~wkey:Log_key.warn_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
              Ignoring.@]" pp_clause (kind, term);
         None
@@ -349,7 +349,7 @@ module Make (Engine: Engine_Subset) = struct
           | Top (bases, origin) ->
             if Origin.register_write bases origin then
               Self.warning ~current:true ~once:true
-                ~wkey:Self.wkey_garbled_mix_assigns
+                ~wkey:Log_key.warn_garbled_mix_assigns
                 "@[The specification of function %a@ has generated \
                  a garbled mix of addresses@ for %a.@]"
                 Kernel_function.pretty kf pp_clause (Assign, assign.it_content)

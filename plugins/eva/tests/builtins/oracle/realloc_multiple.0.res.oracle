@@ -38,12 +38,12 @@
 [eva:progress] realloc_multiple.c:23: Call to builtin realloc
 [eva:progress] realloc_multiple.c:23: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] bases_to_realloc: {__malloc_main1_l12}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main1_l12}
 [eva:malloc:new] realloc_multiple.c:23: allocating variable __realloc_main1_l23
-[eva:malloc] bases_to_realloc: {__malloc_main1_l9}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main1_l9}
 [eva:malloc:new] realloc_multiple.c:23: 
   allocating variable __realloc_main1_l23_0
-[eva:malloc] realloc_multiple.c:23: 
+[eva:debug:malloc] realloc_multiple.c:23: 
   weak free on bases: {__malloc_main1_l9, __malloc_main1_l12}
 [eva:show] realloc_multiple.c:25: 
   Frama_C_dump_each:
@@ -69,7 +69,7 @@
 [eva:progress] realloc_multiple.c:26: Call to builtin free
 [eva:progress] realloc_multiple.c:26: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc_multiple.c:26: 
+[eva:debug:malloc] realloc_multiple.c:26: 
   weak free on bases: {__realloc_main1_l23, __realloc_main1_l23_0}
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
@@ -106,15 +106,15 @@
 [eva:progress] realloc_multiple.c:45: Call to builtin realloc
 [eva:progress] realloc_multiple.c:45: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] bases_to_realloc: {__malloc_main2_l33}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main2_l33}
 [eva:malloc:new] realloc_multiple.c:45: allocating variable __realloc_main2_l45
-[eva:malloc] bases_to_realloc: {__malloc_main2_l30}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main2_l30}
 [eva:malloc:new] realloc_multiple.c:45: 
   allocating variable __realloc_main2_l45_0
-[eva:malloc] bases_to_realloc: {}
+[eva:debug:malloc] bases_to_realloc: {}
 [eva:malloc:new] realloc_multiple.c:45: 
   allocating variable __realloc_main2_l45_1
-[eva:malloc] realloc_multiple.c:45: 
+[eva:debug:malloc] realloc_multiple.c:45: 
   weak free on bases: {__malloc_main2_l30, __malloc_main2_l33}
 [eva:show] realloc_multiple.c:47: 
   Frama_C_dump_each:
@@ -144,7 +144,7 @@
 [eva:progress] realloc_multiple.c:48: Call to builtin free
 [eva:progress] realloc_multiple.c:48: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc_multiple.c:48: 
+[eva:debug:malloc] realloc_multiple.c:48: 
   weak free on bases: {__realloc_main2_l45, __realloc_main2_l45_0,
                        __realloc_main2_l45_1}
 [eva:progress] Recording results for main2
@@ -184,15 +184,15 @@
 [eva:progress] realloc_multiple.c:65: Call to builtin realloc
 [eva:progress] realloc_multiple.c:65: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] bases_to_realloc: {__malloc_main3_l53}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main3_l53}
 [eva:malloc:new] realloc_multiple.c:65: allocating variable __realloc_main3_l65
-[eva:malloc] bases_to_realloc: {__malloc_main3_l52}
+[eva:debug:malloc] bases_to_realloc: {__malloc_main3_l52}
 [eva:malloc:new] realloc_multiple.c:65: 
   allocating variable __realloc_main3_l65_0
-[eva:malloc] bases_to_realloc: {}
+[eva:debug:malloc] bases_to_realloc: {}
 [eva:malloc:new] realloc_multiple.c:65: 
   allocating variable __realloc_main3_l65_1
-[eva:malloc] realloc_multiple.c:65: 
+[eva:debug:malloc] realloc_multiple.c:65: 
   weak free on bases: {__malloc_main3_l52, __malloc_main3_l53}
 [eva:alarm] realloc_multiple.c:66: Warning: 
   accessing uninitialized left-value. assert \initialized(s);
@@ -254,7 +254,8 @@
 [eva:progress] realloc_multiple.c:70: Call to builtin free
 [eva:progress] realloc_multiple.c:70: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc_multiple.c:70: strong free on bases: {__malloc_main3_l53}
+[eva:debug:malloc] realloc_multiple.c:70: 
+  strong free on bases: {__malloc_main3_l53}
 [eva:progress] Recording results for main3
 [eva:progress] Done for function main3
 [eva:progress] Recording results for main

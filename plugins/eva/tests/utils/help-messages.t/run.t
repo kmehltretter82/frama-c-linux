@@ -154,7 +154,6 @@ Help message about message categories.
   [eva] List of message categories.
   
   # Standard Eva message categories:
-    *                     : All categories
     callstack-hash        : additionally print the current callstack hash in
                             some messages
     callstacks            : print the current callstack alongside some messages
@@ -167,7 +166,7 @@ Help message about message categories.
                             builtins interpreting memcpy, memmove and memset
     initial-state         : at the start of the analysis, print the initial
                             value of global variables
-    malloc                : messages from the builtins interpreting dynamic
+    malloc                : messages from builtins interpreting dynamic
                             allocations
     malloc:automatic-free : messages emitted when bases are automatically freed
                             (alloca or VLA)
@@ -186,8 +185,6 @@ Help message about message categories.
     split-return          : messages related to option -eva-split-return
     summary               : print a summary of the analysis at the end,
                             including coverage and alarm numbers
-    widen-hints           : debug messages when failing to use widen_hints
-                            annotations
     widening              : print a message at each point where the analysis
                             applies a widening
   
@@ -236,17 +233,21 @@ Help message about message categories.
     d-taint                : print states of the taint domain
     d-traces               : print states of the traces domain
     d-unit                 : print states of the unit domain
+    domain_product         : inactive category
   
   # Message categories for debug purposes:
-    d-taint-debug           : print debug states of the taint domain on user
-                              directives
-    domain_product          : inactive category
-    include-string-literals : when printing a state, also include globals
-                              representing string literals
-    interferences           : debug messages about interferences from other
-                              threads injected in Eva analysis with Mthread
-    iterator                : debug messages about the fixpoint engine on the
-                              control-flow graph of functions
+    debug:interferences   : debug messages about interferences from other
+                            threads injected in Eva analysis with Mthread
+    debug:iterator        : debug messages about the fixpoint engine on the
+                            control-flow graph of functions
+    debug:malloc          : debug messages from builtins interpreting dynamic
+                            allocations
+    debug:string-literals : when printing a state, also include globals
+                            representing string literals
+    debug:taint           : print debug states of the taint domain on user
+                            directives
+    debug:widen-hints     : debug messages for the interpretation of
+                            widen_hints annotations
   
   # Message categories by verbosity:
     Message categories are automatically enabled or disabled according to the
@@ -267,11 +268,11 @@ Help message about message categories.
          thread
       5: final-states initial-state
       6: imprecision malloc shared-memory:mutex-details
-      7: pointer-comparison shared-memory:iteration widen-hints widening
+      7: pointer-comparison shared-memory:iteration widening
       8: message-queue mutex nonlin shared-memory:values
       9: callstack-hash callstacks
      10: progress
-     11: cardinal global-accesses include-string-literals
+     11: cardinal global-accesses
   
     Warning categories enabled as feedback message by verbosity level:
       2: watchpoint

@@ -56,7 +56,7 @@ let plugins_ok () =
 let generate_specs () =
   let aux kf =
     if need_assigns kf then begin
-      Self.warning ~wkey:Self.wkey_missing_assigns
+      Self.warning ~wkey:Log_key.warn_missing_assigns
         "@[No assigns specified for function '%a' for which option %s is set. \
          Generating potentially incorrect assigns.@]"
         Kernel_function.pretty kf Parameters.UseSpec.option_name;
@@ -104,7 +104,7 @@ let post_analysis (type t) (engine: t engine) mthread_analysis final_state =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
-  Self.warning ~wkey:Self.wkey_garbled_mix_summary "%t" Origin.pretty_history;
+  Self.warning ~wkey:Log_key.warn_garbled_mix_summary "%t" Origin.pretty_history;
   (* Mark unreachable and RTE statuses. Only do this there, not when the
      analysis was aborted (hence, not in post_cleanup), because the
      propagation is incomplete. Also do not mark unreachable statutes if
@@ -216,7 +216,7 @@ let mthread_fixpoint engine analysis =
   let final_states = Thread.Hashtbl.create 1 in
 
   (* We analyse the main thread *)
-  Self.feedback ~dkey:Self.dkey_thread_fixpoint "First analysis of main thread";
+  Self.feedback ~mkey:Log_key.thread_fixpoint "First analysis of main thread";
   let final_state = compute_thread engine Thread.main in
   Thread.Hashtbl.replace final_states Thread.main final_state;
   Self.debug "First Eva analysis for main thread done." ;

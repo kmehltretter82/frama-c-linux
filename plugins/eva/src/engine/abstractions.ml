@@ -623,7 +623,7 @@ module Domain = struct
   type input = domain_info * domain * Domain_mode.t option
   let add : type c v l. input -> (c, v, l) structured identity =
     fun (info, domain, mode) structured ->
-    let wkey = Self.wkey_experimental in
+    let wkey = Log_key.warn_experimental in
     if info.experimental
     then Self.warning ~wkey "The %s domain is experimental." info.name;
     let module Ctx = (val context structured) in

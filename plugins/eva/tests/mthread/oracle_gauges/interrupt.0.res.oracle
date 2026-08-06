@@ -55,7 +55,7 @@
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
-118a173,205
+121a176,208
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva:show] interrupt.c:20: Frama_C_show_each: {1}
 > [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
@@ -89,7 +89,7 @@
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva:show] interrupt.c:20: Frama_C_show_each: {1}
 > [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
-177a265,297
+180a268,300
 > [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva:show] interrupt.c:20: Frama_C_show_each: {0; 1}
 > [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}

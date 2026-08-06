@@ -34,7 +34,7 @@
     jobs[0..2]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:66 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -42,7 +42,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:thread] recreation.c:25: 
   New thread: jobs[3], fun job, parent jobs[0], args {3}
@@ -59,7 +59,7 @@
     jobs[3..5]:
       write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
@@ -67,7 +67,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:thread] recreation.c:25: 
   New thread: jobs[6], fun job, parent jobs[1], args {6}
@@ -84,7 +84,7 @@
     jobs[6..8]:
       write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
@@ -92,7 +92,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[2] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:thread] recreation.c:25: 
   New thread: jobs[9], fun job, parent jobs[2], args {9}
@@ -109,7 +109,7 @@
     jobs[9..11]:
       write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {}
@@ -117,7 +117,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:mutex] recreation.c:37: Lock locks[2]
 [eva:mutex] recreation.c:38: Lock locks[4]
@@ -147,7 +147,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
     shared bases: {}
@@ -155,7 +155,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[4] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:mutex] recreation.c:37: Lock locks[3]
 [eva:mutex] recreation.c:38: Lock locks[5]
@@ -179,7 +179,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
     shared bases: {}
@@ -187,7 +187,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[5] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[5]
 [eva:mutex] recreation.c:37: Lock locks[4]
 [eva:mutex] recreation.c:38: Lock locks[6]
@@ -211,7 +211,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
     shared bases: {}
@@ -219,7 +219,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[6] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[6]
 [eva:mutex] recreation.c:37: Lock locks[5]
 [eva:mutex] recreation.c:38: Lock locks[7]
@@ -243,7 +243,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
     shared bases: {}
@@ -251,7 +251,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[7] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[7]
 [eva:mutex] recreation.c:37: Lock locks[6]
 [eva:mutex] recreation.c:38: Lock locks[8]
@@ -275,7 +275,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
     shared bases: {}
@@ -283,7 +283,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[8] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[8]
 [eva:mutex] recreation.c:37: Lock locks[7]
 [eva:mutex] recreation.c:38: Lock locks[9]
@@ -307,7 +307,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
     shared bases: {}
@@ -315,7 +315,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[9] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[9]
 [eva:mutex] recreation.c:37: Lock locks[8]
 [eva:mutex] recreation.c:38: Lock locks[10]
@@ -339,7 +339,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
     shared bases: {}
@@ -347,7 +347,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[10] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[10]
 [eva:mutex] recreation.c:37: Lock locks[9]
 [eva:mutex] recreation.c:38: Lock locks[11]
@@ -371,7 +371,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
     shared bases: {}
@@ -379,7 +379,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[11] starting at job, iteration 2 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[11]
 [eva:mutex] recreation.c:37: Lock locks[10]
 [eva:mutex] recreation.c:38: Lock locks[0]
@@ -410,7 +410,7 @@
         pthread_mutex_lock :: recreation.c:37 <- job
       read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:48 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
     shared bases: {}
@@ -434,7 +434,7 @@
     jobs[0..2]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:66 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {end}
@@ -446,14 +446,15 @@
 [eva:thread] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
 [eva:thread] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
 [eva:thread] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
-[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:debug:interferences] recreation.c:28: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     end: read by jobs[0] at recreation.c:28 <- job
     jobs[3..5]:
       write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {end}
@@ -471,7 +472,7 @@
     jobs[6..8]:
       write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {end}
@@ -491,7 +492,7 @@
     jobs[9..11]:
       write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {end}
@@ -500,7 +501,8 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[3] starting at job, iteration 3 (potential shared vars
     changed and interferences changed).
-[eva:interferences] recreation.c:40: inject threads interferences at this point
+[eva:debug:interferences] recreation.c:40: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     end: write by jobs[3] at recreation.c:40 <- job
@@ -519,7 +521,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -551,7 +553,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -583,7 +585,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -615,7 +617,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -647,7 +649,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -679,7 +681,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -711,7 +713,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -743,7 +745,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -774,7 +776,7 @@
         pthread_mutex_lock :: recreation.c:37 <- job
       read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:48 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -819,14 +821,15 @@
   New context for jobs[1], fun job, parent <main>, args {1}
 [eva:thread] recreation.c:66: 
   New context for jobs[2], fun job, parent <main>, args {2}
-[eva:interferences] recreation.c:68: inject threads interferences at this point
+[eva:debug:interferences] recreation.c:68: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     end: read by <main> at recreation.c:68 <- main
     jobs[0..2]:
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:66 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {end}
@@ -847,7 +850,7 @@
     jobs[3..5]:
       write by jobs[0] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {end}
@@ -868,7 +871,7 @@
     jobs[6..8]:
       write by jobs[1] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {end}
@@ -889,7 +892,7 @@
     jobs[9..11]:
       write by jobs[2] at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: recreation.c:25 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
     shared bases: {end}
@@ -916,7 +919,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[3] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -948,7 +951,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[4] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -980,7 +983,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[5] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[5]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1012,7 +1015,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[6] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[6]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1044,7 +1047,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[7] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[7]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1076,7 +1079,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[8] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[8]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1108,7 +1111,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[9] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[9]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1140,7 +1143,7 @@
         pthread_mutex_lock :: recreation.c:38 <- job
       read by jobs[10] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:49 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[10]
     concurrent writes:
       end = 1; recreation.c:40 <- job
@@ -1171,7 +1174,7 @@
         pthread_mutex_lock :: recreation.c:37 <- job
       read by jobs[11] at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: recreation.c:48 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[11]
     concurrent writes:
       end = 1; recreation.c:40 <- job

@@ -8,7 +8,7 @@
 
 open Eval
 
-let dkey = Self.register_category "nonlin" ~level:8
+let mkey = Self.register_message_category "nonlin" ~level:8
     ~help:"messages about evaluation of subdivisions enabled by -eva-subdivide-non-linear"
 
 (* ----------------- Occurrences of lvalues in expressions ------------------ *)
@@ -165,7 +165,7 @@ let compute_non_linear expr =
     let list = reverse_map map in
     List.iter
       (fun (e, lval) ->
-         Self.result ~current:true ~once:true ~dkey
+         Self.result ~current:true ~once:true ~mkey
            "non-linear '%a', lv '%a'" Eva_ast.pp_exp e
            (Pretty_utils.pp_list ~sep:", " Eva_ast.pp_lval) lval)
       list;
@@ -750,7 +750,7 @@ module Make
               then (subdivnb * nb) / (1 lsl (nb - 1))
               else subdivnb
             in
-            Self.result ~current:true ~once:true ~dkey
+            Self.result ~current:true ~once:true ~mkey
               "subdividing on %a"
               (Pretty_utils.pp_list ~sep:", " Eva_ast.pp_lval) lvals;
             let subdivide =

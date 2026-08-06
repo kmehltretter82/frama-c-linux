@@ -8,7 +8,7 @@
 
 open Eval
 
-let dkey_cardinal = Self.register_category "cardinal" ~level:11
+let dkey_cardinal = Self.register_message_category "cardinal" ~level:11
     ~help:"estimate the number of concrete states approximated by the analysis \
            at the end of each function"
 
@@ -47,7 +47,7 @@ let print_final_state kf values =
       Format.fprintf fmt "@[  %a@]" Cvalue.Model.pretty values
   in
   let print_cardinal fmt =
-    if Self.is_debug_key_enabled dkey_cardinal then
+    if Self.is_message_category_enabled dkey_cardinal then
       Format.fprintf fmt " (~%a states)"
         Cvalue.CardinalEstimate.pretty (Cvalue.Model.cardinal_estimate values)
   in
@@ -55,11 +55,11 @@ let print_final_state kf values =
     Format.fprintf fmt "Values at end of function %a:%t"
       Kernel_function.pretty kf print_cardinal
   in
-  Self.printf ~dkey:Self.dkey_final_states ~header "%t" print_filtered_state
+  Self.printf ~mkey:Log_key.final_states ~header "%t" print_filtered_state
 
 let pretty_wo_string_literal fmt s =
   let filtered =
-    if Self.(is_debug_key_enabled dkey_include_string_literal)
+    if Self.is_debug_category_enabled Log_key.debug_string_literal
     then s
     else Cvalue.Model.filter_base (fun b -> not (Base.is_string_literal b)) s
   in
@@ -77,7 +77,7 @@ module State = struct
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
 
-  let log_category = Self.dkey_cvalue_domain
+  let log_category = Log_key.cvalue_domain
 
   include Datatype.Make_with_collections (
     struct
@@ -419,7 +419,7 @@ module State = struct
 
   let post_analysis _state =
     if Plugin.is_present "inout"
-    && Self.is_debug_key_enabled Self.dkey_final_states
+    && Self.is_message_category_enabled Log_key.final_states
     && Self.verbose_atleast 1
     && Parameters.Eva.get ()
     then display_results ();

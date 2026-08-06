@@ -49,7 +49,7 @@ module type LeafDomain = sig
 
   module Store: Domain_store.S with type t := t
 
-  val log_category: Self.category
+  val log_category: Self.message_category
 
   val key: t Abstract_domain.key
 end

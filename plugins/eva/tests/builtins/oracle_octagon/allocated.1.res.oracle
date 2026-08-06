@@ -2,20 +2,20 @@
 > [eva:progress] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
 151a154,155
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva:progress] allocated.c:87: Call to builtin free
 161a166,167
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva:progress] allocated.c:87: Call to builtin free
 171a178,179
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva:progress] allocated.c:87: Call to builtin free
 181,182c189,190
 < [eva:progress] allocated.c:82: Call to builtin malloc
 < [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
 ---
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 230a239,250
 > [eva:progress] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_32
@@ -32,119 +32,119 @@
 233d252
 < [eva:partition] allocated.c:84: Trace partitioning superposing up to 300 states
 236,237d254
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 < [eva:progress] allocated.c:87: Call to builtin free
 286c303,313
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 336c363,373
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 386c423,433
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 436c483,493
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 486c543,553
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 536c603,613
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 586c663,673
-< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 634a722,734
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_33}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_34}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_35}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva:progress] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
+> [eva:debug:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 > [eva:partition] allocated.c:81: Trace partitioning superposing up to 500 states
 749,751c849,850
 <   __malloc_main_l82_7[0] ∈ {21} or UNINITIALIZED

@@ -55,7 +55,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -63,7 +63,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of f for thread jobs
 [eva:mutex] one_var_multiple_threads.c:21: Lock lock1
 [eva:mutex] one_var_multiple_threads.c:24: Release lock1
@@ -80,7 +80,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
@@ -88,7 +88,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of g for thread jobs
 [eva:mutex] one_var_multiple_threads.c:29: Lock lock2
 [eva:mutex] one_var_multiple_threads.c:32: Release lock2
@@ -107,7 +107,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
     shared bases: {}
@@ -144,7 +144,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s1, s2}
@@ -153,9 +153,9 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at f, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] one_var_multiple_threads.c:22: 
+[eva:debug:interferences] one_var_multiple_threads.c:22: 
   inject threads interferences at this point
-[eva:interferences] one_var_multiple_threads.c:23: 
+[eva:debug:interferences] one_var_multiple_threads.c:23: 
   inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -170,7 +170,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s1.data) ++; one_var_multiple_threads.c:22 <- f
@@ -193,9 +193,9 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs starting at g, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] one_var_multiple_threads.c:30: 
+[eva:debug:interferences] one_var_multiple_threads.c:30: 
   inject threads interferences at this point
-[eva:interferences] one_var_multiple_threads.c:31: 
+[eva:debug:interferences] one_var_multiple_threads.c:31: 
   inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -210,7 +210,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s2.data) ++; one_var_multiple_threads.c:30 <- g
@@ -271,13 +271,13 @@
 [eva:thread-fixpoint] 
   Analyzing thread <main> starting at main, iteration 3 (shared vars values
     changed and interferences changed).
-[eva:interferences] one_var_multiple_threads.c:50: 
+[eva:debug:interferences] one_var_multiple_threads.c:50: 
   inject threads interferences at this point
-[eva:interferences] one_var_multiple_threads.c:51: 
+[eva:debug:interferences] one_var_multiple_threads.c:51: 
   inject threads interferences at this point
-[eva:interferences] one_var_multiple_threads.c:54: 
+[eva:debug:interferences] one_var_multiple_threads.c:54: 
   inject threads interferences at this point
-[eva:interferences] one_var_multiple_threads.c:55: 
+[eva:debug:interferences] one_var_multiple_threads.c:55: 
   inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
@@ -301,7 +301,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s1, s2}
@@ -323,7 +323,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s1.data) ++; one_var_multiple_threads.c:22 <- f
@@ -365,7 +365,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s2.data) ++; one_var_multiple_threads.c:30 <- g
@@ -446,7 +446,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s1, s2}
@@ -468,7 +468,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s1.data) ++; one_var_multiple_threads.c:22 <- f
@@ -510,7 +510,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       (s2.data) ++; one_var_multiple_threads.c:30 <- g
@@ -599,7 +599,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s1, s2}
@@ -625,7 +625,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */
@@ -673,7 +673,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:29 <- g
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:32 <- g
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
@@ -758,7 +758,7 @@
       read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:56 <- main
     nondet: read by <main> at one_var_multiple_threads.c:41 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {s1, s2}
@@ -779,7 +779,7 @@
         pthread_mutex_lock :: one_var_multiple_threads.c:21 <- f
       read by jobs at FRAMAC_SHARE/eva/mthread_pthread.c:56 <-
         pthread_mutex_unlock :: one_var_multiple_threads.c:24 <- f
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs
     concurrent writes:
       /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */

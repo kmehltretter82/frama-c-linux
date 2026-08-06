@@ -117,7 +117,7 @@
 [eva:progress] malloc_multiple.c:34: Call to builtin free
 [eva:progress] malloc_multiple.c:34: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc_multiple.c:34: 
+[eva:debug:malloc] malloc_multiple.c:34: 
   weak free on bases: {__malloc_w_allocate_and_free_last_l29_4}
 [eva:progress] malloc_multiple.c:35: assertion got status valid.
 [eva:alarm] malloc_multiple.c:36: Warning: assertion got status unknown.

@@ -30,7 +30,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {}
@@ -38,7 +38,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:mutex] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
@@ -56,7 +56,7 @@
     vars[0]:
       read by jobs[0] at thread_arg.c:26 <- job
       write by jobs[0] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
     shared bases: {}
@@ -64,7 +64,7 @@
     interferences by mutexes:
 [eva:thread-fixpoint] 
   Analyzing thread jobs[1] starting at job, iteration 1 (first iteration).
-[eva:interferences] 
+[eva:debug:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:mutex] thread_arg.c:25: Lock locks[1]
 [eva:mutex] thread_arg.c:27: Release locks[1]
@@ -81,7 +81,7 @@
     vars[1]:
       read by jobs[1] at thread_arg.c:26 <- job
       write by jobs[1] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
     shared bases: {}
@@ -109,7 +109,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
@@ -118,8 +118,10 @@
 [eva:thread-fixpoint] 
   Analyzing thread jobs[0] starting at job, iteration 2 (potential shared vars
     changed and interferences changed).
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
+[eva:debug:interferences] thread_arg.c:26: 
+  inject threads interferences at this point
+[eva:debug:interferences] thread_arg.c:26: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     Frama_C_entropy_source:
@@ -133,7 +135,7 @@
     vars[0]:
       read by jobs[0] at thread_arg.c:26 <- job
       write by jobs[0] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -168,7 +170,7 @@
     vars[1]:
       read by jobs[1] at thread_arg.c:26 <- job
       write by jobs[1] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -220,7 +222,8 @@
     changed and interferences changed).
 [eva:thread] thread_arg.c:37: 
   New context for jobs[1], fun job, parent <main>, args {1}
-[eva:interferences] thread_arg.c:45: inject threads interferences at this point
+[eva:debug:interferences] thread_arg.c:45: 
+  inject threads interferences at this point
 [eva:global-accesses] 
   Globals accessed by thread:
     locks[0..1]:
@@ -232,7 +235,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
@@ -254,7 +257,7 @@
     vars[0]:
       read by jobs[0] at thread_arg.c:26 <- job
       write by jobs[0] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -291,7 +294,7 @@
     vars[1]:
       read by jobs[1] at thread_arg.c:26 <- job
       write by jobs[1] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -344,7 +347,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
@@ -366,7 +369,7 @@
     vars[0]:
       read by jobs[0] at thread_arg.c:26 <- job
       write by jobs[0] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -409,7 +412,7 @@
     vars[1]:
       read by jobs[1] at thread_arg.c:26 <- job
       write by jobs[1] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -464,7 +467,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
@@ -486,7 +489,7 @@
     vars[0]:
       read by jobs[0] at thread_arg.c:26 <- job
       write by jobs[0] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -523,7 +526,7 @@
     vars[1]:
       read by jobs[1] at thread_arg.c:26 <- job
       write by jobs[1] at thread_arg.c:26 <- job
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread jobs[1]
     concurrent writes:
       tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
@@ -570,7 +573,7 @@
       write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-
         pthread_create :: thread_arg.c:37 <- main
     vars[0..1]: read by <main> at thread_arg.c:45 <- main
-[eva:interferences] 
+[eva:debug:interferences] 
   Interferences from thread <main>
     concurrent writes:
     shared bases: {Frama_C_entropy_source, vars}
