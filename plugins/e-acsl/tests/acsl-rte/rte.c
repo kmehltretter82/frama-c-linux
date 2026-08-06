@@ -4,6 +4,11 @@
 
 #include <stdlib.h>
 
+struct s
+{
+  int *b;
+};
+
 /*@ ensures
     \let delta = 1;
     \let avg_real = (a+b)/2;
@@ -118,6 +123,10 @@ int main(void) {
   **p = malloc(sizeof(int));
   ***p = 23;
   /*@ assert ***p / i == 23; */
+
+  struct s struct_s;
+  struct_s.b;
+  /*@ assert !\initialized(struct_s.b + (0..1)); */ // pathological case for item #96
 
   return 0;
 }
