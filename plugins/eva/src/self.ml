@@ -15,7 +15,8 @@ include Plugin.Register
       let name = "Eva"
       let shortname = "eva"
       let help =
-        "automatically computes variation domains for the variables of the program"
+        "Static analysis to prove the absence of run-time errors by inferring \
+         properties on program variables using abstract interpretation"
     end)
 
 let () =

@@ -1,7 +1,7 @@
 Plug-in name: Eva
 Plug-in shortname: eva
 Description:
-automatically computes variation domains for the variables of the program
+Static analysis to prove the absence of run-time errors by inferring properties on program variables using abstract interpretation
 
 Most options of the form '-eva-option-name' and without any parameter
 have an opposite with the name '-eva-no-option-name'.
