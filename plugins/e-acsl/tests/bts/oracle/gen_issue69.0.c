@@ -45,65 +45,39 @@ int main(void)
   }
   /*@ assert \forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255; */ ;
   int n = 5;
-  __e_acsl_store_block((void *)(& n),4UL);
-  __e_acsl_full_init((void *)(& n));
   {
     int __gen_e_acsl_m;
-    int __gen_e_acsl_initialized;
     int __gen_e_acsl_if;
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_u;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& n),
-                                                    sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&n",
-                                 (void *)(& n));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "uninitialized: \\initialized(&n)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&n); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&n)";
-      __gen_e_acsl_assert_data_3.file = "issue69.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 10;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
     if (n > 0) __gen_e_acsl_if = 4; else __gen_e_acsl_if = 341;
     __gen_e_acsl_m = __gen_e_acsl_if;
     __gen_e_acsl_forall_2 = 1;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gen_e_acsl_u = 2;
     while (1) {
       {
         int __gen_e_acsl_and_2;
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"u",0,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"u",0,
                                      __gen_e_acsl_u);
         if (-128 <= __gen_e_acsl_u) {
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"u",0,
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"u",0,
                                        __gen_e_acsl_u);
           __gen_e_acsl_and_2 = __gen_e_acsl_u < 128;
         }
         else __gen_e_acsl_and_2 = 0;
-        __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
-        __gen_e_acsl_assert_data_4.pred_txt = "-128 <= u < 128";
-        __gen_e_acsl_assert_data_4.file = "issue69.c";
-        __gen_e_acsl_assert_data_4.fct = "main";
-        __gen_e_acsl_assert_data_4.line = 11;
-        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "-128 <= u < 128";
+        __gen_e_acsl_assert_data_3.file = "issue69.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 11;
+        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       }
       if (__gen_e_acsl_u < __gen_e_acsl_m) ; else break;
       if (__gen_e_acsl_u > 0) ;
@@ -130,7 +104,6 @@ int main(void)
    */
   ;
   __retres = 0;
-  __e_acsl_delete_block((void *)(& n));
   __e_acsl_memory_clean();
   return __retres;
 }

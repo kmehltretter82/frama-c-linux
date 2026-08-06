@@ -173,7 +173,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(&arr[1],4); */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(&arr[1],4)";
       __gen_e_acsl_assert_data_6.file = "nfm_2019.c";
       __gen_e_acsl_assert_data_6.fct = "main";
@@ -219,7 +219,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(&arr[1],4); */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
+      __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(&arr[1],4)";
       __gen_e_acsl_assert_data_8.file = "nfm_2019.c";
       __gen_e_acsl_assert_data_8.fct = "main";
@@ -265,7 +265,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(&arr[1],4); */
     {
       __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(&arr[1],4)";
       __gen_e_acsl_assert_data_10.file = "nfm_2019.c";
       __gen_e_acsl_assert_data_10.fct = "main";
@@ -311,7 +311,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(&arr[2],4); */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
+      __gen_e_acsl_assert_data_12.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(&arr[2],4)";
       __gen_e_acsl_assert_data_12.file = "nfm_2019.c";
       __gen_e_acsl_assert_data_12.fct = "main";
@@ -357,7 +357,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(&arr[2],4); */
     {
       __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "RTE";
+      __gen_e_acsl_assert_data_14.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_14.pred_txt = "\\aligned(&arr[2],4)";
       __gen_e_acsl_assert_data_14.file = "nfm_2019.c";
       __gen_e_acsl_assert_data_14.fct = "main";

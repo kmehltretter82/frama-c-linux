@@ -37,31 +37,7 @@ int main(void)
   __e_acsl_store_block((void *)(& tmp),8UL);
   __e_acsl_full_init((void *)(& tmp));
   {
-    int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& tmp),
-                                                    sizeof(time_t));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&tmp",
-                                 (void *)(& tmp));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(time_t)",0,sizeof(time_t));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "uninitialized: \\initialized(&tmp)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&tmp); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&tmp)";
-      __gen_e_acsl_assert_data_2.file = "vdso.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 13;
-      __gen_e_acsl_assert_data_2.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"tmp",0,tmp);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
@@ -124,7 +100,7 @@ time_t __gen_e_acsl_time(time_t *timer)
     /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(timer,8)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data.fct = "time";
@@ -146,7 +122,7 @@ time_t __gen_e_acsl_time(time_t *timer)
     /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(timer,8)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_2.fct = "time";
@@ -168,7 +144,7 @@ time_t __gen_e_acsl_time(time_t *timer)
     /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(timer,8)";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_3.fct = "time";
@@ -197,7 +173,7 @@ time_t __gen_e_acsl_time(time_t *timer)
       /*@ assert E_ACSL: "pointer alignment": \aligned(timer,8); */
       {
         __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
         __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(timer,8)";
         __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/time.h";
         __gen_e_acsl_assert_data_5.fct = "time";

@@ -104,7 +104,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,1); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(ptr,1)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_2.fct = "fread";
@@ -161,7 +161,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  "__gen_e_acsl_if",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "(\\let size = sizeof(char) * (((nmemb * size - 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_3.fct = "fread";
@@ -207,7 +207,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     /*@ assert E_ACSL: "pointer alignment": \aligned(stream,4); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(stream,4)";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_5.fct = "fread";
@@ -271,7 +271,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,"size",0,
                                    size);
     __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_6.pred_txt = "__retres * size <= 18446744073709551615";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_6.fct = "fread";
@@ -333,7 +333,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(ptr),1); */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(\\old(ptr),1)";
       __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_9.fct = "fread";
@@ -394,7 +394,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  "__gen_e_acsl_if_2",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_assert_data_10.blocking = 1;
-    __gen_e_acsl_assert_data_10.kind = "RTE";
+    __gen_e_acsl_assert_data_10.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_10.pred_txt = "(\\let size = sizeof(char) * (((\\result * \\old(size) - 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_10.fct = "fread";
@@ -496,7 +496,7 @@ int __gen_e_acsl_fclose(FILE *stream)
     /*@ assert E_ACSL: "pointer alignment": \aligned(stream,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(stream,4)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_2.fct = "fclose";

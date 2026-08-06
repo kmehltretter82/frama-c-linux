@@ -38,7 +38,6 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
   {
     int __gen_e_acsl_aligned;
-    int __gen_e_acsl_initialized;
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
@@ -52,7 +51,7 @@ int main(int argc, char const **argv)
     /*@ assert E_ACSL: "pointer alignment": \aligned(q,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(q,4)";
       __gen_e_acsl_assert_data_3.file = "t_fptr.c";
       __gen_e_acsl_assert_data_3.fct = "main";
@@ -60,29 +59,6 @@ int main(int argc, char const **argv)
       __gen_e_acsl_assert_data_3.name = "pointer alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& q),
-                                                    sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&q",
-                                 (void *)(& q));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                   "sizeof(int *)",0,sizeof(int *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "uninitialized: \\initialized(&q)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&q); */
-    {
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&q)";
-      __gen_e_acsl_assert_data_4.file = "t_fptr.c";
-      __gen_e_acsl_assert_data_4.fct = "main";
-      __gen_e_acsl_assert_data_4.line = 19;
-      __gen_e_acsl_assert_data_4.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_valid = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
                                         (void *)(& q));

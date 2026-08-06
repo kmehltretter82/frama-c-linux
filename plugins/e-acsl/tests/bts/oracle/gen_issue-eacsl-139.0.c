@@ -56,7 +56,7 @@ void __gen_e_acsl_f(struct X *item)
     /*@ assert E_ACSL: "pointer alignment": \aligned(item,4); */
     {
       __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data.pred_txt = "\\aligned(item,4)";
       __gen_e_acsl_assert_data.file = "issue-eacsl-139.c";
       __gen_e_acsl_assert_data.fct = "f";
@@ -81,7 +81,7 @@ void __gen_e_acsl_f(struct X *item)
     /*@ assert E_ACSL: "memory access": \valid_read(item); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(item)";
       __gen_e_acsl_assert_data_2.file = "issue-eacsl-139.c";
       __gen_e_acsl_assert_data_2.fct = "f";
@@ -102,7 +102,7 @@ void __gen_e_acsl_f(struct X *item)
     /*@ assert E_ACSL: "pointer alignment": \aligned(item,4); */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(item,4)";
       __gen_e_acsl_assert_data_3.file = "issue-eacsl-139.c";
       __gen_e_acsl_assert_data_3.fct = "f";
@@ -122,7 +122,7 @@ void __gen_e_acsl_f(struct X *item)
     /*@ assert E_ACSL: "pointer alignment": \aligned(\old(item),4); */
     {
       __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(\\old(item),4)";
       __gen_e_acsl_assert_data_4.file = "issue-eacsl-139.c";
       __gen_e_acsl_assert_data_4.fct = "f";

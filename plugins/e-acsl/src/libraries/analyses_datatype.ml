@@ -27,7 +27,7 @@ module Annotation_kind =
         | Postcondition -> Format.fprintf fmt "Postcondition"
         | Invariant -> Format.fprintf fmt "Invariant"
         | Variant -> Format.fprintf fmt "Variant"
-        | RTE -> Format.fprintf fmt "RTE"
+        | RTE -> Format.fprintf fmt "E-ACSL RTE"
     end)
 
 module Pred_or_term =

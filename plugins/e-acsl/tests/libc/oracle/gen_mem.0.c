@@ -648,7 +648,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(dest,1); */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(dest,1)";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_5.fct = "memcpy";
@@ -685,7 +685,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                  0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,"n",0,n);
     __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read((char *)dest + (0 .. n - 1))";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_4.fct = "memcpy";
@@ -703,7 +703,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     /*@ assert E_ACSL: "pointer alignment": \aligned(src,1); */
     {
       __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(src,1)";
       __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_7.fct = "memcpy";
@@ -732,7 +732,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                  0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,"n",0,n);
     __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
     __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read((char *)src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_6.fct = "memcpy";

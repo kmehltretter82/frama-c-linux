@@ -1,5 +1,5 @@
 aligned.c: In function 'main'
-aligned.c:21: Error: RTE failed:
+aligned.c:21: Error: E-ACSL RTE failed:
 	The failing predicate is:
 	division by zero:
 		2 - 2 ≢ 0.

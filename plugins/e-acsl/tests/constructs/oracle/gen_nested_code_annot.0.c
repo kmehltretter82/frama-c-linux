@@ -11,62 +11,9 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 0;
-  __e_acsl_store_block((void *)(& x),4UL);
-  __e_acsl_full_init((void *)(& x));
   int y = 1;
-  __e_acsl_store_block((void *)(& y),4UL);
-  __e_acsl_full_init((void *)(& y));
   {
-    int __gen_e_acsl_initialized;
-    int __gen_e_acsl_initialized_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
-                                                    sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&x",
-                                 (void *)(& x));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "uninitialized: \\initialized(&x)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&x)";
-      __gen_e_acsl_assert_data_2.file = "nested_code_annot.i";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 7;
-      __gen_e_acsl_assert_data_2.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& y),
-                                                      sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&y",
-                                 (void *)(& y));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "uninitialized: \\initialized(&y)",0,
-                                 __gen_e_acsl_initialized_2);
-    /*@ assert E_ACSL: uninitialized: \initialized(&y); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&y)";
-      __gen_e_acsl_assert_data_3.file = "nested_code_annot.i";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 7;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_2,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"x",0,x);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"y",0,y);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -80,279 +27,125 @@ int main(void)
   }
   /*@ assert x < y; */ ;
   {
-    int __gen_e_acsl_initialized_8;
     {
-      int __gen_e_acsl_initialized_3;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& x),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&x",
-                                   (void *)(& x));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                   "uninitialized: \\initialized(&x)",0,
-                                   __gen_e_acsl_initialized_3);
-      /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-      {
-        __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
-        __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&x)";
-        __gen_e_acsl_assert_data_5.file = "nested_code_annot.i";
-        __gen_e_acsl_assert_data_5.fct = "main";
-        __gen_e_acsl_assert_data_5.line = 8;
-        __gen_e_acsl_assert_data_5.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_3,
-                        & __gen_e_acsl_assert_data_5);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-      }
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"x",0,x);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "Precondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "x == 0";
-      __gen_e_acsl_assert_data_4.file = "nested_code_annot.i";
-      __gen_e_acsl_assert_data_4.fct = "main";
-      __gen_e_acsl_assert_data_4.line = 8;
-      __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"x",0,x);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Precondition";
+      __gen_e_acsl_assert_data_2.pred_txt = "x == 0";
+      __gen_e_acsl_assert_data_2.file = "nested_code_annot.i";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 8;
+      __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
     /*@ requires x == 0;
         ensures x >= 1; */
     if (x) {
       {
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
-        __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "Assertion";
-        __gen_e_acsl_assert_data_6.pred_txt = "\\false";
-        __gen_e_acsl_assert_data_6.file = "nested_code_annot.i";
-        __gen_e_acsl_assert_data_6.fct = "main";
-        __gen_e_acsl_assert_data_6.line = 12;
-        __e_acsl_assert(0,& __gen_e_acsl_assert_data_6);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "Assertion";
+        __gen_e_acsl_assert_data_3.pred_txt = "\\false";
+        __gen_e_acsl_assert_data_3.file = "nested_code_annot.i";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 12;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       /*@ assert \false; */ ;
     }
     else {
       {
-        int __gen_e_acsl_initialized_5;
         {
-          int __gen_e_acsl_initialized_4;
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
             {.values = (void *)0};
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-            {.values = (void *)0};
-          __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& x),
-                                                            sizeof(int));
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&x",
-                                       (void *)(& x));
-          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
-                                         "sizeof(int)",0,sizeof(int));
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                       "uninitialized: \\initialized(&x)",0,
-                                       __gen_e_acsl_initialized_4);
-          /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-          {
-            __gen_e_acsl_assert_data_8.blocking = 1;
-            __gen_e_acsl_assert_data_8.kind = "RTE";
-            __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&x)";
-            __gen_e_acsl_assert_data_8.file = "nested_code_annot.i";
-            __gen_e_acsl_assert_data_8.fct = "main";
-            __gen_e_acsl_assert_data_8.line = 14;
-            __gen_e_acsl_assert_data_8.name = "uninitialized";
-            __e_acsl_assert(__gen_e_acsl_initialized_4,
-                            & __gen_e_acsl_assert_data_8);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-          }
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"x",0,x);
-          __gen_e_acsl_assert_data_7.blocking = 1;
-          __gen_e_acsl_assert_data_7.kind = "Precondition";
-          __gen_e_acsl_assert_data_7.pred_txt = "x == 0";
-          __gen_e_acsl_assert_data_7.file = "nested_code_annot.i";
-          __gen_e_acsl_assert_data_7.fct = "main";
-          __gen_e_acsl_assert_data_7.line = 14;
-          __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_7);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-          __e_acsl_full_init((void *)(& x));
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"x",0,x);
+          __gen_e_acsl_assert_data_4.blocking = 1;
+          __gen_e_acsl_assert_data_4.kind = "Precondition";
+          __gen_e_acsl_assert_data_4.pred_txt = "x == 0";
+          __gen_e_acsl_assert_data_4.file = "nested_code_annot.i";
+          __gen_e_acsl_assert_data_4.fct = "main";
+          __gen_e_acsl_assert_data_4.line = 14;
+          __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_4);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         }
         /*@ requires x == 0;
             ensures x == 1; */
         x ++;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-          {.values = (void *)0};
-        __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& x),
-                                                          sizeof(int));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"&x",
-                                     (void *)(& x));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
-                                       "sizeof(int)",0,sizeof(int));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                     "uninitialized: \\initialized(&x)",0,
-                                     __gen_e_acsl_initialized_5);
-        /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-        {
-          __gen_e_acsl_assert_data_10.blocking = 1;
-          __gen_e_acsl_assert_data_10.kind = "RTE";
-          __gen_e_acsl_assert_data_10.pred_txt = "\\initialized(&x)";
-          __gen_e_acsl_assert_data_10.file = "nested_code_annot.i";
-          __gen_e_acsl_assert_data_10.fct = "main";
-          __gen_e_acsl_assert_data_10.line = 15;
-          __gen_e_acsl_assert_data_10.name = "uninitialized";
-          __e_acsl_assert(__gen_e_acsl_initialized_5,
-                          & __gen_e_acsl_assert_data_10);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-        }
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"x",0,x);
-        __gen_e_acsl_assert_data_9.blocking = 1;
-        __gen_e_acsl_assert_data_9.kind = "Postcondition";
-        __gen_e_acsl_assert_data_9.pred_txt = "x == 1";
-        __gen_e_acsl_assert_data_9.file = "nested_code_annot.i";
-        __gen_e_acsl_assert_data_9.fct = "main";
-        __gen_e_acsl_assert_data_9.line = 15;
-        __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_9);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"x",0,x);
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "Postcondition";
+        __gen_e_acsl_assert_data_5.pred_txt = "x == 1";
+        __gen_e_acsl_assert_data_5.file = "nested_code_annot.i";
+        __gen_e_acsl_assert_data_5.fct = "main";
+        __gen_e_acsl_assert_data_5.line = 15;
+        __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       }
       if (x) {
         {
-          int __gen_e_acsl_initialized_7;
           {
-            int __gen_e_acsl_initialized_6;
-            __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+            __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
               {.values = (void *)0};
-            __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
-              {.values = (void *)0};
-            __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& x),
-                                                              sizeof(int));
-            __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,"&x",
-                                         (void *)(& x));
-            __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
-                                           "sizeof(int)",0,sizeof(int));
-            __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
-                                         "uninitialized: \\initialized(&x)",
-                                         0,__gen_e_acsl_initialized_6);
-            /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-            {
-              __gen_e_acsl_assert_data_12.blocking = 1;
-              __gen_e_acsl_assert_data_12.kind = "RTE";
-              __gen_e_acsl_assert_data_12.pred_txt = "\\initialized(&x)";
-              __gen_e_acsl_assert_data_12.file = "nested_code_annot.i";
-              __gen_e_acsl_assert_data_12.fct = "main";
-              __gen_e_acsl_assert_data_12.line = 18;
-              __gen_e_acsl_assert_data_12.name = "uninitialized";
-              __e_acsl_assert(__gen_e_acsl_initialized_6,
-                              & __gen_e_acsl_assert_data_12);
-              __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
-            }
-            __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"x",0,
+            __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"x",0,
                                          x);
-            __gen_e_acsl_assert_data_11.blocking = 1;
-            __gen_e_acsl_assert_data_11.kind = "Precondition";
-            __gen_e_acsl_assert_data_11.pred_txt = "x == 1";
-            __gen_e_acsl_assert_data_11.file = "nested_code_annot.i";
-            __gen_e_acsl_assert_data_11.fct = "main";
-            __gen_e_acsl_assert_data_11.line = 18;
-            __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_11);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
-            __e_acsl_full_init((void *)(& x));
+            __gen_e_acsl_assert_data_6.blocking = 1;
+            __gen_e_acsl_assert_data_6.kind = "Precondition";
+            __gen_e_acsl_assert_data_6.pred_txt = "x == 1";
+            __gen_e_acsl_assert_data_6.file = "nested_code_annot.i";
+            __gen_e_acsl_assert_data_6.fct = "main";
+            __gen_e_acsl_assert_data_6.line = 18;
+            __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_6);
+            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
           }
           /*@ requires x == 1;
               ensures x == 2; */
           x ++;
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
             {.values = (void *)0};
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
-            {.values = (void *)0};
-          __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& x),
-                                                            sizeof(int));
-          __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,"&x",
-                                       (void *)(& x));
-          __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
-                                         "sizeof(int)",0,sizeof(int));
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
-                                       "uninitialized: \\initialized(&x)",0,
-                                       __gen_e_acsl_initialized_7);
-          /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-          {
-            __gen_e_acsl_assert_data_14.blocking = 1;
-            __gen_e_acsl_assert_data_14.kind = "RTE";
-            __gen_e_acsl_assert_data_14.pred_txt = "\\initialized(&x)";
-            __gen_e_acsl_assert_data_14.file = "nested_code_annot.i";
-            __gen_e_acsl_assert_data_14.fct = "main";
-            __gen_e_acsl_assert_data_14.line = 19;
-            __gen_e_acsl_assert_data_14.name = "uninitialized";
-            __e_acsl_assert(__gen_e_acsl_initialized_7,
-                            & __gen_e_acsl_assert_data_14);
-            __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
-          }
-          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"x",0,x);
-          __gen_e_acsl_assert_data_13.blocking = 1;
-          __gen_e_acsl_assert_data_13.kind = "Postcondition";
-          __gen_e_acsl_assert_data_13.pred_txt = "x == 2";
-          __gen_e_acsl_assert_data_13.file = "nested_code_annot.i";
-          __gen_e_acsl_assert_data_13.fct = "main";
-          __gen_e_acsl_assert_data_13.line = 19;
-          __e_acsl_assert(x == 2,& __gen_e_acsl_assert_data_13);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"x",0,x);
+          __gen_e_acsl_assert_data_7.blocking = 1;
+          __gen_e_acsl_assert_data_7.kind = "Postcondition";
+          __gen_e_acsl_assert_data_7.pred_txt = "x == 2";
+          __gen_e_acsl_assert_data_7.file = "nested_code_annot.i";
+          __gen_e_acsl_assert_data_7.fct = "main";
+          __gen_e_acsl_assert_data_7.line = 19;
+          __e_acsl_assert(x == 2,& __gen_e_acsl_assert_data_7);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         }
       }
       else {
         {
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
             {.values = (void *)0};
-          __gen_e_acsl_assert_data_15.blocking = 1;
-          __gen_e_acsl_assert_data_15.kind = "Assertion";
-          __gen_e_acsl_assert_data_15.pred_txt = "\\false";
-          __gen_e_acsl_assert_data_15.file = "nested_code_annot.i";
-          __gen_e_acsl_assert_data_15.fct = "main";
-          __gen_e_acsl_assert_data_15.line = 21;
-          __e_acsl_assert(0,& __gen_e_acsl_assert_data_15);
+          __gen_e_acsl_assert_data_8.blocking = 1;
+          __gen_e_acsl_assert_data_8.kind = "Assertion";
+          __gen_e_acsl_assert_data_8.pred_txt = "\\false";
+          __gen_e_acsl_assert_data_8.file = "nested_code_annot.i";
+          __gen_e_acsl_assert_data_8.fct = "main";
+          __gen_e_acsl_assert_data_8.line = 21;
+          __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
         }
         /*@ assert \false; */ ;
       }
     }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& x),
-                                                      sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,"&x",
-                                 (void *)(& x));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                 "uninitialized: \\initialized(&x)",0,
-                                 __gen_e_acsl_initialized_8);
-    /*@ assert E_ACSL: uninitialized: \initialized(&x); */
-    {
-      __gen_e_acsl_assert_data_17.blocking = 1;
-      __gen_e_acsl_assert_data_17.kind = "RTE";
-      __gen_e_acsl_assert_data_17.pred_txt = "\\initialized(&x)";
-      __gen_e_acsl_assert_data_17.file = "nested_code_annot.i";
-      __gen_e_acsl_assert_data_17.fct = "main";
-      __gen_e_acsl_assert_data_17.line = 9;
-      __gen_e_acsl_assert_data_17.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_8,
-                      & __gen_e_acsl_assert_data_17);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
-    }
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"x",0,x);
-    __gen_e_acsl_assert_data_16.blocking = 1;
-    __gen_e_acsl_assert_data_16.kind = "Postcondition";
-    __gen_e_acsl_assert_data_16.pred_txt = "x >= 1";
-    __gen_e_acsl_assert_data_16.file = "nested_code_annot.i";
-    __gen_e_acsl_assert_data_16.fct = "main";
-    __gen_e_acsl_assert_data_16.line = 9;
-    __e_acsl_assert(x >= 1,& __gen_e_acsl_assert_data_16);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"x",0,x);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Postcondition";
+    __gen_e_acsl_assert_data_9.pred_txt = "x >= 1";
+    __gen_e_acsl_assert_data_9.file = "nested_code_annot.i";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 9;
+    __e_acsl_assert(x >= 1,& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
   __retres = 0;
-  __e_acsl_delete_block((void *)(& y));
-  __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
 }

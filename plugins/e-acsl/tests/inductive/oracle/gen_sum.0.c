@@ -70,7 +70,6 @@ int main(void)
   __e_acsl_full_init((void *)(& ptr));
   {
     int __gen_e_acsl_aligned;
-    int __gen_e_acsl_initialized;
     int __gen_e_acsl_sum_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -84,7 +83,7 @@ int main(void)
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,4); */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(ptr,4)";
       __gen_e_acsl_assert_data_2.file = "sum.c";
       __gen_e_acsl_assert_data_2.fct = "main";
@@ -92,29 +91,6 @@ int main(void)
       __gen_e_acsl_assert_data_2.name = "pointer alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& ptr),
-                                                    sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&ptr",
-                                 (void *)(& ptr));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(int *)",0,sizeof(int *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "uninitialized: \\initialized(&ptr)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&ptr); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&ptr)";
-      __gen_e_acsl_assert_data_3.file = "sum.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 29;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_sum_here_2 = __gen_e_acsl_sum_here(ptr,1,2,4,5);
     if (! __gen_e_acsl_sum_here_2) __e_acsl_sound_verdict = 0;
@@ -135,69 +111,44 @@ int main(void)
   /*@ assert sum(ptr, 1, 2, 4, 5); */ ;
   {
     int __gen_e_acsl_aligned_2;
-    int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_sum_here_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-      {.values = (void *)0};
     __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)ptr,4UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"ptr",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"ptr",
                                  (void *)ptr);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "\"pointer alignment\": \\aligned(ptr,4)",0,
                                  __gen_e_acsl_aligned_2);
     /*@ assert E_ACSL: "pointer alignment": \aligned(ptr,4); */
     {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(ptr,4)";
-      __gen_e_acsl_assert_data_6.file = "sum.c";
-      __gen_e_acsl_assert_data_6.fct = "main";
-      __gen_e_acsl_assert_data_6.line = 30;
-      __gen_e_acsl_assert_data_6.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& ptr),
-                                                      sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&ptr",
-                                 (void *)(& ptr));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                   "sizeof(int *)",0,sizeof(int *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "uninitialized: \\initialized(&ptr)",0,
-                                 __gen_e_acsl_initialized_2);
-    /*@ assert E_ACSL: uninitialized: \initialized(&ptr); */
-    {
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&ptr)";
-      __gen_e_acsl_assert_data_7.file = "sum.c";
-      __gen_e_acsl_assert_data_7.fct = "main";
-      __gen_e_acsl_assert_data_7.line = 30;
-      __gen_e_acsl_assert_data_7.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_2,
-                      & __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(ptr,4)";
+      __gen_e_acsl_assert_data_5.file = "sum.c";
+      __gen_e_acsl_assert_data_5.fct = "main";
+      __gen_e_acsl_assert_data_5.line = 30;
+      __gen_e_acsl_assert_data_5.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __gen_e_acsl_sum_here_4 = __gen_e_acsl_sum_here(ptr,1,2,4,4);
     if (! __gen_e_acsl_sum_here_4) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"ptr",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"ptr",
                                  (void *)ptr);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "sum(ptr, 1, 2, 4, 4)",0,
                                  __gen_e_acsl_sum_here_4);
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "Assertion";
-    __gen_e_acsl_assert_data_5.pred_txt = "!sum(ptr, 1, 2, 4, 4)";
-    __gen_e_acsl_assert_data_5.file = "sum.c";
-    __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 30;
-    __e_acsl_assert(! __gen_e_acsl_sum_here_4,& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!sum(ptr, 1, 2, 4, 4)";
+    __gen_e_acsl_assert_data_4.file = "sum.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 30;
+    __e_acsl_assert(! __gen_e_acsl_sum_here_4,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !sum(ptr, 1, 2, 4, 4); */ ;
   __retres = 0;
@@ -266,15 +217,15 @@ void __gen_e_acsl_sum_fun5_here(__e_acsl_mpz_t *__retres_arg, int *arr,
     else {
       __e_acsl_mpz_t __gen_e_acsl__3;
       {
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
-        __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "Assertion";
-        __gen_e_acsl_assert_data_4.pred_txt = "Incomplete inductive function";
-        __gen_e_acsl_assert_data_4.file = "sum.c";
-        __gen_e_acsl_assert_data_4.fct = "sum_fun5_here";
-        __gen_e_acsl_assert_data_4.line = 16;
-        __e_acsl_assert(0,& __gen_e_acsl_assert_data_4);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "Assertion";
+        __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_3.file = "sum.c";
+        __gen_e_acsl_assert_data_3.fct = "sum_fun5_here";
+        __gen_e_acsl_assert_data_3.line = 16;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       __gmpz_init_set_si(__gen_e_acsl__3,0L);
       __gmpz_init_set(__gen_e_acsl_if,

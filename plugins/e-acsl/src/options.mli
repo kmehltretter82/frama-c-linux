@@ -23,6 +23,7 @@ module O : Parameter_sig.Int
 module Optimisations : sig
   module Hypothesis_gathering : Parameter_sig.Bool
   module Rte : Parameter_sig.Bool
+  module Rte_initialized : Parameter_sig.Bool
   module Trivial_rte : Parameter_sig.Bool
   module Smart_il : Parameter_sig.Bool
   module Verify_valid: Parameter_sig.Bool
