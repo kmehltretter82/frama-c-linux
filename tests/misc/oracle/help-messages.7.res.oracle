@@ -73,6 +73,7 @@ Options taking a string as argument should preferably be written
 -e-acsl-O-no-rte    opposite of -e-acsl-O-rte
 -e-acsl-O-no-rte-initialized  opposite of -e-acsl-O-rte-initialized (set by
                     default)
+-e-acsl-O-no-smart-cil  opposite of -e-acsl-O-smart-cil
 -e-acsl-O-no-smart-il  opposite of -e-acsl-O-smart-il
 -e-acsl-O-no-trivial-rte  opposite of -e-acsl-O-trivial-rte (set by default)
 -e-acsl-O-no-valid  opposite of -e-acsl-O-valid (set by default)
@@ -85,6 +86,9 @@ Options taking a string as argument should preferably be written
 -e-acsl-O-rte-initialized  (O ≤ 1) generate 'initialization' RTE guards for
                     all specifications (opposite option is
                     -e-acsl-O-no-rte-initialized)
+-e-acsl-O-smart-cil  (O ≥ 1) optimises cil statements and predicates using
+                    smart constructors (set by default, opposite option is
+                    -e-acsl-O-no-smart-cil)
 -e-acsl-O-smart-il  (O ≥ 1) optimises expressions using smart constructors
                     (set by default, opposite option is
                     -e-acsl-O-no-smart-il)

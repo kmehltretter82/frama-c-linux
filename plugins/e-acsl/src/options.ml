@@ -206,6 +206,14 @@ module Optimisations = struct
       let descr = "optimises expressions using smart constructors"
     end)
 
+  module Smart_cil =
+    Make (struct
+      let name = "smart-cil"
+      let level = Geq 1
+      let descr = "optimises cil statements and predicates using smart constructors"
+    end)
+
+
   module Verify_valid =
     Make (struct
       let name = "valid"

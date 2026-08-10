@@ -9,13 +9,13 @@
 open Cil_types
 
 let tsizeof ?(loc = Options.gen_loc) typ =
-  if Options.O.get () > 0 then
+  if Options.Optimisations.Smart_cil.get () then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesSizeOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TSizeOf typ) Linteger
   else Logic_const.term ~loc (TSizeOf typ) Linteger
 
 let talignof ?(loc = Options.gen_loc) typ =
-  if Options.O.get () > 0 then
+  if Options.Optimisations.Smart_cil.get () then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesAlignOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TAlignOf typ) Linteger
   else Logic_const.term ~loc (TAlignOf typ) Linteger
@@ -28,7 +28,7 @@ let toffset ?(label = Logic_const.here_label) ?(loc = Options.gen_loc) t =
 
 let tbinop ?(loc = Options.gen_loc) binop t1 t2 =
   let tb = Logic_const.term ~loc (TBinOp (binop,t1,t2)) Linteger in
-  if Options.O.get () > 0 then try
+  if Options.Optimisations.Smart_cil.get () then try
       let z1 = Option.get @@ Terms.extract_integer t1 in
       let z2 = Option.get @@ Terms.extract_integer t2 in
       match binop with
@@ -40,7 +40,7 @@ let tbinop ?(loc = Options.gen_loc) binop t1 t2 =
   else tb
 
 let copy t =
-  if Options.O.get () > 0 then
+  if Options.Optimisations.Smart_cil.get () then
     match t.term_node with
     | TSizeOf typ -> tsizeof ~loc:t.term_loc typ
     | TAlignOf typ -> talignof ~loc:t.term_loc typ

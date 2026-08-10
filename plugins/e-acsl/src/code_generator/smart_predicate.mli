@@ -15,8 +15,8 @@ val prel :
   term ->
   term ->
   predicate
-(** create a relation predicate. Optimisation depends on the [-e-acsl-O]
-    option. *)
+(** create a relation predicate. Optimisation depends on the
+    [-e-acsl-O-smart-cil] option. *)
 
 val pand :
   ?loc:Fileloc.t ->
@@ -24,4 +24,14 @@ val pand :
   predicate ->
   predicate ->
   predicate
-(** create a conjunction. Optimisation depends on the [-e-acsl-O] option. *)
+(** create a conjunction. Optimisation depends on the [-e-acsl-O-smart-cil]
+    option. *)
+
+val por :
+  ?loc:Fileloc.t ->
+  ?names:string list ->
+  predicate ->
+  predicate ->
+  predicate
+(** create a disjunction. Optimisation depends on the [-e-acsl-O-smart-cil]
+    option. *)

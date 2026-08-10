@@ -19,6 +19,7 @@ struct
     | Memory_access
     | Initialized
     | Pointer_alignment
+    | Pointer_value
 
   type t = { kind: kind; pred: predicate }
 
@@ -29,10 +30,11 @@ struct
 
   let priority t =
     match t.kind with
-    | Initialized -> 0
-    | Pointer_alignment -> 1
-    | Memory_access -> 2
-    | _ -> 3
+    | Pointer_value -> 0
+    | Initialized -> 1
+    | Pointer_alignment -> 2
+    | Memory_access -> 3
+    | _ -> 4
 
   let compare g1 g2 = compare (priority g1) (priority g2)
 end
@@ -123,6 +125,14 @@ struct
     if Kernel.UnalignedPointer.is_set ()
     then not @@ Kernel.UnalignedPointer.get ()
     else true
+
+  (** [needs_pointer_value ()] @return
+      - [true] if the option [-warn-invalid-pointer] is used;
+      - [false] if the option [-no-warn-invalid-pointer] is used (default). *)
+  let needs_pointer_value () =
+    if Kernel.InvalidPointer.is_set ()
+    then Kernel.InvalidPointer.get ()
+    else false
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
@@ -131,7 +141,8 @@ end
     - memory access (read)
     - index out of bounds
     - initialization
-    - pointer alignment *)
+    - pointer alignment
+    - pointer value *)
 module Undefined_behaviours =
 struct
 
@@ -205,6 +216,27 @@ struct
     preprocess_guard pred;
     Guard.make Pointer_alignment pred
 
+  let pointer_value ~loc t =
+    let null = Logic_const.term ~loc Tnull t.term_type in
+    let t_cpy_1 = Smart_term.copy t in
+    let t_cpy_2 = Smart_term.copy t in
+    let correct_ptr =
+      if Ast_types.Acsl.is_fun_ptr (Ast_types.Acsl.unroll t.term_type)
+      then Logic_const.pvalid_function ~loc t_cpy_1
+      else
+        Logic_const.pobject_pointer
+          ~loc
+          (Logic_const.here_label, t_cpy_1)
+    in
+    let pred =
+      Smart_predicate.por
+        ~loc
+        ~names:["invalid pointer"]
+        (Smart_predicate.prel ~loc Req null t_cpy_2)
+        correct_ptr
+    in
+    preprocess_guard pred;
+    Guard.make Pointer_value pred
 end
 
 let rte_visitor =
@@ -371,27 +403,50 @@ let rte_visitor =
       | TMem ({term_type = Ctype typ} as t), _ -> self#add_aligned ~orig:t t typ
       | _ -> ()
 
+    method private add_pointer_value ~orig =
+      if Flags.needs_pointer_value () then
+        Guards.add orig
+          (Undefined_behaviours.pointer_value ~loc:orig.term_loc orig)
+
+    method private add_pointer_value_cast ~orig dst =
+      let aux src =
+        match Ast_types.C.unroll_node src,  Ast_types.C.unroll_node dst with
+        (* From int, To pointer *)
+        | TInt _, TPtr _ -> self#add_pointer_value ~orig
+        | _ -> ()
+      in
+      match Ast_types.Acsl.unroll orig.term_type with
+      | Ctype src -> aux src
+      | _ -> ()
+
     method !vterm t =
       begin match t.term_node with
         | TBinOp ((Div | Mod),_,divider) -> self#add_div_mod ~orig:t divider
+        | TBinOp ((PlusPI | MinusPI), _, _) -> self#add_pointer_value ~orig:t
         | TLval lv ->
           begin match Ast_types.Acsl.unroll t.term_type with
             | Ctype typ ->
               self#add_mem_access ~orig:t lv;
               self#add_initialized ~orig:t ~loc:t.term_loc lv typ;
               self#add_aligned_access lv;
-              if Ast_types.C.is_ptr typ then self#add_aligned ~orig:t t typ
+              if Ast_types.C.is_ptr typ then begin
+                self#add_pointer_value ~orig:t;
+                self#add_aligned ~orig:t t typ
+              end
             | _ -> ()
           end
         (* [false] means an explicit cast into a C type *)
         | TCast (false,ty,t') ->
           begin match Ast_types.Acsl.unroll ~unroll_typedef:false ty with
-            | Ctype dst -> self#add_aligned_cast ~orig:t t' dst
+            | Ctype dst ->
+              self#add_pointer_value_cast ~orig:t dst;
+              self#add_aligned_cast ~orig:t t' dst
             | _ ->
               Options.fatal
                 "Explicit conversion to a C type, but %a is not a C type"
                 Printer.pp_logic_type ty
           end
+        | TStartOf _ | TAddrOf _ -> self#add_pointer_value ~orig:t
         | _ -> ()
       end;
       Cil.DoChildren
