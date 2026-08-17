@@ -631,7 +631,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       let ctx = Typing.get_number_ty ~logic_env t in
       let bop_name = Misc.name_of_binop bop in
-      let e1_name = term_to_name t1 in
       let e2_name = term_to_name t2 in
       let zero = Logic_const.tinteger 0 in
       Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
@@ -715,70 +714,9 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
          Gmp.Z.new_var *)
       let t = Some t in
 
-      (* TODO: let RTE generate the undef behaviors assertions *)
-
-      (* Boolean to choose whether the guard [e1 >= 0] should be added *)
-      let should_guard_e1 =
-        if Options.Optimisations.Rte.get () then
-          match bop with
-          | Shiftlt -> Kernel.LeftShiftNegative.get ()
-          | Shiftrt -> Kernel.RightShiftNegative.get ()
-          | _ -> assert false
-        else false
-      in
-
       (* Create the statements to initialize [e1 shift e2] *)
-      let e1_guard_opt, env =
-        if should_guard_e1 then
-          (* Future RTE:
-             if (warn left shift negative and left shift)
-                or (warn right shift negative and right shift)
-             then check e1 >= 0 *)
-          let zero_exp, _, env = to_exp ~adata:Assert.no_data kf env zero in
-          let e1_guard, env =
-            let name = e1_name ^ bop_name ^ "_guard" in
-            Translate_utils.comparison_to_exp
-              ~loc
-              kf
-              env
-              Typing.gmpz
-              ~name
-              Ge
-              e1
-              zero_exp
-              t
-          in
-          let e1_guard_cond, env =
-            let pred =
-              Logic_const.prel ~loc
-                (Rge, Terms.Id.deep_copy t1, Terms.Id.deep_copy zero)
-            in
-            Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
-            let cond, env =
-              Assert.runtime_check
-                ~adata:adata1
-                ~pred_kind:Assert
-                RTE
-                kf
-                env
-                e1_guard
-                pred
-            in
-            cond, env
-          in
-          Some e1_guard_cond, env
-        else
-          (* Manual clean because [runtime_check] has not been called on
-             [adata1]. *)
-          let env = Assert.clean ~loc env adata1 in
-          None, env
-      in
-      let mk_stmts _ e =
-        let shift_instr = mk_shift_instr e in
-        match e1_guard_opt with
-        | None -> [ shift_instr ]
-        | Some e1_guard -> [ e1_guard; shift_instr ]
-      in
+      let env = Assert.clean ~loc env adata1 in
+      let mk_stmts _ e = [ mk_shift_instr e ] in
       let name = bop_name in
       let e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Analyses_types.C_number, ""
