@@ -43,6 +43,9 @@ val ptr_base_and_base_addr: loc:Fileloc.t -> exp -> exp * exp
    [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
    otherwise. *)
 
+val is_signed_int: logic_type -> bool
+(** Checks whether the given logic type is a signed [int] or an [integer]. *)
+
 val is_set_of_ptr_or_array: logic_type -> bool
 (** Checks whether the given logic type is a set of pointers. *)
 

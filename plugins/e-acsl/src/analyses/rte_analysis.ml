@@ -13,6 +13,8 @@ let dkey = Options.Dkey.rte
 module Guard =
 struct
 
+  type shift_kind = Left | Right
+
   type kind =
     | Division_by_zero
     | Out_of_bounds
@@ -20,6 +22,7 @@ struct
     | Initialized
     | Pointer_alignment
     | Pointer_value
+    | Shift of shift_kind
 
   type t = { kind: kind; pred: predicate }
 
@@ -133,6 +136,23 @@ struct
     if Kernel.InvalidPointer.is_set ()
     then Kernel.InvalidPointer.get ()
     else false
+
+  (** [needs_left_shift_negative ()] @return
+      - [true] if the option [-warn-left-shift-negative] is used (default);
+      - [false] if the option [-no-warn-left-shift-negative] is used. *)
+  let needs_left_shift_negative () =
+    if Kernel.LeftShiftNegative.is_set ()
+    then Kernel.LeftShiftNegative.get ()
+    else true
+
+  (** [needs_right_shift_negative ()] @return
+      - [true] if the option [-warn-right-shift-negative] is used;
+      - [false] if the option [-no-warn-right-shift-negative] is used (default). *)
+  let needs_right_shift_negative () =
+    if Kernel.RightShiftNegative.is_set ()
+    then Kernel.RightShiftNegative.get ()
+    else false
+
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
@@ -165,6 +185,22 @@ struct
     in
     preprocess_guard pred;
     Guard.make Division_by_zero pred
+
+  let shift_negative ~loc ~mem shift =
+    let names =
+      match mem with
+      | Guard.Left -> ["left shift negative"]
+      | Right -> ["right shift negative"]
+    in
+    let shift_cpy = Smart_term.copy shift in
+    let pred =
+      Smart_predicate.prel
+        ~loc
+        ~names
+        Rle (Logic_const.tint Z.zero) shift_cpy
+    in
+    preprocess_guard pred;
+    Guard.make (Shift mem) pred
 
   (** [mem_access ~loc lv] creates the predicate that checks if [lv] is a
        valid read. *)
@@ -283,6 +319,14 @@ let rte_visitor =
       if Flags.needs_div_mod () then
         Guards.add orig
           (Undefined_behaviours.div_by_zero ~loc:orig.term_loc divider)
+
+    method private add_shift_negative ~orig ~mem shift =
+      if Misc.is_signed_int shift.term_type &&
+         (mem = Guard.Left && Flags.needs_left_shift_negative ()) ||
+         (mem = Guard.Right && Flags.needs_right_shift_negative ())
+      then
+        Guards.add orig
+          (Undefined_behaviours.shift_negative ~loc:orig.term_loc ~mem shift)
 
     (** [add_index ~index size] adds [index] as key in [table] with a
             guard that checks if [index] is between [0] (included) and [size]
@@ -423,6 +467,8 @@ let rte_visitor =
       begin match t.term_node with
         | TBinOp ((Div | Mod),_,divider) -> self#add_div_mod ~orig:t divider
         | TBinOp ((PlusPI | MinusPI), _, _) -> self#add_pointer_value ~orig:t
+        | TBinOp (Shiftlt,t1,_) -> self#add_shift_negative ~orig:t ~mem:Left t1
+        | TBinOp (Shiftrt,t1,_) -> self#add_shift_negative ~orig:t ~mem:Right t1
         | TLval lv ->
           begin match Ast_types.Acsl.unroll t.term_type with
             | Ctype typ ->

@@ -18,6 +18,8 @@ let stmt ?warn:_ kf stmt =
               ~initialized:Kernel_function.Set.empty
               ~pointer_alignment:false
               ~pointer_value:false
+              ~left_shift_negative:false
+              ~right_shift_negative:false
               ())
     kf stmt
 
@@ -29,6 +31,8 @@ let exp ?warn:_ kf stmt e =
               ~initialized:Kernel_function.Set.empty
               ~pointer_alignment:false
               ~pointer_value:false
+              ~left_shift_negative:false
+              ~right_shift_negative:false
               ())
     kf stmt e
 

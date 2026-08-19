@@ -119,6 +119,12 @@ let is_set_of_ptr_or_array lty =
   else
     false
 
+let is_signed_int lty =
+  match lty with
+  | Ctype cty -> Cil.isSignedInteger cty
+  | Linteger -> true
+  | _ -> false
+
 let is_bitfield_pointers lty =
   let is_bitfield_pointer = function
     | Ctype typ ->
