@@ -186,6 +186,8 @@ end
     - initialization
     - pointer alignment
     - pointer value
+    - left shift negative
+    - right shift negative
     - signed downcast
     - unsigned downcast
     - pointer downcast *)
@@ -212,9 +214,11 @@ struct
     preprocess_guard pred;
     Guard.make Division_by_zero pred
 
-  let shift_negative ~loc ~mem shift =
+  (** [shift_negative ~loc ~kind shift] creates the predicate that checks if
+      [shift] is greater or equal to [Z.zero]. *)
+  let shift_negative ~loc ~kind shift =
     let names =
-      match mem with
+      match kind with
       | Guard.Left -> ["left shift negative"]
       | Right -> ["right shift negative"]
     in
@@ -226,7 +230,7 @@ struct
         Rle (Logic_const.tint Z.zero) shift_cpy
     in
     preprocess_guard pred;
-    Guard.make (Shift mem) pred
+    Guard.make (Shift kind) pred
 
   (** [mem_access ~loc lv] creates the predicate that checks if [lv] is a
        valid read. *)
@@ -377,13 +381,13 @@ let rte_visitor =
         Guards.add orig
           (Undefined_behaviours.div_by_zero ~loc:orig.term_loc divider)
 
-    method private add_shift_negative ~orig ~mem shift =
+    method private add_shift_negative ~orig ~kind shift =
       if Misc.is_signed_int shift.term_type &&
-         (mem = Guard.Left && Flags.needs_left_shift_negative ()) ||
-         (mem = Guard.Right && Flags.needs_right_shift_negative ())
+         (kind = Guard.Left && Flags.needs_left_shift_negative ()) ||
+         (kind = Guard.Right && Flags.needs_right_shift_negative ())
       then
         Guards.add orig
-          (Undefined_behaviours.shift_negative ~loc:orig.term_loc ~mem shift)
+          (Undefined_behaviours.shift_negative ~loc:orig.term_loc ~kind shift)
 
     (** [add_index ~index size] adds [index] as key in [table] with a
             guard that checks if [index] is between [0] (included) and [size]
@@ -628,11 +632,11 @@ let rte_visitor =
           (* [t2] has to be at most a [ILongLong] (typing constraint) *)
           self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint ILongLong)
         | TBinOp (Shiftlt,t1,t2) ->
-          self#add_shift_negative ~orig:t ~mem:Left t1;
+          self#add_shift_negative ~orig:t ~kind:Left t1;
           (* [t2] has to be at most a [IULong] (typing constraint) *)
           self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint IULong)
         | TBinOp (Shiftrt,t1,t2) ->
-          self#add_shift_negative ~orig:t ~mem:Right t1;
+          self#add_shift_negative ~orig:t ~kind:Right t1;
           (* [t2] has to be at most a [IULong] (typing constraint) *)
           self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint IULong)
         | TLval lv ->
