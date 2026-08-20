@@ -25,6 +25,7 @@ module Optimisations : sig
   module Rte : Parameter_sig.Bool
   module Rte_initialized : Parameter_sig.Bool
   module Trivial_rte : Parameter_sig.Bool
+  module Implicit_downcast : Parameter_sig.Bool
   module Smart_il : Parameter_sig.Bool
   module Smart_cil : Parameter_sig.Bool
   module Verify_valid: Parameter_sig.Bool

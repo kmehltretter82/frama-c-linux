@@ -24,23 +24,31 @@
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] at_on_logic_vars.c:8: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] at_on_logic_vars.c:8: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at_on_logic_vars.c:8: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] at_on_logic_vars.c:7: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] at_on_logic_vars.c:7: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] at_on_logic_vars.c:7: Warning: 

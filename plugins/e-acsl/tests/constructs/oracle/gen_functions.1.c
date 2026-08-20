@@ -2333,7 +2333,6 @@ void __gen_e_acsl_f4(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x)
     __e_acsl_mpz_t __gen_e_acsl_sub;
     __e_acsl_mpz_t __gen_e_acsl_f4_3;
     __e_acsl_mpz_t __gen_e_acsl__5;
-    int __gen_e_acsl_cst_shiftl_guard;
     __e_acsl_mp_bitcnt_t __gen_e_acsl_cst_shiftl_coerced;
     __e_acsl_mpz_t __gen_e_acsl_shiftl;
     int __gen_e_acsl_lt;
@@ -2349,16 +2348,6 @@ void __gen_e_acsl_f4(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl__5,99L);
-    __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "0 <= 99 <= 18446744073709551615";
-    __gen_e_acsl_assert_data_3.file = "functions.c";
-    __gen_e_acsl_assert_data_3.fct = "f4";
-    __gen_e_acsl_assert_data_3.line = 183;
-    __gen_e_acsl_assert_data_3.name = "shiftl_rhs_fits_in_mp_bitcnt_t";
-    __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,
-                    & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_cst_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gmpz_init(__gen_e_acsl_shiftl);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl,

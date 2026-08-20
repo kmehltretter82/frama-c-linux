@@ -20,10 +20,6 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] bitwise.c:57: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bitwise.c:57: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] bitwise.c:59: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] bitwise.c:59: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] bitwise.c:61: Warning: 

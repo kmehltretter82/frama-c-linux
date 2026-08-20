@@ -698,9 +698,12 @@ let rec type_term
            | None -> { ty; cast = None }
            | Some ctx -> coerce ~arith_operand ~ctx ty
          in
-         (Rte_analysis.iter_on_guards t @@ fun p ->
-          try type_predicate ~profile p
-          with Error.Not_yet _ | Error.Typing_error _ -> ());
+         (* /!\ The table stores original version of [t]. *)
+         Rte_analysis.iter_on_guards
+           (Logic_normalizer.get_orig_term t)
+           (fun p ->
+              try type_predicate ~profile p
+              with Error.Not_yet _ | Error.Typing_error _ -> ());
          ctx)
       t
   with
@@ -708,7 +711,8 @@ let rec type_term
     Options.debug ~dkey ~level:5 "%a" pp_call_with_result result;
     result
   | Result.Error exn ->
-    Rte_analysis.remove t;
+    (* /!\ The table stores original version of [t]. *)
+    Rte_analysis.remove @@ Logic_normalizer.get_orig_term t;
     raise exn
 
 and type_term_lval ~profile (host, offset) =

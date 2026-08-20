@@ -78,9 +78,11 @@ int __gen_e_acsl_sorted(int *t, int n)
       if (__gen_e_acsl_i < n) ; else break;
       {
         int __gen_e_acsl_aligned;
+        int __gen_e_acsl_and;
         int __gen_e_acsl_aligned_2;
         int __gen_e_acsl_valid_read;
         int __gen_e_acsl_aligned_3;
+        int __gen_e_acsl_and_2;
         int __gen_e_acsl_aligned_4;
         int __gen_e_acsl_valid_read_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
@@ -105,127 +107,177 @@ int __gen_e_acsl_sorted(int *t, int n)
         }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
-        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(t + (__gen_e_acsl_i - 1L)),
-                                                  4UL);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"t",
-                                     (void *)t);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,
                                      __gen_e_acsl_i);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                     "\"pointer alignment\": \\aligned(t + (i - 1),4)",
-                                     0,__gen_e_acsl_aligned_2);
-        /*@ assert E_ACSL: "pointer alignment": \aligned(t + (i - 1),4); */
+        if ((-9223372036854775807L-1L) <= __gen_e_acsl_i - 1L) {
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,
+                                       __gen_e_acsl_i);
+          __gen_e_acsl_and = __gen_e_acsl_i - 1L <= 9223372036854775807L;
+        }
+        else __gen_e_acsl_and = 0;
+        /*@ assert
+              E_ACSL: "signed downcast":
+                -9223372036854775808 <= i - 1 <= 9223372036854775807;
+        */
         {
           __gen_e_acsl_assert_data_2.blocking = 1;
           __gen_e_acsl_assert_data_2.kind = "E-ACSL RTE";
-          __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(t + (i - 1),4)";
+          __gen_e_acsl_assert_data_2.pred_txt = "-9223372036854775808 <= i - 1 <= 9223372036854775807";
           __gen_e_acsl_assert_data_2.file = "bts1324.i";
           __gen_e_acsl_assert_data_2.fct = "sorted";
           __gen_e_acsl_assert_data_2.line = 6;
-          __gen_e_acsl_assert_data_2.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_2,
-                          & __gen_e_acsl_assert_data_2);
+          __gen_e_acsl_assert_data_2.name = "signed downcast";
+          __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
         }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + (__gen_e_acsl_i - 1L)),
-                                                      sizeof(int),(void *)t,
-                                                      (void *)(& t));
+        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(t + (__gen_e_acsl_i - 1L)),
+                                                  4UL);
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"t",
                                      (void *)t);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,
                                      __gen_e_acsl_i);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                       "sizeof(int)",0,sizeof(int));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                     "\"memory access\": \\valid_read(t + (i - 1))",
-                                     0,__gen_e_acsl_valid_read);
-        /*@ assert E_ACSL: "memory access": \valid_read(t + (i - 1)); */
+                                     "\"pointer alignment\": \\aligned(t + (i - 1),4)",
+                                     0,__gen_e_acsl_aligned_2);
+        /*@ assert E_ACSL: "pointer alignment": \aligned(t + (i - 1),4); */
         {
           __gen_e_acsl_assert_data_3.blocking = 1;
           __gen_e_acsl_assert_data_3.kind = "E-ACSL RTE";
-          __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(t + (i - 1))";
+          __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(t + (i - 1),4)";
           __gen_e_acsl_assert_data_3.file = "bts1324.i";
           __gen_e_acsl_assert_data_3.fct = "sorted";
           __gen_e_acsl_assert_data_3.line = 6;
-          __gen_e_acsl_assert_data_3.name = "memory access";
-          __e_acsl_assert(__gen_e_acsl_valid_read,
+          __gen_e_acsl_assert_data_3.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_2,
                           & __gen_e_acsl_assert_data_3);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
           {.values = (void *)0};
-        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)t,4UL);
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + (__gen_e_acsl_i - 1L)),
+                                                      sizeof(int),(void *)t,
+                                                      (void *)(& t));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"t",
                                      (void *)t);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"i",0,
+                                     __gen_e_acsl_i);
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                       "sizeof(int)",0,sizeof(int));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                     "\"pointer alignment\": \\aligned(t,4)",
-                                     0,__gen_e_acsl_aligned_3);
-        /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
+                                     "\"memory access\": \\valid_read(t + (i - 1))",
+                                     0,__gen_e_acsl_valid_read);
+        /*@ assert E_ACSL: "memory access": \valid_read(t + (i - 1)); */
         {
           __gen_e_acsl_assert_data_4.blocking = 1;
           __gen_e_acsl_assert_data_4.kind = "E-ACSL RTE";
-          __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(t,4)";
+          __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(t + (i - 1))";
           __gen_e_acsl_assert_data_4.file = "bts1324.i";
           __gen_e_acsl_assert_data_4.fct = "sorted";
           __gen_e_acsl_assert_data_4.line = 6;
-          __gen_e_acsl_assert_data_4.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_3,
+          __gen_e_acsl_assert_data_4.name = "memory access";
+          __e_acsl_assert(__gen_e_acsl_valid_read,
                           & __gen_e_acsl_assert_data_4);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
-        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)(t + __gen_e_acsl_i),
-                                                  4UL);
+        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)t,4UL);
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"t",
                                      (void *)t);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"i",0,
-                                     __gen_e_acsl_i);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                     "\"pointer alignment\": \\aligned(t + i,4)",
-                                     0,__gen_e_acsl_aligned_4);
-        /*@ assert E_ACSL: "pointer alignment": \aligned(t + i,4); */
+                                     "\"pointer alignment\": \\aligned(t,4)",
+                                     0,__gen_e_acsl_aligned_3);
+        /*@ assert E_ACSL: "pointer alignment": \aligned(t,4); */
         {
           __gen_e_acsl_assert_data_5.blocking = 1;
           __gen_e_acsl_assert_data_5.kind = "E-ACSL RTE";
-          __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(t + i,4)";
+          __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(t,4)";
           __gen_e_acsl_assert_data_5.file = "bts1324.i";
           __gen_e_acsl_assert_data_5.fct = "sorted";
           __gen_e_acsl_assert_data_5.line = 6;
           __gen_e_acsl_assert_data_5.name = "pointer alignment";
-          __e_acsl_assert(__gen_e_acsl_aligned_4,
+          __e_acsl_assert(__gen_e_acsl_aligned_3,
                           & __gen_e_acsl_assert_data_5);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
         }
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
           {.values = (void *)0};
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"i",0,
+                                     __gen_e_acsl_i);
+        if ((-9223372036854775807L-1L) <= (long)__gen_e_acsl_i) {
+          __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"i",0,
+                                       __gen_e_acsl_i);
+          __gen_e_acsl_and_2 = (long)__gen_e_acsl_i <= 9223372036854775807L;
+        }
+        else __gen_e_acsl_and_2 = 0;
+        /*@ assert
+              E_ACSL: "signed downcast":
+                -9223372036854775808 <= i <= 9223372036854775807;
+        */
+        {
+          __gen_e_acsl_assert_data_6.blocking = 1;
+          __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
+          __gen_e_acsl_assert_data_6.pred_txt = "-9223372036854775808 <= i <= 9223372036854775807";
+          __gen_e_acsl_assert_data_6.file = "bts1324.i";
+          __gen_e_acsl_assert_data_6.fct = "sorted";
+          __gen_e_acsl_assert_data_6.line = 6;
+          __gen_e_acsl_assert_data_6.name = "signed downcast";
+          __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_6);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)(t + __gen_e_acsl_i),
+                                                  4UL);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"t",
+                                     (void *)t);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"i",0,
+                                     __gen_e_acsl_i);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                     "\"pointer alignment\": \\aligned(t + i,4)",
+                                     0,__gen_e_acsl_aligned_4);
+        /*@ assert E_ACSL: "pointer alignment": \aligned(t + i,4); */
+        {
+          __gen_e_acsl_assert_data_7.blocking = 1;
+          __gen_e_acsl_assert_data_7.kind = "E-ACSL RTE";
+          __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(t + i,4)";
+          __gen_e_acsl_assert_data_7.file = "bts1324.i";
+          __gen_e_acsl_assert_data_7.fct = "sorted";
+          __gen_e_acsl_assert_data_7.line = 6;
+          __gen_e_acsl_assert_data_7.name = "pointer alignment";
+          __e_acsl_assert(__gen_e_acsl_aligned_4,
+                          & __gen_e_acsl_assert_data_7);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+        }
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"t",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"t",
                                      (void *)t);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"i",0,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"i",0,
                                      __gen_e_acsl_i);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
                                        "sizeof(int)",0,sizeof(int));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                      "\"memory access\": \\valid_read(t + i)",
                                      0,__gen_e_acsl_valid_read_2);
         /*@ assert E_ACSL: "memory access": \valid_read(t + i); */
         {
-          __gen_e_acsl_assert_data_6.blocking = 1;
-          __gen_e_acsl_assert_data_6.kind = "E-ACSL RTE";
-          __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(t + i)";
-          __gen_e_acsl_assert_data_6.file = "bts1324.i";
-          __gen_e_acsl_assert_data_6.fct = "sorted";
-          __gen_e_acsl_assert_data_6.line = 6;
-          __gen_e_acsl_assert_data_6.name = "memory access";
+          __gen_e_acsl_assert_data_8.blocking = 1;
+          __gen_e_acsl_assert_data_8.kind = "E-ACSL RTE";
+          __gen_e_acsl_assert_data_8.pred_txt = "\\valid_read(t + i)";
+          __gen_e_acsl_assert_data_8.file = "bts1324.i";
+          __gen_e_acsl_assert_data_8.fct = "sorted";
+          __gen_e_acsl_assert_data_8.line = 6;
+          __gen_e_acsl_assert_data_8.name = "memory access";
           __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                          & __gen_e_acsl_assert_data_6);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+                          & __gen_e_acsl_assert_data_8);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         }
         if (*(t + (__gen_e_acsl_i - 1L)) <= *(t + __gen_e_acsl_i)) ;
         else {
@@ -245,19 +297,19 @@ int __gen_e_acsl_sorted(int *t, int n)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"\\result",0,
                                    __retres);
-      __gen_e_acsl_assert_data_7.blocking = 1;
-      __gen_e_acsl_assert_data_7.kind = "Postcondition";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\result == 1";
-      __gen_e_acsl_assert_data_7.file = "bts1324.i";
-      __gen_e_acsl_assert_data_7.fct = "sorted";
-      __gen_e_acsl_assert_data_7.line = 7;
-      __gen_e_acsl_assert_data_7.name = "yes";
-      __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_7);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "Postcondition";
+      __gen_e_acsl_assert_data_9.pred_txt = "\\result == 1";
+      __gen_e_acsl_assert_data_9.file = "bts1324.i";
+      __gen_e_acsl_assert_data_9.fct = "sorted";
+      __gen_e_acsl_assert_data_9.line = 7;
+      __gen_e_acsl_assert_data_9.name = "yes";
+      __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_9);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& t));

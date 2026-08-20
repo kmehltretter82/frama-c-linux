@@ -199,6 +199,13 @@ module Optimisations = struct
       let descr = "generate 'initialization' RTE guards for all specifications"
     end)
 
+  module Implicit_downcast =
+    Make (struct
+      let name = "implicit-downcast"
+      let level = Leq 2
+      let descr = "generate RTE guards for implicit downcast done by the translation"
+    end)
+
   module Smart_il =
     Make (struct
       let name = "smart-il"

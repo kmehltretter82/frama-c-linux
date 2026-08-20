@@ -3,11 +3,15 @@
 [eva:alarm] bts1324.i:6: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] bts1324.i:6: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
+[eva:alarm] bts1324.i:6: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] bts1324.i:6: Warning: 
   assertion 'E_ACSL,memory access' got status unknown.
 [eva:alarm] bts1324.i:6: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] bts1324.i:6: Warning: 
+  assertion 'E_ACSL,signed downcast' got status unknown.
 [eva:alarm] bts1324.i:6: Warning: 
   assertion 'E_ACSL,pointer alignment' got status unknown.
 [eva:alarm] bts1324.i:6: Warning: 

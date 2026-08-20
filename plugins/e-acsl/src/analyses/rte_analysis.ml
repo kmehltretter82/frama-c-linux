@@ -12,6 +12,7 @@ let dkey = Options.Dkey.rte
 
 module Guard =
 struct
+  type downcast_kind = Signed | Unsigned | FloatToInt | Pointer
 
   type shift_kind = Left | Right
 
@@ -23,6 +24,7 @@ struct
     | Pointer_alignment
     | Pointer_value
     | Shift of shift_kind
+    | Downcast of downcast_kind
 
   type t = { kind: kind; pred: predicate }
 
@@ -97,17 +99,15 @@ end
 module Flags =
 struct
 
-  (** [needs_div_mod ()] @return:
-      - [true] if the option [-rte-div] from the RTE plugin is used (default);
-      - [false] if the option [-rte-no-div] from the RTE plugin is used. *)
+  (** [needs_div_mod ()] depends on [-rte-div] from the RTE plugin ([true] if
+      not set). *)
   let needs_div_mod () =
     if RteGen.Options.DoDivMod.is_set ()
     then RteGen.Options.DoDivMod.get ()
     else true
 
-  (** [needs_mem_access ()] @return:
-      - [true] if the option [-rte-mem] from the RTE plugin is used (default);
-      - [false] if the option [-rte-no-mem] from the RTE plugin is used; *)
+  (** [needs_mem_access ()] depends on [-rte-mem] from the RTE plugin ([true] if
+      not set). *)
   let needs_mem_access () =
     if RteGen.Options.DoMemAccess.is_set ()
     then RteGen.Options.DoMemAccess.get ()
@@ -121,38 +121,61 @@ struct
     then Option.fold ~none:false ~some:RteGen.Options.DoInitialized.mem okf
     else Options.Optimisations.Rte_initialized.get ()
 
-  (** [needs_pointer_alignment ()] @return
-      - [true] if the option [-warn-unaligned-pointer] is used (default);
-      - [false] if the option [-no-warn-unaligned-pointer] is used. *)
+  (** [needs_pointer_alignment ()] depends on [-warn-unaligned-pointer] ([true]
+      if not set). *)
   let needs_pointer_alignment () =
     if Kernel.UnalignedPointer.is_set ()
     then not @@ Kernel.UnalignedPointer.get ()
     else true
 
-  (** [needs_pointer_value ()] @return
-      - [true] if the option [-warn-invalid-pointer] is used;
-      - [false] if the option [-no-warn-invalid-pointer] is used (default). *)
+  (** [needs_pointer_value ()] depends on [-warn-invalid-pointer] ([false] if
+      not set). *)
   let needs_pointer_value () =
     if Kernel.InvalidPointer.is_set ()
     then Kernel.InvalidPointer.get ()
     else false
 
-  (** [needs_left_shift_negative ()] @return
-      - [true] if the option [-warn-left-shift-negative] is used (default);
-      - [false] if the option [-no-warn-left-shift-negative] is used. *)
+  (** [needs_left_shift_negative ()] depends on [-warn-left-shift-negative]
+      ([true] if not set). *)
   let needs_left_shift_negative () =
     if Kernel.LeftShiftNegative.is_set ()
     then Kernel.LeftShiftNegative.get ()
     else true
 
-  (** [needs_right_shift_negative ()] @return
-      - [true] if the option [-warn-right-shift-negative] is used;
-      - [false] if the option [-no-warn-right-shift-negative] is used (default). *)
+  (** [needs_right_shift_negative ()] depends on [-warn-right-shift-negative]
+      ([false] if not set. *)
   let needs_right_shift_negative () =
     if Kernel.RightShiftNegative.is_set ()
     then Kernel.RightShiftNegative.get ()
     else false
 
+  (** [needs_float_to_int ()] depends on [-rte-float-to-int] from the RTE plugin
+      ([true] if not set). *)
+  let needs_float_to_int () =
+    if RteGen.Options.DoFloatToInt.is_set ()
+    then RteGen.Options.DoFloatToInt.get ()
+    else true
+
+  (** [needs_pointer_downcast ()] depends on [-warn-pointer-downcast] ([true] if
+      not set). *)
+  let needs_pointer_downcast () =
+    if Kernel.PointerDowncast.is_set ()
+    then Kernel.PointerDowncast.get ()
+    else true
+
+  (** [needs_signed_downcast ()] depends on [-warn-signed-downcast] ([false] if
+      not set). *)
+  let needs_signed_downcast () =
+    if Kernel.SignedDowncast.is_set ()
+    then Kernel.SignedDowncast.get ()
+    else false
+
+  (** [needs_unsigned_downcast ()] depends on [-warn-unsigned-downcast] ([false]
+      if not set). *)
+  let needs_unsigned_downcast () =
+    if Kernel.UnsignedDowncast.is_set ()
+    then Kernel.UnsignedDowncast.get ()
+    else false
 end
 
 (** The module [Undefined_behaviours] contains functions that makes a guard for
@@ -162,7 +185,10 @@ end
     - index out of bounds
     - initialization
     - pointer alignment
-    - pointer value *)
+    - pointer value
+    - signed downcast
+    - unsigned downcast
+    - pointer downcast *)
 module Undefined_behaviours =
 struct
 
@@ -273,6 +299,37 @@ struct
     in
     preprocess_guard pred;
     Guard.make Pointer_value pred
+
+  (** [downcast ~kind ~loc t (lb,ub)] creates the predicate that check if [t] is
+      between [lb] and [ub]. *)
+  let downcast ~kind ~loc t (lb,ub) =
+    let on_bounds i =
+      let t = Logic_const.tint i in
+      match kind with
+      | Guard.FloatToInt -> Logic_const.tlogic_coerce ~loc t Lreal
+      | _ -> t
+    in
+    let on_t t =
+      let t = Smart_term.copy t in
+      match kind with
+      | Pointer -> Logic_const.tcast ~loc t (Machine.uintptr_type ())
+      | _ -> t
+    in
+    let names = match kind with
+      | Signed -> ["signed downcast"]
+      | Unsigned -> ["unsigned downcast"]
+      | FloatToInt -> ["float to int"]
+      | Pointer -> ["pointer downcast"]
+    in
+    let pred =
+      Smart_predicate.pand
+        ~loc
+        ~names
+        (Smart_predicate.prel ~loc Rle (on_bounds lb) (on_t t))
+        (Smart_predicate.prel ~loc Rle (on_t t) (on_bounds ub))
+    in
+    preprocess_guard pred;
+    Guard.make (Guard.Downcast kind) pred
 end
 
 let rte_visitor =
@@ -463,12 +520,121 @@ let rte_visitor =
       | Ctype src -> aux src
       | _ -> ()
 
+    (** [add_C_downcast ~orig t src dst] adds an entry for [orig] if the
+               [dst] type is 'smaller' than the source type and the corresponding
+               options are set on. *)
+    method private add_C_downcast ~orig ~implicit t src dst =
+      let get_bounds size is_signed =
+        if is_signed then Cil.min_signed_number size, Cil.max_signed_number size
+        else Z.zero, Cil.max_unsigned_number size
+      in
+      match Ast_types.C.unroll_node src, Ast_types.C.unroll_node dst with
+      (* From int, To int *)
+      | TInt src_ik, TInt dst_ik ->
+        let dst_signed = Cil.isSigned dst_ik in
+        let kind =
+          if dst_signed then Guard.Signed else Unsigned
+        in
+        if dst_signed && Flags.needs_signed_downcast () ||
+           not dst_signed && Flags.needs_unsigned_downcast () ||
+           implicit && Options.Optimisations.Implicit_downcast.get ()
+        then
+          let src_signed = Cil.isSigned src_ik in
+          let   src_size = Cil.bitsSizeOfInt src_ik in
+          let   dst_size = Cil.bitsSizeOfInt dst_ik in
+          if dst_size < src_size ||
+             src_size == dst_size && dst_signed <> src_signed
+          then
+            Guards.add orig
+              (Undefined_behaviours.downcast ~kind ~loc:orig.term_loc t
+                 (get_bounds dst_size dst_signed))
+      (* From float, To int *)
+      | TFloat _, TInt ikind ->
+        if Flags.needs_float_to_int () ||
+           implicit && Options.Optimisations.Implicit_downcast.get ()
+        then
+          let signed = Cil.isSigned ikind in
+          let   size = Cil.bitsSizeOfInt ikind in
+          Guards.add orig
+            (Undefined_behaviours.downcast
+               ~kind:Guard.FloatToInt
+               ~loc:orig.term_loc
+               t
+               (get_bounds size signed))
+      (* From pointer, To int *)
+      | TPtr _, TInt ikind ->
+        if Flags.needs_pointer_downcast () &&
+           not Ast_types.C.(is_intptr_t dst || is_uintptr_t dst) ||
+           implicit && Options.Optimisations.Implicit_downcast.get ()
+        then
+          let signed = Cil.isSigned ikind in
+          let   size = Cil.bitsSizeOfInt ikind in
+          Guards.add orig
+            (Undefined_behaviours.downcast
+               ~kind:Guard.Pointer
+               ~loc:orig.term_loc
+               t
+               (get_bounds size signed))
+      | _ -> ()
+
+    (** [add_logic_downcast ~orig t src dst] adds an entry for [orig]. *)
+    method private add_logic_downcast ~orig ~implicit t src dst =
+      let get_bounds size is_signed =
+        if is_signed then Cil.min_signed_number size, Cil.max_signed_number size
+        else Z.zero, Cil.max_unsigned_number size
+      in
+      match src, Ast_types.C.unroll_node dst with
+      (* From integer, To int *)
+      | Linteger, TInt dst_ik ->
+        let dst_signed = Cil.isSigned dst_ik in
+        let kind =
+          if dst_signed then Guard.Signed else Unsigned
+        in
+        if dst_signed && Flags.needs_signed_downcast () ||
+           not dst_signed && Flags.needs_unsigned_downcast () ||
+           implicit && Options.Optimisations.Implicit_downcast.get ()
+        then
+          let dst_size = Cil.bitsSizeOfInt dst_ik in
+          Guards.add orig
+            (Undefined_behaviours.downcast ~kind ~loc:orig.term_loc t
+               (get_bounds dst_size dst_signed))
+      (* From real, To int *)
+      | Lreal, TInt ikind ->
+        if Flags.needs_float_to_int () ||
+           implicit && Options.Optimisations.Implicit_downcast.get ()
+        then
+          let signed = Cil.isSigned ikind in
+          let   size = Cil.bitsSizeOfInt ikind in
+          Guards.add orig
+            (Undefined_behaviours.downcast
+               ~kind:Guard.FloatToInt
+               ~loc:orig.term_loc
+               t
+               (get_bounds size signed))
+      | _ -> ()
+
+    (** [add_downcast ~orig t dst] distinguishes logic downcast, i.e from a
+        logic type to a C type, and C downcast, i.e between two C types. *)
+    method private add_downcast ~orig ?(implicit = false) t dst =
+      match Ast_types.Acsl.unroll t.term_type with
+      | Ctype src -> self#add_C_downcast ~orig ~implicit t src dst
+      | _ -> self#add_logic_downcast ~orig ~implicit t t.term_type dst
+
     method !vterm t =
       begin match t.term_node with
         | TBinOp ((Div | Mod),_,divider) -> self#add_div_mod ~orig:t divider
-        | TBinOp ((PlusPI | MinusPI), _, _) -> self#add_pointer_value ~orig:t
-        | TBinOp (Shiftlt,t1,_) -> self#add_shift_negative ~orig:t ~mem:Left t1
-        | TBinOp (Shiftrt,t1,_) -> self#add_shift_negative ~orig:t ~mem:Right t1
+        | TBinOp ((PlusPI | MinusPI), _, t2) ->
+          self#add_pointer_value ~orig:t;
+          (* [t2] has to be at most a [ILongLong] (typing constraint) *)
+          self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint ILongLong)
+        | TBinOp (Shiftlt,t1,t2) ->
+          self#add_shift_negative ~orig:t ~mem:Left t1;
+          (* [t2] has to be at most a [IULong] (typing constraint) *)
+          self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint IULong)
+        | TBinOp (Shiftrt,t1,t2) ->
+          self#add_shift_negative ~orig:t ~mem:Right t1;
+          (* [t2] has to be at most a [IULong] (typing constraint) *)
+          self#add_downcast ~orig:t2 ~implicit:true t2 (Cil_const.mk_tint IULong)
         | TLval lv ->
           begin match Ast_types.Acsl.unroll t.term_type with
             | Ctype typ ->
@@ -486,7 +652,8 @@ let rte_visitor =
           begin match Ast_types.Acsl.unroll ~unroll_typedef:false ty with
             | Ctype dst ->
               self#add_pointer_value_cast ~orig:t dst;
-              self#add_aligned_cast ~orig:t t' dst
+              self#add_aligned_cast ~orig:t t' dst;
+              self#add_downcast ~orig:t t' dst
             | _ ->
               Options.fatal
                 "Explicit conversion to a C type, but %a is not a C type"
@@ -501,6 +668,8 @@ let rte_visitor =
       match p.pred_content with
       | Paligned (_,v) ->
         self#add_div_mod ~orig:v v;
+        (* [v] has to be at most a [size_t] (typing constraint) *)
+        self#add_downcast ~orig:v ~implicit:true v (Machine.sizeof_type ());
         Cil.DoChildren
       | Prel((Req | Rneq),t1,t2) when Logic_utils.is_C_array t1 &&
                                       Logic_utils.is_C_array t2 ->

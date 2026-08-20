@@ -318,6 +318,7 @@ int main(int argc, char **argv)
   /*@ assert \valid(pmax); */ ;
   {
     int __gen_e_acsl_aligned_7;
+    int __gen_e_acsl_and;
     int __gen_e_acsl_valid_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
       {.values = (void *)0};
@@ -341,6 +342,30 @@ int main(int argc, char **argv)
       __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"diff",0,diff);
+    if ((-9223372036854775807L-1L) <= (long)diff) {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"diff",0,
+                                   diff);
+      __gen_e_acsl_and = (long)diff <= 9223372036854775807L;
+    }
+    else __gen_e_acsl_and = 0;
+    /*@ assert
+          E_ACSL: "signed downcast":
+            -9223372036854775808 <= diff <= 9223372036854775807;
+    */
+    {
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "E-ACSL RTE";
+      __gen_e_acsl_assert_data_15.pred_txt = "-9223372036854775808 <= diff <= 9223372036854775807";
+      __gen_e_acsl_assert_data_15.file = "block_valid.c";
+      __gen_e_acsl_assert_data_15.fct = "main";
+      __gen_e_acsl_assert_data_15.line = 47;
+      __gen_e_acsl_assert_data_15.name = "signed downcast";
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_15);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+    }
     __gen_e_acsl_valid_7 = __e_acsl_valid((void *)(pmin + diff),sizeof(char),
                                           (void *)pmin,(void *)(& pmin));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"pmin",
@@ -363,47 +388,72 @@ int main(int argc, char **argv)
   /*@ assert !\valid(pmin + diff); */ ;
   {
     int __gen_e_acsl_aligned_8;
+    int __gen_e_acsl_and_2;
     int __gen_e_acsl_valid_8;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
-      {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+      {.values = (void *)0};
     __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)pmax,1UL);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"pmax",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,"pmax",
                                  (void *)pmax);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
                                  "\"pointer alignment\": \\aligned(pmax,1)",
                                  0,__gen_e_acsl_aligned_8);
     /*@ assert E_ACSL: "pointer alignment": \aligned(pmax,1); */
     {
-      __gen_e_acsl_assert_data_16.blocking = 1;
-      __gen_e_acsl_assert_data_16.kind = "E-ACSL RTE";
-      __gen_e_acsl_assert_data_16.pred_txt = "\\aligned(pmax,1)";
-      __gen_e_acsl_assert_data_16.file = "block_valid.c";
-      __gen_e_acsl_assert_data_16.fct = "main";
-      __gen_e_acsl_assert_data_16.line = 49;
-      __gen_e_acsl_assert_data_16.name = "pointer alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_16);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+      __gen_e_acsl_assert_data_17.blocking = 1;
+      __gen_e_acsl_assert_data_17.kind = "E-ACSL RTE";
+      __gen_e_acsl_assert_data_17.pred_txt = "\\aligned(pmax,1)";
+      __gen_e_acsl_assert_data_17.file = "block_valid.c";
+      __gen_e_acsl_assert_data_17.fct = "main";
+      __gen_e_acsl_assert_data_17.line = 49;
+      __gen_e_acsl_assert_data_17.name = "pointer alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_17);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"diff",0,diff);
+    if ((-9223372036854775807L-1L) <= (long)diff) {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"diff",0,
+                                   diff);
+      __gen_e_acsl_and_2 = (long)diff <= 9223372036854775807L;
+    }
+    else __gen_e_acsl_and_2 = 0;
+    /*@ assert
+          E_ACSL: "signed downcast":
+            -9223372036854775808 <= diff <= 9223372036854775807;
+    */
+    {
+      __gen_e_acsl_assert_data_18.blocking = 1;
+      __gen_e_acsl_assert_data_18.kind = "E-ACSL RTE";
+      __gen_e_acsl_assert_data_18.pred_txt = "-9223372036854775808 <= diff <= 9223372036854775807";
+      __gen_e_acsl_assert_data_18.file = "block_valid.c";
+      __gen_e_acsl_assert_data_18.fct = "main";
+      __gen_e_acsl_assert_data_18.line = 49;
+      __gen_e_acsl_assert_data_18.name = "signed downcast";
+      __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_18);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
     }
     __gen_e_acsl_valid_8 = __e_acsl_valid((void *)(pmax - diff),sizeof(char),
                                           (void *)pmax,(void *)(& pmax));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,"pmax",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"pmax",
                                  (void *)pmax);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"diff",0,diff);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"diff",0,diff);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
                                    "sizeof(char)",0,sizeof(char));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                  "\\valid(pmax - diff)",0,
                                  __gen_e_acsl_valid_8);
-    __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "!\\valid(pmax - diff)";
-    __gen_e_acsl_assert_data_15.file = "block_valid.c";
-    __gen_e_acsl_assert_data_15.fct = "main";
-    __gen_e_acsl_assert_data_15.line = 49;
-    __e_acsl_assert(! __gen_e_acsl_valid_8,& __gen_e_acsl_assert_data_15);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "!\\valid(pmax - diff)";
+    __gen_e_acsl_assert_data_16.file = "block_valid.c";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 49;
+    __e_acsl_assert(! __gen_e_acsl_valid_8,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
   }
   /*@ assert !\valid(pmax - diff); */ ;
   __retres = 0;
