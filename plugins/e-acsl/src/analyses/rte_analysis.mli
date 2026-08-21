@@ -21,8 +21,11 @@ val iter_on_guards : term -> (predicate -> unit) -> unit
     all elements applying a given function to them. *)
 
 val fold_guards : default:'a -> term -> (predicate -> 'a -> 'a) -> 'a
-(* retrieve the list of guards for a given term, if it exists, and apply folding
-   operation to it using a given function. *)
+(** retrieve the list of guards for a given term, if it exists, and apply
+    folding operation to it using a given function. *)
+
+val transfer_guards : term -> term -> unit
+(** transfer a set of guards from an entry to a new one and remove the source. *)
 
 val remove : term -> unit
 (** remove an entry from the table. *)

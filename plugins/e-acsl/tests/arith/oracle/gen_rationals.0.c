@@ -142,7 +142,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl__14;
     __e_acsl_mpq_t __gen_e_acsl_add_2;
     int __gen_e_acsl_ne_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl__10);
     __gmpq_set_str(__gen_e_acsl__10,"11/10",10);
@@ -160,13 +160,13 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__14));
     __gen_e_acsl_ne_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__12),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_add_2));
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "Assertion";
-    __gen_e_acsl_assert_data_7.pred_txt = "(double)1.1 != 1 + 0.1";
-    __gen_e_acsl_assert_data_7.file = "rationals.c";
-    __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 17;
-    __e_acsl_assert(__gen_e_acsl_ne_2 != 0,& __gen_e_acsl_assert_data_7);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "(double)1.1 != 1 + 0.1";
+    __gen_e_acsl_assert_data_6.file = "rationals.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 17;
+    __e_acsl_assert(__gen_e_acsl_ne_2 != 0,& __gen_e_acsl_assert_data_6);
     __gmpq_clear(__gen_e_acsl__10);
     __gmpq_clear(__gen_e_acsl__12);
     __gmpq_clear(__gen_e_acsl__13);
@@ -182,7 +182,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl__18;
     __e_acsl_mpq_t __gen_e_acsl_sub;
     int __gen_e_acsl_eq_3;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl__15);
     __gmpq_set_str(__gen_e_acsl__15,"1",10);
@@ -202,13 +202,13 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__18));
     __gen_e_acsl_eq_3 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_3),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub));
-    __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "1 + 0.1 == 2 - 0.9";
-    __gen_e_acsl_assert_data_8.file = "rationals.c";
-    __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 18;
-    __e_acsl_assert(__gen_e_acsl_eq_3 == 0,& __gen_e_acsl_assert_data_8);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "1 + 0.1 == 2 - 0.9";
+    __gen_e_acsl_assert_data_7.file = "rationals.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 18;
+    __e_acsl_assert(__gen_e_acsl_eq_3 == 0,& __gen_e_acsl_assert_data_7);
     __gmpq_clear(__gen_e_acsl__15);
     __gmpq_clear(__gen_e_acsl__16);
     __gmpq_clear(__gen_e_acsl_add_3);
@@ -226,7 +226,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl_y;
     __e_acsl_mpq_t __gen_e_acsl_mul;
     int __gen_e_acsl_ne_3;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl_sum);
     __gmpq_set_d(__gen_e_acsl_sum,(double)sum);
@@ -240,17 +240,17 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_y));
     __gen_e_acsl_ne_3 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_sum),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_mul));
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"sum",sum);
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"x",x);
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"y",y);
-    __gen_e_acsl_assert_data_9.blocking = 1;
-    __gen_e_acsl_assert_data_9.kind = "Assertion";
-    __gen_e_acsl_assert_data_9.pred_txt = "sum != x * y";
-    __gen_e_acsl_assert_data_9.file = "rationals.c";
-    __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 20;
-    __e_acsl_assert(__gen_e_acsl_ne_3 != 0,& __gen_e_acsl_assert_data_9);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_8,"sum",sum);
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_8,"x",x);
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_8,"y",y);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "sum != x * y";
+    __gen_e_acsl_assert_data_8.file = "rationals.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 20;
+    __e_acsl_assert(__gen_e_acsl_ne_3 != 0,& __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     __gmpq_clear(__gen_e_acsl_sum);
     __gmpq_clear(__gen_e_acsl_x);
     __gmpq_clear(__gen_e_acsl_y);
@@ -265,7 +265,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl__21;
     __e_acsl_mpq_t __gen_e_acsl_add_4;
     int __gen_e_acsl_ne_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl__19);
     __gmpq_set_d(__gen_e_acsl__19,1.1);
@@ -279,13 +279,13 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__21));
     __gen_e_acsl_ne_4 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__19),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_add_4));
-    __gen_e_acsl_assert_data_10.blocking = 1;
-    __gen_e_acsl_assert_data_10.kind = "Assertion";
-    __gen_e_acsl_assert_data_10.pred_txt = "1.1d != 1 + 0.1";
-    __gen_e_acsl_assert_data_10.file = "rationals.c";
-    __gen_e_acsl_assert_data_10.fct = "main";
-    __gen_e_acsl_assert_data_10.line = 28;
-    __e_acsl_assert(__gen_e_acsl_ne_4 != 0,& __gen_e_acsl_assert_data_10);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "1.1d != 1 + 0.1";
+    __gen_e_acsl_assert_data_9.file = "rationals.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 28;
+    __e_acsl_assert(__gen_e_acsl_ne_4 != 0,& __gen_e_acsl_assert_data_9);
     __gmpq_clear(__gen_e_acsl__19);
     __gmpq_clear(__gen_e_acsl__20);
     __gmpq_clear(__gen_e_acsl__21);
@@ -302,7 +302,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl__25;
     __e_acsl_mpq_t __gen_e_acsl_sub_2;
     int __gen_e_acsl_gt;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl__22);
     __gmpq_set_si(__gen_e_acsl__22,(long)a,1UL);
@@ -322,16 +322,16 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__25));
     __gen_e_acsl_gt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_5),
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub_2));
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"a",0,a);
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"b",0,b);
-    __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "a + b > 2. - 1.";
-    __gen_e_acsl_assert_data_11.file = "rationals.c";
-    __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 31;
-    __e_acsl_assert(__gen_e_acsl_gt > 0,& __gen_e_acsl_assert_data_11);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"a",0,a);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"b",0,b);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "a + b > 2. - 1.";
+    __gen_e_acsl_assert_data_10.file = "rationals.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 31;
+    __e_acsl_assert(__gen_e_acsl_gt > 0,& __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     __gmpq_clear(__gen_e_acsl__22);
     __gmpq_clear(__gen_e_acsl__23);
     __gmpq_clear(__gen_e_acsl_add_5);

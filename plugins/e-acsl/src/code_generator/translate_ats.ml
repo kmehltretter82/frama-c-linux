@@ -35,12 +35,11 @@ let predicate_to_exp_ref
      ?inplace:bool ->
      ?name:string ->
      kernel_function ->
-     ?rte:bool ->
      Env.t ->
      predicate ->
      exp * Assert.t * Env.t) ref
   =
-  ref (fun ~adata:_ ?inplace:_ ?name:_ _kf ?rte:_ _env _p ->
+  ref (fun ~adata:_ ?inplace:_ ?name:_ _kf _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 (*****************************************************************************)

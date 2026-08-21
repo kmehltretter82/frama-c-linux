@@ -151,16 +151,6 @@ val top_loop_variant: t -> (term * logic_info option) option
 val top_loop_invariants: t -> toplevel_predicate list
 val pop_loop: t -> t
 
-(* ************************************************************************** *)
-(** {2 RTEs} *)
-(* ************************************************************************** *)
-
-val set_rte: t -> bool -> t
-(** [set_rte env x] sets RTE generation to x for the given environment *)
-
-val generate_rte: t -> bool
-(** Returns the current value of RTE generation for the given environment *)
-
 module Logic_env: sig
   val push_new: t -> Profile.t -> t
   val add : t -> logic_var -> ival -> t
@@ -212,25 +202,21 @@ val pop_and_get_contract: t -> contract * t
 (** {2 Utilities} *)
 (* ************************************************************************** *)
 
-val with_params: ?rte:bool -> ?kinstr:kinstr -> env:t -> (t -> t) -> t
-(** [with_params ~rte ~kinstr ~f env] executes the given closure with the given
-    environment after having set RTE generation to [rte] and current kinstr to
-    [kinstr].
+val with_params: ?kinstr:kinstr -> env:t -> (t -> t) -> t
+(** [with_params ~kinstr ~f env] executes the given closure with the given
+    environment after having set the current kinstr to [kinstr].
     [f] is a closure that takes an environment and returns an environment.
-    The environment returned by the closure is updated to restore the RTE
-    generation and kinstr attributes to the values of the original environment,
-    then is returned. *)
+    The environment returned by the closure is updated to restore the kinstr
+    attributes to the values of the original environment, then is returned. *)
 
-val with_params_and_result:
-  ?rte:bool -> ?kinstr:kinstr -> env:t -> (t -> 'a * t) -> 'a * t
-(** [with_params_and_result ~rte ~kinstr ~f env] executes the given closure with
-    the given environment after having set RTE generation to [rte] and current
-    kinstr to [kinstr].
+val with_params_and_result: ?kinstr:kinstr -> env:t -> (t -> 'a * t) -> 'a * t
+(** [with_params_and_result ~kinstr ~f env] executes the given closure with
+    the given environment after having set the current kinstr to [kinstr].
     [f] is a closure that takes an environment and returns a pair where the
     first member is an arbitrary value and the second member is the environment.
-    The environment returned by the closure is updated to restore the RTE
-    generation and kinstr attributes to the values of the original environment,
-    then the function returns the arbitrary value returned by the closure along
-    with the updated environment. *)
+    The environment returned by the closure is updated to restore the kinstr
+    attributes to the values of the original environment, then the function
+    returns the arbitrary value returned by the closure along with the updated
+    environment. *)
 
 val pretty: Format.formatter -> t -> unit

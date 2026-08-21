@@ -77,6 +77,18 @@ struct
 
   let remove t = Terms.remove tbl t
 
+  let transfer t_src t_dst =
+    begin match Terms.find_opt tbl t_src with
+      | Some src_guards ->
+        begin match Terms.find_opt tbl t_dst with
+          | Some dst_guards ->
+            Terms.replace tbl t_dst @@ Guards.union src_guards dst_guards
+          | None -> Terms.add tbl t_dst src_guards
+        end
+      | None -> ()
+    end;
+    remove t_src
+
   let mem_guard_kind t kind =
     match Terms.find_opt tbl t with
     | Some guards -> Guards.exists (fun g' -> (Guard.kind g') = kind) guards
@@ -679,6 +691,10 @@ let rte_visitor =
                                       Logic_utils.is_C_array t2 ->
         self#add_array_comparison t1 t2;
         Cil.SkipChildren
+      | Pseparated tlist ->
+        let deref t = ((TMem t),TNoOffset) in
+        List.iter (fun t -> self#add_mem_access ~orig:t (deref t)) tlist;
+        Cil.DoChildren
       | _ -> (); Cil.DoChildren
 
     method !vfunc f =
@@ -711,5 +727,7 @@ let iter_on_guards = Guards.iter_on_guards
 let fold_guards ~default = Guards.fold_guards ~default
 
 let remove t = Guards.remove t
+
+let transfer_guards = Guards.transfer
 
 let clear () = Guards.clear ()

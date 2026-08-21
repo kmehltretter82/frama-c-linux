@@ -14,7 +14,6 @@ val generalized_untyped_to_exp:
   adata:Assert.t ->
   ?name:string ->
   kernel_function ->
-  ?rte:bool ->
   Env.t ->
   predicate ->
   exp * Assert.t * Env.t
@@ -34,17 +33,15 @@ val to_exp :
   ?inplace:bool ->
   ?name:string ->
   kernel_function ->
-  ?rte:bool ->
   Env.t ->
   predicate ->
   exp * Assert.t * Env.t
-(** [to_exp ~adata ?inplace ?name kf ?rte env p] translates an ACSL predicate into a C expression.
+(** [to_exp ~adata ?inplace ?name kf env p] translates an ACSL predicate into a C expression.
     - [adata]: assertion context
     - [inplace]: if the root predicate has a label, indicates if it should be
       immediately translated or if [Translate_ats] should be used to retrieve the translation
     - [name]: name to use for generated variables
     - [kf]: the enclosing function.
-    - [rte]: if true, generate and translate RTE before translating the predicate
     - [env]: the current environment
     - [p]: the predicate to translate *)
 
@@ -55,24 +52,3 @@ exception No_simple_translation of predicate
 val untyped_to_exp: predicate -> exp
 (** Convert an untyped ACSL predicate into a corresponding C expression. This
     expression is valid only in certain contexts and shouldn't be used. *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-module Translate_rtes : sig
-  val translate_rte_annots_ref:
-    ((Format.formatter -> code_annotation -> unit) ->
-     code_annotation ->
-     kernel_function ->
-     Env.t ->
-     code_annotation list ->
-     Env.t) ref
-
-  val translate_rte_exp_ref:
-    (?filter:(code_annotation -> bool) ->
-     kernel_function ->
-     Env.t ->
-     exp ->
-     Env.t) ref
-end

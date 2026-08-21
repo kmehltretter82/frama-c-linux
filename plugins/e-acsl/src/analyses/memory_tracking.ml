@@ -547,21 +547,8 @@ module rec Transfer
                else
                  state
              in
-             let state =
-               Annotations.fold_code_annot
-                 (fun _ -> register_code_annot kf) stmt state
-             in
-             if stmt.ghost then
-               let rtes = if Options.Optimisations.Rte.get ()
-                 then Rte.stmt kf stmt
-                 else []
-               in
-               let logic_env = Analyses_datatype.Logic_env.empty in
-               List.iter (Typing.preprocess_rte ~logic_env) rtes;
-               List.fold_left
-                 (fun state a -> register_code_annot kf a state) state rtes
-             else
-               state
+             Annotations.fold_code_annot
+               (fun _ -> register_code_annot kf) stmt state
            else (* not (Options.Functions.check kf): do not monitor [kf] *)
              state
          in

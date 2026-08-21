@@ -42,22 +42,12 @@ val untyped_to_exp: typ option -> term -> exp
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-module Translate_rtes : sig
-  val exp_ref:
-    (?filter:(code_annotation -> bool) ->
-     kernel_function ->
-     Env.t ->
-     exp ->
-     Env.t) ref
-end
-
 module Translate_predicates : sig
   val to_exp_ref :
     (adata:Assert.t ->
      ?inplace:bool ->
      ?name:string ->
      kernel_function ->
-     ?rte:bool ->
      Env.t ->
      predicate ->
      exp * Assert.t * Env.t)

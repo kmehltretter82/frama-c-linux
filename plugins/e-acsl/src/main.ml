@@ -66,7 +66,7 @@ let generate_code =
                redoing the RTE management system  *)
             let selection =
               State_selection.union
-                (Rte.get_state_selection_with_dependencies ())
+                (State_selection.with_dependencies RteGen.Generator.self)
                 (State_selection.with_dependencies Options.Run.self)
             in
             Project.clear ~selection ~project:copied_prj ();

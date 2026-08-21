@@ -91,7 +91,6 @@ val predicate_to_exp_ref:
   (adata:Assert.t ->
    ?name:string ->
    kernel_function ->
-   ?rte:bool ->
    Env.t ->
    predicate ->
    exp * Assert.t * Env.t) ref

@@ -9,17 +9,6 @@
 open Cil_types
 
 (* Forward references *)
-module Translate_rtes = struct
-  let exp_ref:
-    (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
-     Env.t) ref =
-    let func ?filter _kf _env _e =
-      let _ = filter in
-      Extlib.mk_labeled_fun "translate_rte_ref"
-    in
-    ref func
-  let exp ?filter kf env e = !exp_ref ?filter kf env e
-end
 
 module Translate_utils = struct
   let comparison_to_exp_ref:
@@ -48,8 +37,6 @@ let length_exp ~loc kf env ~name array =
     let len = Cil.lenOfArray64 array_len in
     (Cil.kinteger64 ~loc len), env
   with Cil.LenOfArray _ ->
-    (* check RTE on the array before accessing its block length and offset *)
-    let env = Translate_rtes.exp kf env array in
     (* helper function *)
     let rtl env name =
       Env.rtl_call_to_new_var
@@ -177,19 +164,6 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   (* Create the access to the arrays *)
   let array1_iter_e = Smart_exp.subscript ~loc array1 iter_e in
   let array2_iter_e = Smart_exp.subscript ~loc array2 iter_e in
-  (* Check RTE on the arrays, filtering out bounding checks since the accesses
-     are built already in bounds *)
-  let filter a =
-    let index_bound =
-      Alarms.get_name (Index_out_of_bound (iter_e, Some len1_exp))
-    in
-    match a.annot_content with
-    | AAssert (_, { tp_statement = { pred_name = hd :: _ }})
-      when Datatype.String.equal hd index_bound -> false
-    | _ -> true
-  in
-  let env = Translate_rtes.exp ~filter kf env array1_iter_e in
-  let env = Translate_rtes.exp ~filter kf env array2_iter_e in
   (* Create the condition *)
   let cond, env =
     let ty_array1_iter = Cil.typeOf array1_iter_e in

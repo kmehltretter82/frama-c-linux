@@ -17,17 +17,8 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:516: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:521: Warning: 
   no assigns clause generated for function strnlen because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
-  E-ACSL construct
-  `logic functions or predicates with no definition nor reads clause'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:515: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
@@ -70,14 +61,6 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -129,14 +112,6 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.

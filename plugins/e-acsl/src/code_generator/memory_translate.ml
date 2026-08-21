@@ -200,7 +200,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   let logic_env = Env.Logic_env.get env in
   Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.nan ~logic_env ptr;
   let (ptr, adata), env =
-    Env.with_params_and_result ~rte:true ~env (fun env ->
+    Env.with_params_and_result ~env (fun env ->
         let e, adata, env = Translate_terms.to_exp ~adata kf env ptr in
         (e, adata), env)
   in
@@ -273,7 +273,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
    expression in bytes. [adata] and [env] as usual. *)
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
-    Env.with_params_and_result ~rte:true ~env (fun env ->
+    Env.with_params_and_result ~env (fun env ->
         let e, adata, env = Translate_terms.to_exp ~adata kf env t in
         (e, adata), env)
   in
@@ -354,6 +354,7 @@ let extract_quantifiers_from_arg ~loc arg =
         let arg' =
           Logic_utils.mk_logic_AddrOf ~loc (TVar lv, toffset') lty_noset
         in
+        Rte_analysis.transfer_guards arg arg';
         arg', quantifiers
       with Range_elimination_exception ->
         (* Case C: range elimination failed *)
@@ -480,7 +481,10 @@ let call_with_tset
                    "arithmetic over set of pointers or arrays"
                else
                  (* Case A *)
-                 arg_from_range ~adata ~loc kf env rev_args ptr r p
+                 (* [t] is not used anymore, thus we can safely transferred its
+                    RTE guards to [ptr] *)
+                 (Rte_analysis.transfer_guards t ptr;
+                  arg_from_range ~adata ~loc kf env rev_args ptr r p)
              | TAddrOf(lh, off) ->
                begin match Logic_utils.last_term_offset off with
                  | TIndex({ term_node = Trange _ } as r, TNoOffset) ->
@@ -490,6 +494,9 @@ let call_with_tset
                    let ptr =
                      Logic_const.term ~loc (TStartOf (lh, TNoOffset)) lty_noset
                    in
+                   (* [t] is not used anymore, thus we can safely transferred its
+                      RTE guards to [ptr] *)
+                   Rte_analysis.transfer_guards t ptr;
                    arg_from_range ~adata ~loc kf env rev_args ptr r p
                  | _ ->
                    (* Case A, B with failed range elimination or C *)
