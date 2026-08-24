@@ -22,36 +22,20 @@ open Interlang_gen.M.Operators
 
 (********************** Forward references ********************************)
 
-module Translate_rtes = struct
-  let exp_ref
-    : (?filter:(code_annotation -> bool) ->
-       kernel_function ->
-       Env.t ->
-       exp ->
-       Env.t) ref
-    =
-    ref (fun ?filter:_ _kf _env _e ->
-        Extlib.mk_labeled_fun "translate_rte_exp_ref")
-
-  let exp ?filter kf env e =
-    !exp_ref ?filter kf env e
-end
-
 module Translate_predicates = struct
   let to_exp_ref :
     (adata:Assert.t ->
      ?inplace:bool ->
      ?name:string ->
      kernel_function ->
-     ?rte:bool ->
      Env.t ->
      predicate ->
      exp * Assert.t * Env.t) ref
-    = ref @@ fun ~adata:_ ?inplace:_ ?name:_ _kf ?rte:_ _env _p ->
+    = ref @@ fun ~adata:_ ?inplace:_ ?name:_ _kf _env _p ->
     Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_ref"
 
-  let to_exp ~adata ?inplace ?name kf ?rte env p =
-    !to_exp_ref ~adata ?inplace ?name kf ?rte env p
+  let to_exp ~adata ?inplace ?name kf env p =
+    !to_exp_ref ~adata ?inplace ?name kf env p
 
   let to_exp_il_ref :
     (predicate Interlang_trans.il_compiler) ref
@@ -161,9 +145,9 @@ let create_and_init_var ~loc kf ty name exp_init env =
     (fun v_as_varinfo v_as_exp ->
        [ Gmp.init_set ~loc (Cil.var v_as_varinfo) v_as_exp  exp_init ])
 
-let with_env ?rte ?kinstr ~env f =
+let with_env ?kinstr ~env f =
   let (e', adata), env =
-    Env.with_params_and_result ?rte ?kinstr ~env
+    Env.with_params_and_result ?kinstr ~env
       (fun env -> let e', adata, env = f env in (e', adata), env)
   in
   e', adata, env
@@ -686,7 +670,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let (e, adata), env =
-      Env.with_params_and_result ~rte:true ~env (fun env ->
+      Env.with_params_and_result ~env (fun env ->
           let e1, adata, env1 = to_exp ~adata kf env t1 in
           let env' = Env.push env1 in
           let e2, adata, env2 =
@@ -703,7 +687,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let (e, adata), env =
-      Env.with_params_and_result ~rte:true ~env (fun env ->
+      Env.with_params_and_result ~env (fun env ->
           let e1, adata, env1 = to_exp ~adata kf env t1 in
           let e2, adata, env2 =
             to_exp ~adata kf (Env.push env1) t2
@@ -839,7 +823,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let t1 = Logic_normalizer.get_term t1 in
     let t2 = Logic_normalizer.get_term t2 in
     let (e, adata), env =
-      Env.with_params_and_result ~rte:true ~env (fun env ->
+      Env.with_params_and_result ~env (fun env ->
           let e1, adata, env1 = Translate_predicates.to_exp ~adata kf env cond in
           let e2, adata, env2 =
             to_exp ~adata kf (Env.push env1) t1
@@ -872,7 +856,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Tbase_addr(BuiltinLabel Here, t') ->
     let name = "base_addr" in
     let e', _, env =
-      with_env ~rte:true ~env (fun env -> to_exp ~adata:Assert.no_data kf env t')
+      with_env ~env (fun env -> to_exp ~adata:Assert.no_data kf env t')
     in
     let e, env =
       Memory_translate.call
@@ -890,7 +874,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let size_t = Machine.sizeof_type () in
     let name = "offset" in
     let e', adata, env =
-      with_env ~rte:true ~env (fun env -> to_exp ~adata kf env t')
+      with_env ~env (fun env -> to_exp ~adata kf env t')
     in
     let e, env =
       Memory_translate.call ~loc kf name size_t env [e']
@@ -902,7 +886,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let size_t = Machine.sizeof_type () in
     let name = "block_length" in
     let e', adata, env =
-      with_env ~rte:true ~env (fun env -> to_exp ~adata kf env t')
+      with_env ~env (fun env -> to_exp ~adata kf env t')
     in
     let e, env =
       Memory_translate.call ~loc kf name size_t env [e']
@@ -958,20 +942,15 @@ and to_exp_il ?inplace t =
    environment. Also extend this environment in order to include the generating
    constructs. *)
 and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
-  let generate_rte = Env.generate_rte env in
-  Options.feedback ~dkey ~level:5 "translating term %a (rte? %b) in local \
-                                   environment '%a'"
-    Printer.pp_term t generate_rte Profile.pretty
+  Options.feedback ~dkey ~level:5 "translating term %a in local environment '%a'"
+    Printer.pp_term t Profile.pretty
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
   let rexp, _, _ as result =
-    Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
+    Extlib.flatten @@ Env.with_params_and_result ~env (fun env ->
         let e, adata, env, sty, name =
           to_exp_old_with_rtes ?inplace ~adata kf env t
-        in
-        let env =
-          if generate_rte then Translate_rtes.exp kf env e else env
         in
         let cast = Typing.get_cast ~logic_env t in
         let name = if name = "" then None else Some name in
@@ -1025,7 +1004,6 @@ let untyped_to_exp typ t =
   let logic_env = Logic_env.empty in
   Typing.preprocess_term ~use_gmp_opt:true ~logic_env ?ctx t;
   let env = Env.push Env.empty in
-  let env = Env.set_rte env false in
   let e, _, env =
     try to_exp ~adata:Assert.no_data Cil_datatype.Kf.dummy env t
     with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)

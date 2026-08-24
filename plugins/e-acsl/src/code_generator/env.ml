@@ -48,7 +48,6 @@ type block_info = {
 type local_env = {
   block_info: block_info;
   mp_tbl: mp_tbl;
-  rte: bool
 }
 
 type loop_env = {
@@ -92,8 +91,7 @@ let empty_mp_tbl =
 
 let empty_local_env =
   { block_info = empty_block;
-    mp_tbl = empty_mp_tbl;
-    rte = true }
+    mp_tbl = empty_mp_tbl}
 
 let empty_loop_env =
   { variant = None;
@@ -155,18 +153,6 @@ let top_loop_invariants env =
 let pop_loop env =
   let _, tl = top_loop_env env in
   { env with loop_envs = tl }
-
-(* ************************************************************************** *)
-(** {2 RTEs} *)
-(* ************************************************************************** *)
-
-let set_rte env b =
-  let local_env, tl_env = top env in
-  { env with env_stack = { local_env with rte = b } :: tl_env }
-
-let generate_rte env =
-  let local_env, _ = top env in
-  if Options.Optimisations.Rte.get () then local_env.rte else false
 
 (* ************************************************************************** *)
 (** {2 Kinstr} *)
@@ -250,9 +236,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
         env_stack = local_env :: tl_env }
     | Varname.Block ->
       let local_env =
-        { local_env with
-          block_info = new_block;
-          mp_tbl = extend_tbl local_env.mp_tbl }
+        { block_info = new_block; mp_tbl = extend_tbl local_env.mp_tbl }
       in
       { env with
         cpt = n;
@@ -606,13 +590,7 @@ let pop_and_get_contract env =
 (** {2 Utilities} *)
 (* ************************************************************************** *)
 
-let with_params_and_result ?rte ?kinstr ~env f =
-  let old_rte, env =
-    match rte with
-    | Some rte ->
-      Some (generate_rte env), set_rte env rte
-    | None -> None, env
-  in
+let with_params_and_result ?kinstr ~env f =
   let old_kinstr, env =
     match kinstr with
     | Some kinstr ->
@@ -625,16 +603,11 @@ let with_params_and_result ?rte ?kinstr ~env f =
     | Some kinstr -> set_kinstr env kinstr
     | None -> env
   in
-  let env =
-    match old_rte with
-    | Some rte -> set_rte env rte
-    | None -> env
-  in
   other, env
 
-let with_params ?rte ?kinstr ~env f =
+let with_params ?kinstr ~env f =
   let (), env =
-    with_params_and_result ?rte ?kinstr ~env (fun env -> (), f env)
+    with_params_and_result ?kinstr ~env (fun env -> (), f env)
   in
   env
 

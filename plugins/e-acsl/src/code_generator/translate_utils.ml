@@ -32,16 +32,15 @@ let predicate_to_exp_ref
   : (adata:Assert.t ->
      ?name:string ->
      kernel_function ->
-     ?rte:bool ->
      Env.t ->
      predicate ->
      exp * Assert.t * Env.t) ref
   =
-  ref (fun ~adata:_ ?name:_ _kf ?rte:_ _env _p ->
+  ref (fun ~adata:_ ?name:_ _kf _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
-let predicate_to_exp ~adata ?name kf ?rte env p =
-  !predicate_to_exp_ref ~adata ?name kf ?rte env p
+let predicate_to_exp ~adata ?name kf env p =
+  !predicate_to_exp_ref ~adata ?name kf env p
 
 (**************************************************************************)
 (********************** Utility functions *********************************)

@@ -78,7 +78,6 @@ val predicate_to_exp_ref:
    ?inplace:bool ->
    ?name:string ->
    kernel_function ->
-   ?rte:bool ->
    Env.t ->
    predicate ->
    exp * Assert.t * Env.t) ref
