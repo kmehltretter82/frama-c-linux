@@ -21,10 +21,10 @@ Prover CFG returns Valid
 ------------------------------------------------------------
 
 Goal Check ("gcc_extensions.i", line 12, characters 13-42):
-Let a = global(G_i128_1129).
+Let a = global(G_i128_1132).
 Let m = write_sint128(mem_0, a, 2469211232873017104).
 Let x = read_sint128(m, a).
-Let a_1 = global(G_u128_1130).
+Let a_1 = global(G_u128_1133).
 Let m_1 = write_uint128(m, a_1, to_uint128(2 * x)).
 Let x_1 = read_sint128(m_1, a).
 Assume {
@@ -38,10 +38,10 @@ Prove: x_1 = 1234605616436508552.
 ------------------------------------------------------------
 
 Goal Check ("gcc_extensions.i", line 13, characters 14-33):
-Let a = global(G_i128_1129).
+Let a = global(G_i128_1132).
 Let m = write_sint128(mem_0, a, 2469211232873017104).
 Let x = read_sint128(m, a).
-Let a_1 = global(G_u128_1130).
+Let a_1 = global(G_u128_1133).
 Let m_1 = write_uint128(m, a_1, to_uint128(2 * x)).
 Let x_1 = read_uint128(m_1, a_1).
 Assume {

@@ -498,15 +498,15 @@
         },
         "__builtin_fmod": {
             "rettype":"double",
-            "args": ["double"]
+            "args": ["double","double"]
         },
         "__builtin_fmodf": {
             "rettype":"float",
-            "args": ["float"]
+            "args": ["float","float"]
         },
         "__builtin_fmodl": {
             "rettype":"long double",
-            "args": ["long double"]
+            "args": ["long double","long double"]
         },
         "__builtin_fprintf": {
             "rettype":"int",
@@ -579,15 +579,15 @@
             "args": []
         },
         "__builtin_ilogb": {
-            "rettype":"double",
+            "rettype":"int",
             "args": ["double"]
         },
         "__builtin_ilogbf": {
-            "rettype":"float",
+            "rettype":"int",
             "args": ["float"]
         },
         "__builtin_ilogbl": {
-            "rettype":"long double",
+            "rettype":"int",
             "args": ["long double"]
         },
         "__builtin_inf": {
@@ -892,7 +892,7 @@
         },
         "__builtin_object_size": {
             "rettype":"size_t",
-            "args": ["void *","int"]
+            "args": ["void const *","int"]
         },
         "__builtin_offsetof": {
             "rettype":"size_t",
@@ -1102,7 +1102,7 @@
         },
         "__builtin_strchr": {
             "rettype":"char *",
-            "args": ["char *","int"]
+            "args": ["char const *","int"]
         },
         "__builtin_strcmp": {
             "rettype":"int",
