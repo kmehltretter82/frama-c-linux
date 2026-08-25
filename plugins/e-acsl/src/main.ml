@@ -112,6 +112,10 @@ let change_printer =
             if Functions.Libc.is_vla_alloc_name vi.Cil_types.vname then
               (* Replace VLA allocation with calls to [__builtin_alloca] *)
               Format.fprintf fmt "%s" Functions.Libc.actual_alloca
+            else if Options.Replace_libc_functions.get () &&
+                    Functions.Libc.has_replacement vi.vorig_name
+            then
+              Format.pp_print_string fmt (Functions.Libc.replacement_name vi.vorig_name)
             else
               let replacement =
                 Ast_attributes.find_fc_stdlib_extern_replacement vi.vattr
