@@ -1549,7 +1549,7 @@ module MemBytes
     (mtgt: map int (block 'a)) (ptgt: addr)
     (msrc: map int (block 'a)) (psrc: addr) (size: int)
     : map int (block 'a) =
-    set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
+    set mtgt ptgt.base (bwrite_seq (get mtgt ptgt.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
