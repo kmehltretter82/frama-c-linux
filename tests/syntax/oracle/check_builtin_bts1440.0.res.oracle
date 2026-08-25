@@ -218,11 +218,11 @@
   
   long double __builtin_fminl(long double __x0, long double __x1);
   
-  double __builtin_fmod(double __x0);
+  double __builtin_fmod(double __x0, double __x1);
   
-  float __builtin_fmodf(float __x0);
+  float __builtin_fmodf(float __x0, float __x1);
   
-  long double __builtin_fmodl(long double __x0);
+  long double __builtin_fmodl(long double __x0, long double __x1);
   
   int __builtin_fprintf(void *__x0, char const *__x1 , ...);
   
@@ -258,11 +258,11 @@
   
   void __builtin_ia32_sfence(void);
   
-  double __builtin_ilogb(double __x0);
+  int __builtin_ilogb(double __x0);
   
-  float __builtin_ilogbf(float __x0);
+  int __builtin_ilogbf(float __x0);
   
-  long double __builtin_ilogbl(long double __x0);
+  int __builtin_ilogbl(long double __x0);
   
   double __builtin_inf(void);
   
@@ -416,7 +416,7 @@
   
   long double __builtin_nexttowardl(long double __x0, long double __x1);
   
-  unsigned int __builtin_object_size(void *__x0, int __x1);
+  unsigned int __builtin_object_size(void const *__x0, int __x1);
   
   unsigned int __builtin_offsetof(unsigned int __x0);
   
@@ -520,7 +520,7 @@
   
   char *__builtin_strcat(char *__x0, char const *__x1);
   
-  char *__builtin_strchr(char *__x0, int __x1);
+  char *__builtin_strchr(char const *__x0, int __x1);
   
   int __builtin_strcmp(char const *__x0, char const *__x1);
   

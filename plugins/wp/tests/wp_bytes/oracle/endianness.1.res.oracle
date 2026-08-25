@@ -7,22 +7,22 @@
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 33, characters 21-51):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -67,22 +67,22 @@ Prove: x_13 = 1234605616436508552.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 34, characters 22-43):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -127,22 +127,22 @@ Prove: x_11 = 287454020.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 35, characters 22-43):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -187,22 +187,22 @@ Prove: x_9 = 1432778632.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 36, characters 22-37):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -247,22 +247,22 @@ Prove: x_7 = 4386.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 37, characters 22-37):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -307,22 +307,22 @@ Prove: x_5 = 13124.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 38, characters 22-37):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
@@ -367,22 +367,22 @@ Prove: x_3 = 21862.
 ------------------------------------------------------------
 
 Goal Check 'big' ("endianness.i", line 39, characters 22-37):
-Let a = global(L_array_1131).
+Let a = global(L_array_1134).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
-Let x_1 = read_uint16(mem_0, global(L_u16_3_1138)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_1141)).
 Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
-Let x_3 = read_uint16(mem_0, global(L_u16_2_1137)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_1140)).
 Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
-Let x_5 = read_uint16(mem_0, global(L_u16_1_1136)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_1139)).
 Let x_6 = read_uint16(mem_0, a_1).
-Let x_7 = read_uint16(mem_0, global(L_u16_0_1135)).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_1138)).
 Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
-Let x_9 = read_uint32(mem_0, global(L_u32_1_1134)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_1137)).
 Let x_10 = read_uint32(mem_0, a_1).
-Let x_11 = read_uint32(mem_0, global(L_u32_0_1133)).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_1136)).
 Let x_12 = read_uint64(mem_0, a_1).
-Let x_13 = read_uint64(mem_0, global(L_u64_0_1132)).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_1135)).
 Assume {
   Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
       is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
