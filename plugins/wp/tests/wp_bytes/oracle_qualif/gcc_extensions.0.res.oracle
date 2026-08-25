@@ -4,14 +4,16 @@
 [wp] [Valid] Goal int128_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal int128_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 2 goals scheduled
-[wp] [Valid] bytes_raw_int128_check (Alt-Ergo) (Cached)
-[wp] [Valid] bytes_raw_int128_check_2 (Alt-Ergo) (Cached)
-[wp] Proved goals:    4 / 4
+[wp] 3 goals scheduled
+[wp] [Unsuccess] bytes_raw_int128_check_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] bytes_raw_int128_check_ko_2 (Alt-Ergo) (Cached)
+[wp] [Valid] bytes_raw_int128_check_ok (Alt-Ergo) (Cached)
+[wp] Proved goals:    3 / 5
   Terminating:     1
   Unreachable:     1
-  Alt-Ergo:        2
+  Alt-Ergo:        1
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  int128                    2        2        4       100%
+  int128                    2        1        5      60.0%
 ------------------------------------------------------------

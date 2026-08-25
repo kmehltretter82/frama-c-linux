@@ -43,7 +43,7 @@ let value_codec_encode_unsigned fmt size =
   let consbyte ~last fmt n =
     if n = 1
     then fprintf fmt "(L.Cons (mod v 0x100)"
-    else fprintf fmt "(L.Cons (mod (div v 0x%x) 0x100)" (1 lsl (8 * (n - 1))) ;
+    else fprintf fmt "(L.Cons (mod (div v 0x1%s) 0x100)" (String.make (2 * (n-1)) '0') ;
 
     if last then fprintf fmt " L.Nil%s" (String.init n (fun _ -> ')')) ;
     fprintf fmt "@,"
@@ -71,9 +71,10 @@ let value_codec_decode_unsigned fmt size =
     else fprintf fmt "L.Cons b%d (%a)" n (mline (n + 1)) stop
   in
   let rec rline n fmt stop =
+    let zeroes = String.make (n*2) '0' in
     if n = stop - 1
-    then fprintf fmt "b%d * 0x%x" n (1 lsl (8 * n))
-    else fprintf fmt "b%d * 0x%x + %a" n (1 lsl (8 * n)) (rline (n + 1)) stop
+    then fprintf fmt "b%d * 0x1%s" n zeroes
+    else fprintf fmt "b%d * 0x1%s + %a" n zeroes (rline (n + 1)) stop
   in
   let case fmt stop =
     fprintf fmt "| %a ->@," (mline 0) stop ;
@@ -498,7 +499,7 @@ let membytes_preamble fmt () =
     (mtgt: map int (block 'a)) (ptgt: addr)
     (msrc: map int (block 'a)) (psrc: addr) (size: int)
     : map int (block 'a) =
-    set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
+    set mtgt ptgt.base (bwrite_seq (get mtgt ptgt.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size

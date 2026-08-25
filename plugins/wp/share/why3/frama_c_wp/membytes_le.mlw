@@ -159,7 +159,7 @@ module ValueCodec
   function decode_uint128 (s: seq int) : int =
     match s with
     | L.Cons b0 (L.Cons b1 (L.Cons b2 (L.Cons b3 (L.Cons b4 (L.Cons b5 (L.Cons b6 (L.Cons b7 (L.Cons b8 (L.Cons b9 (L.Cons b10 (L.Cons b11 (L.Cons b12 (L.Cons b13 (L.Cons b14 (L.Cons b15 (L.Nil)))))))))))))))) ->
-      b0 * 0x1 + b1 * 0x100 + b2 * 0x10000 + b3 * 0x1000000 + b4 * 0x100000000 + b5 * 0x10000000000 + b6 * 0x1000000000000 + b7 * 0x100000000000000 + b8 * 0x1 + b9 * 0x100 + b10 * 0x10000 + b11 * 0x1000000 + b12 * 0x100000000 + b13 * 0x10000000000 + b14 * 0x1000000000000 + b15 * 0x100000000000000
+      b0 * 0x1 + b1 * 0x100 + b2 * 0x10000 + b3 * 0x1000000 + b4 * 0x100000000 + b5 * 0x10000000000 + b6 * 0x1000000000000 + b7 * 0x100000000000000 + b8 * 0x10000000000000000 + b9 * 0x1000000000000000000 + b10 * 0x100000000000000000000 + b11 * 0x10000000000000000000000 + b12 * 0x1000000000000000000000000 + b13 * 0x100000000000000000000000000 + b14 * 0x10000000000000000000000000000 + b15 * 0x1000000000000000000000000000000
     | _ -> 0
     end
     
@@ -175,14 +175,14 @@ module ValueCodec
     (L.Cons (mod (div v 0x10000000000) 0x100)
     (L.Cons (mod (div v 0x1000000000000) 0x100)
     (L.Cons (mod (div v 0x100000000000000) 0x100)
-    (L.Cons (mod (div v 0x1) 0x100)
-    (L.Cons (mod (div v 0x100) 0x100)
-    (L.Cons (mod (div v 0x10000) 0x100)
-    (L.Cons (mod (div v 0x1000000) 0x100)
-    (L.Cons (mod (div v 0x100000000) 0x100)
-    (L.Cons (mod (div v 0x10000000000) 0x100)
-    (L.Cons (mod (div v 0x1000000000000) 0x100)
-    (L.Cons (mod (div v 0x100000000000000) 0x100) L.Nil))))))))))))))))
+    (L.Cons (mod (div v 0x10000000000000000) 0x100)
+    (L.Cons (mod (div v 0x1000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x100000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x10000000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x1000000000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x100000000000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x10000000000000000000000000000) 0x100)
+    (L.Cons (mod (div v 0x1000000000000000000000000000000) 0x100) L.Nil))))))))))))))))
     
   function encode_sint128 (v: int) : seq int =
     encode_uint128 (to_uint128 v)
@@ -1549,7 +1549,7 @@ module MemBytes
     (mtgt: map int (block 'a)) (ptgt: addr)
     (msrc: map int (block 'a)) (psrc: addr) (size: int)
     : map int (block 'a) =
-    set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
+    set mtgt ptgt.base (bwrite_seq (get mtgt ptgt.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
