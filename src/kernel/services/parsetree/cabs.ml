@@ -48,6 +48,7 @@ type typeSpecifier = (* Merge all specifiers into one type *)
   | TtypeofT of specifier * decl_type       (* GCC __typeof__ *)
   | TtypeofUnqualE of expression            (* C23 typeof_unqual *)
   | TtypeofUnqualT of specifier * decl_type (* C23 typeof_unqual *)
+  | TautoE of expression                    (* GCC __auto_type *)
 (* This attribute is common for all types in the mutually recursive group of
    types so we only need to mention it once. *)
 [@@deriving show { with_path = false } ]
@@ -68,6 +69,7 @@ and spec_elem =
   | SpecCV of cvspec            (* const/volatile *)
   | SpecAttr of attribute       (* __attribute__ *)
   | SpecStorage of storage
+  | SpecAutoType
   | SpecInline
   | SpecType of typeSpecifier
   | SpecAlignas of expression

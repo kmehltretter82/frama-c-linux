@@ -324,7 +324,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token<Fileloc.t> INT64 INT128
 %token<Fileloc.t> FLOAT32 FLOAT64 ENUM STRUCT TYPEDEF UNION
 %token<Fileloc.t> SIGNED UNSIGNED LONG SHORT
-%token<Fileloc.t> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
+%token<Fileloc.t> VOLATILE EXTERN STATIC CONST RESTRICT AUTO AUTO_TYPE REGISTER
 %token<Fileloc.t> THREAD THREAD_LOCAL
 %token<Fileloc.t> GHOST
 
@@ -1133,6 +1133,7 @@ decl_spec_wo_type_nor_attr: /* ISO 6.7 */
 | EXTERN   { SpecStorage EXTERN, $1 }
 | STATIC   { SpecStorage STATIC, $1 }
 | AUTO     { SpecStorage AUTO, $1 }
+| AUTO_TYPE { SpecAutoType, $1 }
 | REGISTER { SpecStorage REGISTER, $1}
 // ISO 6.7.4
 | INLINE   { SpecInline, $1 }

@@ -124,11 +124,14 @@ and childrenTypeSpecifier vis ts =
     let s' = visitCabsSpecifier vis s in
     let dt' = visitCabsDeclType vis false dt in
     if s != s' || dt != dt' then TtypeofUnqualT (s', dt') else ts
+  | TautoE e ->
+    let e' = visitCabsExpression vis e in
+    if e' != e then TautoE e' else ts
   | ts -> ts
 
 and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
   match se with
-    SpecTypedef | SpecInline | SpecStorage _ -> se
+    SpecTypedef | SpecInline | SpecAutoType | SpecStorage _ -> se
   | SpecCV _ -> se    (* cop out *)
   | SpecAttr a -> begin
       let al' = visitCabsAttribute vis a in

@@ -108,6 +108,7 @@ let init_lexicon () =
   Logic_env.reset_typenames () ;
   Logic_env.builtin_types_as_typenames () ;
   valid "auto" (fun loc -> AUTO loc) ;
+  gcc "__auto_type" (fun loc -> AUTO_TYPE loc) ;
   valid "const" (fun loc -> CONST loc) ;
   valid "__const" (fun loc -> CONST loc) ;
   valid "__const__" (fun loc -> CONST loc) ;

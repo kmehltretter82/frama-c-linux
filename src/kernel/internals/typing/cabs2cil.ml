@@ -4070,6 +4070,9 @@ let rec doSpecList loc ghost
     match se with
     | Cabs.SpecTypedef -> acc
     | Cabs.SpecInline -> isinline := true; acc
+    | Cabs.SpecAutoType ->
+      Errorloc.abort_context
+        "__auto_type requires a single variable with an initializer"
     | Cabs.SpecStorage st ->
       if !storage <> NoStorage then
         Kernel.error ~once:true ~current:true "Multiple storage specifiers";
@@ -4392,6 +4395,12 @@ let rec doSpecList loc ghost
     | [Cabs.TtypeofUnqualT (specs, dt)] ->
       let t = doOnlyType loc ghost specs dt in
       Ast_types.C.remove_qualifiers t
+    | [Cabs.TautoE e] ->
+      let (_, s, _, t) =
+        doExp (ghost_local_env ghost) CNoConst e AType
+      in
+      clean_up_chunk_locals s;
+      t
 
     | l ->
       Errorloc.abort_context
@@ -9058,6 +9067,47 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
   let<> UpdatedCurrentLoc = get_definitionloc def in
   match def with
   | Cabs.DECDEF (logic_spec, (s, nl), loc) ->
+    let has_auto_type =
+      List.exists (function Cabs.SpecAutoType -> true | _ -> false) s
+    in
+    let s =
+      if not has_auto_type then s
+      else begin
+        let auto_count =
+          List.fold_left
+            (fun n -> function Cabs.SpecAutoType -> n + 1 | _ -> n)
+            0 s
+        in
+        if auto_count <> 1 then
+          Errorloc.abort_context
+            "multiple __auto_type specifiers in one declaration";
+        if List.exists (function Cabs.SpecType _ -> true | _ -> false) s then
+          Errorloc.abort_context
+            "__auto_type cannot be combined with another type specifier";
+        let rec plain_declarator = function
+          | Cabs.JUSTBASE -> true
+          | Cabs.PARENTYPE (_, decl, _) -> plain_declarator decl
+          | Cabs.ARRAY _ | Cabs.PTR _ | Cabs.PROTO _ -> false
+        in
+        let init_expr =
+          match nl with
+          | [((_, decl, _, _), Cabs.SINGLE_INIT init)]
+            when plain_declarator decl -> init
+          | [_] ->
+            Errorloc.abort_context
+              "__auto_type requires a plain variable declarator and a single \
+               expression initializer"
+          | _ ->
+            Errorloc.abort_context
+              "__auto_type can only declare one variable at a time"
+        in
+        List.map
+          (function
+            | Cabs.SpecAutoType -> Cabs.SpecType (Cabs.TautoE init_expr)
+            | spec -> spec)
+          s
+      end
+    in
     (* Do the specifiers exactly once *)
     let sugg =
       match nl with

@@ -154,6 +154,7 @@ let rec print_specifiers fmt (specs: spec_elem list) =
   let print_spec_elem fmt = function
       SpecTypedef -> fprintf fmt "typedef"
     | SpecInline -> fprintf fmt "inline"
+    | SpecAutoType -> fprintf fmt "__auto_type"
     | SpecStorage NO_STORAGE -> fprintf fmt "/* no storage */"
     | SpecStorage AUTO -> fprintf fmt "auto"
     | SpecStorage STATIC -> fprintf fmt "static"
@@ -205,6 +206,7 @@ and print_type_spec fmt = function
     fprintf fmt "__typeof_unqual__(@[%a@])" print_expression e
   | TtypeofUnqualT (s,d) ->
     fprintf fmt "__typeof_unqual__(@[%a@])" print_onlytype (s, d)
+  | TautoE e -> fprintf fmt "__auto_type(@[%a@])" print_expression e
 
 (* print "struct foo", but with specified keyword and a list of
  * attributes to put between keyword and name *)
