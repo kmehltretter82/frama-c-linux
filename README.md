@@ -1,5 +1,12 @@
 ![Frama-C](share/frama-c.png?raw=true)
 
+> [!NOTE]
+> **Frama-C Linux** is a downstream fork focused on accepting Linux kernel C,
+> modeling kernel-specific semantics, and finding practical kernel bugs with
+> low-noise analyses. It is not an official Frama-C distribution. See the
+> [Linux kernel roadmap](KERNEL.md) and the
+> [upstream synchronization notes](UPSTREAM.md).
+
 [Frama-C](https://frama-c.com) is a platform dedicated to the analysis of
 source code written in C.
 
