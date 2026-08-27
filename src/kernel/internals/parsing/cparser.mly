@@ -359,7 +359,8 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token<Fileloc.t> IF
 %token ELSE
 
-%token<Fileloc.t> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Fileloc.t> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM
+%token<Fileloc.t> TYPEOF TYPEOF_UNQUAL FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
 %token<Fileloc.t> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
@@ -1266,6 +1267,11 @@ type_spec:   /* ISO 6.7.2 */
 | TYPEOF LPAREN expression RPAREN     { TtypeofE $3, $1 }
 | TYPEOF LPAREN type_name RPAREN      { let s, d = $3 in
                                           TtypeofT (s, d), $1 }
+| TYPEOF_UNQUAL LPAREN expression RPAREN
+                                      { TtypeofUnqualE $3, $1 }
+| TYPEOF_UNQUAL LPAREN type_name RPAREN
+                                      { let s, d = $3 in
+                                        TtypeofUnqualT (s, d), $1 }
 ;
 
 /* (* ISO 6.7.2. Except that we allow empty structs. We

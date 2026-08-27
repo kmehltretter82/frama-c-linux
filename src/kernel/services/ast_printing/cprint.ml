@@ -201,6 +201,10 @@ and print_type_spec fmt = function
   | TtypeofE e -> fprintf fmt "__typeof__(@[%a@])" print_expression e
   | TtypeofT (s,d) ->
     fprintf fmt "__typeof__(@[%a@])"print_onlytype (s, d)
+  | TtypeofUnqualE e ->
+    fprintf fmt "__typeof_unqual__(@[%a@])" print_expression e
+  | TtypeofUnqualT (s,d) ->
+    fprintf fmt "__typeof_unqual__(@[%a@])" print_onlytype (s, d)
 
 (* print "struct foo", but with specified keyword and a list of
  * attributes to put between keyword and name *)

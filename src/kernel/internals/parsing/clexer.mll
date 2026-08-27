@@ -172,6 +172,9 @@ let init_lexicon () =
   valid "__typeof__" (fun loc -> TYPEOF loc) ;
   valid "__typeof" (fun loc -> TYPEOF loc) ;
   valid "typeof" (fun loc -> TYPEOF loc) ;
+  valid "__typeof_unqual__" (fun loc -> TYPEOF_UNQUAL loc) ;
+  valid "__typeof_unqual" (fun loc -> TYPEOF_UNQUAL loc) ;
+  c23_or_later "typeof_unqual" (fun loc -> TYPEOF_UNQUAL loc) ;
   valid "__volatile__" (fun loc -> VOLATILE loc) ;
   valid "__volatile" (fun loc -> VOLATILE loc) ;
   valid "__FUNCTION__" (fun loc -> FUNCTION__ loc) ;

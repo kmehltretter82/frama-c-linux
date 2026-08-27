@@ -4383,6 +4383,15 @@ let rec doSpecList loc ghost
       clean_up_chunk_locals s;
       t
     | [Cabs.TtypeofT (specs, dt)] -> doOnlyType loc ghost specs dt
+    | [Cabs.TtypeofUnqualE e] ->
+      let (_, s, _, t) =
+        doExp (ghost_local_env ghost) CNoConst e AExpLeaveArrayFun
+      in
+      clean_up_chunk_locals s;
+      Ast_types.C.remove_qualifiers t
+    | [Cabs.TtypeofUnqualT (specs, dt)] ->
+      let t = doOnlyType loc ghost specs dt in
+      Ast_types.C.remove_qualifiers t
 
     | l ->
       Errorloc.abort_context

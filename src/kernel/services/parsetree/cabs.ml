@@ -44,8 +44,10 @@ type typeSpecifier = (* Merge all specifiers into one type *)
   | Tstruct of string * field_group list option * attribute list
   | Tunion of string * field_group list option * attribute list
   | Tenum of string * enum_item list option * attribute list
-  | TtypeofE of expression                      (* GCC __typeof__ *)
+  | TtypeofE of expression                  (* GCC __typeof__ *)
   | TtypeofT of specifier * decl_type       (* GCC __typeof__ *)
+  | TtypeofUnqualE of expression            (* C23 typeof_unqual *)
+  | TtypeofUnqualT of specifier * decl_type (* C23 typeof_unqual *)
 (* This attribute is common for all types in the mutually recursive group of
    types so we only need to mention it once. *)
 [@@deriving show { with_path = false } ]

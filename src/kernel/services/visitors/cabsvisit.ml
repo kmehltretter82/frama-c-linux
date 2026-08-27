@@ -117,6 +117,13 @@ and childrenTypeSpecifier vis ts =
     let s' = visitCabsSpecifier vis s in
     let dt' = visitCabsDeclType vis false dt in
     if s != s' || dt != dt' then TtypeofT (s', dt') else ts
+  | TtypeofUnqualE e ->
+    let e' = visitCabsExpression vis e in
+    if e' != e then TtypeofUnqualE e' else ts
+  | TtypeofUnqualT (s, dt) ->
+    let s' = visitCabsSpecifier vis s in
+    let dt' = visitCabsDeclType vis false dt in
+    if s != s' || dt != dt' then TtypeofUnqualT (s', dt') else ts
   | ts -> ts
 
 and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
