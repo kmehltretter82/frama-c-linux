@@ -183,6 +183,7 @@ let init_lexicon () =
   valid "__PRETTY_FUNCTION__" (fun loc -> PRETTY_FUNCTION__ loc) ;
   valid "__label__" (fun _ -> LABEL__) ;
   valid "__restrict" (fun loc -> RESTRICT loc) ;
+  valid "__restrict__" (fun loc -> RESTRICT loc) ;
   valid "restrict" (fun loc -> RESTRICT loc) ;
   valid "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
   (*** GCC ***)
