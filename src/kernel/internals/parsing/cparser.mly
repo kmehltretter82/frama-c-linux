@@ -1021,10 +1021,6 @@ statement:
     let loc = Errorloc.convert_loc $sloc in
     no_ghost [COMPGOTO (smooth_expression $3, loc) ]
   }
-| ASM GOTO asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
-    let loc = Errorloc.convert_loc $loc in
-    no_ghost [ASM ($3, mk_asm_templates $5, $6, loc)]
-  }
 | ASM asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
     let loc = Errorloc.convert_loc $sloc in
     no_ghost [ASM ($2, mk_asm_templates $4, $5, loc)]
@@ -1853,6 +1849,8 @@ asmattr:
 | /* empty */      { [] }
 | VOLATILE asmattr { ("volatile", []) :: $2 }
 | CONST asmattr    { ("const", []) :: $2 }
+| INLINE asmattr   { $2 }
+| GOTO asmattr     { $2 }
 ;
 
 asmtemplate:
