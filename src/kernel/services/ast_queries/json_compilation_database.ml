@@ -22,6 +22,7 @@ type arg_type =
     Path of string
   | Define of string
   | Undefine of string
+  | Plain of string
 
 let whitelisted_prefixes =
   [
@@ -31,11 +32,12 @@ let whitelisted_prefixes =
     Path "-imacros";
     Path "-isystem";
     Define "-D";
-    Undefine "-U"
+    Undefine "-U";
+    Plain "-std="
   ]
 
 let string_of_arg_type = function
-    Path s | Define s | Undefine s -> s
+    Path s | Define s | Undefine s | Plain s -> s
 
 let whitelist =
   List.map (fun p ->
@@ -134,9 +136,8 @@ let filter_useful_flags ~requote option_list =
   in
   let process_prefix prefix suffix =
     match prefix with
-    | Path s -> s ^ suffix
+    | Path s | Undefine s | Plain s -> s ^ suffix
     | Define s -> s ^ convert_define suffix
-    | Undefine s -> s ^ suffix
   in
   let remove_extraneous_quotes arg =
     let len = String.length arg in

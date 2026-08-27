@@ -1,0 +1,7 @@
+[
+  {
+    "directory": ".",
+    "command": "cc -std=gnu11 -c compilation_db_std.c",
+    "file": "compilation_db_std.c"
+  }
+]
