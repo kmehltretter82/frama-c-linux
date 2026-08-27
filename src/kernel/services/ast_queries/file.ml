@@ -345,12 +345,17 @@ let unsupported_float_types =
     Datatype.String.Set.empty
     [ "BFLT16"; "FLT16"; "FLT128"; "LDBL"; ]
 
-let known_bad_macros =
-  Datatype.String.Set.add_seq
-    (List.to_seq
-       (["__GCC_IEC_559_COMPLEX"; "__SIZEOF_INT128__"; "__SSE__"; "__SSE2__" ]
-        @ unsupported_libc_macros))
-    unsupported_float_types
+let known_bad_macros machdep =
+  let macros =
+    Datatype.String.Set.add_seq
+      (List.to_seq
+         (["__GCC_IEC_559_COMPLEX"; "__SIZEOF_INT128__"; "__SSE__";
+           "__SSE2__" ] @ unsupported_libc_macros))
+      unsupported_float_types
+  in
+  if Machdep.gccMode machdep then
+    Datatype.String.Set.remove "__SIZEOF_INT128__" macros
+  else macros
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
@@ -363,8 +368,8 @@ let () = Cmdline.run_after_exiting_stage print_machdep_header
 
 let print_machdep_builtin_macros () =
   if Kernel.PrintMachdepBuiltinMacros.get () then begin
-    let censored_macros = known_bad_macros in
     let machdep = get_machdep() in
+    let censored_macros = known_bad_macros machdep in
     Machdep.gen_define_custom_macros Format.std_formatter censored_macros machdep;
     raise Cmdline.Exit
   end else Cmdline.nop
@@ -472,7 +477,7 @@ let censored_macros cpp_args =
        (let+ name = String.remove_prefix "-U" arg in
         String.trim_underscores name)
        |> Option.fold ~none ~some)
-    known_bad_macros
+    (known_bad_macros (get_machdep ()))
     (List.(flatten (map (String.split_on_char ' ') cpp_args)))
 
 let build_cpp_cmd = function
