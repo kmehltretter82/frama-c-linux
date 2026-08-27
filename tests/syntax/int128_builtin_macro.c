@@ -8,6 +8,7 @@
 #  error invalid __SIZEOF_INT128__ value
 # endif
 unsigned __int128 wide_integer;
+__signed__ __int128 signed_wide_integer;
 #else
 # ifdef __SIZEOF_INT128__
 #  error __SIZEOF_INT128__ requires a GCC-compatible machdep

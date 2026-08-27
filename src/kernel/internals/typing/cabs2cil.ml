@@ -4205,7 +4205,8 @@ let rec doSpecList loc ghost
     | [Cabs.Tunsigned; Cabs.Tint64] -> ulongLongType
 
     (* int128 is a gcc extension *)
-    | [Cabs.Tint128] -> int128Type
+    | [Cabs.Tint128]
+    | [Cabs.Tsigned; Cabs.Tint128] -> int128Type
     | [Cabs.Tunsigned; Cabs.Tint128] -> uint128Type
 
     | [Cabs.Tfloat]   -> floatType
