@@ -28,7 +28,11 @@ let is_publish = function
   | _ -> false
 
 let is_faultable_access = function
-  | "mte_copy_tags_from_user" -> true
+  | "mte_copy_tags_from_user"
+  | "mte_copy_tags_to_user"
+  | "copy_from_user"
+  | "copy_to_user"
+  | "clear_user" -> true
   | _ -> false
 
 let ignored_result = function
