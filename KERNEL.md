@@ -75,6 +75,8 @@ kernel sources and headers:
 | `1fea1525b664a1475b04f90b896914ae18563538` | DWC3 | 8/8 | none |
 | `543de713a19da4be6128b93c2fd27c4b28276a03` | library | 21/21 | none |
 | `543de713a19da4be6128b93c2fd27c4b28276a03` | DWC3 | 8/8 | none |
+| `3f28ad0641bf27835b0f7b87c3925704491a740a` | library | 21/21 | none |
+| `3f28ad0641bf27835b0f7b87c3925704491a740a` | DWC3 | 8/8 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -92,6 +94,12 @@ warnings for qualifier removal. Revision `543de713a1` preserves the argument
 type of polymorphic `__builtin_constant_p` expressions instead of casting them
 through its placeholder `int` prototype. This removes another 680 warnings
 from the library corpus and 320 from DWC3, leaving totals of 2,661 and 1,436.
+Revision `3f28ad0641` classifies GCC `hot` and `cold` as function-type
+attributes while continuing to preserve them on labels. This removes 2,062
+misplaced-attribute warnings from the library corpus and 1,024 from DWC3,
+leaving 599 and 412 warnings respectively. The remaining attribute warnings
+are explicitly identified unknown attributes rather than silently discarded
+declaration attributes.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated; the

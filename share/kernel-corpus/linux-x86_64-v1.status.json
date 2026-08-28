@@ -140,6 +140,26 @@
         "kernel:libc:frama-c": 40,
         "kernel:typing:implicit-conv-void-ptr": 354
       }
+    },
+    {
+      "name": "frontend-with-hot-cold-function-attributes",
+      "frontend_revision": "3f28ad0641bf27835b0f7b87c3925704491a740a",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21,
+      "warning_count": 599,
+      "warnings_by_key": {
+        "kernel:asm:clobber": 20,
+        "kernel:attrs:unknown": 185,
+        "kernel:libc:frama-c": 40,
+        "kernel:typing:implicit-conv-void-ptr": 354
+      }
     }
   ],
   "model_effect": {
@@ -190,6 +210,18 @@
       "int_conversion_warnings": 0
     },
     "removed_spurious_warnings": 680
+  },
+  "hot_cold_attribute_effect": {
+    "frontend_revision": "3f28ad0641bf27835b0f7b87c3925704491a740a",
+    "before": {
+      "warning_count": 2661,
+      "misplaced_attribute_warnings": 2062
+    },
+    "after": {
+      "warning_count": 599,
+      "misplaced_attribute_warnings": 0
+    },
+    "removed_spurious_warnings": 2062
   },
   "remaining_model_queue": {
     "undeclared_builtins": [],
