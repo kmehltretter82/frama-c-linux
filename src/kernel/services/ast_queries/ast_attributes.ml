@@ -327,6 +327,7 @@ let () =
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; "aconst";
+      "nonstring";
       (* Gcc uses this to specify the name to be used in assembly for a global. *)
       "asm" ]
 
@@ -458,5 +459,4 @@ let () =
           register ?ignore ?print attr_class name
         )
     )
-
 

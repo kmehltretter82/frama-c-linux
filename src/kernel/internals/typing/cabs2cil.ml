@@ -2387,6 +2387,9 @@ let varSizeArrays : exp IH.t = IH.create 17
 type expAction =
     ADrop                               (* Drop the result. Only the
                                          * side-effect is interesting *)
+  | ADropType                           (* Drop the result while retaining its
+                                         * type. Used to validate GCC void
+                                         * return expressions. *)
   | AType                               (* Only the type of the result
                                            is interesting.  *)
   | ASet of bool * lval * lval list * typ
@@ -2417,6 +2420,10 @@ type expAction =
   | AExpLeaveArrayFun                   (* Do it like an expression, but do
                                          * not convert arrays of functions
                                          * into pointers *)
+
+let isDropAction = function
+  | ADrop | ADropType -> true
+  | AType | ASet _ | AExp _ | AExpLeaveArrayFun -> false
 
 
 type expConst =
@@ -2712,7 +2719,97 @@ let vla_free_fun () =
   memoBuiltin ~force_keep:true ~spec "__fc_vla_free"
     (voidType, Args [p_arg], false)
 
-let conditionalConversion (t2: typ) (t3: typ) : typ =
+(* ISO C defines a null pointer constant more narrowly than an expression
+   which a value-oriented constant folder can reduce to zero. In particular,
+   [variable * 0] is not an integer constant expression. This distinction is
+   observable in the type selected by the conditional operator and is used by
+   the Linux kernel's [__is_constexpr] macro. *)
+let isNullPointerConstant (e: exp) : bool =
+  let is_integer_constant_zero e =
+    Cil.isIntegerConstant e &&
+    match Cil.constFoldToInt ~machdep:true e with
+    | Some value -> Z.is_zero value
+    | None -> false
+  in
+  match e.enode with
+  | CastE (t, inner) when Ast_types.C.is_void_ptr t ->
+    is_integer_constant_zero inner
+  | _ when Ast_types.C.is_integral (Cil.typeOf e) ->
+    is_integer_constant_zero e
+  | _ -> false
+
+(* GCC accepts array member designators with non-constant indices in
+   [__builtin_offsetof]. In that case the result is not an integer constant
+   expression: it is the fixed field offset plus the runtime index multiplied
+   by the array element size. Keep that expression in the CIL AST instead of
+   rejecting it through [Cil.bitsOffset]. *)
+let offsetExpression ~loc (base_type: typ) (offset: offset) : exp =
+  let result_type = Machine.sizeof_type () in
+  let result_kind = Machine.sizeof_kind () in
+  let integer value = Cil.kinteger ~loc result_kind value in
+  let add left right =
+    Cil.mkBinOp_exn ~constfold:true ~loc PlusA left right
+  in
+  let rec offset_from base_type = function
+    | NoOffset -> integer 0
+    | Field (field, remaining) ->
+      let start, _width = Cil.fieldBitsOffset field in
+      if start mod 8 <> 0 then
+        Kernel.error ~current:true "Using offset of bitfield";
+      add (integer (start / 8)) (offset_from field.ftype remaining)
+    | Index (index, remaining) ->
+      let element_type = Ast_types.C.direct_array_element base_type in
+      let element_size = integer (Cil.bytesSizeOf element_type) in
+      let converted_index =
+        Cil.mkCastT ~oldt:(Cil.typeOf index) ~newt:result_type index
+      in
+      let indexed_offset =
+        Cil.mkBinOp_exn ~constfold:true ~loc Mult converted_index element_size
+      in
+      add indexed_offset (offset_from element_type remaining)
+  in
+  offset_from base_type offset
+
+let rec offsetHasAttribute name = function
+  | NoOffset -> false
+  | Index (_, remaining) -> offsetHasAttribute name remaining
+  | Field (field, remaining) ->
+    Ast_attributes.contains name field.fattr ||
+    Ast_types.C.has_attribute name field.ftype ||
+    offsetHasAttribute name remaining
+
+let lvalHasAttribute name (host, offset) =
+  let host_has_attribute =
+    match host with
+    | Var variable ->
+      Ast_attributes.contains name variable.vattr ||
+      Ast_types.C.has_attribute name variable.vtype
+    | Mem _ -> Ast_types.C.has_attribute name (Cil.typeOfLhost host)
+  in
+  host_has_attribute || offsetHasAttribute name offset
+
+let rec expressionHasAttribute name expression expression_type =
+  Ast_types.C.has_attribute name expression_type ||
+  match expression.enode with
+  | Lval lval | StartOf lval | AddrOf lval -> lvalHasAttribute name lval
+  | CastE (_, inner) -> expressionHasAttribute name inner (Cil.typeOf inner)
+  | _ -> false
+
+let builtinAttributeName expression =
+  match (stripParen expression).expr_node with
+  | Cabs.VARIABLE name -> Some (String.trim_underscores name)
+  | _ -> None
+
+let cabsStringLiteral expression =
+  match (stripParen expression).expr_node with
+  | Cabs.CONSTANT (Cabs.CONST_STRING value) -> Some value
+  | _ -> None
+
+let conditionalConversion ?e2 ?e3 (t2: typ) (t3: typ) : typ =
+  let is_null_pointer_constant = function
+    | Some e -> isNullPointerConstant e
+    | None -> false
+  in
   let tresult =  (* ISO 6.5.15 *)
     let t2' = Ast_types.C.unroll t2 in
     let t3' = Ast_types.C.unroll t3 in
@@ -2722,8 +2819,14 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
     | TComp comp2, TComp comp3
       when comp2.ckey = comp3.ckey -> t2
     | TVoid, TVoid  -> t2
-    | TPtr _, TPtr { tnode = TVoid } -> t2
-    | TPtr { tnode = TVoid }, TPtr _ -> t3
+    | TPtr _, TPtr { tnode = TVoid } ->
+      if is_null_pointer_constant e3 then t2
+      else if Option.is_some e3 then t3
+      else t2
+    | TPtr { tnode = TVoid }, TPtr _ ->
+      if is_null_pointer_constant e2 then t3
+      else if Option.is_some e2 then t2
+      else t3
     | TPtr _, TPtr _ when Cil_datatype.Typ.equal t2 t3 -> t2
     | TPtr _, TInt _  -> t2 (* most likely comparison with 0 *)
     | TInt _, TPtr _ -> t3 (* most likely comparison with 0 *)
@@ -5436,6 +5539,7 @@ and doExp local_env
   let finishExp ?(newWhat=what) reads (se: chunk) (e: exp) (t: typ) =
     match newWhat with
     | ADrop
+    | ADropType
     | AType ->
       let (e', t') = processArrayFun e t in
       (reads, se, e', t')
@@ -5477,7 +5581,7 @@ and doExp local_env
   let result =
     match e.expr_node with
     | Cabs.PAREN e -> doExp (paren_local_env local_env) asconst e what
-    | Cabs.NOTHING when what = ADrop ->
+    | Cabs.NOTHING when isDropAction what ->
       finishExp [] (unspecified_chunk empty) (Cil.integer ~loc 0) intType
     | Cabs.NOTHING ->
       Errorloc.abort_context "must have a non-void expression here"
@@ -5836,7 +5940,7 @@ and doExp local_env
         match what with
         | AExp (Some _) -> AExp (Some typ)
         | AExp None -> what
-        | ADrop | AType | AExpLeaveArrayFun -> what
+        | ADrop | ADropType | AType | AExpLeaveArrayFun -> what
         | ASet (_, _, _, lvt) ->
           (* If the cast from typ to lvt would be dropped, then we
            * continue with a Set *)
@@ -5897,6 +6001,8 @@ and doExp local_env
       let (t'', e'') =
         match typ.tnode with
         | TVoid when what' = ADrop -> (t', e') (* strange GNU thing *)
+        | TVoid when what' = ADropType ->
+          typ, Cil.mkCastT ~oldt:t' ~newt:typ e'
         |  _ ->
           (* Do this to check the cast, unless we are sure that we do not
            * need the check. *)
@@ -6091,7 +6197,7 @@ and doExp local_env
             in
             let tresult, opresult = doBinOp loc uop' e' (Cil.one ~loc:e'.eloc) in
             let reads, se', result =
-              if what <> ADrop && what <> AType then
+              if not (isDropAction what) && what <> AType then
                 let descr =
                   Format.asprintf "%a%s"
                     Cil_descriptive_printer.pp_exp  e'
@@ -6171,7 +6277,7 @@ and doExp local_env
             let needsTemp =
               not (Cil.isBitfield lv) && (* PC: BTS 933, 968 *)
               match what, lv with
-              | (ADrop|AType), _ -> false
+              | (ADrop|ADropType|AType), _ -> false
               | _, (Mem e, off) ->
                 not (Cil.isConstant e) || not (Cil.isConstantOffset off)
               | _, (Var _, off) -> not (Cil.isConstantOffset off)
@@ -6315,6 +6421,18 @@ and doExp local_env
             (Cil.new_exp ~loc (Lval (Cil.var tmp)))
             intType
       end
+    | Cabs.CALL
+        ({ expr_node = VARIABLE "__builtin_strlen"}, [ argument ], [])
+      when Machine.gccMode() && Option.is_some (cabsStringLiteral argument) ->
+      let string = Option.get (cabsStringLiteral argument) in
+      let length =
+        match String.index_opt string (Char.chr 0) with
+        | Some index -> index
+        | None -> String.length string
+      in
+      finishExp [] (unspecified_chunk empty)
+        (Cil.kinteger ~loc (Machine.sizeof_kind ()) length)
+        (Machine.sizeof_type ())
     | Cabs.CALL({ expr_node = VARIABLE "__builtin_choose_expr"},
                 args, ghost_args)
       when Machine.gccMode() ->
@@ -6348,6 +6466,39 @@ and doExp local_env
           end
         | _ ->
           Errorloc.abort_context "ill-formed call to __builtin_choose_expr"
+      end
+    | Cabs.CALL({ expr_node = VARIABLE "__builtin_has_attribute"},
+                args, ghost_args)
+      when Machine.gccMode() ->
+      begin
+        match args, ghost_args with
+        | [ subject; attribute ], [] ->
+          let attribute_name =
+            match builtinAttributeName attribute with
+            | Some name -> name
+            | None ->
+              Errorloc.abort_context
+                "second argument of __builtin_has_attribute should be an attribute"
+          in
+          (* The subject is inspected but not evaluated. Keep only locals
+             needed to represent its type, just as for sizeof. *)
+          let _, chunk, subject', subject_type =
+            doExp
+              (no_paren_local_env local_env)
+              CNoConst
+              subject
+              AExpLeaveArrayFun
+          in
+          let scope_chunk =
+            drop_chunk "__builtin_has_attribute" chunk subject subject'
+          in
+          let value =
+            if expressionHasAttribute attribute_name subject' subject_type
+            then 1 else 0
+          in
+          finishExp [] scope_chunk (Cil.integer ~loc value) intType
+        | _ ->
+          Errorloc.abort_context "ill-formed call to __builtin_has_attribute"
       end
     | Cabs.CALL(f, args, ghost_args) ->
       let (rf,sf, f', ft') =
@@ -6945,11 +7096,7 @@ and doExp local_env
                     prestype := Machine.sizeof_type ();
                     let typ = Cil.typeOfLhost host in
                     try
-                      let start, _width = Cil.bitsOffset typ offset in
-                      if start mod 8 <> 0 then
-                        Kernel.error ~current:true "Using offset of bitfield";
-                      let kind = Machine.sizeof_kind () in
-                      pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
+                      pres := offsetExpression ~loc:e.eloc typ offset;
                     with Cil.SizeOfError (s, _) ->
                       pres := e;
                       Kernel.error ~once:true ~current:true
@@ -7069,6 +7216,14 @@ and doExp local_env
         in
         match !pwhat with
         | ADrop -> addCall None (Cil.zero ~loc:e.expr_loc) intType
+        | ADropType ->
+          if Ast_types.C.is_void resType' then
+            let zero = Cil.zero ~loc:e.expr_loc in
+            let void_expression =
+              Cil.mkCastT ~oldt:intType ~newt:resType' zero
+            in
+            addCall None void_expression resType'
+          else addCall None (Cil.zero ~loc:e.expr_loc) intType
         | AType -> prestype := resType'
         | ASet(is_real_var, lv, _, vtype) when !pis__builtin_va_arg ->
           (* Make an exception here for __builtin_va_arg *)
@@ -7162,6 +7317,7 @@ and doExp local_env
         in
         let what' = match what with
           | ADrop -> ADrop
+          | ADropType -> ADropType
           | _ -> AExp None
         in
         let is_true_cond = evaluate_cond_exp ce1 in
@@ -7194,7 +7350,17 @@ and doExp local_env
         let r3, se3, e3', t3 =
           doExp (no_paren_local_env local_env) asconst' e3 what'
         in
-        let tresult = conditionalConversion t2 t3 in
+        let e2_for_conversion =
+          match e2'o, ce1 with
+          | Some e2', _ -> Some e2'
+          | None, CEExp (_, e1') -> Some e1'
+          | None, _ -> None
+        in
+        let tresult =
+          match e2_for_conversion with
+          | Some e2' -> conditionalConversion ~e2:e2' ~e3:e3' t2 t3
+          | None -> conditionalConversion ~e3:e3' t2 t3
+        in
         if asconst <> CNoConst && is_true_cond = `CTrue then begin
           clean_up_chunk_locals se2;
           clean_up_chunk_locals se3;
@@ -7232,7 +7398,7 @@ and doExp local_env
                   ((empty @@@ (se1, ghost)) @@@ (se2, ghost))
                   (snd (castTo t2 tresult e2')) tresult
             end
-          | _ when what = ADrop ->
+          | _ when isDropAction what ->
             (* We are not interested by the result, but might want to
                evaluate e2 and e3 if they are dangerous expressions. *)
             (* dummy result, that will be ultimately be dropped *)
@@ -7810,7 +7976,7 @@ and doFullExp local_env const e what =
   let se', e' =
     if !contains_temp_subarray then begin
       contains_temp_subarray := false;
-      if what = ADrop
+      if isDropAction what
       then enclose_chunk ~ghost (add_reads ~ghost loc r se), e
       else hide_chunk ~ghost ~loc r se e t
     end
@@ -10069,9 +10235,15 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let loc' = convLoc loc in
     (* Sometimes we return the result of a void function call *)
     if Ast_types.C.is_void !currentReturnType then begin
-      Kernel.error ~current:true
-        "Return statement with a value in function returning void";
-      let (se, _, _) = doFullExp local_env CNoConst e ADrop in
+      let (se, _, expression_type) =
+        doFullExp local_env CNoConst e ADropType
+      in
+      (* GCC and Clang accept [return expression;] in a void function when
+         [expression] itself has type void. The kernel uses this extension in
+         small forwarding wrappers. A non-void value remains an error. *)
+      if not (Machine.gccMode () && Ast_types.C.is_void expression_type) then
+        Kernel.error ~current:true
+          "Return statement with a value in function returning void";
       se @@@ (returnChunk ~ghost None loc', ghost)
     end else begin
       let rt =
