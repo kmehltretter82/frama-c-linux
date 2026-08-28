@@ -38,9 +38,21 @@ The fork includes `frama-c-script kernel-corpus`, which runs one Frama-C
 process per translation unit using exact Kbuild commands and records a
 machine-readable failure taxonomy. The initial pinned `x86_64` corpus improved
 from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST;
-the follow-on DWC3 driver corpus now reaches 8/8, for 29/29 across both sets.
+the follow-on DWC3 driver corpus reaches 8/8, and a complete Open vSwitch
+`datapath.c` reaches 1/1, for 30/30 across all three sets.
 See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
 scope, caveats, and next work.
+
+## Linux kernel checks
+
+The downstream `kernel-checks` plug-in begins the semantic-specialization
+layer. Its first rule uses Eva values to report only provable uses of encoded
+`ERR_PTR` values as object pointers, indirect call targets, or deallocator
+arguments. Focused tests cover 32-bit and 64-bit intervals and common kernel
+deallocators; a reduced replay of Linux fix `ee30dd2909d8` reports one
+violation before the fix and none after it. Enable it with `-kernel-checks`.
+See [the plug-in README](plugins/kernel_checks/README.md) for its guarantees
+and current whole-translation-unit limitations.
 
 ## Installation
 

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "linux-x86_64-openvswitch-v1",
+  "description": "Linux Open vSwitch datapath corpus built by x86_64 Kbuild",
+  "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+  "architecture": "x86_64",
+  "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "kbuild": {
+    "base_configuration": "tinyconfig",
+    "config_fragment": "configs/linux-x86_64-openvswitch-v1.fragment",
+    "config_sha256": "16142942d79f53a9319de1de37b4679edce8e23d160c8a35a0835cbe701e964b"
+  },
+  "model_headers": [
+    "../kernel-models/compiler_builtins.h"
+  ],
+  "files": [
+    "net/openvswitch/datapath.c"
+  ]
+}

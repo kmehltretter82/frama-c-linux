@@ -51,16 +51,19 @@ explicit semantics policy.
 
 ## Current measured status
 
-Two versioned `x86_64` corpora are pinned to Linux commit
+Three versioned `x86_64` corpora are pinned to Linux commit
 `388b607d107c07aaade04c7f22f344cab6bdccd3` and GCC 15.2.0:
 
 - `linux-x86_64-v1` contains 21 architecture-neutral MPI and string-library
   translation units from a `tinyconfig` build; and
 - `linux-x86_64-dwc3-v1` contains eight DWC3 core, dual-role, gadget, host,
-  tracing, ULPI, and debugfs translation units from the supplied Kconfig
+  tracing, ULPI, and debugfs translation units from its supplied Kconfig
+  fragment; and
+- `linux-x86_64-openvswitch-v1` contains the complete Open vSwitch
+  `net/openvswitch/datapath.c` translation unit from its supplied Kconfig
   fragment.
 
-On 2026-08-28, all 29 translation units reached a typed AST from unmodified
+On 2026-08-28, all 30 translation units reached a typed AST from unmodified
 kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
@@ -77,6 +80,7 @@ kernel sources and headers:
 | `543de713a19da4be6128b93c2fd27c4b28276a03` | DWC3 | 8/8 | none |
 | `3f28ad0641bf27835b0f7b87c3925704491a740a` | library | 21/21 | none |
 | `3f28ad0641bf27835b0f7b87c3925704491a740a` | DWC3 | 8/8 | none |
+| `af35b39cf375e0e21681c2d62f3e088ae869a80b` | Open vSwitch datapath | 1/1 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -101,13 +105,24 @@ leaving 599 and 412 warnings respectively. The remaining attribute warnings
 are explicitly identified unknown attributes rather than silently discarded
 declaration attributes.
 
+Revision `af35b39cf3` takes the unmodified Open vSwitch datapath through a
+typed AST by adding four focused kernel-C compatibility rules: trailing
+commas in extended-asm operand lists, GNU omitted-middle conditionals inside
+attributes, constant folding for the `__builtin_bswap16`/`32`/`64` families,
+and GCC/MSVC nested flexible-array extensions. Strict machine models continue
+to reject the latter extension. The resulting translation unit contains 241
+defined functions, 3,747 source lines, 813 calls, and 864 pointer
+dereferences. It emits 64 classified warnings and no undeclared builtins.
+
 The measurements used clean Linux sources. The library compilation database
-was copied from Kbuild with only its absolute source-root prefix relocated; the
-DWC3 database was generated directly in an out-of-tree build. Reproduction
-metadata and warning inventories are in
+was copied from Kbuild with only its absolute source-root prefix relocated;
+the DWC3 and Open vSwitch databases were generated directly in out-of-tree
+builds. Reproduction metadata and warning inventories are in
 [`linux-x86_64-v1.status.json`](share/kernel-corpus/linux-x86_64-v1.status.json)
 and
-[`linux-x86_64-dwc3-v1.status.json`](share/kernel-corpus/linux-x86_64-dwc3-v1.status.json).
+[`linux-x86_64-dwc3-v1.status.json`](share/kernel-corpus/linux-x86_64-dwc3-v1.status.json),
+with frontend and checker evidence for Open vSwitch in
+[`linux-x86_64-openvswitch-v1.status.json`](share/kernel-corpus/linux-x86_64-openvswitch-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -121,11 +136,11 @@ frama-c-script kernel-corpus \
   --output results.json
 ```
 
-Use `linux-x86_64-dwc3-v1.json` in the command above to run the DWC3 corpus
-against a compilation database generated with
-`configs/linux-x86_64-dwc3-v1.fragment`. Corpus manifests automatically load
-their declared model headers; pass `--no-manifest-models` for a controlled
-unmodeled comparison.
+Use `linux-x86_64-dwc3-v1.json` or `linux-x86_64-openvswitch-v1.json` in the
+command above with a compilation database generated from the matching
+fragment in `configs/`. Corpus manifests automatically load their declared
+model headers; pass `--no-manifest-models` for a controlled unmodeled
+comparison.
 
 From this repository's development tree, build `@install` and replace the
 command above with
@@ -139,9 +154,10 @@ This 100% result establishes front-end compatibility for these small corpora;
 it does **not** establish that the files are bug-free or that every kernel
 operation is modeled accurately. The runs still expose a semantic-quality
 queue, notably pointer and call-type warnings, unsupported attributes,
-library-model warnings, and conservative inline-assembly handling. Those
-models and diagnostics must improve before a typed AST is treated as a
-verification result.
+library-model warnings, dropped side effects in unevaluated `sizeof`
+operands, and conservative inline-assembly handling. Those models and
+diagnostics must improve before a typed AST is treated as a verification
+result.
 
 ## Architecture
 
@@ -205,6 +221,21 @@ valid object pointer, an encoded error, `NULL`, and an unknown pointer, then
 flag only provable protocol violations such as dereferencing or freeing an
 encoded error.
 
+Revision `29cce175b1` implements that initial checker as the optional
+`kernel-checks` plug-in. It classifies Eva values at reads, writes, indirect
+calls, and common deallocator calls, while leaving mixtures and unknown values
+unreported. Focused 32-bit and 64-bit tests pass, and a reduced replay of Linux
+commit `ee30dd2909d8b98619f4341c70ec8dc8e155ab02` reports one violation before
+the Open vSwitch fix and zero after it.
+
+A direct run from `ovs_flow_cmd_set` on the complete current translation unit
+exits successfully but reaches only 4 of 241 defined functions and 13 of 104
+entry-reachable statements before argument-validity alarms eliminate the
+important paths. Deeper generic Eva context initialization exceeded 150- and
+180-second limits. Its zero checker findings are therefore explicitly
+inconclusive: the next semantic milestone is a bounded kernel entry state plus
+models for netlink attributes, `sk_buff` ownership, allocation, and cleanup.
+
 The next candidates are:
 
 1. lock and execution-context mistakes, including sleeping in atomic context;
@@ -233,10 +264,19 @@ for the first milestone.
 
 ## Near-term sequence
 
-1. Keep the fork continuously buildable and establish the corpus runner.
-2. Import exact Kbuild commands and record a baseline failure taxonomy.
-3. Fix the highest-frequency front-end blockers with regression tests.
-4. Introduce kernel compiler-semantics and API models.
-5. Implement and validate the `ERR_PTR` checker.
+1. Keep the fork continuously buildable and the corpus runner reproducible.
+   This is established for the current branch and remains a continuous gate.
+2. Import exact Kbuild commands and record a baseline failure taxonomy. This
+   is established for all three current `x86_64` corpora.
+3. Fix the highest-frequency front-end blockers with regression tests. This
+   is complete for the current 30-file corpus and continues as the corpus
+   expands.
+4. Introduce kernel compiler-semantics and API models. Compiler builtin models
+   are in place; object, ownership, concurrency, and architecture models are
+   ongoing.
+5. Implement and validate the `ERR_PTR` checker. The first rule and historical
+   replay are complete; precise full-translation-unit entry and API modeling
+   remain.
 6. Expand the corpus by subsystem and architecture without relaxing the
-   unmodified-source rule.
+   unmodified-source rule. Open vSwitch is the first networking target;
+   `arm64`, RISC-V, and broader subsystem coverage remain.
