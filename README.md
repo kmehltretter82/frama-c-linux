@@ -39,7 +39,9 @@ process per translation unit using exact Kbuild commands and records a
 machine-readable failure taxonomy. The initial pinned `x86_64` corpus improved
 from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST;
 the follow-on DWC3 driver corpus reaches 8/8, and a complete Open vSwitch
-`datapath.c` reaches 1/1, for 30/30 across all three sets.
+`datapath.c` reaches 1/1, for 30/30 across all three `x86_64` sets. The same
+21-file library corpus also reaches 21/21 with exact ARM64 Kbuild commands and
+the generated `gcc_arm64` machine model.
 See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
 scope, caveats, and next work.
 

@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "corpus": "linux-arm64-v1",
+  "corpus_manifest_sha256": "4e72a5030b23c2b449dd10734e08f3152c0b14a56e2a102850fb667a01b99b0d",
+  "compilation_database_sha256": "850b86232a35ff050da334b3bfdecbcae18513f74c8b008c5dcc934cd401c0ef",
+  "machdep_sha256": "09a78511fa16e34f8098ae072eab842e7f76588d201e77d9d17ac1a2471e1bcc",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+    "linux_tree_dirty": false,
+    "architecture": "arm64",
+    "kbuild_configuration": "tinyconfig",
+    "kbuild_facts": {
+      "CONFIG_SMP": "y",
+      "CONFIG_NR_CPUS": 512,
+      "CONFIG_BASE_SMALL": "n"
+    },
+    "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "translation_units": 21,
+    "model_headers": [
+      {
+        "path": "kernel-models/compiler_builtins.h",
+        "sha256": "cf814012207de9020475e3f4dfd5c55d0f6e5679a8e0615ed1bc125b990295ec"
+      }
+    ],
+    "source_policy": "Kernel source and headers are unmodified; the compilation database contains the exact commands from an out-of-tree arm64 Kbuild."
+  },
+  "measurements": [
+    {
+      "name": "initial-generated-machdep",
+      "base_frontend_revision": "b052363875838679fce020f873cd0f91d6f5c894",
+      "attempted": 21,
+      "typed": 0,
+      "success_rate": 0.0,
+      "by_stage": {
+        "syntax": 21
+      },
+      "failures_by_kind": {
+        "syntax-error": 21
+      },
+      "first_blocker": "The generated file stored aarch64-linux-gnu-gcc as the semantic compiler family, disabling GCC parsing and censoring __SIZEOF_INT128__."
+    },
+    {
+      "name": "after-compiler-family-correction",
+      "attempted": 21,
+      "typed": 0,
+      "success_rate": 0.0,
+      "by_stage": {
+        "typing": 21
+      },
+      "failures_by_kind": {
+        "unresolved-variable:__uint128_t": 21
+      },
+      "first_blocker": "AArch64 headers use GCC's predefined __uint128_t alias without including a userspace header."
+    },
+    {
+      "name": "after-kernel-int128-aliases",
+      "attempted": 21,
+      "typed": 1,
+      "success_rate": 0.047619,
+      "by_stage": {
+        "typed": 1,
+        "typing": 20
+      },
+      "failures_by_kind": {
+        "nonconstant-kernel-ilog2-array-bound": 20
+      },
+      "first_blocker": "A constant ternary passed to __builtin_constant_p was lowered through a temporary, selecting a non-constant ilog2 fallback in NR_KERNFS_LOCKS."
+    },
+    {
+      "name": "frontend-after-arm64-compatibility",
+      "frontend_revision": "beea50c48973af68920d96ad225483a2fd26d26c",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21,
+      "warning_count": 993,
+      "warnings_by_key": {
+        "kernel:CERT:MSC:37": 231,
+        "kernel:attrs:unknown": 185,
+        "kernel:libc:frama-c": 40,
+        "kernel:typing:flexible-array-extension": 100,
+        "kernel:typing:implicit-conv-void-ptr": 437
+      },
+      "undeclared_builtins": [],
+      "unknown_attributes": [
+        "__alloc_size__",
+        "__assume_aligned__",
+        "__counted_by__",
+        "__designated_init__",
+        "__error__",
+        "__externally_visible__",
+        "__gnu_inline__",
+        "__transparent_union__",
+        "mode"
+      ],
+      "aggregate_metrics": {
+        "defined_functions": 132,
+        "sloc": 3952,
+        "decision_points": 646,
+        "loops": 117,
+        "function_calls": 320,
+        "pointer_dereferences": 614,
+        "cyclomatic_complexity": 778
+      }
+    }
+  ],
+  "compatibility_changes": [
+    "Detect and store the compiler semantic family separately from the cross-compiler executable.",
+    "Preserve the executable so generated cross machdeps regenerate byte-for-byte with --from-file.",
+    "Add the generated GCC AArch64 LP64 machdep and focused ABI/macro regression.",
+    "Model GCC's predefined signed and unsigned 128-bit aliases in the kernel-safe compiler header.",
+    "Preserve constant conditional operands for foldable GCC builtins.",
+    "Constant-fold nonzero __builtin_clz, __builtin_clzl, __builtin_clzll, __builtin_ctz, __builtin_ctzl, and __builtin_ctzll calls using the selected machdep widths."
+  ],
+  "validation": {
+    "install_build": "passed with dune -j 1",
+    "syntax_suite": "passed",
+    "libc_suite": "passed",
+    "misc_suite": "passed",
+    "machdep_schema_check": "passed",
+    "machdep_from_file_roundtrip": "byte-identical",
+    "corpus_require_all_typed": "passed"
+  },
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for this pinned corpus. It is not a proof of functional correctness, an ARM weak-memory model, or precise semantics for AArch64 inline assembly."
+}

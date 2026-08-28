@@ -31,7 +31,7 @@ The milestone is complete when the project can:
 The initial corpus should stay small enough to diagnose every failure. It will
 start with architecture-neutral library code and `drivers/usb/dwc3`, then grow
 across subsystems and architectures. Host `x86_64` is the first front-end
-target; `arm64` and RISC-V follow once the measurement harness is stable.
+target; `arm64` is now the second measured target, and RISC-V follows.
 
 Compatibility work will initially concentrate on constructs that occur in
 kernel builds, including:
@@ -63,8 +63,13 @@ Three versioned `x86_64` corpora are pinned to Linux commit
   `net/openvswitch/datapath.c` translation unit from its supplied Kconfig
   fragment.
 
-On 2026-08-28, all 30 translation units reached a typed AST from unmodified
-kernel sources and headers:
+The versioned `linux-arm64-v1` corpus runs the same 21 architecture-neutral
+library files through an ARM64 `tinyconfig` Kbuild with
+`aarch64-linux-gnu-gcc` 15.2.0. This is a distinct target/ABI measurement, not
+21 additional unique source files.
+
+On 2026-08-28, all 30 `x86_64` translation units and all 21 ARM64 target runs
+reached a typed AST from unmodified kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
 | --- | --- | ---: | --- |
@@ -81,6 +86,7 @@ kernel sources and headers:
 | `3f28ad0641bf27835b0f7b87c3925704491a740a` | library | 21/21 | none |
 | `3f28ad0641bf27835b0f7b87c3925704491a740a` | DWC3 | 8/8 | none |
 | `af35b39cf375e0e21681c2d62f3e088ae869a80b` | Open vSwitch datapath | 1/1 | none |
+| `beea50c48973af68920d96ad225483a2fd26d26c` | ARM64 library | 21/21 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -114,15 +120,34 @@ to reject the latter extension. The resulting translation unit contains 241
 defined functions, 3,747 source lines, 813 calls, and 864 pointer
 dereferences. It emits 64 classified warnings and no undeclared builtins.
 
+Revision `beea50c489` adds reproducible GCC ARM64 support. The machdep
+generator now distinguishes the semantic compiler family (`gcc`) from the
+cross-compiler executable and retains both for byte-identical `--from-file`
+regeneration. The generated LP64 model exposes AArch64 target macros,
+unsigned plain `char`, 128-bit integer support, and target alignments. The
+kernel-safe compiler header supplies GCC's predefined `__int128_t` and
+`__uint128_t` aliases, and the front end preserves constant conditional
+operands while folding nonzero `clz`/`ctz` builtin families with machdep-sized
+widths.
+
+Those changes move the ARM64 corpus from 0/21 syntax failures, through 0/21
+typing failures and 1/21 typed, to 21/21 typed. The final run contains 132
+defined functions, 3,952 source lines, 320 calls, and 614 pointer
+dereferences, with 993 classified warnings and no undeclared builtins. ARM64
+`tinyconfig` enables SMP with 512 configured CPUs, exposing the constant
+`ilog2` array-bound path that the initial x86 configuration did not exercise.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
-the DWC3 and Open vSwitch databases were generated directly in out-of-tree
-builds. Reproduction metadata and warning inventories are in
+the DWC3, Open vSwitch, and ARM64 databases were generated directly in
+out-of-tree builds. Reproduction metadata and warning inventories are in
 [`linux-x86_64-v1.status.json`](share/kernel-corpus/linux-x86_64-v1.status.json)
 and
 [`linux-x86_64-dwc3-v1.status.json`](share/kernel-corpus/linux-x86_64-dwc3-v1.status.json),
 with frontend and checker evidence for Open vSwitch in
-[`linux-x86_64-openvswitch-v1.status.json`](share/kernel-corpus/linux-x86_64-openvswitch-v1.status.json).
+[`linux-x86_64-openvswitch-v1.status.json`](share/kernel-corpus/linux-x86_64-openvswitch-v1.status.json)
+and ARM64 frontend evidence in
+[`linux-arm64-v1.status.json`](share/kernel-corpus/linux-arm64-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -141,6 +166,11 @@ command above with a compilation database generated from the matching
 fragment in `configs/`. Corpus manifests automatically load their declared
 model headers; pass `--no-manifest-models` for a controlled unmodeled
 comparison.
+
+For ARM64, use `linux-arm64-v1.json`, an ARM64 `tinyconfig` compilation
+database, and add `--machdep gcc_arm64`. The compiler executable recorded in
+the machdep is generation and round-trip metadata; target preprocessing flags
+still come from the selected compilation-database entry.
 
 From this repository's development tree, build `@install` and replace the
 command above with
@@ -267,10 +297,10 @@ for the first milestone.
 1. Keep the fork continuously buildable and the corpus runner reproducible.
    This is established for the current branch and remains a continuous gate.
 2. Import exact Kbuild commands and record a baseline failure taxonomy. This
-   is established for all three current `x86_64` corpora.
+   is established for all four current corpus configurations.
 3. Fix the highest-frequency front-end blockers with regression tests. This
-   is complete for the current 30-file corpus and continues as the corpus
-   expands.
+   is complete for the current 51 translation-unit/architecture runs and
+   continues as the corpus expands.
 4. Introduce kernel compiler-semantics and API models. Compiler builtin models
    are in place; object, ownership, concurrency, and architecture models are
    ongoing.
@@ -278,5 +308,6 @@ for the first milestone.
    replay are complete; precise full-translation-unit entry and API modeling
    remain.
 6. Expand the corpus by subsystem and architecture without relaxing the
-   unmodified-source rule. Open vSwitch is the first networking target;
-   `arm64`, RISC-V, and broader subsystem coverage remain.
+   unmodified-source rule. Open vSwitch is the first networking target and
+   ARM64 is the second architecture; RISC-V and broader subsystem coverage
+   remain.
