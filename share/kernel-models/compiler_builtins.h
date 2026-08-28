@@ -27,6 +27,16 @@ typedef unsigned __int128 __uint128_t;
 #endif
 
 /*
+ * Frama-C does not yet retain GCC's __counted_by__ association between a
+ * flexible array and its counter field.  Model __builtin_counted_by_ref with
+ * its documented unannotated-array type so Linux's _Generic wrappers select
+ * their no-counter fallback.  This is a front-end compatibility model: it
+ * deliberately does not model a counter-field update for annotated arrays.
+ */
+/*@ assigns \nothing; */
+void *__builtin_counted_by_ref(void *flexible_array);
+
+/*
  * GCC permits the operands and destination of its generic overflow builtins
  * to have different integral types.  This first kernel model covers matching
  * int, long, and long long variants (signed and unsigned), which includes the

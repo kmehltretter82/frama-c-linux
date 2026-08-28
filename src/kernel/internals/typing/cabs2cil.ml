@@ -153,6 +153,12 @@ let is_stdlib_function_macro n = List.mem n no_suppress_function_macro
 
 let is_stdlib_macro n = List.mem n no_redefine_macro
 
+let warn_suppressed_stdlib_function_macro n =
+  if is_stdlib_function_macro n then
+    Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
+      "%s is a standard macro. Its definition cannot be suppressed, \
+       see CERT C coding rules MSC38-C" n
+
 let is_bitwise_bop = function
   | Cabs.BAND | Cabs.BOR | Cabs.XOR -> true
   | _ -> false
@@ -5595,21 +5601,18 @@ and doExp local_env
       Errorloc.abort_context "must have a non-void expression here"
     (* Do the potential lvalues first *)
     | Cabs.VARIABLE n -> begin
-        if is_stdlib_function_macro n then begin
-          (* These must be macros. They can be implemented with a function
-             of the same name, but in that case, it is not possible to
-             take the address of the function (or do anything else than
-             calling the function, which is matched later on). *)
-          Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
-            "%s is a standard macro. Its definition cannot be suppressed, \
-             see CERT C coding rules MSC38-C" n
-        end;
         (* Look up in the environment *)
         try
           let env = if ghost then ghost_env else env in
           let envdata = Datatype.String.Hashtbl.find env n in
           match envdata with
           | EnvVar vi, _ ->
+            (* A function-like macro may coexist with an ordinary object of
+               the same name: the preprocessor only expands the name when it
+               is followed by '('. A resolved function still denotes the
+               forbidden non-macro form. *)
+            if Ast_types.C.is_fun vi.vtype then
+              warn_suppressed_stdlib_function_macro n;
             let lval = Cil.var vi in
             let reads =
               if
@@ -5637,6 +5640,7 @@ and doExp local_env
               typ
           | _ -> raise Not_found
         with Not_found -> begin
+            warn_suppressed_stdlib_function_macro n;
             if isOldStyleVarArgName n then
               Errorloc.abort_context
                 "Cannot resolve variable %s. \
