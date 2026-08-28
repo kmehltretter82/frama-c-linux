@@ -1,0 +1,178 @@
+{
+  "schema_version": 3,
+  "corpus": "linux-arm64-kvm-v4",
+  "corpus_manifest_sha256": "f77d4bee7232efa90e336ae914e39a53c1f2759f88f7a9bec7cf4fe386186e62",
+  "compilation_database_sha256": "f897232a109b94a6b90355415275c0cec47195d7512db131ddbfce99ba7c308d",
+  "kbuild_config_sha256": "30360a6cee057870bf40d65d0cdbafa201307cbbaed971b902f7cf8d9252e6dc",
+  "machdep_sha256": "09a78511fa16e34f8098ae072eab842e7f76588d201e77d9d17ac1a2471e1bcc",
+  "raw_result_sha256": "4d788ed588cd767fa7d257c9ece13be6939bc69a65c4fa6c319437898456fd17",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_tree_dirty": false,
+    "architecture": "arm64",
+    "kbuild_configuration": "defconfig",
+    "kbuild_facts": {
+      "CONFIG_VIRTUALIZATION": "y",
+      "CONFIG_KVM": "y",
+      "CONFIG_KVM_COMMON": "y",
+      "CONFIG_ARM64_PTR_AUTH": "y",
+      "CONFIG_HW_PERF_EVENTS": "y",
+      "CONFIG_CC_HAS_COUNTED_BY": "y",
+      "CONFIG_CC_HAS_COUNTED_BY_PTR": "n",
+      "CONFIG_CC_HAS_BROKEN_COUNTED_BY_REF": "n",
+      "CONFIG_NVHE_EL2_DEBUG": "n"
+    },
+    "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "frontend_revision": "d18e6fd3dc",
+    "machdep": "gcc_arm64",
+    "report_schema_version": 3,
+    "target_analyses": 83,
+    "distinct_c_sources": 77,
+    "kvm_command_inventory": {
+      "arm64_kvm_contexts": 75,
+      "generic_kvm_contexts": 8,
+      "distinct_c_sources": 77,
+      "sources_with_one_command": 71,
+      "shared_sources_with_vhe_and_nvhe_commands": 6,
+      "vhe_variant_targets": 6,
+      "nvhe_variant_targets": 6,
+      "corpus_policy": "Every arch/arm64/kvm C command context plus every compiled virt/kvm C source in the pinned successful defconfig build."
+    },
+    "target_databases": {
+      "one_entry_databases": 83,
+      "unique_one_entry_database_hashes": 83,
+      "all_vhe_nvhe_pairs_have_distinct_hashes": true
+    },
+    "model_headers": [
+      {
+        "path": "kernel-models/compiler_builtins.h",
+        "sha256": "7d24db19e1567fd476efb96e45584bce0f84073884152034b12e1d7d9c5d8cf4"
+      }
+    ],
+    "source_policy": "Linux source and headers came from a clean detached worktree. The successful Kbuild database had only its absolute source-root prefix relocated to that worktree; compiler arguments and the out-of-tree generated headers were preserved."
+  },
+  "measurements": [
+    {
+      "name": "counted-by-common-context-differential",
+      "baseline_frontend_revision": "fa3a38ab02",
+      "baseline_linux_commit": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+      "baseline_linux_tree_dirty": true,
+      "baseline_raw_result_sha256": "caef8fcbf7cad65a3e62cd24f599863ffd4414c42b6030cc25c37bd67e8c7a5b",
+      "common_targets": 75,
+      "baseline_warning_count": 6238,
+      "counted_by_warning_count_removed": 75,
+      "final_warning_count_on_common_targets": 6163,
+      "targets_with_exactly_one_warning_removed": 75,
+      "targets_with_other_warning_deltas": 0,
+      "interpretation": "The baseline tree carried only unrelated untracked review reports. Every common ARM64 KVM context lost exactly its once-per-process unknown __counted_by__ diagnostic; no other warning class changed."
+    },
+    {
+      "name": "complete-arm64-and-generic-kvm-command-inventory",
+      "frontend_revision": "d18e6fd3dc",
+      "attempted": 83,
+      "typed": 83,
+      "success_rate": 1,
+      "by_stage": {
+        "typed": 83
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 83,
+      "total_process_seconds": 2855.775,
+      "warning_count": 6902,
+      "warnings_by_key": {
+        "kernel": 86,
+        "kernel:CERT:EXP:46": 8,
+        "kernel:CERT:MSC:37": 1006,
+        "kernel:asm:clobber": 860,
+        "kernel:attrs:unknown": 585,
+        "kernel:libc:frama-c": 166,
+        "kernel:typing:flexible-array-extension": 830,
+        "kernel:typing:implicit-conv-void-ptr": 2860,
+        "kernel:typing:incompatible-types-call": 500,
+        "kernel:typing:variadic": 1
+      },
+      "undeclared_builtins": [],
+      "unknown_attributes": [
+        "__alloc_size__",
+        "__assume_aligned__",
+        "__designated_init__",
+        "__error__",
+        "__externally_visible__",
+        "__gnu_inline__",
+        "__no_profile_instrument_function__",
+        "__no_sanitize_address__",
+        "__transparent_union__"
+      ],
+      "aggregate_metrics": {
+        "defined_functions": 7042,
+        "sloc": 109658,
+        "decision_points": 17804,
+        "loops": 539,
+        "function_calls": 17616,
+        "pointer_dereferences": 18439,
+        "cyclomatic_complexity": 24846
+      }
+    }
+  ],
+  "compatibility_changes": [
+    "Retain and validate GCC counted_by associations on flexible arrays and GCC 16 structure pointer fields, including integral bit-field counters.",
+    "Give __builtin_counted_by_ref its field-dependent pointer type and counter address, so Linux allocation wrappers update the real count field.",
+    "Return typed void-pointer null for unannotated arrays and pointer fields without evaluating their operand, matching GCC side-effect behavior.",
+    "Reject malformed associations, function-pointer fields, pointers to structures containing flexible arrays, and standalone pointer operands."
+  ],
+  "semantic_validation": {
+    "focused_test": {
+      "file": "tests/syntax/kernel_counted_by_ref.c",
+      "eva_runtime_alarms": 0,
+      "assertions_valid": 9,
+      "assertions_unknown": 0,
+      "assertions_invalid": 0,
+      "covered_behavior": [
+        "annotated counter address and write",
+        "single evaluation for an annotated side-effecting operand",
+        "no evaluation and null result for an unannotated side-effecting operand",
+        "_Generic fallback selection",
+        "bit-field counter update",
+        "GCC 16 pointer-field counter update",
+        "__builtin_has_attribute metadata retention"
+      ]
+    },
+    "malformed_regressions": {
+      "file": "tests/syntax/kernel_counted_by_invalid.c",
+      "expected_rejections": 8,
+      "cases": [
+        "missing counter",
+        "non-integral counter",
+        "fixed array",
+        "union pointer field",
+        "function pointer field",
+        "wrong attribute arity",
+        "pointer to a structure with a flexible array",
+        "standalone pointer builtin operand"
+      ]
+    },
+    "real_kvm_normalization": "The exact virt/kvm/irqchip.c command expands kzalloc_flex() to a write through __builtin_counted_by_ref, normalized as __obj_ptr->nr_rt_entries = __count."
+  },
+  "model_limitations": [
+    "Eva does not yet consume counted_by metadata as a general flexible-array bounds invariant; this milestone preserves the association and models the counter-reference builtin.",
+    "GCC 16 pointer-field support does not yet model GCC dynamic-object-size or bounds-sanitizer behavior.",
+    "Remaining architecture attributes and inline-assembly effects are classified but are not precise ARM64 KVM verification semantics."
+  ],
+  "validation": {
+    "install_build": "passed",
+    "complete_syntax_suite": "passed",
+    "focused_counted_by_regressions": "passed",
+    "corpus_require_all_typed": "passed for 83 of 83 target analyses",
+    "clean_linux_worktree": "passed at 548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "optional_lint_wrappers": "not available in the opam switch: ocp-indent.dynlink and headache are missing"
+  },
+  "next_semantic_targets": [
+    "Use counted_by metadata to constrain flexible-array accesses in Eva and kernel-specific checks.",
+    "Add ownership, cleanup, and lock-state checks across generic virt/kvm and ARM64 KVM call paths.",
+    "Model selected ARM64 system-register and privileged-assembly boundaries needed by fresh bug analyses."
+  ],
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for all selected Kbuild contexts. It does not prove KVM correctness. Unlike v3's compatibility fallback, v4 preserves the flexible-array-to-counter relationship and normalizes Linux's generated counter writes, providing semantic input for later bounds verification."
+}

@@ -56,9 +56,21 @@ exact command and isolates it in a one-entry compilation database; all 24
 target analyses across 18 distinct source files reach a typed AST. The v3
 corpus expands this to the complete pinned Kbuild inventory: 75/75 command
 contexts across all 69 ARM64 KVM C files type from unmodified sources. Two
-focused fixes add GCC 15 counted-by fallback typing and permit ordinary local
-objects named like standard function-like macros. This is a frontend milestone,
-not a new Linux bug finding. The first bounded semantic replay now exercises
+focused fixes initially added GCC 15 counted-by fallback typing and permitted
+ordinary local objects named like standard function-like macros.
+
+The v4 gate pins clean Linux `548e7bcd0c54`, adds all eight compiled generic
+`virt/kvm` sources, and types 83/83 command contexts across 77 distinct C
+files. Revision `d18e6fd3dc` replaces the fallback with real GCC semantics:
+Frama-C retains and validates `counted_by` field associations, gives
+`__builtin_counted_by_ref` its field-dependent pointer type and address, and
+models GCC's unannotated null result without evaluating the operand. The exact
+`virt/kvm/irqchip.c` command now normalizes Linux's `kzalloc_flex()` counter
+update to the actual `nr_rt_entries` field. Eva does not yet use this metadata
+as a general flexible-array bounds invariant, so this is semantic plumbing and
+expanded frontend coverage rather than a proof or a new Linux bug finding.
+
+The first bounded semantic replay exercises
 the known 2023 `kvm_arm_set_fw_reg()` stack overflow: an Eva user-copy extent
 model reports one invalid destination bound for the vulnerable prefix and none
 for the current guarded function, both inside the complete current
@@ -102,6 +114,14 @@ Linux `548e7bcd0c54`, the exact Kbuild-mapped checker result changes from one
 ordering violation to none, and the affected ARM64 configurations compile with
 `W=1`. This remains candidate source and compile evidence, not an upstream
 confirmation.
+
+The vCPU-events candidate also has a
+[one-patch v1 fix](contrib/linux-patches/arm64-kvm-vcpu-events-v1/). A bounded
+Eva replay shows the vulnerable `KVM_SET_VCPU_EVENTS` ordering returning
+`-EINVAL` after committing an external abort and changing PC and PSTATE; the
+validation-first ordering proves rejection with unchanged state. The patch and
+ARM64 selftest cross-build cleanly and pass strict `checkpatch`, but have not
+yet been executed on ARM64 hardware or accepted upstream.
 
 ## Installation
 

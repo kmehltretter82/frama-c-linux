@@ -90,9 +90,14 @@ successful pinned build: 75 exact command contexts across 69 distinct source
 files. It contains 63 single-command sources and both VHE/nVHE commands for
 each of the six shared hyp sources.
 
+The `linux-arm64-kvm-v4` corpus keeps all 75 architecture contexts and adds the
+eight generic `virt/kvm` C sources compiled by the same build. It therefore
+covers 83 exact command contexts across 77 distinct source files, while
+retaining both variants of the six shared hyp sources.
+
 On 2026-08-28, all 30 `x86_64` translation units, all 21 common ARM64 target
-runs, and all 75 ARM64 KVM v3 target analyses reached a typed AST from
-unmodified kernel sources and headers:
+runs, and all 83 ARM64 plus generic KVM v4 target analyses reached a typed AST
+from unmodified kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
 | --- | --- | ---: | --- |
@@ -115,6 +120,7 @@ unmodified kernel sources and headers:
 | `02ef22ad912611e00557bf211590ad8a9c53e2ff` | ARM64 KVM v2 command contexts | 24/24 | none |
 | `32c2ab90e61337deeabeca168b70ae62f7fb7d06` | ARM64 KVM unique-command expansion | 61/63 | counted-by builtin and local stdarg macro names |
 | `74da75a021c6f4477209dcc83861ca3028978eb7` | complete ARM64 KVM command inventory | 75/75 | none |
+| `d18e6fd3dc` | complete ARM64 and generic KVM inventory | 83/83 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -191,10 +197,10 @@ warnings and no undeclared builtins. Counts intentionally include both build
 contexts and repeated inline/header definitions.
 
 Revision `74da75a021` closes the two blockers found when expanding beyond v2.
-GCC 15 exposes `__builtin_counted_by_ref`; because Frama-C does not yet retain
-the associated `__counted_by__` field metadata, the kernel model gives it the
-documented unannotated `void *` fallback and explicitly does not claim the
-counter-field update. Separately, the frontend now permits ordinary in-scope
+GCC 15 exposes `__builtin_counted_by_ref`; at that revision Frama-C did not
+retain the associated `__counted_by__` field metadata, so the kernel model gave
+it the documented unannotated `void *` fallback and explicitly did not claim
+the counter-field update. Separately, the frontend permits ordinary in-scope
 objects named `va_start`, `va_end`, `va_arg`, or `va_copy`: a function-like
 macro only expands when followed by `(`. Existing diagnostics for unresolved
 macro names and actual functions such as `setjmp` remain enforced. These fixes
@@ -206,6 +212,25 @@ dereferences. It emits 6,226 classified warnings and no undeclared builtins.
 Those totals include both VHE/nVHE contexts and repeated inline/header
 definitions. This completes frontend coverage of the pinned ARM64 KVM C build;
 it does not prove KVM behavior or constitute a new Linux bug finding.
+
+Revision `d18e6fd3dc` replaces v3's counted-by fallback with retained GCC
+metadata and dynamic `__builtin_counted_by_ref` typing. Annotated flexible
+arrays, integral bit-field counters, and GCC 16 pointer fields resolve to the
+real counter address; unannotated fields produce typed `void *` null without
+evaluating their operand. Eight rejection controls cover malformed attributes
+and invalid operands, while Eva proves nine positive and fallback assertions.
+In the 75 common contexts this removes exactly one unknown-counted-by warning
+from every target and changes no other warning class.
+
+The v4 gate expands the clean Linux `548e7bcd0c54` run to 83/83 contexts over
+77 distinct C sources by adding all eight compiled `virt/kvm` files. Metrics
+reports 7,042 defined functions, 109,658 source lines, 17,616 calls, and 18,439
+pointer dereferences across the separate ASTs. The run emits 6,902 classified
+warnings, no undeclared builtins, and no unknown counted-by attribute. The
+remaining warnings and repeated metrics include per-process headers and both
+VHE/nVHE contexts. Eva does not yet derive general FAM access bounds from the
+metadata; the immediate semantic gain is that Linux allocation macros now
+normalize their generated counter writes to the correct structure field.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
@@ -223,7 +248,9 @@ with ARM64 KVM evidence in
 and
 [`linux-arm64-kvm-v2.status.json`](share/kernel-corpus/linux-arm64-kvm-v2.status.json),
 with complete command-inventory evidence in
-[`linux-arm64-kvm-v3.status.json`](share/kernel-corpus/linux-arm64-kvm-v3.status.json).
+[`linux-arm64-kvm-v3.status.json`](share/kernel-corpus/linux-arm64-kvm-v3.status.json),
+and with counted-by semantics plus generic KVM coverage in
+[`linux-arm64-kvm-v4.status.json`](share/kernel-corpus/linux-arm64-kvm-v4.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -244,7 +271,7 @@ model headers; pass `--no-manifest-models` for a controlled unmodeled
 comparison.
 
 For ARM64, add `--machdep gcc_arm64`. Use `linux-arm64-v1.json` with a
-`tinyconfig` compilation database, or `linux-arm64-kvm-v3.json` with a
+`tinyconfig` compilation database, or `linux-arm64-kvm-v4.json` with a
 `defconfig` build whose KVM directory has been compiled. The KVM manifests use
 `path`, `variant`, `arguments_contain`, and `arguments_exclude` target objects
 for shared sources; legacy string path entries remain supported. Include and
@@ -294,7 +321,9 @@ common C frontend paths. The KVM-specific layer now moves
 `linux-arm64-kvm-v1` from 3/12 to 12/12 typed, then reaches 24/24 target
 analyses in v2 by adding both exact commands for all six shared VHE/nVHE
 sources. Version 3 reaches 75/75 for the complete C command inventory from the
-pinned KVM build. ARM64 KVM work now continues in semantic layers:
+pinned KVM build. Version 4 reaches 83/83 after adding the generic KVM core and
+preserves counted-by associations needed by Linux flexible-array allocation
+macros. ARM64 KVM work now continues in semantic layers:
 
 1. keep the complete exact-Kbuild corpus as a gate and add every command
    context introduced by later Kbuild configurations or kernel revisions;
@@ -483,6 +512,15 @@ focused no-hugetlb and no-MTE configurations, and all four patches pass strict
 `checkpatch`. Runtime reproducers, architecture testing, maintainer review, and
 upstream acceptance remain before closure.
 
+The vCPU-events candidate has a separate one-patch v1 fix under
+[`contrib/linux-patches/arm64-kvm-vcpu-events-v1`](contrib/linux-patches/arm64-kvm-vcpu-events-v1/).
+The bounded Eva replay shows the vulnerable ordering returning `-EINVAL`
+after changing PC, PSTATE, and committed-abort state; the validation-first
+control proves rejection with all three unchanged. The patch carries the
+identified `Fixes:` tag, passes strict `checkpatch`, and builds both `guest.o`
+and the ARM64 `external_aborts` selftest. Runtime ARM64 execution, maintainer
+review, and upstream acceptance remain open.
+
 The next candidates are:
 
 1. lock and execution-context mistakes, including sleeping in atomic context;
@@ -516,7 +554,7 @@ for the first milestone.
 2. Import exact Kbuild commands and record a baseline failure taxonomy. This
    is established for all seven current versioned corpus measurements.
 3. Fix the highest-frequency front-end blockers with regression tests. This
-   is complete for the current 126 translation-unit/target-context runs and
+   is complete for the current 134 translation-unit/target-context runs and
    continues as the corpus expands.
 4. Introduce kernel compiler-semantics and API models. Compiler builtin models
    are in place; object, ownership, concurrency, and architecture models are
@@ -526,7 +564,8 @@ for the first milestone.
    Open vSwitch translation unit. General entry and kernel API modeling remain.
 6. Expand ARM64 KVM without relaxing the unmodified-source rule. The first
    host/VGIC/nVHE corpus, all shared VHE/nVHE pairs, and the complete 75-command
-   pinned C inventory are established. The first historical buffer-overflow
+   pinned architecture inventory are established; v4 adds all eight generic
+   KVM core commands for an 83/83 gate. The first historical buffer-overflow
    replay is also established at one invalid user-copy bound before and zero
    after the fix. The first fresh audit is complete, five current candidates
    survived adversarial review, the MTE lock ordering is detected in the full
