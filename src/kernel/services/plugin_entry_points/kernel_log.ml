@@ -258,6 +258,9 @@ let () = set_warn_status wkey_extension_unknown Log.Werror
 let wkey_file_not_found = register_warn_category "file:not-found"
 let () = set_warn_status wkey_file_not_found Log.Wfeedback
 
+let wkey_flexible_array_extension =
+  register_warn_category "typing:flexible-array-extension"
+
 let wkey_format = register_warn_category "libc:format"
 
 let wkey_ghost_already_ghost = register_warn_category "ghost:already-ghost"

@@ -5220,11 +5220,19 @@ and makeCompType loc ghost (isstruct: bool)
         Kernel.error ~source
           "field `%s' declared as a function" n
       else if Cil.has_flexible_array_member ftype && isstruct then begin
-        if not (last_group && last_field) then
-          Kernel.error ~source
-            "non-final field `%s' declared with a type containing a flexible \
-             array member."
-            n
+        if not (last_group && last_field) then begin
+          if Machine.(gccMode () || msvcMode ()) then
+            Kernel.warning
+              ~wkey:Kernel.wkey_flexible_array_extension ~source
+              "accepting non-final field `%s' whose type contains a flexible \
+               array member as a compiler extension"
+              n
+          else
+            Kernel.error ~source
+              "non-final field `%s' declared with a type containing a flexible \
+               array member."
+              n
+        end
         else if not Machine.(gccMode() || msvcMode ()) then
           Kernel.error ~source
             "field `%s' declared with a type containing a flexible array \
@@ -7139,6 +7147,56 @@ and doExp local_env
                     ~once:true
                     ~current:true
                     "Invalid call to builtin_types_compatible_p"
+              end
+            | name when name = "__builtin_bswap16"
+                         || name = "__builtin_bswap32"
+                         || name = "__builtin_bswap64" ->
+              let bits =
+                if name = "__builtin_bswap16" then 16
+                else if name = "__builtin_bswap32" then 32
+                else 64
+              in
+              let byte_swap value =
+                let value =
+                  Z.logand value (Z.pred (Z.shift_left Z.one bits))
+                in
+                let rec swap offset result =
+                  if offset = bits then result
+                  else
+                    let byte = Z.extract value offset 8 in
+                    let target = bits - offset - 8 in
+                    swap (offset + 8)
+                      (Z.logor result (Z.shift_left byte target))
+                in
+                swap 0 Z.zero
+              in
+              begin
+                match !pargs with
+                | [ arg ] -> begin
+                    match (Cil.constFold true arg).enode with
+                    | Const (CInt64 (value, _, _)) ->
+                      let kind =
+                        match Ast_types.C.unroll_skel resType' with
+                        | TInt kind -> kind
+                        | _ -> assert false
+                      in
+                      piscall := false;
+                      pres :=
+                        Cil.kinteger64 ~loc:e.expr_loc ~kind
+                          (byte_swap value);
+                      prestype := resType'
+                    | _ when asconst = CConst ->
+                      piscall := false;
+                      Errorloc.abort_context
+                        "Non-constant argument to %s in constant." name
+                    | _ -> ()
+                  end
+                | _ when asconst = CConst ->
+                  piscall := false;
+                  Errorloc.abort_context
+                    "Invalid call to %s in constant." name
+                | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s" name
               end
             | "__builtin_expect" ->
               begin

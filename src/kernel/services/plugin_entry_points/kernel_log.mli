@@ -237,6 +237,8 @@ val wkey_extension_unknown: warn_category
 val wkey_file_not_found: warn_category
 (** Warnings related to missing files during preprocessing/parsing. *)
 
+val wkey_flexible_array_extension: warn_category
+
 val wkey_format: warn_category
 
 val wkey_ghost_already_ghost: warn_category

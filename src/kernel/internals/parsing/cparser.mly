@@ -1816,6 +1816,8 @@ conditional_attr:
 | logical_or_attr                        { $1 }
 | logical_or_attr QUEST attr_test conditional_attr COLON2 conditional_attr
     { make_expr $sloc (QUESTION($1, $4, $6)) }
+| logical_or_attr QUEST attr_test omitted_attr_colon conditional_attr
+    { make_expr $sloc (QUESTION($1, $1, $5)) }
 
 assign_attr:
 | conditional_attr                     { $1 }
@@ -1824,6 +1826,12 @@ assign_attr:
 /* hack to avoid shift reduce conflict in attribute parsing. */
 attr_test:
 | /* empty */ { Cabshelper.push_attr_test () }
+
+/* When the middle operand is omitted, the lexer has already read the colon
+   before [attr_test]'s empty action can switch it to [COLON2]. Restore the
+   attribute-lexer state before parsing the right operand. */
+omitted_attr_colon:
+| COLON { Cabshelper.pop_attr_test () }
 
 attr: assign_attr { $1 }
 
@@ -1876,6 +1884,7 @@ asmoutputs:
 asmoperands:
 | /* empty */   { [] }
 | asmoperandsne { List.rev $1 }
+| asmoperandsne COMMA { List.rev $1 }
 ;
 
 asmoperandsne:
