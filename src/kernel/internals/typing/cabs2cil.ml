@@ -7316,7 +7316,13 @@ and doExp local_env
           clean_up_cond_locals ce1;
         in
         let what' = match what with
-          | ADrop -> ADrop
+          (* Even when the conditional value itself is discarded, retain the
+             actual type of a void-valued arm.  In particular, Linux delay
+             macros commonly select between a void function call and a GNU
+             statement expression whose final statement is a loop.  Plain
+             [ADrop] represents a discarded call with an integer dummy, which
+             would make the valid void/void conditional look like int/void. *)
+          | ADrop -> ADropType
           | ADropType -> ADropType
           | _ -> AExp None
         in
@@ -7357,9 +7363,17 @@ and doExp local_env
           | None, _ -> None
         in
         let tresult =
-          match e2_for_conversion with
-          | Some e2' -> conditionalConversion ~e2:e2' ~e3:e3' t2 t3
-          | None -> conditionalConversion ~e3:e3' t2 t3
+          if isDropAction what &&
+             (Ast_types.C.is_void t2 || Ast_types.C.is_void t3)
+          then
+            (* GCC gives a conditional with one void arm type void.  Frama-C
+               has historically accepted that extension when the result is
+               discarded; keep doing so now that the arm types are retained. *)
+            voidType
+          else
+            match e2_for_conversion with
+            | Some e2' -> conditionalConversion ~e2:e2' ~e3:e3' t2 t3
+            | None -> conditionalConversion ~e3:e3' t2 t3
         in
         if asconst <> CNoConst && is_true_cond = `CTrue then begin
           clean_up_chunk_locals se2;
@@ -7541,10 +7555,22 @@ and doExp local_env
         in
         (* Save the previous data *)
         let old_gnu = ! gnu_body_result in
+        let void_body () =
+          { stmt_ghost = local_env.is_ghost;
+            stmt_node = Cabs.NOP (None, loc) }, true
+        in
         let lastComp, isvoidbody =
           match what with
           | ADrop -> (* We are dropping the result *)
-            {stmt_ghost = local_env.is_ghost; stmt_node = Cabs.NOP (None, loc)}, true
+            void_body ()
+          | ADropType ->
+            (* Preserve the final computation's type when there is one, but
+               unlike a value context accept a body ending in a statement:
+               such a GNU statement expression has type void. *)
+            begin
+              try findLastComputation (List.rev b.Cabs.bstmts), false
+              with Not_found -> void_body ()
+            end
           | _ ->
             try findLastComputation (List.rev b.Cabs.bstmts), false
             with Not_found ->

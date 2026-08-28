@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "linux-x86_64-dwc3-v1",
+  "description": "Linux DWC3 core, dual-role, tracing, ULPI, and debugfs corpus built by x86_64 Kbuild",
+  "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+  "architecture": "x86_64",
+  "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "kbuild": {
+    "base_configuration": "tinyconfig",
+    "config_fragment": "configs/linux-x86_64-dwc3-v1.fragment",
+    "config_sha256": "564f939ba07257ef4518a424bb1b8e93601bb9e54e0f2cd470e80a88173fe25a"
+  },
+  "model_headers": [
+    "../kernel-models/compiler_builtins.h"
+  ],
+  "files": [
+    "drivers/usb/dwc3/core.c",
+    "drivers/usb/dwc3/debugfs.c",
+    "drivers/usb/dwc3/drd.c",
+    "drivers/usb/dwc3/ep0.c",
+    "drivers/usb/dwc3/gadget.c",
+    "drivers/usb/dwc3/host.c",
+    "drivers/usb/dwc3/trace.c",
+    "drivers/usb/dwc3/ulpi.c"
+  ]
+}

@@ -1,0 +1,64 @@
+[kernel] Parsing kernel_compiler_builtins.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  unknown_uint ∈ [--..--]
+  unknown_ulong ∈ [--..--]
+  unknown_ullong ∈ [--..--]
+[eva:progress] 
+  computing for function __builtin_clz <- main.
+  Called from kernel_compiler_builtins.c:16.
+[eva] using specification for function __builtin_clz
+[eva:progress] kernel_compiler_builtins.c:16: 
+  function __builtin_clz: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_clz
+[eva:progress] 
+  computing for function __builtin_ctz <- main.
+  Called from kernel_compiler_builtins.c:17.
+[eva] using specification for function __builtin_ctz
+[eva:progress] kernel_compiler_builtins.c:17: 
+  function __builtin_ctz: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_ctz
+[eva:progress] kernel_compiler_builtins.c:18: assertion got status valid.
+[eva:progress] kernel_compiler_builtins.c:19: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_clzl <- main.
+  Called from kernel_compiler_builtins.c:23.
+[eva] using specification for function __builtin_clzl
+[eva:progress] kernel_compiler_builtins.c:23: 
+  function __builtin_clzl: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_clzl
+[eva:progress] 
+  computing for function __builtin_ctzl <- main.
+  Called from kernel_compiler_builtins.c:24.
+[eva] using specification for function __builtin_ctzl
+[eva:progress] kernel_compiler_builtins.c:24: 
+  function __builtin_ctzl: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_ctzl
+[eva:progress] kernel_compiler_builtins.c:25: assertion got status valid.
+[eva:progress] kernel_compiler_builtins.c:26: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_clzll <- main.
+  Called from kernel_compiler_builtins.c:30.
+[eva] using specification for function __builtin_clzll
+[eva:progress] kernel_compiler_builtins.c:30: 
+  function __builtin_clzll: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_clzll
+[eva:progress] 
+  computing for function __builtin_ctzll <- main.
+  Called from kernel_compiler_builtins.c:31.
+[eva] using specification for function __builtin_ctzll
+[eva:progress] kernel_compiler_builtins.c:31: 
+  function __builtin_ctzll: precondition 'x_nonzero' got status valid.
+[eva:progress] Done for function __builtin_ctzll
+[eva:progress] kernel_compiler_builtins.c:32: assertion got status valid.
+[eva:progress] kernel_compiler_builtins.c:33: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  ui ∈ [--..--]
+  ul ∈ [--..--]
+  ull ∈ [--..--]
+  __retres ∈ {0}

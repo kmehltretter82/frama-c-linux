@@ -1,5 +1,5 @@
   $ mkdir kernel build
-  $ touch kernel/ok.c kernel/preprocess.c kernel/syntax.c kernel/builtin.c kernel/normalize.c kernel/static.c
+  $ touch kernel/ok.c kernel/preprocess.c kernel/syntax.c kernel/builtin.c kernel/normalize.c kernel/static.c model.h
   $ cat > compile_commands.json <<EOF
   > [
   >   {"directory":"$PWD/build","file":"$PWD/kernel/ok.c","command":"cc -c $PWD/kernel/ok.c"},
@@ -12,7 +12,7 @@
   > EOF
   $ kernel_commit=$(git -C kernel init -q && git -C kernel config user.email test@example.com && git -C kernel config user.name Test && git -C kernel add . && git -C kernel commit -qm initial && git -C kernel rev-parse HEAD)
   $ cat > corpus.json <<EOF
-  > {"name":"test", "linux_commit":"$kernel_commit", "files":["ok.c","preprocess.c","syntax.c","builtin.c","normalize.c","static.c"]}
+  > {"name":"test", "linux_commit":"$kernel_commit", "model_headers":["model.h"], "files":["ok.c","preprocess.c","syntax.c","builtin.c","normalize.c","static.c"]}
   > EOF
   $ cat > fake-frama-c <<'EOF'
   > #!/bin/bash
@@ -58,14 +58,18 @@
   > result = json.load(open("results.json"))
   > print(result["schema_version"])
   > print(result["frama_c"]["version"])
+  > print([item["path"].rsplit("/", 1)[-1] for item in result["frama_c"]["model_headers"]])
+  > print(any(arg.startswith("-cpp-extra-args=-include ") and arg.endswith("/model.h") for arg in result["results"][0]["frama_c_command"]))
   > summary = dict(result["summary"])
   > summary.pop("total_process_seconds")
   > print(summary)
   > print([(item["file"], item["stage"], item["failure_kind"]) for item in result["results"]])
   > print(result["results"][0]["metrics"])
   > EOF
-  1
+  2
   fake-frama-c 1.0
+  ['model.h']
+  True
   {'attempted': 6, 'typed': 1, 'success_rate': 0.166667, 'by_stage': {'typed': 1, 'preprocessing': 1, 'syntax': 1, 'typing': 1, 'normalization': 1, 'missing-model': 1}, 'failures_by_kind': {'builtin:__builtin_example': 1, 'failed-static-assert': 1, 'normalization-failure': 1, 'preprocessor-command': 1, 'syntax-error': 1}}
   [('ok.c', 'typed', 'typed-ast'), ('preprocess.c', 'preprocessing', 'preprocessor-command'), ('syntax.c', 'syntax', 'syntax-error'), ('builtin.c', 'missing-model', 'builtin:__builtin_example'), ('normalize.c', 'normalization', 'normalization-failure'), ('static.c', 'typing', 'failed-static-assert')]
   {'defined_functions': 2, 'sloc': 7, 'functions': 2}

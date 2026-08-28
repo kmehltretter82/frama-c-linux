@@ -4,6 +4,9 @@
   "description": "Architecture-neutral Linux library corpus built by x86_64 Kbuild",
   "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
   "architecture": "x86_64",
+  "model_headers": [
+    "../kernel-models/compiler_builtins.h"
+  ],
   "files": [
     "lib/crypto/mpi/generic_mpih-add1.c",
     "lib/crypto/mpi/generic_mpih-lshift.c",
