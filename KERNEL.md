@@ -73,6 +73,8 @@ kernel sources and headers:
 | `880d8ef6f5b4269b59db60c88e874ab026cf681c` | DWC3 | 8/8 | none |
 | `1fea1525b664a1475b04f90b896914ae18563538` | library | 21/21 | none |
 | `1fea1525b664a1475b04f90b896914ae18563538` | DWC3 | 8/8 | none |
+| `543de713a19da4be6128b93c2fd27c4b28276a03` | library | 21/21 | none |
+| `543de713a19da4be6128b93c2fd27c4b28276a03` | DWC3 | 8/8 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -86,7 +88,10 @@ warning totals to 5,501 and 2,892. Revision `1fea1525b6` then fixes partial
 `const`/`volatile` qualifier additions in general C type compatibility. It
 removes 2,160 spurious call-type warnings from the library corpus and 1,136
 from DWC3, reducing the totals again to 3,341 and 1,756 while preserving
-warnings for qualifier removal.
+warnings for qualifier removal. Revision `543de713a1` preserves the argument
+type of polymorphic `__builtin_constant_p` expressions instead of casting them
+through its placeholder `int` prototype. This removes another 680 warnings
+from the library corpus and 320 from DWC3, leaving totals of 2,661 and 1,436.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated; the

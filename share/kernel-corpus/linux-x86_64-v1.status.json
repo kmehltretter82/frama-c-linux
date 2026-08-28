@@ -119,6 +119,27 @@
         "kernel:typing:incompatible-types-call": 340,
         "kernel:typing:int-conversion": 340
       }
+    },
+    {
+      "name": "frontend-with-polymorphic-constant-p",
+      "frontend_revision": "543de713a19da4be6128b93c2fd27c4b28276a03",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21,
+      "warning_count": 2661,
+      "warnings_by_key": {
+        "kernel:asm:clobber": 20,
+        "kernel:attrs": 2062,
+        "kernel:attrs:unknown": 185,
+        "kernel:libc:frama-c": 40,
+        "kernel:typing:implicit-conv-void-ptr": 354
+      }
     }
   ],
   "model_effect": {
@@ -155,6 +176,20 @@
       "incompatible_types_call_warnings": 340
     },
     "removed_spurious_call_warnings": 2160
+  },
+  "constant_p_polymorphism_effect": {
+    "frontend_revision": "543de713a19da4be6128b93c2fd27c4b28276a03",
+    "before": {
+      "warning_count": 3341,
+      "incompatible_types_call_warnings": 340,
+      "int_conversion_warnings": 340
+    },
+    "after": {
+      "warning_count": 2661,
+      "incompatible_types_call_warnings": 0,
+      "int_conversion_warnings": 0
+    },
+    "removed_spurious_warnings": 680
   },
   "remaining_model_queue": {
     "undeclared_builtins": [],
