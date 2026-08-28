@@ -31,7 +31,12 @@ let main () =
          (memory-access checks remain enabled)"
     end;
     let violations = Err_ptr.run () in
-    Options.result "ERR_PTR: %d provable protocol violation(s)" violations
+    Options.result "ERR_PTR: %d provable protocol violation(s)" violations;
+    let mte_violations = Mte.run () in
+    if mte_violations > 0 then
+      Options.result
+        "MTE initialization: %d faultable access violation(s)"
+        mte_violations
   end
 
 let () = Boot.Main.extend main

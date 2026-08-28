@@ -63,8 +63,9 @@ the known 2023 `kvm_arm_set_fw_reg()` stack overflow: an Eva user-copy extent
 model reports one invalid destination bound for the vulnerable prefix and none
 for the current guarded function, both inside the complete current
 `hypercalls.c` translation unit. This calibrates bug detection against a
-historical fix; it is not a newly discovered kernel bug. The next work applies
-the model to fresh KVM candidates and adds architecture-boundary scenarios.
+historical fix; it is not a newly discovered kernel bug. Fresh work now applies
+the same evidence standard to KVM candidates and architecture-boundary
+scenarios.
 
 ## Linux kernel checks
 
@@ -86,6 +87,16 @@ full-translation-unit replays of Linux fix `a25bc8486f9c0`. A userspace-selected
 16-byte register copy into an 8-byte stack object produces one invalid ACSL
 precondition before the fix and none after the size guard. This is the first
 KVM semantic calibration case, not a fresh finding.
+
+Fresh ARM64 KVM analysis has now moved beyond calibration. A focused MTE
+initialization checker reports one current faultable-user-access ordering in
+the complete 160-function `guest.c` translation unit. A reduced Eva model also
+invalidates the folio-wide MTE validity invariant when KVM initializes only one
+base page before publishing a hugetlb folio as tagged, while proving a
+whole-folio fixed control. A seven-lens source audit produced five
+high-confidence current candidates in total; only the initialization-lock
+finding is currently automated by the checker. Runtime reproduction and Linux
+maintainer confirmation remain open.
 
 ## Installation
 

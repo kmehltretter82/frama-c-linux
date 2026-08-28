@@ -308,7 +308,11 @@ pinned KVM build. ARM64 KVM work now continues in semantic layers:
    positive findings, fixed controls, coverage, alarms, and model assumptions
    recorded separately. The first case now replays `a25bc8486f9c0`: Eva marks
    the vulnerable user-copy destination extent invalid and accepts the fixed
-   size-guarded path.
+   size-guarded path; and
+6. turn fresh source-audit candidates into narrow, reproducible semantic
+   checks. The first such rule detects a faultable MTE userspace copy while
+   one-shot tag initialization is unpublished in the complete `guest.c`
+   translation unit.
 
 Initial success means reproducible C analysis and defensible findings on
 selected paths. It does not mean proving the complete KVM implementation, the
@@ -432,6 +436,43 @@ forces the copy-success outcome, assumes a valid 16-byte userspace source, and
 does not model concurrency or architecture side effects outside the selected
 path.
 
+The first fresh ARM64 KVM audit against Linux `388b607d107c` produced five
+high-confidence current candidates, each surviving three independent
+adversarial review passes. One root cause occurs in both `guest.c` and
+`mmu.c`:
+
+1. `kvm_vm_ioctl_mte_copy_tags()` holds the one-shot MTE initialization state
+   across `mte_copy_tags_from_user()`. A userspace fault can wait for
+   `mmap_lock` while a concurrent `mprotect(PROT_MTE)` holds that lock and
+   waits for tagged-state publication, forming an ABBA deadlock.
+2. A base-page tag import, and separately a base-page-sized stage-2
+   sanitization, can publish a multi-page hugetlb folio as fully tagged while
+   untouched subpages retain stale allocation tags.
+3. Reading tags from a fresh hugetlb folio can fall through to
+   `page_mte_tagged()`, whose debug check rejects hugetlb pages; with
+   `panic_on_warn`, a valid ioctl can panic the host.
+4. `__kvm_arm_vcpu_set_events()` can commit an external abort before rejecting
+   invalid SError fields, so an ioctl returning `-EINVAL` has already changed
+   architectural vCPU state.
+5. The first SMCCC filter insertion treats its documented, recoverable
+   `-ENOMEM` result as `WARN_ON_ONCE`; `panic_on_warn` turns allocation
+   pressure into a host panic.
+
+The downstream MTE rule automates the first candidate. It performs a narrow
+intraprocedural CFG analysis over all typed definitions and reports exactly one
+faultable access in the complete pinned `guest.c`: the live call in
+`kvm_vm_ioctl_mte_copy_tags()`. The translation unit contains 160 defined
+functions; Eva analyzes only the trivial scan entry because checker coverage
+is AST-wide rather than Eva-reachability-based. A reduced Eva model separately
+marks the hugetlb folio-wide validity assertion invalid before whole-folio
+initialization and valid in a synthetic repaired control.
+
+These are source-level findings, not yet accepted upstream defects. The
+relevant code was unchanged in upstream commit `548e7bcd0c54` on 2026-08-28,
+and focused public searches found no existing report or fix. Runtime
+reproducers, architecture testing, maintainer review, and minimal Linux patches
+remain before closure.
+
 The next candidates are:
 
 1. lock and execution-context mistakes, including sleeping in atomic context;
@@ -477,6 +518,9 @@ for the first milestone.
    host/VGIC/nVHE corpus, all shared VHE/nVHE pairs, and the complete 75-command
    pinned C inventory are established. The first historical buffer-overflow
    replay is also established at one invalid user-copy bound before and zero
-   after the fix. Fresh KVM candidate analysis, conservative architecture
-   models, and additional bounded scenarios now precede RISC-V and broader
-   subsystem coverage.
+   after the fix. The first fresh audit is complete, five current candidates
+   survived adversarial review, the MTE lock ordering is detected in the full
+   current translation unit, and the hugetlb publication invariant has an Eva
+   before/fixed model. Runtime reproducers, Linux fixes, conservative
+   architecture models, and additional bounded scenarios now precede RISC-V
+   and broader subsystem coverage.

@@ -105,3 +105,8 @@ let wkey_err_ptr =
   register_warn_category
     ~help:"provable violations of the Linux ERR_PTR protocol"
     "err-ptr"
+
+let wkey_mte_init =
+  register_warn_category
+    ~help:"faultable user accesses while ARM64 MTE initialization is pending"
+    "mte-init"

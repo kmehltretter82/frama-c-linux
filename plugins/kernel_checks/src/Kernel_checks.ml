@@ -6,4 +6,5 @@
 (**************************************************************************)
 
 module Err_ptr = Err_ptr
+module Mte = Mte
 module Models = Models

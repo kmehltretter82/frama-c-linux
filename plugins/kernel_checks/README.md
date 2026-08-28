@@ -42,6 +42,29 @@ alarm in addition to the protocol-specific diagnostic. Use
 `-kernel-checks-no-preserve-encoded-pointers` to retain the creation-time
 checks.
 
+## ARM64 MTE initialization protocol
+
+The second checker targets a concrete ARM64 KVM locking protocol. The kernel's
+`try_page_mte_tagging()` and `folio_try_hugetlb_mte_tagging()` helpers acquire
+a one-shot initialization state that is released by publishing the matching
+tagged bit. Calling faultable userspace access code while that state is held
+can deadlock against a page-fault path that waits for publication.
+
+The current rule is intentionally narrow. Within each defined function, it
+performs a forward control-flow analysis and reports a direct
+`mte_copy_tags_from_user()` call when an ignored-result call to either
+initialization helper may precede it and no tagged-state publication must have
+occurred. It does not claim to be a general lock, alias, or interprocedural
+concurrency analysis. Storing and checking an acquisition result is left
+unclassified rather than guessed about.
+
+The checker inspects every function in the typed AST, independently of Eva's
+selected entry-point reachability. On the complete pinned ARM64 KVM
+`arch/arm64/kvm/guest.c` translation unit, this produces exactly one diagnostic
+at the tag import in `kvm_vm_ioctl_mte_copy_tags()`. Eva intentionally analyzes
+only the trivial bounded harness entry in this scan; the protocol result covers
+all 160 function definitions parsed from the translation unit.
+
 ## Bounded callback and fault models
 
 `-kernel-checks-bounded-entry` supplies a conservative finite default for
@@ -117,6 +140,35 @@ historical vulnerable prefix produces one invalid destination precondition;
 the actual current function's 8-byte size guard produces none. Focused reduced
 before/after tests enforce the same result under `gcc_arm64`.
 
+The MTE protocol tests add one positive deadlock-shaped case and a non-faulting
+kernel-copy control. The tracked `kernel-harnesses/arm64_kvm_mte_scan.c`
+harness includes the complete current `guest.c` and reports the one live
+faultable-user-access violation described above. A separate reduced hugetlb
+model captures the folio-wide validity invariant: Eva marks the assertion
+invalid when one base page is initialized before publishing a folio-wide bit,
+and proves it when all subpages are initialized first. The latter is a
+synthetic fixed control, not an upstream Linux patch.
+
+Map and scan `guest.c` with its exact Kbuild command:
+
+```sh
+share_path=$(frama-c -print-share-path)
+frama-c-script kernel-harness \
+  -p /path/to/compile_commands.json \
+  --source /path/to/linux/arch/arm64/kvm/guest.c \
+  --harness "$share_path/kernel-harnesses/arm64_kvm_mte_scan.c" \
+  -o /tmp/arm64-kvm-mte-scan.json
+frama-c \
+  -machdep gcc_arm64 \
+  -compilation-db /tmp/arm64-kvm-mte-scan.json \
+  "-cpp-extra-args=-include $share_path/kernel-models/compiler_builtins.h" \
+  -main frama_c_arm64_kvm_mte_scan \
+  -eva-slevel 1 \
+  -kernel-checks \
+  -kernel-checks-bounded-entry \
+  "$share_path/kernel-harnesses/arm64_kvm_mte_scan.c"
+```
+
 Map the exact `hypercalls.c` Kbuild command as above, then select either
 `frama_c_arm64_kvm_fw_reg_before` or
 `frama_c_arm64_kvm_fw_reg_fixed` with `-main`, and run Eva with
@@ -131,4 +183,6 @@ fail. Generic callback entry states, other outcomes, concurrency, and full
 ownership semantics remain outside this result. A zero count from a shallow
 direct translation-unit run remains inconclusive. The KVM result likewise
 covers one oversized-register success path; it does not prove all ioctl inputs
-or model unrelated ARM64 architectural effects.
+or model unrelated ARM64 architectural effects. The MTE protocol diagnostic
+establishes a hazardous source-level ordering; a runtime reproducer and
+upstream maintainer review are still required to close the kernel finding.
