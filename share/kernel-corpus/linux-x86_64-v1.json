@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "name": "linux-x86_64-v1",
+  "description": "Architecture-neutral Linux library corpus built by x86_64 Kbuild",
+  "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+  "architecture": "x86_64",
+  "files": [
+    "lib/crypto/mpi/generic_mpih-add1.c",
+    "lib/crypto/mpi/generic_mpih-lshift.c",
+    "lib/crypto/mpi/generic_mpih-mul1.c",
+    "lib/crypto/mpi/generic_mpih-mul2.c",
+    "lib/crypto/mpi/generic_mpih-mul3.c",
+    "lib/crypto/mpi/generic_mpih-rshift.c",
+    "lib/crypto/mpi/generic_mpih-sub1.c",
+    "lib/crypto/mpi/mpi-add.c",
+    "lib/crypto/mpi/mpi-bit.c",
+    "lib/crypto/mpi/mpi-cmp.c",
+    "lib/crypto/mpi/mpi-div.c",
+    "lib/crypto/mpi/mpi-mod.c",
+    "lib/crypto/mpi/mpi-mul.c",
+    "lib/crypto/mpi/mpi-pow.c",
+    "lib/crypto/mpi/mpi-sub-ui.c",
+    "lib/crypto/mpi/mpicoder.c",
+    "lib/crypto/mpi/mpih-cmp.c",
+    "lib/crypto/mpi/mpih-div.c",
+    "lib/crypto/mpi/mpih-mul.c",
+    "lib/crypto/mpi/mpiutil.c",
+    "lib/string.c"
+  ]
+}

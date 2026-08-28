@@ -75,6 +75,10 @@ usage() {
    echo "      definitions, with source location and number of statements."
    echo "      Accepts Frama-C options (e.g. '-cpp-extra-args' for parsing)."
    echo ""
+   echo "  - kernel-corpus --compilation-database PATH --kernel-root PATH [options]"
+   echo "      Runs each selected translation unit in a separate Frama-C process"
+   echo "      and writes machine-readable compatibility results and full logs."
+   echo ""
    echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
    echo "      Creates a new machdep definition for a specific target."
    echo "      Use 'frama-c-script make-machdep --help' for more information."
@@ -103,9 +107,20 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
 # directory containing frama-c and frama-c-script.
-export FRAMAC_BIN="$DIR"
-FRAMAC_LIB=$("${DIR}/frama-c" -print-lib-path)
-FRAMAC_SHARE=$("${DIR}/frama-c" -print-share-path)
+if [ -x "${DIR}/frama-c" ]; then
+    FRAMAC="${DIR}/frama-c"
+elif command -v frama-c > /dev/null 2>&1; then
+    # In a Dune development tree, the source-copy script is executed from
+    # _build/default/bin while executables are exposed through Dune's PATH.
+    FRAMAC=$(command -v frama-c)
+else
+    echo "error: cannot find the frama-c executable"
+    exit 1
+fi
+FRAMAC_BIN=$(dirname "$FRAMAC")
+export FRAMAC_BIN
+FRAMAC_LIB=$("$FRAMAC" -print-lib-path)
+FRAMAC_SHARE=$("$FRAMAC" -print-share-path)
 ANALYSIS_SCRIPTS_DIR="${FRAMAC_LIB}/analysis-scripts"
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
@@ -207,8 +222,8 @@ configure_for_frama_c() {
         machdep=x86_64
     fi
     fc_machdep_dir=$(mktemp -d "${TMPDIR:-/tmp/}__fc_script_configure_machdepXXXXXX.dir")
-    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-header > "$fc_machdep_dir/__fc_machdep.h"
-    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-builtin-macros > "$fc_machdep_dir/__fc_builtin_macros.h"
+    "$FRAMAC" -machdep "$machdep" -print-machdep-header > "$fc_machdep_dir/__fc_machdep.h"
+    "$FRAMAC" -machdep "$machdep" -print-machdep-builtin-macros > "$fc_machdep_dir/__fc_builtin_macros.h"
     mkdir -p "$fc_machdep_dir/wrappers"
     for p in cc gcc clang; do
         cat > "$fc_machdep_dir/wrappers/$p" <<EOF
@@ -242,7 +257,11 @@ case "$command" in
         # to avoid a slow startup, we only load plugins which perform syntactic
         # transformations. This may trigger annotation errors due to missing
         # plugins, so we disable those
-        "${DIR}/frama-c" "$@" -no-autoload-plugins -load-module instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
+        "$FRAMAC" "$@" -no-autoload-plugins -load-module instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
+        ;;
+    "kernel-corpus")
+        shift;
+        "$ANALYSIS_SCRIPTS_DIR/kernel_corpus.py" "$@";
         ;;
     "find-fun")
         shift;
