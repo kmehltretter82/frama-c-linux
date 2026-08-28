@@ -13,7 +13,7 @@
     "kbuild_config_fragment_sha256": "59f7413e5eb8b3951af3f0a7fa56792626634447193e4cb1bf0e51e4df42226f",
     "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
     "frama_c_version": "34.0~~dev (Selenium)",
-    "frontend_revision": "880d8ef6f5b4269b59db60c88e874ab026cf681c",
+    "frontend_revision": "1fea1525b664a1475b04f90b896914ae18563538",
     "machdep": "gcc_x86_64",
     "translation_units": 8,
     "model_headers": [
@@ -34,7 +34,7 @@
     "failures_by_kind": {},
     "all_exit_zero": true,
     "metrics_collected": 8,
-    "warning_count": 2892,
+    "warning_count": 1756,
     "warnings_by_key": {
       "kernel": 1,
       "kernel:asm:clobber": 116,
@@ -42,10 +42,22 @@
       "kernel:attrs:unknown": 72,
       "kernel:libc:frama-c": 16,
       "kernel:typing:implicit-conv-void-ptr": 156,
-      "kernel:typing:incompatible-types-call": 1344,
+      "kernel:typing:incompatible-types-call": 208,
       "kernel:typing:int-conversion": 160,
       "kernel:typing:variadic": 3
     }
+  },
+  "qualifier_compatibility_effect": {
+    "frontend_revision": "1fea1525b664a1475b04f90b896914ae18563538",
+    "before": {
+      "warning_count": 2892,
+      "incompatible_types_call_warnings": 1344
+    },
+    "after": {
+      "warning_count": 1756,
+      "incompatible_types_call_warnings": 208
+    },
+    "removed_spurious_call_warnings": 1136
   },
   "remaining_model_queue": {
     "undeclared_builtins": [],

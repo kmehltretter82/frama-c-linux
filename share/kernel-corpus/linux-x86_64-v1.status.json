@@ -96,6 +96,29 @@
         "kernel:typing:incompatible-types-call": 2500,
         "kernel:typing:int-conversion": 340
       }
+    },
+    {
+      "name": "frontend-with-qualifier-subsets",
+      "frontend_revision": "1fea1525b664a1475b04f90b896914ae18563538",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21,
+      "warning_count": 3341,
+      "warnings_by_key": {
+        "kernel:asm:clobber": 20,
+        "kernel:attrs": 2062,
+        "kernel:attrs:unknown": 185,
+        "kernel:libc:frama-c": 40,
+        "kernel:typing:implicit-conv-void-ptr": 354,
+        "kernel:typing:incompatible-types-call": 340,
+        "kernel:typing:int-conversion": 340
+      }
     }
   ],
   "model_effect": {
@@ -120,6 +143,18 @@
       "__builtin_mul_overflow",
       "__builtin_sub_overflow"
     ]
+  },
+  "qualifier_compatibility_effect": {
+    "frontend_revision": "1fea1525b664a1475b04f90b896914ae18563538",
+    "before": {
+      "warning_count": 5501,
+      "incompatible_types_call_warnings": 2500
+    },
+    "after": {
+      "warning_count": 3341,
+      "incompatible_types_call_warnings": 340
+    },
+    "removed_spurious_call_warnings": 2160
   },
   "remaining_model_queue": {
     "undeclared_builtins": [],
