@@ -122,19 +122,76 @@
     "The counted-by fallback deliberately does not model the counter-field update performed for a GCC-recognized __counted_by__ association.",
     "Unknown architecture attributes and inline assembly effects remain classified but are not yet precise KVM verification semantics."
   ],
+  "semantic_validation": {
+    "historical_arm64_kvm_usercopy_replay": {
+      "linux_fix": "a25bc8486f9c01c1af6b6c5657234b2eee2c39d6",
+      "title": "KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg()",
+      "discovery_status": "Known historical Linux bug used for detector calibration; no new Linux bug is claimed.",
+      "linux_base": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+      "affected_source": "arch/arm64/kvm/hypercalls.c",
+      "scope": "The tracked harness includes the complete current hypercalls.c translation unit. Its fixed entry calls the actual current function; its before entry contains the exact vulnerable prefix from the fix parent, reduced after the copy because the synthetic oversized register ID cannot match a firmware-register switch case.",
+      "scenario": {
+        "userspace_register_size_bytes": 16,
+        "stack_destination_size_bytes": 8,
+        "user_source_extent_bytes": 16,
+        "copy_outcome": "forced success",
+        "copy_model": "ACSL source_extent and destination_extent preconditions plus byte-copy assigns"
+      },
+      "artifacts": {
+        "harness": "kernel-harnesses/arm64_kvm_fw_reg.c",
+        "harness_sha256": "eb5136cd248bc51128ba24416fb990e60bd119da2487a39537963b25ad2ad318",
+        "database_mapper": "analysis-scripts/kernel_harness.py",
+        "reduced_before_test": "plugins/kernel_checks/tests/historical/arm64_kvm_a25bc8486f9c_before.c",
+        "reduced_before_test_sha256": "004d5f7ecfeb72697b60fa23c461768ce42133c4f7b23bfdf10fd3aaec9d5727",
+        "reduced_after_test": "plugins/kernel_checks/tests/historical/arm64_kvm_a25bc8486f9c_after.c",
+        "reduced_after_test_sha256": "02fb933987f2e522b570ab7360483a31da03f31ef5aaa3fc021a215d95fbb859"
+      },
+      "analysis_profile": {
+        "machdep": "gcc_arm64",
+        "eva_slevel": 10,
+        "compilation_command": "exact pinned Kbuild hypercalls.c command mapped to the tracked harness"
+      },
+      "before_fix": {
+        "entry_point": "frama_c_arm64_kvm_fw_reg_before",
+        "exit_zero": true,
+        "functions_analyzed": 2,
+        "defined_functions": 65,
+        "statements_reached": 5,
+        "statements_total": 11,
+        "invalid_destination_extent_preconditions": 1,
+        "eva_analysis_warnings": 0,
+        "eva_runtime_alarms": 0
+      },
+      "fixed": {
+        "entry_point": "frama_c_arm64_kvm_fw_reg_fixed",
+        "exit_zero": true,
+        "functions_analyzed": 3,
+        "defined_functions": 65,
+        "statements_reached": 11,
+        "statements_total": 89,
+        "invalid_destination_extent_preconditions": 0,
+        "eva_analysis_warnings": 0,
+        "eva_runtime_alarms": 0
+      },
+      "diagnostic_interpretation": "Eva emits the invalid contract property on its alarm channel, while the analysis summary counts it as one invalid logical precondition rather than a runtime alarm.",
+      "limitations": "This bounded success-path replay assumes a valid userspace source and does not establish whole-function input coverage, concurrency semantics, or complete ARM64 architectural behavior."
+    }
+  },
   "validation": {
     "arm64_kvm_kbuild": "passed",
     "install_build": "passed with dune -j 1",
     "focused_real_kvm_blockers": "passed for arm.c and nested.c",
     "syntax_suite": "passed, including existing CERT MSC38-C controls",
     "libc_suite": "passed",
-    "corpus_require_all_typed": "passed for 75 of 75 target analyses"
+    "corpus_require_all_typed": "passed for 75 of 75 target analyses",
+    "arm64_kvm_historical_usercopy_regressions": "passed one invalid destination extent before and zero after",
+    "kernel_checks_suite": "passed including reduced ARM64 KVM before/fixed controls"
   },
   "next_semantic_targets": [
     "conservative system-register and privileged assembly boundaries",
     "stage-2 page-table map, unmap, and invalidation scenarios",
     "nVHE and protected-KVM page ownership transitions",
-    "historical ARM64 KVM bug-fix replays followed by fresh candidate analysis"
+    "additional historical ARM64 KVM bug-fix replays and fresh candidate analysis"
   ],
-  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for every ARM64 KVM C command context in this pinned build. It is not a proof of KVM correctness, complete EL2 behavior, the Arm memory model, or precise semantics for AArch64 inline assembly. No new Linux bug is claimed by this frontend milestone. Aggregate AST metrics count repeated inline and header definitions once per target analysis."
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for every ARM64 KVM C command context in this pinned build. It is not a proof of KVM correctness, complete EL2 behavior, the Arm memory model, or precise semantics for AArch64 inline assembly. The first semantic result is a bounded replay of a known historical buffer overflow, not a newly discovered Linux bug. Aggregate AST metrics count repeated inline and header definitions once per target analysis."
 }

@@ -58,8 +58,13 @@ corpus expands this to the complete pinned Kbuild inventory: 75/75 command
 contexts across all 69 ARM64 KVM C files type from unmodified sources. Two
 focused fixes add GCC 15 counted-by fallback typing and permit ordinary local
 objects named like standard function-like macros. This is a frontend milestone,
-not a new Linux bug finding. The next work adds architecture-boundary models,
-bounded semantic scenarios, and historical KVM bug replays.
+not a new Linux bug finding. The first bounded semantic replay now exercises
+the known 2023 `kvm_arm_set_fw_reg()` stack overflow: an Eva user-copy extent
+model reports one invalid destination bound for the vulnerable prefix and none
+for the current guarded function, both inside the complete current
+`hypercalls.c` translation unit. This calibrates bug detection against a
+historical fix; it is not a newly discovered kernel bug. The next work applies
+the model to fresh KVM candidates and adds architecture-boundary scenarios.
 
 ## Linux kernel checks
 
@@ -75,6 +80,12 @@ upstream one-line fix is reversed and restored. Enable it with
 `-kernel-checks`. See
 [the plug-in README](plugins/kernel_checks/README.md) for the reproducible
 workflow, guarantees, and limitations.
+
+ARM64 KVM validation also includes a user-copy size model and reduced plus
+full-translation-unit replays of Linux fix `a25bc8486f9c0`. A userspace-selected
+16-byte register copy into an 8-byte stack object produces one invalid ACSL
+precondition before the fix and none after the size guard. This is the first
+KVM semantic calibration case, not a fresh finding.
 
 ## Installation
 

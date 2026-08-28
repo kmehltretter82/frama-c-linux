@@ -306,7 +306,9 @@ pinned KVM build. ARM64 KVM work now continues in semantic layers:
    allocation cleanup, and protected-KVM ownership transitions; and
 5. validate candidate checkers against real historical ARM64 KVM fixes, with
    positive findings, fixed controls, coverage, alarms, and model assumptions
-   recorded separately.
+   recorded separately. The first case now replays `a25bc8486f9c0`: Eva marks
+   the vulnerable user-copy destination extent invalid and accepts the fixed
+   size-guarded path.
 
 Initial success means reproducible C analysis and defensible findings on
 selected paths. It does not mean proving the complete KVM implementation, the
@@ -411,6 +413,25 @@ a proof of the complete translation unit or a general model of Open vSwitch.
 Broader automatic entry-state, allocation, ownership, locking, and netlink
 models remain required.
 
+The first ARM64 KVM semantic replay targets Linux commit
+`a25bc8486f9c01c1af6b6c5657234b2eee2c39d6` (`KVM: arm64: Fix buffer overflow
+in kvm_arm_set_fw_reg()`). The affected ioctl register ID can select a 16-byte
+copy into an 8-byte `u64` stack destination. A success-path `copy_from_user`
+contract makes destination and source extents explicit. In the reduced test
+and in a harness containing the complete current `hypercalls.c`, Eva records
+one invalid `destination_extent` precondition for the historical vulnerable
+prefix. The actual current function rejects the oversized ID before the copy
+and records no invalid precondition or Eva warning. The full harness analyzes
+2/65 functions and reaches 5/11 statements in the vulnerable prefix; the fixed
+entry analyzes 3/65 and reaches 11/89 statements.
+
+This is a bounded replay of a known upstream bug. It validates that an explicit
+kernel user-copy boundary model distinguishes the vulnerable and fixed paths;
+it neither rediscovers the bug nor proves the rest of `hypercalls.c`. The model
+forces the copy-success outcome, assumes a valid 16-byte userspace source, and
+does not model concurrency or architecture side effects outside the selected
+path.
+
 The next candidates are:
 
 1. lock and execution-context mistakes, including sleeping in atomic context;
@@ -454,6 +475,8 @@ for the first milestone.
    Open vSwitch translation unit. General entry and kernel API modeling remain.
 6. Expand ARM64 KVM without relaxing the unmodified-source rule. The first
    host/VGIC/nVHE corpus, all shared VHE/nVHE pairs, and the complete 75-command
-   pinned C inventory are established. Conservative architecture models,
-   bounded bug scenarios, and historical KVM replays now precede RISC-V and
-   broader subsystem coverage.
+   pinned C inventory are established. The first historical buffer-overflow
+   replay is also established at one invalid user-copy bound before and zero
+   after the fix. Fresh KVM candidate analysis, conservative architecture
+   models, and additional bounded scenarios now precede RISC-V and broader
+   subsystem coverage.

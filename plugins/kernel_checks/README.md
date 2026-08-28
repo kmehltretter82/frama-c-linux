@@ -108,9 +108,27 @@ from `ee30dd2909d8` reversed, it analyzes 30/251 functions, reaches 144/231
 statements, and reports exactly one violation at `kfree_skb(reply)`. Both runs
 have the same two unrelated Eva alarms.
 
-This establishes the checker on one explicit allocation-failure scenario, not
-whole-kernel analysis coverage. The harness supplies selected objects and API
-outcomes, and the allocation is forced to fail. Generic callback entry states,
-other outcomes, concurrency, and full ownership semantics remain outside this
-result. A zero count from a shallow direct translation-unit run remains
-inconclusive.
+The ARM64 KVM harness at
+`kernel-harnesses/arm64_kvm_fw_reg.c` includes the complete current
+`arch/arm64/kvm/hypercalls.c` translation unit and replays Linux fix
+`a25bc8486f9c0`. Its modeled successful `copy_from_user()` requires both copy
+extents to be valid. With a userspace-selected 16-byte register size, the
+historical vulnerable prefix produces one invalid destination precondition;
+the actual current function's 8-byte size guard produces none. Focused reduced
+before/after tests enforce the same result under `gcc_arm64`.
+
+Map the exact `hypercalls.c` Kbuild command as above, then select either
+`frama_c_arm64_kvm_fw_reg_before` or
+`frama_c_arm64_kvm_fw_reg_fixed` with `-main`, and run Eva with
+`-machdep gcc_arm64 -eva-slevel 10`. The former is a reduced historical prefix
+inside the complete current translation unit; it is not a historical kernel
+checkout.
+
+The Open vSwitch result establishes the checker on one explicit
+allocation-failure scenario, not whole-kernel analysis coverage. Its harness
+supplies selected objects and API outcomes, and the allocation is forced to
+fail. Generic callback entry states, other outcomes, concurrency, and full
+ownership semantics remain outside this result. A zero count from a shallow
+direct translation-unit run remains inconclusive. The KVM result likewise
+covers one oversized-register success path; it does not prove all ioctl inputs
+or model unrelated ARM64 architectural effects.
