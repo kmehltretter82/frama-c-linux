@@ -51,12 +51,14 @@ tagged bit. Calling faultable userspace access code while that state is held
 can deadlock against a page-fault path that waits for publication.
 
 The current rule is intentionally narrow. Within each defined function, it
-performs a forward control-flow analysis and reports a direct
-`mte_copy_tags_from_user()` call when an ignored-result call to either
-initialization helper may precede it and no tagged-state publication must have
-occurred. It does not claim to be a general lock, alias, or interprocedural
-concurrency analysis. Storing and checking an acquisition result is left
-unclassified rather than guessed about.
+performs a forward control-flow analysis and reports direct MTE tag-copy or
+ordinary user-copy helpers when an ignored-result call to either initialization
+helper may precede them and no tagged-state publication must have occurred.
+The recognized direct calls are `mte_copy_tags_from_user()`,
+`mte_copy_tags_to_user()`, `copy_from_user()`, `copy_to_user()`, and
+`clear_user()`. It does not claim to be a general lock, alias, uaccess, or
+interprocedural concurrency analysis. Storing and checking an acquisition
+result is left unclassified rather than guessed about.
 
 The checker inspects every function in the typed AST, independently of Eva's
 selected entry-point reachability. On the complete pinned ARM64 KVM
@@ -141,13 +143,22 @@ the actual current function's 8-byte size guard produces none. Focused reduced
 before/after tests enforce the same result under `gcc_arm64`.
 
 The MTE protocol tests add one positive deadlock-shaped case and a non-faulting
-kernel-copy control. The tracked `kernel-harnesses/arm64_kvm_mte_scan.c`
+kernel-copy control. A staged-uaccess test also accepts `copy_from_user()`
+before initialization acquisition and reports the same call when deliberately
+moved after acquisition. The tracked `kernel-harnesses/arm64_kvm_mte_scan.c`
 harness includes the complete current `guest.c` and reports the one live
 faultable-user-access violation described above. A separate reduced hugetlb
 model captures the folio-wide validity invariant: Eva marks the assertion
 invalid when one base page is initialized before publishing a folio-wide bit,
-and proves it when all subpages are initialized first. The latter is a
-synthetic fixed control, not an upstream Linux patch.
+and proves it when all subpages are initialized first.
+
+The candidate Linux series in
+[`contrib/linux-patches/arm64-kvm-mte-v1`](../../contrib/linux-patches/arm64-kvm-mte-v1/)
+turns the exact Kbuild-mapped full-source result from one MTE ordering
+diagnostic at baseline `548e7bcd0c54` into none. The checker still recognizes
+the staged `copy_from_user()`, so this fixed control remains sensitive to its
+placement. The series is not an upstream-accepted fix and has not yet had an
+ARM64 KVM runtime test.
 
 Map and scan `guest.c` with its exact Kbuild command:
 

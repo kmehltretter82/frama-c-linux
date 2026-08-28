@@ -469,9 +469,19 @@ initialization and valid in a synthetic repaired control.
 
 These are source-level findings, not yet accepted upstream defects. The
 relevant code was unchanged in upstream commit `548e7bcd0c54` on 2026-08-28,
-and focused public searches found no existing report or fix. Runtime
-reproducers, architecture testing, maintainer review, and minimal Linux patches
-remain before closure.
+and focused public searches found no existing report or fix.
+
+The three MTE-family candidates now have a four-patch v1 series under
+[`contrib/linux-patches/arm64-kvm-mte-v1`](contrib/linux-patches/arm64-kvm-mte-v1/).
+It stages tag bytes before acquiring the one-shot initialization state,
+initializes complete hugetlb folios before publishing their tagged state, and
+keeps fresh hugetlb reads out of the base-page tagged helper. With the exact
+Kbuild command, the checker reports one violation at baseline `guest.c:1051`
+and none after the series; both bounded Eva runs produce zero alarms. The
+affected ARM64 objects and complete KVM directory compile with `W=1`, including
+focused no-hugetlb and no-MTE configurations, and all four patches pass strict
+`checkpatch`. Runtime reproducers, architecture testing, maintainer review, and
+upstream acceptance remain before closure.
 
 The next candidates are:
 
@@ -521,6 +531,7 @@ for the first milestone.
    after the fix. The first fresh audit is complete, five current candidates
    survived adversarial review, the MTE lock ordering is detected in the full
    current translation unit, and the hugetlb publication invariant has an Eva
-   before/fixed model. Runtime reproducers, Linux fixes, conservative
-   architecture models, and additional bounded scenarios now precede RISC-V
-   and broader subsystem coverage.
+   before/fixed model. A compile-tested four-patch candidate now changes the
+   full-source MTE result from one violation to none. Runtime reproducers,
+   maintainer review, conservative architecture models, and additional bounded
+   scenarios now precede RISC-V and broader subsystem coverage.

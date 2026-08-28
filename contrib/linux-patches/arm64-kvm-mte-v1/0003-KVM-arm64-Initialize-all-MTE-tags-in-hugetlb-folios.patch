@@ -1,0 +1,39 @@
+From e2f023abd7283e2995b6805a31fc193c7d9598eb Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Fri, 28 Aug 2026 21:48:02 +0000
+Subject: [PATCH 3/4] KVM: arm64: Initialize all MTE tags in hugetlb folios
+
+PG_mte_tagged is folio-wide for hugetlb, but sanitise_mte_tags() clears
+only mapping_size bytes before publishing it. Dirty logging forces
+mapping_size to PAGE_SIZE, and alignment or nested-stage constraints can
+also select a base-page mapping within a multi-page hugetlb folio.
+
+Publishing the flag after that partial clear makes untouched subpages
+appear initialized and can expose stale allocation tags to the guest. Use
+the whole-folio helper before publishing the flag, regardless of the
+stage-2 mapping granule.
+
+Fixes: 25c17c4b55de ("hugetlb: arm64: add mte support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/kvm/mmu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9ba86450fe4af..364b159d3eda4 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1514,8 +1514,7 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 	if (folio_test_hugetlb(folio)) {
+ 		/* Hugetlb has MTE flags set on head page only */
+ 		if (folio_try_hugetlb_mte_tagging(folio)) {
+-			for (i = 0; i < nr_pages; i++, page++)
+-				mte_clear_page_tags(page_address(page));
++			mte_clear_hugetlb_tags(folio);
+ 			folio_set_hugetlb_mte_tagged(folio);
+ 		}
+ 		return;
+-- 
+2.53.0
+

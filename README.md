@@ -96,7 +96,12 @@ base page before publishing a hugetlb folio as tagged, while proving a
 whole-folio fixed control. A seven-lens source audit produced five
 high-confidence current candidates in total; only the initialization-lock
 finding is currently automated by the checker. Runtime reproduction and Linux
-maintainer confirmation remain open.
+maintainer confirmation remain open. The three MTE-family candidates now have
+a [four-patch v1 fix series](contrib/linux-patches/arm64-kvm-mte-v1/): against
+Linux `548e7bcd0c54`, the exact Kbuild-mapped checker result changes from one
+ordering violation to none, and the affected ARM64 configurations compile with
+`W=1`. This remains candidate source and compile evidence, not an upstream
+confirmation.
 
 ## Installation
 

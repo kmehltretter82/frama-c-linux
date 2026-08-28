@@ -1,0 +1,42 @@
+From 4b34e75d32dc651ba4058a4680c57b45c3912308 Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Fri, 28 Aug 2026 21:48:22 +0000
+Subject: [PATCH 4/4] KVM: arm64: Use the hugetlb MTE tagged helper exclusively
+
+The KVM_ARM_MTE_COPY_TAGS read path combines its hugetlb test with the
+folio-wide tagged flag using &&, then ORs that result with
+page_mte_tagged(). For an untagged hugetlb folio, short-circuit evaluation
+reaches page_mte_tagged(), whose VM_WARN_ON_ONCE() explicitly rejects
+hugetlb pages.
+
+Select exactly one helper based on the folio type. This avoids a DEBUG_VM
+warning for a valid tag read and prevents panic_on_warn from turning the
+ioctl into a host panic.
+
+Fixes: 25c17c4b55de ("hugetlb: arm64: add mte support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/kvm/guest.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 7b335e3382215..a324fc34a08c2 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -1036,9 +1036,9 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 		maddr = page_address(page);
+ 
+ 		if (!write) {
+-			if ((folio_test_hugetlb(folio) &&
+-			     folio_test_hugetlb_mte_tagged(folio)) ||
+-			     page_mte_tagged(page))
++			if (folio_test_hugetlb(folio) ?
++			    folio_test_hugetlb_mte_tagged(folio) :
++			    page_mte_tagged(page))
+ 				num_tags = mte_copy_tags_to_user(tags, maddr,
+ 							MTE_GRANULES_PER_PAGE);
+ 			else
+-- 
+2.53.0
+

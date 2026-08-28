@@ -1,0 +1,122 @@
+From 5f23cd91eda51119aded1174f91569e02ca32d41 Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Fri, 28 Aug 2026 21:47:37 +0000
+Subject: [PATCH 2/4] KVM: arm64: Stage MTE tags before initialization
+
+mte_copy_tags_from_user() may fault after KVM has acquired the one-shot
+MTE initialization state. A concurrent mprotect(PROT_MTE) can then hold
+mmap_lock for writing and wait in mte_sync_tags() for the tagged state,
+while the uaccess fault waits for mmap_lock for reading. A non-resident
+PROT_MTE alias of the same page can also make a single ioctl deadlock
+itself.
+
+Copy one page of tag bytes into a reusable kernel buffer before acquiring
+the MTE state, then apply them with the non-faulting kernel-buffer helper.
+A failed user copy does not partially apply the imported tags. Preserve
+the existing no-op behavior for zero-length copies by allocating only when
+there is data to stage.
+
+When first initializing a hugetlb folio, clear every subpage before
+applying the imported page and publishing the folio-wide tagged state.
+
+Fixes: d77e59a8fccd ("arm64: mte: Lock a page for MTE tag initialisation")
+Fixes: 25c17c4b55de ("hugetlb: arm64: add mte support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/kvm/guest.c | 41 +++++++++++++++++++++++++++++------------
+ 1 file changed, 29 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b01d6622b8720..7b335e3382215 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -14,6 +14,7 @@
+ #include <linux/nospec.h>
+ #include <linux/kvm_host.h>
+ #include <linux/module.h>
++#include <linux/slab.h>
+ #include <linux/stddef.h>
+ #include <linux/string.h>
+ #include <linux/vmalloc.h>
+@@ -978,6 +979,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 	gpa_t guest_ipa = copy_tags->guest_ipa;
+ 	size_t length = copy_tags->length;
+ 	void __user *tags = copy_tags->addr;
++	u8 *tag_buf = NULL;
+ 	gpa_t gfn;
+ 	bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
+ 	int ret = 0;
+@@ -998,6 +1000,12 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 	if (length > INT_MAX)
+ 		return -EINVAL;
+ 
++	if (write && length) {
++		tag_buf = kmalloc(MTE_GRANULES_PER_PAGE, GFP_KERNEL);
++		if (!tag_buf)
++			return -ENOMEM;
++	}
++
+ 	gfn = gpa_to_gfn(guest_ipa);
+ 
+ 	mutex_lock(&kvm->slots_lock);
+@@ -1040,20 +1048,29 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			kvm_release_page_clean(page);
+ 		} else {
+ 			/*
+-			 * Only locking to serialise with a concurrent
+-			 * __set_ptes() in the VMM but still overriding the
+-			 * tags, hence ignoring the return value.
++			 * Stage the tags before taking the one-shot MTE
++			 * initialization state. A fault while that state is held
++			 * can deadlock with __set_ptes() waiting for publication.
+ 			 */
+-			if (folio_test_hugetlb(folio))
+-				folio_try_hugetlb_mte_tagging(folio);
+-			else
++			num_tags = MTE_GRANULES_PER_PAGE -
++				copy_from_user(tag_buf, tags,
++					       MTE_GRANULES_PER_PAGE);
++			if (num_tags != MTE_GRANULES_PER_PAGE) {
++				kvm_release_page_unused(page);
++				ret = -EFAULT;
++				goto out;
++			}
++
++			if (folio_test_hugetlb(folio)) {
++				if (folio_try_hugetlb_mte_tagging(folio))
++					mte_clear_hugetlb_tags(folio);
++			} else {
+ 				try_page_mte_tagging(page);
+-			num_tags = mte_copy_tags_from_user(maddr, tags,
+-							MTE_GRANULES_PER_PAGE);
++			}
++
++			mte_copy_tags_from_kernel(maddr, tag_buf,
++						  MTE_GRANULES_PER_PAGE);
+ 
+-			/* uaccess failed, don't leave stale tags */
+-			if (num_tags != MTE_GRANULES_PER_PAGE)
+-				mte_clear_page_tags(maddr);
+ 			if (folio_test_hugetlb(folio))
+ 				folio_set_hugetlb_mte_tagged(folio);
+ 			else
+@@ -1061,7 +1078,6 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 
+ 			kvm_release_page_dirty(page);
+ 		}
+-
+ 		if (num_tags != MTE_GRANULES_PER_PAGE) {
+ 			ret = -EFAULT;
+ 			goto out;
+@@ -1074,6 +1090,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 
+ out:
+ 	mutex_unlock(&kvm->slots_lock);
++	kfree(tag_buf);
+ 	/* If some data has been copied report the number of bytes copied */
+ 	if (length != copy_tags->length)
+ 		return copy_tags->length - length;
+-- 
+2.53.0
+

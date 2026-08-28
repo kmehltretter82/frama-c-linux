@@ -160,6 +160,9 @@ README* header_spec=.ignore
 *.nix header_spec=.ignore
 /nix/*.patch header_spec=.ignore
 
+# Mail-formatted Linux patches contain intentional embedded diff whitespace.
+/contrib/linux-patches/**/*.patch header_spec=.ignore -whitespace
+
 *.md header_spec=.ignore
 *.opam header_spec=.ignore
 

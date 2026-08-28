@@ -1,0 +1,125 @@
+From 8a0e26784d4c046d4fe9872a0fc055b3b675300d Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Fri, 28 Aug 2026 21:48:49 +0000
+Subject: [PATCH 1/4] arm64: mte: Add helpers for staged tag imports
+
+KVM needs to stage tag bytes in kernel memory before entering the one-shot
+MTE initialization state. Add a non-faulting helper that applies tags from
+a kernel buffer for that purpose.
+
+Also centralize clearing all tags in a hugetlb folio. Iterate from the
+folio head so callers operating on an arbitrary subpage cannot leave part
+of the folio uninitialized before publishing its folio-wide tagged state.
+
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/include/asm/mte.h |  7 +++++++
+ arch/arm64/kernel/mte.c      | 22 ++++++++++++++++++----
+ arch/arm64/lib/mte.S         | 17 +++++++++++++++++
+ 3 files changed, 42 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
+index 7f7b97e099968..63b256594d2d3 100644
+--- a/arch/arm64/include/asm/mte.h
++++ b/arch/arm64/include/asm/mte.h
+@@ -19,6 +19,7 @@
+ #include <asm/pgtable-types.h>
+ 
+ void mte_clear_page_tags(void *addr);
++void mte_copy_tags_from_kernel(void *to, const void *from, unsigned long n);
+ unsigned long mte_copy_tags_from_user(void *to, const void __user *from,
+ 				      unsigned long n);
+ unsigned long mte_copy_tags_to_user(void __user *to, void *from,
+@@ -164,6 +165,8 @@ static inline int mte_ptrace_copy_tags(struct task_struct *child,
+ #endif /* CONFIG_ARM64_MTE */
+ 
+ #if defined(CONFIG_HUGETLB_PAGE) && defined(CONFIG_ARM64_MTE)
++void mte_clear_hugetlb_tags(struct folio *folio);
++
+ static inline void folio_set_hugetlb_mte_tagged(struct folio *folio)
+ {
+ 	VM_WARN_ON_ONCE(!folio_test_hugetlb(folio));
+@@ -209,6 +212,10 @@ static inline bool folio_try_hugetlb_mte_tagging(struct folio *folio)
+ 	return false;
+ }
+ #else
++static inline void mte_clear_hugetlb_tags(struct folio *folio)
++{
++}
++
+ static inline void folio_set_hugetlb_mte_tagged(struct folio *folio)
+ {
+ }
+diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+index 1a9aad6ef22a0..bafe96e1356a0 100644
+--- a/arch/arm64/kernel/mte.c
++++ b/arch/arm64/kernel/mte.c
+@@ -36,6 +36,23 @@ DEFINE_STATIC_KEY_FALSE(mte_async_or_asymm_mode);
+ EXPORT_SYMBOL_GPL(mte_async_or_asymm_mode);
+ #endif
+ 
++#ifdef CONFIG_HUGETLB_PAGE
++/*
++ * Clear the tags for every base page before publishing the folio-wide
++ * PG_mte_tagged flag. The caller must hold the folio's MTE initialisation
++ * state acquired by folio_try_hugetlb_mte_tagging().
++ */
++void mte_clear_hugetlb_tags(struct folio *folio)
++{
++	unsigned long i;
++
++	VM_WARN_ON_ONCE(!folio_test_hugetlb(folio));
++
++	for (i = 0; i < folio_nr_pages(folio); i++)
++		mte_clear_page_tags(page_address(folio_page(folio, i)));
++}
++#endif
++
+ void mte_sync_tags(pte_t pte, unsigned int nr_pages)
+ {
+ 	struct page *page = pte_page(pte);
+@@ -43,12 +60,9 @@ void mte_sync_tags(pte_t pte, unsigned int nr_pages)
+ 	unsigned long i;
+ 
+ 	if (folio_test_hugetlb(folio)) {
+-		unsigned long nr = folio_nr_pages(folio);
+-
+ 		/* Hugetlb MTE flags are set for head page only */
+ 		if (folio_try_hugetlb_mte_tagging(folio)) {
+-			for (i = 0; i < nr; i++, page++)
+-				mte_clear_page_tags(page_address(page));
++			mte_clear_hugetlb_tags(folio);
+ 			folio_set_hugetlb_mte_tagged(folio);
+ 		}
+ 
+diff --git a/arch/arm64/lib/mte.S b/arch/arm64/lib/mte.S
+index 5018ac03b6bf3..70c527c9efbc2 100644
+--- a/arch/arm64/lib/mte.S
++++ b/arch/arm64/lib/mte.S
+@@ -105,6 +105,23 @@ USER(2f, ldtrb	w4, [x1])
+ 	ret
+ SYM_FUNC_END(mte_copy_tags_from_user)
+ 
++/*
++ * Read tags from a kernel buffer (one tag per byte) and set the corresponding
++ * tags at the given kernel address.
++ *   x0 - kernel address (to)
++ *   x1 - kernel buffer (from)
++ *   x2 - number of tags/bytes (n)
++ */
++SYM_FUNC_START(mte_copy_tags_from_kernel)
++	cbz	x2, 2f
++1:	ldrb	w3, [x1], #1
++	lsl	x3, x3, #MTE_TAG_SHIFT
++	stg	x3, [x0], #MTE_GRANULE_SIZE
++	subs	x2, x2, #1
++	b.ne	1b
++2:	ret
++SYM_FUNC_END(mte_copy_tags_from_kernel)
++
+ /*
+  * Get the tags from a kernel address range and write the tag values to the
+  * given user buffer (one tag per byte). Used by PTRACE_PEEKMTETAGS.
+-- 
+2.53.0
+
