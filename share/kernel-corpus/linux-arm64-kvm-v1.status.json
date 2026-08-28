@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "corpus": "linux-arm64-kvm-v1",
+  "corpus_manifest_sha256": "ea47358ae7260088137c2b80b0a2d20c6e7f366ee6d0fec4c7b3096d7cb603f9",
+  "compilation_database_sha256": "6925df5ab698e81c7f239814703010a3cded0974de27062607444cf0a73b5178",
+  "kbuild_config_sha256": "285cb70eeea5fee24448140d3f55d76dcf4fc11b02483a7789ae345766ac033f",
+  "machdep_sha256": "09a78511fa16e34f8098ae072eab842e7f76588d201e77d9d17ac1a2471e1bcc",
+  "raw_result_sha256": "080b96b6ef79ae05c6dc43ef1e572b465a8cfd512f8fa5c882b26ff37d5dc632",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+    "linux_tree_dirty": false,
+    "architecture": "arm64",
+    "kbuild_configuration": "defconfig",
+    "kbuild_facts": {
+      "CONFIG_VIRTUALIZATION": "y",
+      "CONFIG_KVM": "y",
+      "CONFIG_KVM_COMMON": "y",
+      "CONFIG_ARM64_PTR_AUTH": "y",
+      "CONFIG_HW_PERF_EVENTS": "y",
+      "CONFIG_NVHE_EL2_DEBUG": "n"
+    },
+    "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "translation_units": 12,
+    "kvm_command_inventory": {
+      "distinct_c_sources": 69,
+      "sources_with_one_command": 63,
+      "shared_sources_with_vhe_and_nvhe_commands": 6,
+      "corpus_policy": "v1 selects only sources with one unambiguous command"
+    },
+    "model_headers": [
+      {
+        "path": "kernel-models/compiler_builtins.h",
+        "sha256": "cf814012207de9020475e3f4dfd5c55d0f6e5679a8e0615ed1bc125b990295ec"
+      }
+    ],
+    "source_policy": "Kernel source and headers are unmodified; the compilation database contains exact commands from a successful out-of-tree ARM64 defconfig KVM build."
+  },
+  "measurements": [
+    {
+      "name": "initial-arm64-kvm-baseline",
+      "frontend_revision": "2c09fd7398d5330ada443e5404b930ede775b45a",
+      "raw_result_sha256": "90814f53dae5ce98cf5ee743af7f0a9b7a5134d601026e54ff0b805174be82a5",
+      "attempted": 12,
+      "typed": 3,
+      "success_rate": 0.25,
+      "by_stage": {
+        "typed": 3,
+        "typing": 9
+      },
+      "failures_by_kind": {
+        "typing-error": 9
+      },
+      "first_blocker": "A non-decay context from GNU typeof was propagated recursively through a cast, so reserved_pg_dir remained an array inside (unsigned long)reserved_pg_dir in the ARM64 RELOC_HIDE macro."
+    },
+    {
+      "name": "after-direct-operand-decay-fix",
+      "frontend_revision": "dd370b2d31d4bf3a0d20fe598c58a330ba93c71e",
+      "attempted": 12,
+      "typed": 12,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 12
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 12,
+      "total_process_seconds": 431.172,
+      "warning_count": 1036,
+      "warnings_by_key": {
+        "kernel": 12,
+        "kernel:CERT:EXP:46": 4,
+        "kernel:CERT:MSC:37": 145,
+        "kernel:asm:clobber": 113,
+        "kernel:attrs:unknown": 96,
+        "kernel:libc:frama-c": 24,
+        "kernel:pp:compilation-db": 12,
+        "kernel:typing:flexible-array-extension": 120,
+        "kernel:typing:implicit-conv-void-ptr": 436,
+        "kernel:typing:incompatible-types-call": 74
+      },
+      "undeclared_builtins": [],
+      "unknown_attributes": [
+        "__alloc_size__",
+        "__assume_aligned__",
+        "__counted_by__",
+        "__designated_init__",
+        "__error__",
+        "__externally_visible__",
+        "__gnu_inline__",
+        "__transparent_union__"
+      ],
+      "aggregate_metrics": {
+        "defined_functions": 1423,
+        "sloc": 20367,
+        "decision_points": 3446,
+        "loops": 100,
+        "function_calls": 3462,
+        "pointer_dereferences": 3468,
+        "cyclomatic_complexity": 4869
+      }
+    }
+  ],
+  "compatibility_changes": [
+    "Limit sizeof/alignof and GNU typeof non-decay context to the direct cast expression instead of recursively applying it to the cast operand.",
+    "Add a focused gcc_arm64 regression for complete and incomplete arrays plus function designators cast inside typeof and sizeof."
+  ],
+  "validation": {
+    "arm64_kvm_kbuild": "passed",
+    "install_build": "passed with dune -j 1",
+    "focused_syntax_regression": "passed",
+    "syntax_suite": "passed",
+    "libc_suite": "passed",
+    "misc_suite": "passed with unavailable ZMQ tests disabled",
+    "corpus_require_all_typed": "passed"
+  },
+  "next_frontend_targets": [
+    "represent both VHE and nVHE compilation commands for the six shared hyp C sources",
+    "expand across the remaining unique ARM64 KVM C sources",
+    "classify and reduce the remaining warning inventory"
+  ],
+  "next_semantic_targets": [
+    "system-register and privileged assembly boundaries",
+    "stage-2 page-table map, unmap, and invalidation scenarios",
+    "nVHE and protected-KVM page ownership transitions",
+    "historical ARM64 KVM bug-fix replays"
+  ],
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for this pinned corpus. It is not a proof of KVM correctness, complete EL2 behavior, the Arm memory model, or precise semantics for AArch64 inline assembly."
+}

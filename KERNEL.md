@@ -73,8 +73,15 @@ from x86_64 even for common C files. It is frontend coverage, not yet a claim
 that ARM64 inline assembly, atomics, PAC/MTE, or the architecture memory model
 have complete verification semantics.
 
-On 2026-08-28, all 30 `x86_64` translation units and all 21 ARM64 target runs
-reached a typed AST from unmodified kernel sources and headers:
+The `linux-arm64-kvm-v1` corpus uses an ARM64 `defconfig` KVM build and selects
+12 unmodified host, VGIC, and nVHE translation units with unambiguous Kbuild
+commands. It covers exit handling, hypercalls, fault injection, MMIO, host MMU
+and sysreg code, VGIC MMIO, and nVHE hypercall, memory-protection, page
+allocation, sysreg, and TLB code.
+
+On 2026-08-28, all 30 `x86_64` translation units, all 21 common ARM64 target
+runs, and all 12 ARM64 KVM translation units reached a typed AST from
+unmodified kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
 | --- | --- | ---: | --- |
@@ -92,6 +99,8 @@ reached a typed AST from unmodified kernel sources and headers:
 | `3f28ad0641bf27835b0f7b87c3925704491a740a` | DWC3 | 8/8 | none |
 | `af35b39cf375e0e21681c2d62f3e088ae869a80b` | Open vSwitch datapath | 1/1 | none |
 | `beea50c48973af68920d96ad225483a2fd26d26c` | ARM64 library | 21/21 | none |
+| `2c09fd7398d5330ada443e5404b930ede775b45a` | ARM64 KVM | 3/12 | 9 cast/array-decay typing failures |
+| `dd370b2d31d4bf3a0d20fe598c58a330ba93c71e` | ARM64 KVM | 12/12 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -142,6 +151,20 @@ dereferences, with 993 classified warnings and no undeclared builtins. ARM64
 `tinyconfig` enables SMP with 512 configured CPUs, exposing the constant
 `ilog2` array-bound path that the initial x86 configuration did not exercise.
 
+Revision `dd370b2d31` establishes the first ARM64 KVM corpus. GNU `typeof`
+suppresses array and function-designator decay for its direct operand, but the
+frontend incorrectly propagated that non-decay context through an explicit
+cast. ARM64's `RELOC_HIDE((unsigned long)reserved_pg_dir, 0)` therefore tried
+to cast an array directly to an integer in nine files. Scoping non-decay to the
+cast expression, as required by the language rules, moves the corpus from
+3/12 to 12/12 typed. A focused regression covers complete and incomplete
+arrays and function designators inside `typeof` and `sizeof`.
+
+The final KVM run aggregates 1,423 defined functions, 20,367 source lines,
+3,462 calls, and 3,468 pointer dereferences across the 12 separate ASTs. It
+emits 1,036 classified warnings and no undeclared builtins. These aggregate
+counts include repeated inline/header definitions in each translation unit.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
 the DWC3, Open vSwitch, and ARM64 databases were generated directly in
@@ -152,7 +175,9 @@ and
 with frontend and checker evidence for Open vSwitch in
 [`linux-x86_64-openvswitch-v1.status.json`](share/kernel-corpus/linux-x86_64-openvswitch-v1.status.json)
 and ARM64 frontend evidence in
-[`linux-arm64-v1.status.json`](share/kernel-corpus/linux-arm64-v1.status.json).
+[`linux-arm64-v1.status.json`](share/kernel-corpus/linux-arm64-v1.status.json),
+with ARM64 KVM evidence in
+[`linux-arm64-kvm-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -172,10 +197,23 @@ fragment in `configs/`. Corpus manifests automatically load their declared
 model headers; pass `--no-manifest-models` for a controlled unmodeled
 comparison.
 
-For ARM64, use `linux-arm64-v1.json`, an ARM64 `tinyconfig` compilation
-database, and add `--machdep gcc_arm64`. The compiler executable recorded in
-the machdep is generation and round-trip metadata; target preprocessing flags
-still come from the selected compilation-database entry.
+For ARM64, add `--machdep gcc_arm64`. Use `linux-arm64-v1.json` with a
+`tinyconfig` compilation database, or `linux-arm64-kvm-v1.json` with a
+`defconfig` build whose KVM directory has been compiled. The compiler
+executable recorded in the machdep is generation and round-trip metadata;
+target preprocessing flags still come from the selected
+compilation-database entry.
+
+Generate the measured KVM database from the pinned Linux tree with:
+
+```sh
+kvm_build=/tmp/linux-arm64-kvm-build
+make O="$kvm_build" ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+make -j8 O="$kvm_build" ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+  arch/arm64/kvm/
+python3 scripts/clang-tools/gen_compile_commands.py \
+  -d "$kvm_build" -o /tmp/linux-arm64-kvm-compile_commands.json
+```
 
 From this repository's development tree, build `@install` and replace the
 command above with
@@ -202,15 +240,16 @@ and protected-KVM code crosses the EL2 privilege boundary and manages stage-2
 translation and memory ownership. This makes it a useful test of whether the
 fork can progress from portable kernel C to architecture-specific bug finding.
 
-The existing 21/21 ARM64 corpus is only a prerequisite. It validates the GCC
-AArch64 machine model and common C frontend paths, but contains no KVM
-translation units. ARM64 KVM work will proceed in measured layers:
+The 21/21 ARM64 library corpus validates the GCC AArch64 machine model and
+common C frontend paths. The first KVM-specific layer is now established:
+`linux-arm64-kvm-v1` moves from 3/12 to 12/12 typed using exact commands from a
+successful KVM-enabled build. ARM64 KVM work continues in measured layers:
 
-1. generate a KVM-enabled ARM64 build and version an exact-Kbuild corpus across
-   representative host code, stage-2 page-table code, VGIC/sysreg emulation,
-   and nVHE/pKVM C code;
-2. classify frontend blockers without modifying Linux sources, adding focused
-   tests for every accepted compiler or architecture extension;
+1. expand the exact-Kbuild corpus across the remaining host, VHE, nVHE, VGIC,
+   stage-2 page-table, and pKVM C code, including command variants for shared
+   sources;
+2. continue classifying frontend blockers without modifying Linux sources,
+   adding focused tests for every accepted compiler or architecture extension;
 3. model system-register accesses, privileged assembly boundaries, barriers,
    atomics, locks, address translation, and page ownership conservatively;
 4. add bounded scenarios for stage-2 map/unmap, vCPU/sysreg handling, MMIO,
@@ -353,9 +392,9 @@ for the first milestone.
 1. Keep the fork continuously buildable and the corpus runner reproducible.
    This is established for the current branch and remains a continuous gate.
 2. Import exact Kbuild commands and record a baseline failure taxonomy. This
-   is established for all four current corpus configurations.
+   is established for all five current corpus configurations.
 3. Fix the highest-frequency front-end blockers with regression tests. This
-   is complete for the current 51 translation-unit/architecture runs and
+   is complete for the current 63 translation-unit/architecture runs and
    continues as the corpus expands.
 4. Introduce kernel compiler-semantics and API models. Compiler builtin models
    are in place; object, ownership, concurrency, and architecture models are
@@ -363,6 +402,7 @@ for the first milestone.
 5. Implement and validate the `ERR_PTR` checker. The first rule and historical
    replay are complete, including a tracked bounded scenario over the complete
    Open vSwitch translation unit. General entry and kernel API modeling remain.
-6. Expand next into ARM64 KVM without relaxing the unmodified-source rule,
-   first measuring representative host and hypervisor C files and then adding
-   bounded bug scenarios. RISC-V and broader subsystem coverage follow.
+6. Expand ARM64 KVM without relaxing the unmodified-source rule. The first
+   12-file host/VGIC/nVHE corpus is established; shared VHE/nVHE source
+   variants, the remaining KVM files, and bounded bug scenarios follow before
+   RISC-V and broader subsystem coverage.

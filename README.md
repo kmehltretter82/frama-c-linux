@@ -48,10 +48,11 @@ model.
 See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
 scope, caveats, and next work.
 
-The next subsystem priority is **ARM64 KVM**. The current 21/21 ARM64 result is
-the prerequisite machine-model and frontend foundation; the next corpus will
-exercise real KVM host, stage-2 page-table, VGIC, and nVHE/pKVM C code, followed
-by architecture-boundary models and historical bug replays.
+The primary subsystem priority is **ARM64 KVM**. Its first exact-Kbuild corpus
+spans 12 host, VGIC, and nVHE translation units. A focused cast-decay fix moves
+that corpus from 3/12 to 12/12 typed. The next work expands KVM coverage and
+adds architecture-boundary models, bounded semantic scenarios, and historical
+bug replays.
 
 ## Linux kernel checks
 
