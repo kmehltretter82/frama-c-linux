@@ -37,7 +37,7 @@ import time
 from typing import Any
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 STAGES = (
     "typed",
     "database",
@@ -54,11 +54,30 @@ STAGES = (
 
 
 @dataclass(frozen=True)
+class CorpusTarget:
+    relative_path: str
+    variant: str | None = None
+    arguments_contain: tuple[str, ...] = ()
+    arguments_exclude: tuple[str, ...] = ()
+
+    @property
+    def label(self) -> str:
+        suffix = f"@{self.variant}" if self.variant else ""
+        return f"{self.relative_path}{suffix}"
+
+
+@dataclass(frozen=True)
 class Target:
     index: int
     relative_path: str
+    variant: str | None
     source: Path
     entry: dict[str, Any]
+
+    @property
+    def label(self) -> str:
+        suffix = f"@{self.variant}" if self.variant else ""
+        return f"{self.relative_path}{suffix}"
 
 
 def parse_args() -> argparse.Namespace:
@@ -88,14 +107,14 @@ def parse_args() -> argparse.Namespace:
         action="append",
         default=[],
         metavar="GLOB",
-        help="include matching relative paths; repeatable",
+        help="include matching relative paths or path@variant labels; repeatable",
     )
     parser.add_argument(
         "--exclude",
         action="append",
         default=[],
         metavar="GLOB",
-        help="exclude matching relative paths; repeatable",
+        help="exclude matching relative paths or path@variant labels; repeatable",
     )
     parser.add_argument("--limit", type=int, help="run at most this many selected files")
     parser.add_argument(
@@ -200,7 +219,66 @@ def validate_relative_path(value: str) -> str:
     return path.as_posix()
 
 
-def load_corpus(path: Path | None) -> tuple[dict[str, Any], list[str] | None]:
+def string_array_field(value: dict[str, Any], name: str) -> tuple[str, ...]:
+    items = value.get(name, [])
+    if not isinstance(items, list) or not all(
+        isinstance(item, str) and item for item in items
+    ):
+        raise ValueError(f"corpus target {name} must be an array of non-empty strings")
+    return tuple(items)
+
+
+def parse_corpus_target(value: Any) -> CorpusTarget:
+    if isinstance(value, str):
+        return CorpusTarget(validate_relative_path(value))
+    if not isinstance(value, dict):
+        raise ValueError("every corpus entry must be a string or target object")
+
+    allowed = {"path", "variant", "arguments_contain", "arguments_exclude"}
+    unknown = sorted(set(value) - allowed)
+    if unknown:
+        raise ValueError(f"unknown corpus target field(s): {', '.join(unknown)}")
+    path = value.get("path")
+    variant = value.get("variant")
+    if not isinstance(path, str):
+        raise ValueError("corpus target path must be a string")
+    if not isinstance(variant, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", variant):
+        raise ValueError(
+            "corpus target variant must use only letters, digits, '.', '_', or '-'"
+        )
+    contains = string_array_field(value, "arguments_contain")
+    excludes = string_array_field(value, "arguments_exclude")
+    if not contains and not excludes:
+        raise ValueError("a variant corpus target needs an argument selector")
+    overlap = sorted(set(contains) & set(excludes))
+    if overlap:
+        raise ValueError(
+            f"corpus target both requires and excludes argument(s): {', '.join(overlap)}"
+        )
+    return CorpusTarget(
+        validate_relative_path(path), variant, contains, excludes
+    )
+
+
+def validate_corpus_targets(values: list[Any]) -> list[CorpusTarget]:
+    targets = [parse_corpus_target(value) for value in values]
+    keys = [(target.relative_path, target.variant) for target in targets]
+    if len(keys) != len(set(keys)):
+        raise ValueError("corpus manifest contains duplicate path/variant targets")
+    variants_by_path: dict[str, list[str | None]] = defaultdict(list)
+    for target in targets:
+        variants_by_path[target.relative_path].append(target.variant)
+    for path, variants in variants_by_path.items():
+        if len(variants) > 1 and any(variant is None for variant in variants):
+            raise ValueError(
+                f"repeated corpus path '{path}' must use named variants for every target"
+            )
+    return targets
+
+
+def load_corpus(
+    path: Path | None,
+) -> tuple[dict[str, Any], list[CorpusTarget] | None]:
     if path is None:
         return {"name": "all-database-files-below-kernel-root"}, None
     if not path.is_file():
@@ -215,14 +293,10 @@ def load_corpus(path: Path | None) -> tuple[dict[str, Any], list[str] | None]:
         metadata = {"name": path.stem}
         with path.open(encoding="utf-8") as stream:
             files = [line.strip() for line in stream if line.strip() and not line.lstrip().startswith("#")]
-    if not all(isinstance(item, str) for item in files):
-        raise ValueError("every corpus entry must be a string")
-    normalized = [validate_relative_path(item) for item in files]
-    if len(normalized) != len(set(normalized)):
-        raise ValueError("corpus manifest contains duplicate paths")
+    targets = validate_corpus_targets(files)
     metadata["path"] = str(path.resolve())
     metadata["sha256"] = file_sha256(path)
-    return metadata, normalized
+    return metadata, targets
 
 
 def resolve_model_headers(
@@ -328,21 +402,28 @@ def command_version(executable: Path) -> str | None:
         return None
 
 
-def matches_filters(path: str, includes: list[str], excludes: list[str]) -> bool:
-    included = not includes or any(fnmatch.fnmatch(path, pattern) for pattern in includes)
-    excluded = any(fnmatch.fnmatch(path, pattern) for pattern in excludes)
+def matches_filters(
+    target: CorpusTarget, includes: list[str], excludes: list[str]
+) -> bool:
+    names = (target.relative_path, target.label)
+    included = not includes or any(
+        fnmatch.fnmatch(name, pattern) for pattern in includes for name in names
+    )
+    excluded = any(
+        fnmatch.fnmatch(name, pattern) for pattern in excludes for name in names
+    )
     return included and not excluded
 
 
-def select_paths(
+def select_targets(
     database: list[dict[str, Any]],
     database_dir: Path,
     kernel_root: Path,
-    manifest_paths: list[str] | None,
+    manifest_targets: list[CorpusTarget] | None,
     includes: list[str],
     excludes: list[str],
     limit: int | None,
-) -> tuple[list[str], dict[Path, list[dict[str, Any]]]]:
+) -> tuple[list[CorpusTarget], dict[Path, list[dict[str, Any]]]]:
     entries: dict[Path, list[dict[str, Any]]] = defaultdict(list)
     for entry in database:
         if not isinstance(entry, dict) or "file" not in entry:
@@ -350,21 +431,24 @@ def select_paths(
         source = resolve_database_source(entry, database_dir)
         entries[source].append(entry)
 
-    if manifest_paths is None:
-        paths = []
+    if manifest_targets is None:
+        targets = []
         for source in entries:
             try:
                 relative = source.relative_to(kernel_root).as_posix()
             except ValueError:
                 continue
-            paths.append(relative)
-        paths.sort()
+            targets.append(CorpusTarget(relative))
+        targets.sort(key=lambda target: target.relative_path)
     else:
-        paths = manifest_paths
-    paths = [path for path in paths if matches_filters(path, includes, excludes)]
+        targets = manifest_targets
+    targets = [
+        target for target in targets
+        if matches_filters(target, includes, excludes)
+    ]
     if limit is not None:
-        paths = paths[:limit]
-    return paths, entries
+        targets = targets[:limit]
+    return targets, entries
 
 
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
@@ -527,10 +611,43 @@ def compile_command(entry: dict[str, Any]) -> list[str] | str | None:
     return None
 
 
-def database_failure(index: int, path: str, source: Path, kind: str, detail: str) -> dict[str, Any]:
-    return {
+def compilation_arguments(entry: dict[str, Any]) -> list[str] | None:
+    arguments = entry.get("arguments")
+    if isinstance(arguments, list) and all(isinstance(item, str) for item in arguments):
+        return arguments
+    command = entry.get("command")
+    if isinstance(command, str):
+        try:
+            return shlex.split(command)
+        except ValueError:
+            return None
+    return None
+
+
+def entry_matches_target(entry: dict[str, Any], target: CorpusTarget) -> bool:
+    if not target.arguments_contain and not target.arguments_exclude:
+        return True
+    arguments = compilation_arguments(entry)
+    if arguments is None:
+        return False
+    argument_set = set(arguments)
+    return (
+        all(argument in argument_set for argument in target.arguments_contain)
+        and all(argument not in argument_set for argument in target.arguments_exclude)
+    )
+
+
+def database_failure(
+    index: int,
+    target: CorpusTarget,
+    source: Path,
+    kind: str,
+    detail: str,
+) -> dict[str, Any]:
+    result = {
         "index": index,
-        "file": path,
+        "target": target.label,
+        "file": target.relative_path,
         "source": str(source),
         "stage": "database",
         "failure_kind": kind,
@@ -549,6 +666,9 @@ def database_failure(index: int, path: str, source: Path, kind: str, detail: str
         "unknown_attributes": [],
         "metrics": {},
     }
+    if target.variant:
+        result["variant"] = target.variant
+    return result
 
 
 def terminate_process_group(process: subprocess.Popen[Any]) -> None:
@@ -574,7 +694,6 @@ def terminate_process_group(process: subprocess.Popen[Any]) -> None:
 def run_target(
     target: Target,
     executable: Path,
-    database: Path,
     machdep: str,
     extra_arguments: list[str],
     metrics: bool,
@@ -584,14 +703,20 @@ def run_target(
     output_parent: Path,
 ) -> dict[str, Any]:
     relative = PurePosixPath(target.relative_path)
-    log_path = log_root.joinpath(*relative.parts).with_name(relative.name + ".log")
+    artifact_name = relative.name + (f"@{target.variant}" if target.variant else "")
+    log_path = log_root.joinpath(*relative.parts).with_name(artifact_name + ".log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
+    target_database = (
+        log_root.joinpath(".compilation-databases", *relative.parts)
+        .with_name(artifact_name + ".json")
+    )
+    write_json(target_database, [target.entry])
     command = [
         str(executable),
         "-machdep",
         machdep,
         "-compilation-db",
-        str(database),
+        str(target_database),
     ]
     if metrics:
         command.append("-metrics")
@@ -625,10 +750,13 @@ def run_target(
     facts = output_facts(output)
     try:
         log_reference = os.path.relpath(log_path, output_parent)
+        database_reference = os.path.relpath(target_database, output_parent)
     except ValueError:
         log_reference = str(log_path)
+        database_reference = str(target_database)
     result = {
         "index": target.index,
+        "target": target.label,
         "file": target.relative_path,
         "source": str(target.source),
         "stage": stage,
@@ -640,18 +768,22 @@ def run_target(
         "frama_c_command": command,
         "compile_command": compile_command(target.entry),
         "compile_directory": target.entry.get("directory"),
+        "target_compilation_database": database_reference,
+        "target_compilation_database_sha256": file_sha256(target_database),
         "log": log_reference,
         **facts,
     }
+    if target.variant:
+        result["variant"] = target.variant
     return result
 
 
-def write_report(path: Path, report: dict[str, Any]) -> None:
+def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
         with temporary.open("w", encoding="utf-8") as stream:
-            json.dump(report, stream, indent=2, ensure_ascii=False)
+            json.dump(value, stream, indent=2, ensure_ascii=False)
             stream.write("\n")
         os.replace(temporary, path)
     finally:
@@ -659,6 +791,10 @@ def write_report(path: Path, report: dict[str, Any]) -> None:
             temporary.unlink()
         except FileNotFoundError:
             pass
+
+
+def write_report(path: Path, report: dict[str, Any]) -> None:
+    write_json(path, report)
 
 
 def summary_for(results: list[dict[str, Any]]) -> dict[str, Any]:
@@ -693,7 +829,7 @@ def main() -> int:
         if not isinstance(database, list):
             raise ValueError("compilation database root must be an array")
         manifest_path = args.corpus.resolve() if args.corpus else None
-        corpus, manifest_paths = load_corpus(manifest_path)
+        corpus, manifest_targets = load_corpus(manifest_path)
         executable = find_frama_c(args.frama_c)
         model_headers = resolve_model_headers(
             manifest_path,
@@ -716,11 +852,11 @@ def main() -> int:
                 f"corpus requires Linux {declared_commit}, but --kernel-root is "
                 f"{kernel['commit']}; use --allow-kernel-mismatch to override"
             )
-        selected, entries = select_paths(
+        selected, entries = select_targets(
             database,
             database_path.parent,
             kernel_root,
-            manifest_paths,
+            manifest_targets,
             args.include,
             args.exclude,
             args.limit,
@@ -739,38 +875,82 @@ def main() -> int:
     log_root.mkdir(parents=True, exist_ok=True)
     immediate: list[dict[str, Any]] = []
     targets: list[Target] = []
-    for index, relative_path in enumerate(selected):
+    for index, selected_target in enumerate(selected):
+        relative_path = selected_target.relative_path
         source = (kernel_root / PurePosixPath(relative_path)).resolve()
         if not source.is_relative_to(kernel_root):
             immediate.append(
-                database_failure(index, relative_path, source, "path-escape", "source escapes kernel root")
+                database_failure(
+                    index,
+                    selected_target,
+                    source,
+                    "path-escape",
+                    "source escapes kernel root",
+                )
             )
         elif not source.is_file():
             immediate.append(
-                database_failure(index, relative_path, source, "missing-source", "source file does not exist")
+                database_failure(
+                    index,
+                    selected_target,
+                    source,
+                    "missing-source",
+                    "source file does not exist",
+                )
             )
         elif source not in entries:
             immediate.append(
                 database_failure(
                     index,
-                    relative_path,
+                    selected_target,
                     source,
                     "missing-command",
                     "source has no compilation-database entry",
                 )
             )
-        elif len(entries[source]) != 1:
-            immediate.append(
-                database_failure(
-                    index,
-                    relative_path,
-                    source,
-                    "ambiguous-command",
-                    f"source has {len(entries[source])} compilation-database entries",
-                )
-            )
         else:
-            targets.append(Target(index, relative_path, source, entries[source][0]))
+            source_entries = entries[source]
+            matching_entries = [
+                entry for entry in source_entries
+                if entry_matches_target(entry, selected_target)
+            ]
+            if len(matching_entries) != 1:
+                has_selector = bool(
+                    selected_target.arguments_contain
+                    or selected_target.arguments_exclude
+                )
+                if has_selector:
+                    kind = (
+                        "missing-command-variant"
+                        if not matching_entries
+                        else "ambiguous-command-variant"
+                    )
+                    detail = (
+                        f"variant '{selected_target.variant}' matched "
+                        f"{len(matching_entries)} of {len(source_entries)} "
+                        "compilation-database entries"
+                    )
+                else:
+                    kind = "ambiguous-command"
+                    detail = (
+                        f"source has {len(source_entries)} "
+                        "compilation-database entries"
+                    )
+                immediate.append(
+                    database_failure(
+                        index, selected_target, source, kind, detail
+                    )
+                )
+            else:
+                targets.append(
+                    Target(
+                        index,
+                        relative_path,
+                        selected_target.variant,
+                        source,
+                        matching_entries[0],
+                    )
+                )
 
     completed_results: list[dict[str, Any]] = []
     with ThreadPoolExecutor(max_workers=args.jobs) as executor:
@@ -779,7 +959,6 @@ def main() -> int:
                 run_target,
                 target,
                 executable,
-                database_path,
                 args.machdep,
                 extra_arguments,
                 not args.no_metrics,
@@ -798,7 +977,7 @@ def main() -> int:
             if not args.quiet:
                 print(
                     f"[{finished}/{len(targets)}] {result['stage']:<15} "
-                    f"{result['duration_seconds']:>8.3f}s  {result['file']}",
+                    f"{result['duration_seconds']:>8.3f}s  {result['target']}",
                     flush=True,
                 )
 

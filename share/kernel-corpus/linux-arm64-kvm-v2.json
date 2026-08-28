@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "name": "linux-arm64-kvm-v2",
+  "description": "ARM64 KVM host, VGIC, nVHE, and shared VHE/nVHE C corpus",
+  "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+  "architecture": "arm64",
+  "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "kbuild": {
+    "base_configuration": "defconfig"
+  },
+  "model_headers": [
+    "../kernel-models/compiler_builtins.h"
+  ],
+  "files": [
+    "arch/arm64/kvm/handle_exit.c",
+    "arch/arm64/kvm/hyp/nvhe/hyp-main.c",
+    "arch/arm64/kvm/hyp/nvhe/mem_protect.c",
+    "arch/arm64/kvm/hyp/nvhe/page_alloc.c",
+    "arch/arm64/kvm/hyp/nvhe/sys_regs.c",
+    "arch/arm64/kvm/hyp/nvhe/tlb.c",
+    {
+      "path": "arch/arm64/kvm/hyp/aarch32.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/aarch32.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/exception.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/exception.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/pgtable.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/pgtable.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v3-sr.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v3-sr.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v5-sr.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v5-sr.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    "arch/arm64/kvm/hypercalls.c",
+    "arch/arm64/kvm/inject_fault.c",
+    "arch/arm64/kvm/mmio.c",
+    "arch/arm64/kvm/mmu.c",
+    "arch/arm64/kvm/sys_regs.c",
+    "arch/arm64/kvm/vgic/vgic-mmio.c"
+  ]
+}
