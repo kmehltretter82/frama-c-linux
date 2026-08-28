@@ -5099,13 +5099,19 @@ let included_qualifiers ?(context=Identical) a1 a2 =
   let a2 = drop "restrict" a2 in
   let a1_no_cv = drop_list ["const"; "volatile"] a1 in
   let a2_no_cv = drop_list ["const"; "volatile"] a2 in
+  let cv_subset left right =
+    (not (contains "const" left) || contains "const" right) &&
+    (not (contains "volatile" left) || contains "volatile" right)
+  in
   let is_equal = Cil_datatype.Attributes.equal a1 a2 in
   if is_equal then true
   else begin
     match context with
     | Identical -> false
-    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
-    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
+    | Covariant ->
+      Cil_datatype.Attributes.equal a1_no_cv a2_no_cv && cv_subset a2 a1
+    | Contravariant ->
+      Cil_datatype.Attributes.equal a1_no_cv a2_no_cv && cv_subset a1 a2
     | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
   end
 
