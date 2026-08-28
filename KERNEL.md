@@ -85,8 +85,13 @@ target selected by exact argument presence or absence and run with a generated
 one-entry compilation database. The result is 24 target analyses over 18
 distinct source files, including six VHE/nVHE pairs.
 
+The `linux-arm64-kvm-v3` corpus is the complete C command inventory from that
+successful pinned build: 75 exact command contexts across 69 distinct source
+files. It contains 63 single-command sources and both VHE/nVHE commands for
+each of the six shared hyp sources.
+
 On 2026-08-28, all 30 `x86_64` translation units, all 21 common ARM64 target
-runs, and all 24 ARM64 KVM v2 target analyses reached a typed AST from
+runs, and all 75 ARM64 KVM v3 target analyses reached a typed AST from
 unmodified kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
@@ -108,6 +113,8 @@ unmodified kernel sources and headers:
 | `2c09fd7398d5330ada443e5404b930ede775b45a` | ARM64 KVM | 3/12 | 9 cast/array-decay typing failures |
 | `dd370b2d31d4bf3a0d20fe598c58a330ba93c71e` | ARM64 KVM | 12/12 | none |
 | `02ef22ad912611e00557bf211590ad8a9c53e2ff` | ARM64 KVM v2 command contexts | 24/24 | none |
+| `32c2ab90e61337deeabeca168b70ae62f7fb7d06` | ARM64 KVM unique-command expansion | 61/63 | counted-by builtin and local stdarg macro names |
+| `74da75a021c6f4477209dcc83861ca3028978eb7` | complete ARM64 KVM command inventory | 75/75 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -183,6 +190,23 @@ calls, and 4,895 pointer dereferences across 24 ASTs. It emits 2,004 classified
 warnings and no undeclared builtins. Counts intentionally include both build
 contexts and repeated inline/header definitions.
 
+Revision `74da75a021` closes the two blockers found when expanding beyond v2.
+GCC 15 exposes `__builtin_counted_by_ref`; because Frama-C does not yet retain
+the associated `__counted_by__` field metadata, the kernel model gives it the
+documented unannotated `void *` fallback and explicitly does not claim the
+counter-field update. Separately, the frontend now permits ordinary in-scope
+objects named `va_start`, `va_end`, `va_arg`, or `va_copy`: a function-like
+macro only expands when followed by `(`. Existing diagnostics for unresolved
+macro names and actual functions such as `setjmp` remain enforced. These fixes
+move the two failing unique-command files, `arm.c` and `nested.c`, to typed.
+
+The resulting v3 gate is 75/75. Across its separate ASTs, Metrics reports 5,938
+defined functions, 94,317 source lines, 14,942 calls, and 15,000 pointer
+dereferences. It emits 6,226 classified warnings and no undeclared builtins.
+Those totals include both VHE/nVHE contexts and repeated inline/header
+definitions. This completes frontend coverage of the pinned ARM64 KVM C build;
+it does not prove KVM behavior or constitute a new Linux bug finding.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
 the DWC3, Open vSwitch, and ARM64 databases were generated directly in
@@ -197,7 +221,9 @@ and ARM64 frontend evidence in
 with ARM64 KVM evidence in
 [`linux-arm64-kvm-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-v1.status.json)
 and
-[`linux-arm64-kvm-v2.status.json`](share/kernel-corpus/linux-arm64-kvm-v2.status.json).
+[`linux-arm64-kvm-v2.status.json`](share/kernel-corpus/linux-arm64-kvm-v2.status.json),
+with complete command-inventory evidence in
+[`linux-arm64-kvm-v3.status.json`](share/kernel-corpus/linux-arm64-kvm-v3.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -218,8 +244,8 @@ model headers; pass `--no-manifest-models` for a controlled unmodeled
 comparison.
 
 For ARM64, add `--machdep gcc_arm64`. Use `linux-arm64-v1.json` with a
-`tinyconfig` compilation database, or `linux-arm64-kvm-v2.json` with a
-`defconfig` build whose KVM directory has been compiled. The v2 manifest uses
+`tinyconfig` compilation database, or `linux-arm64-kvm-v3.json` with a
+`defconfig` build whose KVM directory has been compiled. The KVM manifests use
 `path`, `variant`, `arguments_contain`, and `arguments_exclude` target objects
 for shared sources; legacy string path entries remain supported. Include and
 exclude globs may match either a path or its `path@variant` label. The compiler
@@ -267,13 +293,13 @@ The 21/21 ARM64 library corpus validates the GCC AArch64 machine model and
 common C frontend paths. The KVM-specific layer now moves
 `linux-arm64-kvm-v1` from 3/12 to 12/12 typed, then reaches 24/24 target
 analyses in v2 by adding both exact commands for all six shared VHE/nVHE
-sources. ARM64 KVM work continues in measured layers:
+sources. Version 3 reaches 75/75 for the complete C command inventory from the
+pinned KVM build. ARM64 KVM work now continues in semantic layers:
 
-1. expand the exact-Kbuild corpus across the remaining host, VHE, nVHE, VGIC,
-   stage-2 page-table, and pKVM C code, retaining every relevant command
-   context for shared sources;
-2. continue classifying frontend blockers without modifying Linux sources,
-   adding focused tests for every accepted compiler or architecture extension;
+1. keep the complete exact-Kbuild corpus as a gate and add every command
+   context introduced by later Kbuild configurations or kernel revisions;
+2. classify and reduce warnings that obscure or weaken semantic analysis,
+   without modifying Linux sources or silently dropping unsupported effects;
 3. model system-register accesses, privileged assembly boundaries, barriers,
    atomics, locks, address translation, and page ownership conservatively;
 4. add bounded scenarios for stage-2 map/unmap, vCPU/sysreg handling, MMIO,
@@ -416,9 +442,9 @@ for the first milestone.
 1. Keep the fork continuously buildable and the corpus runner reproducible.
    This is established for the current branch and remains a continuous gate.
 2. Import exact Kbuild commands and record a baseline failure taxonomy. This
-   is established for all six current versioned corpus measurements.
+   is established for all seven current versioned corpus measurements.
 3. Fix the highest-frequency front-end blockers with regression tests. This
-   is complete for the current 75 translation-unit/target-context runs and
+   is complete for the current 126 translation-unit/target-context runs and
    continues as the corpus expands.
 4. Introduce kernel compiler-semantics and API models. Compiler builtin models
    are in place; object, ownership, concurrency, and architecture models are
@@ -427,6 +453,7 @@ for the first milestone.
    replay are complete, including a tracked bounded scenario over the complete
    Open vSwitch translation unit. General entry and kernel API modeling remain.
 6. Expand ARM64 KVM without relaxing the unmodified-source rule. The first
-   12-file host/VGIC/nVHE corpus and all six shared VHE/nVHE source pairs are
-   established; the remaining KVM files and bounded bug scenarios follow
-   before RISC-V and broader subsystem coverage.
+   host/VGIC/nVHE corpus, all shared VHE/nVHE pairs, and the complete 75-command
+   pinned C inventory are established. Conservative architecture models,
+   bounded bug scenarios, and historical KVM replays now precede RISC-V and
+   broader subsystem coverage.

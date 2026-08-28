@@ -1,0 +1,140 @@
+{
+  "schema_version": 3,
+  "corpus": "linux-arm64-kvm-v3",
+  "corpus_manifest_sha256": "f8207d1d3d3a7a82ece14ca1c13b25a51ab6a21d350796a7f8c52bfdb6ee7e49",
+  "compilation_database_sha256": "6925df5ab698e81c7f239814703010a3cded0974de27062607444cf0a73b5178",
+  "kbuild_config_sha256": "285cb70eeea5fee24448140d3f55d76dcf4fc11b02483a7789ae345766ac033f",
+  "machdep_sha256": "09a78511fa16e34f8098ae072eab842e7f76588d201e77d9d17ac1a2471e1bcc",
+  "raw_result_sha256": "2c8953b6d382d683a774e702272389d45dbf5a035c0b96b18156e0178154d177",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+    "linux_tree_dirty": false,
+    "architecture": "arm64",
+    "kbuild_configuration": "defconfig",
+    "kbuild_facts": {
+      "CONFIG_VIRTUALIZATION": "y",
+      "CONFIG_KVM": "y",
+      "CONFIG_KVM_COMMON": "y",
+      "CONFIG_ARM64_PTR_AUTH": "y",
+      "CONFIG_HW_PERF_EVENTS": "y",
+      "CONFIG_NVHE_EL2_DEBUG": "n"
+    },
+    "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "report_schema_version": 3,
+    "target_analyses": 75,
+    "distinct_c_sources": 69,
+    "kvm_command_inventory": {
+      "commands": 75,
+      "distinct_c_sources": 69,
+      "sources_with_one_command": 63,
+      "shared_sources_with_vhe_and_nvhe_commands": 6,
+      "vhe_variant_targets": 6,
+      "nvhe_variant_targets": 6,
+      "corpus_policy": "v3 contains every ARM64 KVM C command context in the pinned successful Kbuild database"
+    },
+    "target_databases": {
+      "one_entry_databases": 75,
+      "unique_one_entry_database_hashes": 75,
+      "all_vhe_nvhe_pairs_have_distinct_hashes": true
+    },
+    "model_headers": [
+      {
+        "path": "kernel-models/compiler_builtins.h",
+        "sha256": "1cb7521dfa6d8ddf136e04a79af545c69490644d1d79056cf4a8b66803db3d00"
+      }
+    ],
+    "source_policy": "Kernel source and headers are unmodified; the compilation database contains exact commands from a successful out-of-tree ARM64 defconfig KVM build."
+  },
+  "measurements": [
+    {
+      "name": "unique-command-expansion-baseline",
+      "frontend_revision": "32c2ab90e61337deeabeca168b70ae62f7fb7d06",
+      "raw_result_sha256": "6b563dc800303d6e4006af84639a4357624626606dc484eab3187ef8deb11af8",
+      "attempted_source_paths": 69,
+      "typed_unique_commands": 61,
+      "unique_commands": 63,
+      "expected_ambiguous_shared_paths": 6,
+      "typing_failures": 2,
+      "first_blockers": {
+        "arch/arm64/kvm/arm.c": "GCC 15 __builtin_counted_by_ref was undeclared and therefore typed as int, making Linux's selected _Generic result non-pointer.",
+        "arch/arm64/kvm/nested.c": "Ordinary local objects named va_start and va_end were incorrectly diagnosed as suppressed standard function-like macros."
+      },
+      "complete_context_interpretation": "The already-published v2 run typed all 12 shared-source variants, so the combined inventory stood at 73 of 75 command contexts before these two fixes."
+    },
+    {
+      "name": "complete-arm64-kvm-command-inventory",
+      "frontend_revision": "74da75a021c6f4477209dcc83861ca3028978eb7",
+      "attempted": 75,
+      "typed": 75,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 75
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 75,
+      "total_process_seconds": 2793.778,
+      "warning_count": 6226,
+      "warnings_by_key": {
+        "kernel": 76,
+        "kernel:CERT:EXP:46": 8,
+        "kernel:CERT:MSC:37": 910,
+        "kernel:asm:clobber": 704,
+        "kernel:attrs:unknown": 604,
+        "kernel:libc:frama-c": 150,
+        "kernel:typing:flexible-array-extension": 750,
+        "kernel:typing:implicit-conv-void-ptr": 2572,
+        "kernel:typing:incompatible-types-call": 452
+      },
+      "undeclared_builtins": [],
+      "unknown_attributes": [
+        "__alloc_size__",
+        "__assume_aligned__",
+        "__counted_by__",
+        "__designated_init__",
+        "__error__",
+        "__externally_visible__",
+        "__gnu_inline__",
+        "__no_profile_instrument_function__",
+        "__no_sanitize_address__",
+        "__transparent_union__"
+      ],
+      "aggregate_metrics": {
+        "defined_functions": 5938,
+        "sloc": 94317,
+        "decision_points": 15230,
+        "loops": 423,
+        "function_calls": 14942,
+        "pointer_dereferences": 15000,
+        "cyclomatic_complexity": 21168
+      }
+    }
+  ],
+  "compatibility_changes": [
+    "Permit ordinary in-scope objects to use standard function-like macro names, while preserving CERT MSC38-C diagnostics for unresolved names and actual functions such as setjmp.",
+    "Model __builtin_counted_by_ref as its void-pointer fallback because Frama-C does not yet retain GCC __counted_by__ associations.",
+    "Add focused regressions for local va_start, va_end, va_arg, and va_copy objects and for Linux's _Generic counted-by fallback."
+  ],
+  "model_limitations": [
+    "The counted-by fallback deliberately does not model the counter-field update performed for a GCC-recognized __counted_by__ association.",
+    "Unknown architecture attributes and inline assembly effects remain classified but are not yet precise KVM verification semantics."
+  ],
+  "validation": {
+    "arm64_kvm_kbuild": "passed",
+    "install_build": "passed with dune -j 1",
+    "focused_real_kvm_blockers": "passed for arm.c and nested.c",
+    "syntax_suite": "passed, including existing CERT MSC38-C controls",
+    "libc_suite": "passed",
+    "corpus_require_all_typed": "passed for 75 of 75 target analyses"
+  },
+  "next_semantic_targets": [
+    "conservative system-register and privileged assembly boundaries",
+    "stage-2 page-table map, unmap, and invalidation scenarios",
+    "nVHE and protected-KVM page ownership transitions",
+    "historical ARM64 KVM bug-fix replays followed by fresh candidate analysis"
+  ],
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for every ARM64 KVM C command context in this pinned build. It is not a proof of KVM correctness, complete EL2 behavior, the Arm memory model, or precise semantics for AArch64 inline assembly. No new Linux bug is claimed by this frontend milestone. Aggregate AST metrics count repeated inline and header definitions once per target analysis."
+}

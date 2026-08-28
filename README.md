@@ -53,9 +53,13 @@ spans 12 host, VGIC, and nVHE translation units. A focused cast-decay fix moves
 that corpus from 3/12 to 12/12 typed. The v2 corpus adds all six hyp sources
 that Kbuild compiles in both VHE and nVHE contexts. The runner selects each
 exact command and isolates it in a one-entry compilation database; all 24
-target analyses across 18 distinct source files reach a typed AST. The next
-work expands across the remaining KVM files and adds architecture-boundary
-models, bounded semantic scenarios, and historical bug replays.
+target analyses across 18 distinct source files reach a typed AST. The v3
+corpus expands this to the complete pinned Kbuild inventory: 75/75 command
+contexts across all 69 ARM64 KVM C files type from unmodified sources. Two
+focused fixes add GCC 15 counted-by fallback typing and permit ordinary local
+objects named like standard function-like macros. This is a frontend milestone,
+not a new Linux bug finding. The next work adds architecture-boundary models,
+bounded semantic scenarios, and historical KVM bug replays.
 
 ## Linux kernel checks
 

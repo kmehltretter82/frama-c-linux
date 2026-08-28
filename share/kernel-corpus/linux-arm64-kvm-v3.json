@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "name": "linux-arm64-kvm-v3",
+  "description": "Complete ARM64 KVM C command-context corpus from a defconfig Kbuild",
+  "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+  "architecture": "arm64",
+  "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "kbuild": {
+    "base_configuration": "defconfig"
+  },
+  "model_headers": [
+    "../kernel-models/compiler_builtins.h"
+  ],
+  "files": [
+    "arch/arm64/kvm/arch_timer.c",
+    "arch/arm64/kvm/arm.c",
+    "arch/arm64/kvm/at.c",
+    "arch/arm64/kvm/config.c",
+    "arch/arm64/kvm/debug.c",
+    "arch/arm64/kvm/emulate-nested.c",
+    "arch/arm64/kvm/fpsimd.c",
+    "arch/arm64/kvm/guest.c",
+    "arch/arm64/kvm/handle_exit.c",
+    {
+      "path": "arch/arm64/kvm/hyp/aarch32.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/aarch32.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/exception.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/exception.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    "arch/arm64/kvm/hyp/nvhe/debug-sr.c",
+    "arch/arm64/kvm/hyp/nvhe/early_alloc.c",
+    "arch/arm64/kvm/hyp/nvhe/ffa.c",
+    "arch/arm64/kvm/hyp/nvhe/hyp-main.c",
+    "arch/arm64/kvm/hyp/nvhe/hyp-smp.c",
+    "arch/arm64/kvm/hyp/nvhe/mem_protect.c",
+    "arch/arm64/kvm/hyp/nvhe/mm.c",
+    "arch/arm64/kvm/hyp/nvhe/page_alloc.c",
+    "arch/arm64/kvm/hyp/nvhe/pkvm.c",
+    "arch/arm64/kvm/hyp/nvhe/psci-relay.c",
+    "arch/arm64/kvm/hyp/nvhe/setup.c",
+    "arch/arm64/kvm/hyp/nvhe/stacktrace.c",
+    "arch/arm64/kvm/hyp/nvhe/switch.c",
+    "arch/arm64/kvm/hyp/nvhe/sys_regs.c",
+    "arch/arm64/kvm/hyp/nvhe/sysreg-sr.c",
+    "arch/arm64/kvm/hyp/nvhe/timer-sr.c",
+    "arch/arm64/kvm/hyp/nvhe/tlb.c",
+    {
+      "path": "arch/arm64/kvm/hyp/pgtable.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/pgtable.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v3-sr.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v3-sr.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v5-sr.c",
+      "variant": "vhe",
+      "arguments_exclude": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    {
+      "path": "arch/arm64/kvm/hyp/vgic-v5-sr.c",
+      "variant": "nvhe",
+      "arguments_contain": ["-D__KVM_NVHE_HYPERVISOR__"]
+    },
+    "arch/arm64/kvm/hyp/vhe/debug-sr.c",
+    "arch/arm64/kvm/hyp/vhe/switch.c",
+    "arch/arm64/kvm/hyp/vhe/sysreg-sr.c",
+    "arch/arm64/kvm/hyp/vhe/timer-sr.c",
+    "arch/arm64/kvm/hyp/vhe/tlb.c",
+    "arch/arm64/kvm/hypercalls.c",
+    "arch/arm64/kvm/inject_fault.c",
+    "arch/arm64/kvm/mmio.c",
+    "arch/arm64/kvm/mmu.c",
+    "arch/arm64/kvm/nested.c",
+    "arch/arm64/kvm/pauth.c",
+    "arch/arm64/kvm/pkvm.c",
+    "arch/arm64/kvm/pmu-emul.c",
+    "arch/arm64/kvm/pmu.c",
+    "arch/arm64/kvm/psci.c",
+    "arch/arm64/kvm/pvtime.c",
+    "arch/arm64/kvm/reset.c",
+    "arch/arm64/kvm/stacktrace.c",
+    "arch/arm64/kvm/sys_regs.c",
+    "arch/arm64/kvm/trng.c",
+    "arch/arm64/kvm/va_layout.c",
+    "arch/arm64/kvm/vgic-sys-reg-v3.c",
+    "arch/arm64/kvm/vgic/vgic-debug.c",
+    "arch/arm64/kvm/vgic/vgic-init.c",
+    "arch/arm64/kvm/vgic/vgic-irqfd.c",
+    "arch/arm64/kvm/vgic/vgic-its.c",
+    "arch/arm64/kvm/vgic/vgic-kvm-device.c",
+    "arch/arm64/kvm/vgic/vgic-mmio-v2.c",
+    "arch/arm64/kvm/vgic/vgic-mmio-v3.c",
+    "arch/arm64/kvm/vgic/vgic-mmio.c",
+    "arch/arm64/kvm/vgic/vgic-v2.c",
+    "arch/arm64/kvm/vgic/vgic-v3-nested.c",
+    "arch/arm64/kvm/vgic/vgic-v3.c",
+    "arch/arm64/kvm/vgic/vgic-v4.c",
+    "arch/arm64/kvm/vgic/vgic-v5.c",
+    "arch/arm64/kvm/vgic/vgic.c",
+    "arch/arm64/kvm/vmid.c"
+  ]
+}
