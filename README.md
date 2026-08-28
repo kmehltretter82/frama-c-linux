@@ -50,9 +50,12 @@ scope, caveats, and next work.
 
 The primary subsystem priority is **ARM64 KVM**. Its first exact-Kbuild corpus
 spans 12 host, VGIC, and nVHE translation units. A focused cast-decay fix moves
-that corpus from 3/12 to 12/12 typed. The next work expands KVM coverage and
-adds architecture-boundary models, bounded semantic scenarios, and historical
-bug replays.
+that corpus from 3/12 to 12/12 typed. The v2 corpus adds all six hyp sources
+that Kbuild compiles in both VHE and nVHE contexts. The runner selects each
+exact command and isolates it in a one-entry compilation database; all 24
+target analyses across 18 distinct source files reach a typed AST. The next
+work expands across the remaining KVM files and adds architecture-boundary
+models, bounded semantic scenarios, and historical bug replays.
 
 ## Linux kernel checks
 

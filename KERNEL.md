@@ -79,8 +79,14 @@ commands. It covers exit handling, hypercalls, fault injection, MMIO, host MMU
 and sysreg code, VGIC MMIO, and nVHE hypercall, memory-protection, page
 allocation, sysreg, and TLB code.
 
+The `linux-arm64-kvm-v2` corpus retains those 12 targets and adds all six hyp
+sources that have distinct VHE and nVHE commands. Each mode is an independent
+target selected by exact argument presence or absence and run with a generated
+one-entry compilation database. The result is 24 target analyses over 18
+distinct source files, including six VHE/nVHE pairs.
+
 On 2026-08-28, all 30 `x86_64` translation units, all 21 common ARM64 target
-runs, and all 12 ARM64 KVM translation units reached a typed AST from
+runs, and all 24 ARM64 KVM v2 target analyses reached a typed AST from
 unmodified kernel sources and headers:
 
 | Front-end revision | Corpus | Typed | First blocking failure |
@@ -101,6 +107,7 @@ unmodified kernel sources and headers:
 | `beea50c48973af68920d96ad225483a2fd26d26c` | ARM64 library | 21/21 | none |
 | `2c09fd7398d5330ada443e5404b930ede775b45a` | ARM64 KVM | 3/12 | 9 cast/array-decay typing failures |
 | `dd370b2d31d4bf3a0d20fe598c58a330ba93c71e` | ARM64 KVM | 12/12 | none |
+| `02ef22ad912611e00557bf211590ad8a9c53e2ff` | ARM64 KVM v2 command contexts | 24/24 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
@@ -165,6 +172,17 @@ The final KVM run aggregates 1,423 defined functions, 20,367 source lines,
 emits 1,036 classified warnings and no undeclared builtins. These aggregate
 counts include repeated inline/header definitions in each translation unit.
 
+Revision `02ef22ad91` removes the compilation-database ambiguity for shared
+KVM sources. Versioned manifests can name a target such as `pgtable.c@vhe` or
+`pgtable.c@nvhe` and select its exact command by argument presence or absence.
+Frama-C receives a generated one-entry database for every target, so it cannot
+silently choose the other command for the same pathname. Missing and broad
+selectors are rejected as distinct machine-readable failures. The v2 run is
+24/24 typed and aggregates 2,034 defined functions, 30,003 source lines, 4,796
+calls, and 4,895 pointer dereferences across 24 ASTs. It emits 2,004 classified
+warnings and no undeclared builtins. Counts intentionally include both build
+contexts and repeated inline/header definitions.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
 the DWC3, Open vSwitch, and ARM64 databases were generated directly in
@@ -177,7 +195,9 @@ with frontend and checker evidence for Open vSwitch in
 and ARM64 frontend evidence in
 [`linux-arm64-v1.status.json`](share/kernel-corpus/linux-arm64-v1.status.json),
 with ARM64 KVM evidence in
-[`linux-arm64-kvm-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-v1.status.json).
+[`linux-arm64-kvm-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-v1.status.json)
+and
+[`linux-arm64-kvm-v2.status.json`](share/kernel-corpus/linux-arm64-kvm-v2.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -198,8 +218,11 @@ model headers; pass `--no-manifest-models` for a controlled unmodeled
 comparison.
 
 For ARM64, add `--machdep gcc_arm64`. Use `linux-arm64-v1.json` with a
-`tinyconfig` compilation database, or `linux-arm64-kvm-v1.json` with a
-`defconfig` build whose KVM directory has been compiled. The compiler
+`tinyconfig` compilation database, or `linux-arm64-kvm-v2.json` with a
+`defconfig` build whose KVM directory has been compiled. The v2 manifest uses
+`path`, `variant`, `arguments_contain`, and `arguments_exclude` target objects
+for shared sources; legacy string path entries remain supported. Include and
+exclude globs may match either a path or its `path@variant` label. The compiler
 executable recorded in the machdep is generation and round-trip metadata;
 target preprocessing flags still come from the selected
 compilation-database entry.
@@ -241,13 +264,14 @@ translation and memory ownership. This makes it a useful test of whether the
 fork can progress from portable kernel C to architecture-specific bug finding.
 
 The 21/21 ARM64 library corpus validates the GCC AArch64 machine model and
-common C frontend paths. The first KVM-specific layer is now established:
-`linux-arm64-kvm-v1` moves from 3/12 to 12/12 typed using exact commands from a
-successful KVM-enabled build. ARM64 KVM work continues in measured layers:
+common C frontend paths. The KVM-specific layer now moves
+`linux-arm64-kvm-v1` from 3/12 to 12/12 typed, then reaches 24/24 target
+analyses in v2 by adding both exact commands for all six shared VHE/nVHE
+sources. ARM64 KVM work continues in measured layers:
 
 1. expand the exact-Kbuild corpus across the remaining host, VHE, nVHE, VGIC,
-   stage-2 page-table, and pKVM C code, including command variants for shared
-   sources;
+   stage-2 page-table, and pKVM C code, retaining every relevant command
+   context for shared sources;
 2. continue classifying frontend blockers without modifying Linux sources,
    adding focused tests for every accepted compiler or architecture extension;
 3. model system-register accesses, privileged assembly boundaries, barriers,
@@ -392,9 +416,9 @@ for the first milestone.
 1. Keep the fork continuously buildable and the corpus runner reproducible.
    This is established for the current branch and remains a continuous gate.
 2. Import exact Kbuild commands and record a baseline failure taxonomy. This
-   is established for all five current corpus configurations.
+   is established for all six current versioned corpus measurements.
 3. Fix the highest-frequency front-end blockers with regression tests. This
-   is complete for the current 63 translation-unit/architecture runs and
+   is complete for the current 75 translation-unit/target-context runs and
    continues as the corpus expands.
 4. Introduce kernel compiler-semantics and API models. Compiler builtin models
    are in place; object, ownership, concurrency, and architecture models are
@@ -403,6 +427,6 @@ for the first milestone.
    replay are complete, including a tracked bounded scenario over the complete
    Open vSwitch translation unit. General entry and kernel API modeling remain.
 6. Expand ARM64 KVM without relaxing the unmodified-source rule. The first
-   12-file host/VGIC/nVHE corpus is established; shared VHE/nVHE source
-   variants, the remaining KVM files, and bounded bug scenarios follow before
-   RISC-V and broader subsystem coverage.
+   12-file host/VGIC/nVHE corpus and all six shared VHE/nVHE source pairs are
+   established; the remaining KVM files and bounded bug scenarios follow
+   before RISC-V and broader subsystem coverage.

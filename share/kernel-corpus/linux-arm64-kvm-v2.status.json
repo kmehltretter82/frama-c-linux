@@ -1,0 +1,122 @@
+{
+  "schema_version": 3,
+  "corpus": "linux-arm64-kvm-v2",
+  "corpus_manifest_sha256": "aef75c25daaddad2da49c2b2c8d53d07a2c5294a80affa04fb473969ee220250",
+  "compilation_database_sha256": "6925df5ab698e81c7f239814703010a3cded0974de27062607444cf0a73b5178",
+  "kbuild_config_sha256": "285cb70eeea5fee24448140d3f55d76dcf4fc11b02483a7789ae345766ac033f",
+  "machdep_sha256": "09a78511fa16e34f8098ae072eab842e7f76588d201e77d9d17ac1a2471e1bcc",
+  "raw_result_sha256": "562872ad0d91656dc3ff4ab740b05f3ce97683ae599953c555581a03df3a8663",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+    "linux_tree_dirty": false,
+    "architecture": "arm64",
+    "kbuild_configuration": "defconfig",
+    "kbuild_facts": {
+      "CONFIG_VIRTUALIZATION": "y",
+      "CONFIG_KVM": "y",
+      "CONFIG_KVM_COMMON": "y",
+      "CONFIG_ARM64_PTR_AUTH": "y",
+      "CONFIG_HW_PERF_EVENTS": "y",
+      "CONFIG_NVHE_EL2_DEBUG": "n"
+    },
+    "compiler": "aarch64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "report_schema_version": 3,
+    "target_analyses": 24,
+    "distinct_c_sources": 18,
+    "shared_source_variants": {
+      "sources": 6,
+      "vhe_targets": 6,
+      "nvhe_targets": 6,
+      "selection": "Exact argument presence or absence selects one of the source's Kbuild commands. Each analysis receives a generated one-entry compilation database.",
+      "one_entry_databases": 24,
+      "unique_one_entry_database_hashes": 24,
+      "all_vhe_nvhe_pairs_have_distinct_hashes": true
+    },
+    "kvm_command_inventory": {
+      "distinct_c_sources": 69,
+      "sources_with_one_command": 63,
+      "shared_sources_with_vhe_and_nvhe_commands": 6,
+      "corpus_policy": "v2 retains the v1 unique-command set and adds both exact command variants for all six shared hyp sources"
+    },
+    "model_headers": [
+      {
+        "path": "kernel-models/compiler_builtins.h",
+        "sha256": "cf814012207de9020475e3f4dfd5c55d0f6e5679a8e0615ed1bc125b990295ec"
+      }
+    ],
+    "source_policy": "Kernel source and headers are unmodified; the compilation database contains exact commands from a successful out-of-tree ARM64 defconfig KVM build."
+  },
+  "measurement": {
+    "name": "exact-vhe-nvhe-command-variants",
+    "frontend_revision": "02ef22ad912611e00557bf211590ad8a9c53e2ff",
+    "attempted": 24,
+    "typed": 24,
+    "success_rate": 1.0,
+    "by_stage": {
+      "typed": 24
+    },
+    "failures_by_kind": {},
+    "all_exit_zero": true,
+    "metrics_collected": 24,
+    "total_process_seconds": 822.517,
+    "warning_count": 2004,
+    "warnings_by_key": {
+      "kernel": 24,
+      "kernel:CERT:EXP:46": 4,
+      "kernel:CERT:MSC:37": 291,
+      "kernel:asm:clobber": 227,
+      "kernel:attrs:unknown": 192,
+      "kernel:libc:frama-c": 48,
+      "kernel:typing:flexible-array-extension": 240,
+      "kernel:typing:implicit-conv-void-ptr": 832,
+      "kernel:typing:incompatible-types-call": 146
+    },
+    "undeclared_builtins": [],
+    "unknown_attributes": [
+      "__alloc_size__",
+      "__assume_aligned__",
+      "__counted_by__",
+      "__designated_init__",
+      "__error__",
+      "__externally_visible__",
+      "__gnu_inline__",
+      "__transparent_union__"
+    ],
+    "aggregate_metrics": {
+      "defined_functions": 2034,
+      "sloc": 30003,
+      "decision_points": 5077,
+      "loops": 125,
+      "function_calls": 4796,
+      "pointer_dereferences": 4895,
+      "cyclomatic_complexity": 7111
+    }
+  },
+  "compatibility_changes": [
+    "Allow versioned corpus manifests to name target variants and select compilation-database entries by exact argument presence and absence.",
+    "Run every target against a generated one-entry compilation database so duplicate source paths cannot make Frama-C choose a different command.",
+    "Use path@variant labels for filtering, progress, logs, and report records while keeping legacy string-only manifests compatible.",
+    "Reject missing, overly broad, and selector-free duplicate commands with distinct machine-readable database failures."
+  ],
+  "validation": {
+    "arm64_kvm_kbuild": "passed",
+    "install_build": "passed with dune -j 1",
+    "kernel_corpus_suite": "passed, including selected, missing, ambiguous, and selector-free duplicate command cases",
+    "corpus_require_all_typed": "passed for 24 of 24 target analyses"
+  },
+  "next_frontend_targets": [
+    "expand across the remaining unique ARM64 KVM C sources",
+    "classify and reduce the remaining warning inventory",
+    "retain both command contexts whenever another source is built in multiple KVM modes"
+  ],
+  "next_semantic_targets": [
+    "system-register and privileged assembly boundaries",
+    "stage-2 page-table map, unmap, and invalidation scenarios",
+    "nVHE and protected-KVM page ownership transitions",
+    "historical ARM64 KVM bug-fix replays"
+  ],
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed for every selected Kbuild command context. It is not a proof of KVM correctness, complete EL2 behavior, the Arm memory model, or precise semantics for AArch64 inline assembly. Aggregate AST metrics count repeated inline and header definitions once per target analysis."
+}
