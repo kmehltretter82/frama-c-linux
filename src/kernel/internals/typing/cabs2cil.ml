@@ -5948,7 +5948,12 @@ and doExp local_env
         match what with
         | AExp (Some _) -> AExp (Some typ)
         | AExp None -> what
-        | ADrop | ADropType | AType | AExpLeaveArrayFun -> what
+        | AExpLeaveArrayFun ->
+          (* The non-decay context of sizeof/alignof (and GNU typeof) applies
+             to its direct operand, which is this cast, not recursively to the
+             operand of the cast (ISO C 6.3.2.1 for the standard cases). *)
+          AExp None
+        | ADrop | ADropType | AType -> what
         | ASet (_, _, _, lvt) ->
           (* If the cast from typ to lvt would be dropped, then we
            * continue with a Set *)
