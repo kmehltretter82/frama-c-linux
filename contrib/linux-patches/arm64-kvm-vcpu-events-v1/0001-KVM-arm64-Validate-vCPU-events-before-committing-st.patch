@@ -1,0 +1,116 @@
+From fd918c259a8083237070aa4e8d4d9bdf80f4569c Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Fri, 28 Aug 2026 22:16:50 +0000
+Subject: [PATCH] KVM: arm64: Validate vCPU events before committing state
+
+KVM_SET_VCPU_EVENTS can request an external data abort and an SError in
+the same structure. The external abort is injected and committed before
+the SError ESR is validated, so an invalid ESR returns -EINVAL after
+changing the vCPU's architectural state.
+
+Validate the complete SError request before injecting either event. Add a
+selftest that combines a valid external abort with an invalid SError after
+an MMIO exit and verifies that the rejected ioctl leaves the MMIO
+instruction able to complete normally.
+
+Fixes: 77ee70a07357 ("KVM: arm64: nv: Honor SError exception routing / masking")
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/kvm/guest.c                        | 15 ++++---
+ .../selftests/kvm/arm64/external_aborts.c     | 39 +++++++++++++++++++
+ 2 files changed, 48 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b01d6622b8720..dd26d1eacaf3c 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -786,6 +786,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	u64 esr = events->exception.serror_esr;
+ 	int ret = 0;
+ 
++	/* Validate the SError request before committing architectural state. */
++	if (serror_pending) {
++		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && has_esr)
++			return -EINVAL;
++
++		if (has_esr && (esr & ~ESR_ELx_ISS_MASK))
++			return -EINVAL;
++	}
++
+ 	/*
+ 	 * Immediately commit the pending SEA to the vCPU's architectural
+ 	 * state which is necessary since we do not return a pending SEA
+@@ -802,12 +811,6 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	if (!serror_pending)
+ 		return 0;
+ 
+-	if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && has_esr)
+-		return -EINVAL;
+-
+-	if (has_esr && (esr & ~ESR_ELx_ISS_MASK))
+-		return -EINVAL;
+-
+ 	if (has_esr)
+ 		ret = kvm_inject_serror_esr(vcpu, esr);
+ 	else
+diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
+index d8fe17a6cc592..400bbdfe1735f 100644
+--- a/tools/testing/selftests/kvm/arm64/external_aborts.c
++++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
+@@ -137,6 +137,44 @@ static void test_mmio_abort(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++static void test_rejected_events_guest(void)
++{
++	asm volatile("ldr x0, [%0]"
++		     : : "r" (MMIO_ADDR) : "x0", "memory");
++
++	GUEST_DONE();
++}
++
++/*
++ * Verify that a rejected SError request does not commit an otherwise valid
++ * external abort from the same KVM_SET_VCPU_EVENTS ioctl.
++ */
++static void test_rejected_events(void)
++{
++	struct kvm_vcpu_events events = {};
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int ret;
++
++	vm = vm_create_with_dabt_handler(&vcpu, test_rejected_events_guest,
++					 unexpected_dabt_handler);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
++
++	events.exception.serror_pending = true;
++	events.exception.serror_has_esr = true;
++	events.exception.ext_dabt_pending = true;
++	events.exception.serror_esr = BIT_ULL(63);
++
++	ret = __vcpu_ioctl(vcpu, KVM_SET_VCPU_EVENTS, &events);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "KVM_SET_VCPU_EVENTS returned %d, errno %d", ret, errno);
++
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
+ extern char test_mmio_nisv_insn;
+ 
+ static void test_mmio_nisv_guest(void)
+@@ -400,6 +438,7 @@ static void test_serror_amo(void)
+ int main(void)
+ {
+ 	test_mmio_abort();
++	test_rejected_events();
+ 	test_mmio_nisv();
+ 	test_mmio_nisv_abort();
+ 	test_serror();
+-- 
+2.53.0
+
+
