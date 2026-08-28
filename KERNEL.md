@@ -49,6 +49,56 @@ Passing the parser is not sufficient if a workaround changes program meaning.
 Every compatibility rule therefore needs a focused regression test and an
 explicit semantics policy.
 
+## Current measured status
+
+The first versioned corpus, `linux-x86_64-v1`, contains 21 unmodified
+translation units: Linux's architecture-neutral MPI library plus
+`lib/string.c`. It is pinned to Linux commit
+`388b607d107c07aaade04c7f22f344cab6bdccd3` and uses exact commands captured
+from an `x86_64` `tinyconfig` Kbuild with GCC 15.2.0.
+
+On 2026-08-28, the corpus moved from 1/21 translation units typed (4.8%) to
+21/21 typed (100%):
+
+| Front-end revision | Typed | First blocking failure |
+| --- | ---: | --- |
+| `ba238b329d8e9201ae28813281d2549d73192bdb` | 1/21 | 20 non-constant static assertions |
+| `c0dceb9138348f5fe04c53c8c553dfefcd96010e` | 21/21 | none |
+
+The final measurement used a clean Linux tree at the pinned commit. Neither
+the kernel sources nor its headers were edited. The compilation database was
+copied from Kbuild and only its absolute source-root prefix was relocated to
+the clean checkout. The corresponding machine-readable snapshot is
+[`share/kernel-corpus/linux-x86_64-v1.status.json`](share/kernel-corpus/linux-x86_64-v1.status.json).
+
+Run the corpus against a matching kernel checkout with:
+
+```sh
+frama-c-script kernel-corpus \
+  --compilation-database /path/to/compile_commands.json \
+  --kernel-root /path/to/linux \
+  --corpus "$(frama-c -print-share-path)/kernel-corpus/linux-x86_64-v1.json" \
+  --jobs 4 \
+  --require-all-typed \
+  --output results.json
+```
+
+From this repository's development tree, build `@install` and replace the
+command above with
+`opam exec --switch=fragma -- dune exec --no-build -- frama-c-script`.
+The runner executes one Frama-C process per translation unit, saves full logs,
+and writes the exact compiler and Frama-C commands, first terminal diagnostic,
+failure stage and kind, warning keys, missing built-ins, unknown attributes,
+timings, and Metrics output to JSON.
+
+This 100% result establishes front-end compatibility for this small corpus;
+it does **not** establish that these files are bug-free or that every kernel
+operation is modeled accurately. The run still exposes a semantic-quality
+queue, notably overflow and bit-count built-ins, pointer and call-type
+warnings, unsupported attributes, library-model warnings, and conservative
+inline-assembly handling. Modeling those constructs, then expanding into
+`drivers/usb/dwc3`, is the next step.
+
 ## Architecture
 
 The intended data flow is:

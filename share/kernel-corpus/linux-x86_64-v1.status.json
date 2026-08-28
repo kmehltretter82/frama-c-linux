@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "corpus": "linux-x86_64-v1",
+  "corpus_manifest_sha256": "073d60160395e16d923adb1c3f160a6af2b7f9b03be39ced2f277c3d40824398",
+  "measured_on": "2026-08-28",
+  "environment": {
+    "linux_commit": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+    "linux_tree_dirty": false,
+    "architecture": "x86_64",
+    "kbuild_configuration": "tinyconfig",
+    "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_x86_64",
+    "translation_units": 21,
+    "source_policy": "Kernel source and headers are unmodified; only the absolute source-root prefix in the Kbuild compilation database was relocated to the clean checkout."
+  },
+  "measurements": [
+    {
+      "name": "frontend-baseline",
+      "frontend_revision": "ba238b329d8e9201ae28813281d2549d73192bdb",
+      "attempted": 21,
+      "typed": 1,
+      "success_rate": 0.047619047619047616,
+      "by_stage": {
+        "typed": 1,
+        "typing": 20
+      },
+      "failures_by_kind": {
+        "nonconstant-static-assert": 20
+      },
+      "note": "The saved baseline logs were reclassified with the final corpus-runner taxonomy."
+    },
+    {
+      "name": "frontend-after-compatibility",
+      "frontend_revision": "c0dceb9138348f5fe04c53c8c553dfefcd96010e",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21
+    }
+  ],
+  "remaining_model_queue": {
+    "undeclared_builtins_seen_in_all_translation_units": [
+      "__builtin_add_overflow",
+      "__builtin_clz",
+      "__builtin_clzl",
+      "__builtin_clzll",
+      "__builtin_ctzl",
+      "__builtin_mul_overflow",
+      "__builtin_sub_overflow"
+    ],
+    "unknown_attributes": [
+      "__alloc_size__",
+      "__assume_aligned__",
+      "__counted_by__",
+      "__designated_init__",
+      "__error__",
+      "__externally_visible__",
+      "__gnu_inline__",
+      "__transparent_union__",
+      "mode",
+      "nocf_check"
+    ]
+  },
+  "interpretation": "Typed means preprocessing, parsing, type-checking, normalization, and Metrics completed. It is not a proof of functional correctness or complete kernel semantics."
+}

@@ -32,6 +32,15 @@ These plug-ins share a common language and can exchange information via
 **[ACSL](https://frama-c.com/acsl.html)** (*ANSI/ISO C Specification Language*)
 properties. Plug-ins can also collaborate via their APIs.
 
+## Linux kernel corpus
+
+The fork includes `frama-c-script kernel-corpus`, which runs one Frama-C
+process per translation unit using exact Kbuild commands and records a
+machine-readable failure taxonomy. The initial pinned `x86_64` corpus improved
+from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST.
+See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
+scope, caveats, and next work.
+
 ## Installation
 
 Installation packages for Linux and macOS are available on
