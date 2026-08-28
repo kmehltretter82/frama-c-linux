@@ -31,7 +31,8 @@ The milestone is complete when the project can:
 The initial corpus should stay small enough to diagnose every failure. It will
 start with architecture-neutral library code and `drivers/usb/dwc3`, then grow
 across subsystems and architectures. Host `x86_64` is the first front-end
-target; `arm64` is now the second measured target, and RISC-V follows.
+target; `arm64` is now the second measured target. ARM64 KVM is the primary
+next subsystem, with RISC-V and broader subsystem coverage following it.
 
 Compatibility work will initially concentrate on constructs that occur in
 kernel builds, including:
@@ -66,7 +67,11 @@ Three versioned `x86_64` corpora are pinned to Linux commit
 The versioned `linux-arm64-v1` corpus runs the same 21 architecture-neutral
 library files through an ARM64 `tinyconfig` Kbuild with
 `aarch64-linux-gnu-gcc` 15.2.0. This is a distinct target/ABI measurement, not
-21 additional unique source files.
+21 additional unique source files. It matters because data-model details,
+target predefined macros, alignment, and Kconfig-selected paths can differ
+from x86_64 even for common C files. It is frontend coverage, not yet a claim
+that ARM64 inline assembly, atomics, PAC/MTE, or the architecture memory model
+have complete verification semantics.
 
 On 2026-08-28, all 30 `x86_64` translation units and all 21 ARM64 target runs
 reached a typed AST from unmodified kernel sources and headers:
@@ -189,6 +194,36 @@ operands, and conservative inline-assembly handling. Those models and
 diagnostics must improve before a typed AST is treated as a verification
 result.
 
+## Priority target: ARM64 KVM
+
+ARM64 KVM is the primary next expansion target. It is both architecture-heavy
+and security-sensitive: host EL1 code controls guest state, while VHE, nVHE,
+and protected-KVM code crosses the EL2 privilege boundary and manages stage-2
+translation and memory ownership. This makes it a useful test of whether the
+fork can progress from portable kernel C to architecture-specific bug finding.
+
+The existing 21/21 ARM64 corpus is only a prerequisite. It validates the GCC
+AArch64 machine model and common C frontend paths, but contains no KVM
+translation units. ARM64 KVM work will proceed in measured layers:
+
+1. generate a KVM-enabled ARM64 build and version an exact-Kbuild corpus across
+   representative host code, stage-2 page-table code, VGIC/sysreg emulation,
+   and nVHE/pKVM C code;
+2. classify frontend blockers without modifying Linux sources, adding focused
+   tests for every accepted compiler or architecture extension;
+3. model system-register accesses, privileged assembly boundaries, barriers,
+   atomics, locks, address translation, and page ownership conservatively;
+4. add bounded scenarios for stage-2 map/unmap, vCPU/sysreg handling, MMIO,
+   allocation cleanup, and protected-KVM ownership transitions; and
+5. validate candidate checkers against real historical ARM64 KVM fixes, with
+   positive findings, fixed controls, coverage, alarms, and model assumptions
+   recorded separately.
+
+Initial success means reproducible C analysis and defensible findings on
+selected paths. It does not mean proving the complete KVM implementation, the
+Arm memory model, or handwritten assembly. Unsupported EL2 effects must remain
+visible and conservative rather than being silently erased.
+
 ## Architecture
 
 The intended data flow is:
@@ -263,8 +298,29 @@ exits successfully but reaches only 4 of 241 defined functions and 13 of 104
 entry-reachable statements before argument-validity alarms eliminate the
 important paths. Deeper generic Eva context initialization exceeded 150- and
 180-second limits. Its zero checker findings are therefore explicitly
-inconclusive: the next semantic milestone is a bounded kernel entry state plus
-models for netlink attributes, `sk_buff` ownership, allocation, and cleanup.
+inconclusive.
+
+The next semantic milestone is now implemented as an opt-in, bounded analysis
+scenario. `frama-c-script kernel-harness` maps the exact Kbuild command for a
+translation unit onto a small tracked harness, while
+`-kernel-checks-bounded-entry` selects a finite Eva callback-entry profile and
+`-kernel-checks-err-ptr-source` forces a named pointer-returning operation to
+return a chosen encoded error. The Open vSwitch harness includes the complete
+`datapath.c`, constructs concrete `sk_buff`, socket, netlink, and attribute
+objects, and models the API outcomes needed to reach the allocation-failure
+cleanup path.
+
+Against Linux `388b607d107c`, the fixed file analyzes 30 of 251 functions and
+reaches 145 of 232 statements in the selected scenario, with two unrelated Eva
+alarms and zero `ERR_PTR` findings. Reversing only the one-line change from
+`ee30dd2909d8` analyzes the same 30 functions and reaches 144 of 231
+statements, with the same two alarms and exactly one finding at
+`kfree_skb(reply)`. The allocation function is deliberately fault-injected and
+several API success outcomes are scenario models. This is evidence that the
+checker exposes the historical defect under the stated failure path; it is not
+a proof of the complete translation unit or a general model of Open vSwitch.
+Broader automatic entry-state, allocation, ownership, locking, and netlink
+models remain required.
 
 The next candidates are:
 
@@ -305,9 +361,8 @@ for the first milestone.
    are in place; object, ownership, concurrency, and architecture models are
    ongoing.
 5. Implement and validate the `ERR_PTR` checker. The first rule and historical
-   replay are complete; precise full-translation-unit entry and API modeling
-   remain.
-6. Expand the corpus by subsystem and architecture without relaxing the
-   unmodified-source rule. Open vSwitch is the first networking target and
-   ARM64 is the second architecture; RISC-V and broader subsystem coverage
-   remain.
+   replay are complete, including a tracked bounded scenario over the complete
+   Open vSwitch translation unit. General entry and kernel API modeling remain.
+6. Expand next into ARM64 KVM without relaxing the unmodified-source rule,
+   first measuring representative host and hypervisor C files and then adding
+   bounded bug scenarios. RISC-V and broader subsystem coverage follow.

@@ -26,6 +26,36 @@ module MaxErrno = Int
       let help = "largest errno encoded by ERR_PTR (default: 4095)"
     end)
 
+module BoundedEntry = False
+    (struct
+      let option_name = "-kernel-checks-bounded-entry"
+      let help =
+        "configure a bounded Eva entry state for Linux callback analysis; \
+         unless explicitly overridden, enables -lib-entry and uses context \
+         depth 0 and width 1; use an analysis harness for deeper objects"
+    end)
+
+module FaultErrno = Int
+    (struct
+      let option_name = "-kernel-checks-fault-errno"
+      let arg_name = "n"
+      let default = 12
+      let help =
+        "positive errno returned by the Frama_C_kernel_err_ptr Eva fault \
+         model (default: 12, ENOMEM)"
+    end)
+
+let () = FaultErrno.set_range ~min:1 ~max:max_int
+
+module ErrPtrSources = String_set
+    (struct
+      let option_name = "-kernel-checks-err-ptr-source"
+      let arg_name = "f1,...,fn"
+      let help =
+        "interpret each listed pointer-returning function as the \
+         Frama_C_kernel_err_ptr fault model"
+    end)
+
 module PreserveEncodedPointers = True
     (struct
       let option_name = "-kernel-checks-preserve-encoded-pointers"

@@ -9,7 +9,7 @@
 (install
  (package frama-c)
  (section (site (frama-c share)))
- (source_trees emacs theme libc kernel-corpus kernel-models)
+ (source_trees emacs theme libc kernel-corpus kernel-harnesses kernel-models)
  (files
   ; Auto-Complete
   (autocomplete_frama-c as autocomplete_frama-c)

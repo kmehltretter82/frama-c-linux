@@ -79,6 +79,10 @@ usage() {
    echo "      Runs each selected translation unit in a separate Frama-C process"
    echo "      and writes machine-readable compatibility results and full logs."
    echo ""
+   echo "  - kernel-harness -p PATH --source FILE --harness FILE -o PATH [options]"
+   echo "      Reuses a translation unit's compilation command for a tracked"
+   echo "      analysis harness, optionally with a historical source override."
+   echo ""
    echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
    echo "      Creates a new machdep definition for a specific target."
    echo "      Use 'frama-c-script make-machdep --help' for more information."
@@ -262,6 +266,10 @@ case "$command" in
     "kernel-corpus")
         shift;
         "$ANALYSIS_SCRIPTS_DIR/kernel_corpus.py" "$@";
+        ;;
+    "kernel-harness")
+        shift;
+        "$ANALYSIS_SCRIPTS_DIR/kernel_harness.py" "$@";
         ;;
     "find-fun")
         shift;

@@ -41,9 +41,17 @@ from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST;
 the follow-on DWC3 driver corpus reaches 8/8, and a complete Open vSwitch
 `datapath.c` reaches 1/1, for 30/30 across all three `x86_64` sets. The same
 21-file library corpus also reaches 21/21 with exact ARM64 Kbuild commands and
-the generated `gcc_arm64` machine model.
+the generated `gcc_arm64` machine model. The second target exercises a distinct
+ABI, target macros, alignments, and kernel configuration paths; it does not yet
+imply complete modeling of ARM64 assembly, atomics, or the architecture memory
+model.
 See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
 scope, caveats, and next work.
+
+The next subsystem priority is **ARM64 KVM**. The current 21/21 ARM64 result is
+the prerequisite machine-model and frontend foundation; the next corpus will
+exercise real KVM host, stage-2 page-table, VGIC, and nVHE/pKVM C code, followed
+by architecture-boundary models and historical bug replays.
 
 ## Linux kernel checks
 
@@ -52,9 +60,13 @@ layer. Its first rule uses Eva values to report only provable uses of encoded
 `ERR_PTR` values as object pointers, indirect call targets, or deallocator
 arguments. Focused tests cover 32-bit and 64-bit intervals and common kernel
 deallocators; a reduced replay of Linux fix `ee30dd2909d8` reports one
-violation before the fix and none after it. Enable it with `-kernel-checks`.
-See [the plug-in README](plugins/kernel_checks/README.md) for its guarantees
-and current whole-translation-unit limitations.
+violation before the fix and none after it. A tracked bounded harness now
+includes the complete current Open vSwitch `datapath.c`, forces the affected
+allocation failure, and reports the same one-before/zero-after result when the
+upstream one-line fix is reversed and restored. Enable it with
+`-kernel-checks`. See
+[the plug-in README](plugins/kernel_checks/README.md) for the reproducible
+workflow, guarantees, and limitations.
 
 ## Installation
 

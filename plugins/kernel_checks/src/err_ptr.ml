@@ -125,9 +125,36 @@ class checker = object (self)
     | Some index ->
       match List.nth_opt arguments index with
       | None -> ()
+      | Some pointer when self#forwards_deallocator_formal pointer -> ()
       | Some pointer ->
         self#check_expression
           ~access:Base.Object_pointer (Deallocate name) pointer
+
+  method private forwards_deallocator_formal expression =
+    (* Eva follows inline deallocator wrappers.  Report at the caller-facing
+       deallocator, not again when that wrapper forwards the same formal. *)
+    let rec direct_var expression =
+      match expression.enode with
+      | Lval (Var varinfo, NoOffset) -> Some varinfo
+      | CastE (_, expression) -> direct_var expression
+      | _ -> None
+    in
+    match self#current_kf, direct_var expression with
+    | Some kernel_function, Some actual ->
+      let name = Kernel_function.get_name kernel_function in
+      begin
+        match deallocator_argument name with
+        | None -> false
+        | Some index ->
+          begin
+            match
+              List.nth_opt (Kernel_function.get_formals kernel_function) index
+            with
+            | None -> false
+            | Some formal -> Cil_datatype.Varinfo.equal formal actual
+          end
+      end
+    | None, _ | _, None -> false
 
   method! vinst instruction =
     begin

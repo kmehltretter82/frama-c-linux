@@ -1,1 +1,1 @@
-DEFAULT_SUITES=err_ptr historical
+DEFAULT_SUITES=err_ptr historical models

@@ -16,6 +16,13 @@ let main () =
     if Z.geq (Z.of_int max_errno) pointer_modulus then
       Options.abort
         "-kernel-checks-max-errno must fit below the pointer modulus";
+    let fault_errno = Options.FaultErrno.get () in
+    if fault_errno > max_errno then
+      Options.abort
+        "-kernel-checks-fault-errno must not exceed \
+         -kernel-checks-max-errno";
+    Models.configure_entry_profile ();
+    Models.configure_err_ptr_sources ();
     if Options.PreserveEncodedPointers.get () then begin
       Options.apply_encoded_pointer_profile ();
       Options.feedback

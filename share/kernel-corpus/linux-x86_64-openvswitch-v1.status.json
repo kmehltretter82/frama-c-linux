@@ -87,12 +87,79 @@
       "custom_max_errno_expected": 1,
       "custom_max_errno_observed": 1
     },
+    "fault_source_regressions": {
+      "machine_models": [
+        "gcc_x86_32",
+        "gcc_x86_64",
+        "gcc_arm64"
+      ],
+      "before_fix_violations_expected": 3,
+      "before_fix_violations_observed": 3,
+      "after_fix_violations_expected": 0,
+      "after_fix_violations_observed": 0,
+      "custom_fault_errno_tested": 5,
+      "bounded_entry_profile_tested_on": "gcc_arm64"
+    },
     "historical_replay": {
       "linux_fix": "ee30dd2909d8b98619f4341c70ec8dc8e155ab02",
       "title": "net: openvswitch: fix possible kfree_skb of ERR_PTR",
       "scope": "reduced source-level replay of the affected control flow",
       "before_fix_violations": 1,
       "after_fix_violations": 0
+    },
+    "bounded_translation_unit_replay": {
+      "scope": "The tracked harness includes the complete current datapath.c translation unit and supplies a bounded callback environment. The comparison reverses only the upstream one-line fix in the pinned current source.",
+      "linux_base": "388b607d107c07aaade04c7f22f344cab6bdccd3",
+      "source_variants": {
+        "fixed_sha256": "50909d2eedcec1a0f754ce7e08bf418033d50863441e8b138ac35ee688c85512",
+        "one_line_fix_reversed_sha256": "b8bd28ff89ccaf1db5a1da1459b9045ecbfd3cac2bd6f33f1f5fbfdb8056cfd4",
+        "reversed_linux_fix": "ee30dd2909d8b98619f4341c70ec8dc8e155ab02"
+      },
+      "artifacts": {
+        "harness": "kernel-harnesses/openvswitch_flow_cmd_set.c",
+        "harness_sha256": "1078e6cd2d84b42f26356b56537b69460163029f444878214ab97febb5d86ffb",
+        "database_mapper": "analysis-scripts/kernel_harness.py",
+        "database_mapper_sha256": "8b70c54c3123e407376d41795c24a399a4605922d8f362f003212e9a323319ce",
+        "fault_model": "plugins/kernel_checks/src/models.ml",
+        "fault_model_sha256": "3cff679ec2eb783c7fbcd928cfd6a18b0a7e9d46daff6409393df3de5d380bfa",
+        "compiler_model": "kernel-models/compiler_builtins.h",
+        "compiler_model_sha256": "cf814012207de9020475e3f4dfd5c55d0f6e5679a8e0615ed1bc125b990295ec"
+      },
+      "analysis_profile": {
+        "entry_point": "frama_c_ovs_flow_cmd_set_harness",
+        "machdep": "gcc_x86_64",
+        "eva_slevel": 10,
+        "lib_entry": true,
+        "eva_context_depth": 0,
+        "eva_context_width": 1,
+        "fault_source": "ovs_flow_cmd_build_info",
+        "fault_errno": 12
+      },
+      "fixed": {
+        "exit_zero": true,
+        "functions_analyzed": 30,
+        "defined_functions": 251,
+        "statements_reached": 145,
+        "statements_total": 232,
+        "eva_alarms": 2,
+        "err_ptr_violations": 0
+      },
+      "one_line_fix_reversed": {
+        "exit_zero": true,
+        "functions_analyzed": 30,
+        "defined_functions": 251,
+        "statements_reached": 144,
+        "statements_total": 231,
+        "eva_alarms": 2,
+        "err_ptr_violations": 1,
+        "finding": "kfree_skb(reply) receives ERR_PTR(-12)"
+      },
+      "scenario_models": [
+        "concrete skb, socket, net, generic-netlink message, and attribute objects",
+        "selected match, device, vport, datapath, and flow lookup success outcomes",
+        "side-effect-free forced allocation failure for ovs_flow_cmd_build_info"
+      ],
+      "interpretation": "Positive before/fixed control evidence for the selected allocation-failure path; not a proof of the complete translation unit or a complete Open vSwitch semantic model."
     },
     "current_translation_unit_smoke": {
       "entry_point": "ovs_flow_cmd_set",
@@ -125,7 +192,7 @@
         "result": "timeout"
       }
     ],
-    "next_model_requirement": "Provide bounded entry-state and kernel object/API models for netlink attributes, sk_buff ownership, allocation, and cleanup before treating full-translation-unit results as verification evidence."
+    "next_model_requirement": "Generalize beyond the tracked bounded scenario with reusable netlink, sk_buff ownership, allocation, cleanup, locking, and callback-entry models."
   },
   "remaining_model_queue": {
     "undeclared_builtins": [],
