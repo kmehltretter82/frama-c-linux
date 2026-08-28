@@ -41,6 +41,14 @@ parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-o", type=argparse.FileType("w"), dest="dest_file")
 parser.add_argument("--compiler", default="cc", help="which compiler to use; default is 'cc'")
 parser.add_argument(
+    "--compiler-family",
+    choices=("gcc", "clang", "msvc"),
+    help=(
+        "Frama-C compiler semantics to record; by default this is detected "
+        "from predefined macros (useful for cross-compiler commands)"
+    ),
+)
+parser.add_argument(
     "--compiler-version",
     default="--version",
     help="option to pass to the compiler to obtain its version; default is --version",
@@ -88,6 +96,9 @@ parser.add_argument(
 )
 
 args, other_args = parser.parse_known_args()
+compiler_was_explicit = any(
+    arg == "--compiler" or arg.startswith("--compiler=") for arg in sys.argv[1:]
+)
 
 if args.verbose:
     logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -148,7 +159,11 @@ if args.from_file:
             sys.exit(1)
     if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
         raise Exception("Missing fields in yaml file")
-    args.compiler = orig_machdep["compiler"]
+    if not compiler_was_explicit:
+        args.compiler = orig_machdep.get("compiler_executable", orig_machdep["compiler"])
+        recorded_family = orig_machdep["compiler"]
+        if not args.compiler_family and recorded_family in ("gcc", "clang", "msvc"):
+            args.compiler_family = recorded_family
     if isinstance(orig_machdep["cpp_arch_flags"], list):
         args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
     else:  # old version of the schema used a single string
@@ -189,6 +204,35 @@ compilation_command = [args.compiler]
 
 for flag in args.cpp_arch_flags + args.compiler_flags:
     compilation_command = compilation_command + flag.split(" ")
+
+
+def detect_compiler_family():
+    if args.compiler_family:
+        return args.compiler_family
+
+    cmd = compilation_command + ["-dM", "-E", "-"]
+    proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+    if proc.returncode == 0:
+        macros = proc.stdout
+        # Clang also defines __GNUC__, so test it first.
+        if re.search(r"^# *define +__clang__\b", macros, re.MULTILINE):
+            return "clang"
+        if re.search(r"^# *define +_MSC_VER\b", macros, re.MULTILINE):
+            return "msvc"
+        if re.search(r"^# *define +__GNUC__\b", macros, re.MULTILINE):
+            return "gcc"
+
+    executable = Path(args.compiler).name
+    if executable in ("gcc", "clang", "msvc"):
+        return executable
+    logging.critical(
+        "cannot determine compiler family for '%s'; use --compiler-family",
+        args.compiler,
+    )
+    sys.exit(1)
+
+
+compiler_family = detect_compiler_family()
 
 standard_source_files = [
     # sanity_check is juste here to ensure that the given compiler
@@ -262,7 +306,7 @@ gcc_alignof_source_files = [
     ("gcc_alignof_max_align_t.c", "number"),
 ]
 
-if args.compiler == "gcc":
+if compiler_family == "gcc":
     source_files = standard_source_files + gcc_alignof_source_files
 else:
     source_files = standard_source_files
@@ -430,7 +474,8 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         machdep["max_extended_alignment"] = align_test
         align_test = 2 * align_test
 
-    machdep["compiler"] = args.compiler
+    machdep["compiler"] = compiler_family
+    machdep["compiler_executable"] = args.compiler
     machdep["cpp_arch_flags"] = args.cpp_arch_flags
     machdep["version"] = version
 

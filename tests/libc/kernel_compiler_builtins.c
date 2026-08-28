@@ -35,3 +35,8 @@ int main(void)
 
   return 0;
 }
+
+_Static_assert(sizeof(__int128_t) == 16,
+               "GCC's signed 128-bit alias is modeled");
+_Static_assert(sizeof(__uint128_t) == 16,
+               "GCC's unsigned 128-bit alias is modeled");

@@ -71,7 +71,7 @@
         "parser:unsupported:pragma", "plugin-not-loaded", "pp",
         "pp:compilation-db", "pp:line-directive", "project", "prototype",
         "too-large-array", "typing", "typing:alignof-bitfield",
-        "typing:implicit-conv-void-ptr",
+        "typing:flexible-array-extension", "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration", "typing:implicit-int",
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",

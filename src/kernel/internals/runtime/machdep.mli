@@ -73,6 +73,8 @@ type mach = {
   has__builtin_va_list: bool; (** Whether [__builtin_va_list] is a known type *)
   (** Compiler being used. Currently recognized names are 'gcc', 'msvc' and 'generic'. *)
   compiler: string;
+  (** Compiler executable used to generate this machdep, when recorded. *)
+  compiler_executable: string;
   (** Architecture-specific flags to be given to the preprocessor (if supported) *)
   cpp_arch_flags: string list;
   version: string;        (** Information on this machdep *)

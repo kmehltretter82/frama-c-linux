@@ -14,4 +14,11 @@ int integer_is_constant(int value)
   return __retres;
 }
 
+int constant_conditional_array[2];
+int clz_int[31];
+int clz_long[63];
+int clz_long_long[63];
+int ctz_int[3];
+int ctz_long[3];
+int ctz_long_long[3];
 

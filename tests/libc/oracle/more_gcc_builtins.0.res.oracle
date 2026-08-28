@@ -99,28 +99,8 @@
 [eva:alarm] more_gcc_builtins.c:46: Warning: 
   function __builtin_clz: precondition 'x_nonzero' got status invalid.
 [eva:progress] Done for function __builtin_clz
-[eva:progress] 
-  computing for function __builtin_clz <- main.
-  Called from more_gcc_builtins.c:49.
-[eva:progress] more_gcc_builtins.c:49: 
-  function __builtin_clz: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_clz
 [eva:progress] more_gcc_builtins.c:50: assertion got status valid.
-[eva:progress] 
-  computing for function __builtin_clzl <- main.
-  Called from more_gcc_builtins.c:51.
-[eva] using specification for function __builtin_clzl
-[eva:progress] more_gcc_builtins.c:51: 
-  function __builtin_clzl: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_clzl
 [eva:progress] more_gcc_builtins.c:52: assertion got status valid.
-[eva:progress] 
-  computing for function __builtin_clzll <- main.
-  Called from more_gcc_builtins.c:53.
-[eva] using specification for function __builtin_clzll
-[eva:progress] more_gcc_builtins.c:53: 
-  function __builtin_clzll: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_clzll
 [eva:progress] more_gcc_builtins.c:54: assertion got status valid.
 [eva:progress] 
   computing for function __builtin_ctz <- main.
@@ -129,28 +109,8 @@
 [eva:alarm] more_gcc_builtins.c:56: Warning: 
   function __builtin_ctz: precondition 'x_nonzero' got status invalid.
 [eva:progress] Done for function __builtin_ctz
-[eva:progress] 
-  computing for function __builtin_ctz <- main.
-  Called from more_gcc_builtins.c:59.
-[eva:progress] more_gcc_builtins.c:59: 
-  function __builtin_ctz: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_ctz
 [eva:progress] more_gcc_builtins.c:60: assertion got status valid.
-[eva:progress] 
-  computing for function __builtin_ctzl <- main.
-  Called from more_gcc_builtins.c:61.
-[eva] using specification for function __builtin_ctzl
-[eva:progress] more_gcc_builtins.c:61: 
-  function __builtin_ctzl: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_ctzl
 [eva:progress] more_gcc_builtins.c:62: assertion got status valid.
-[eva:progress] 
-  computing for function __builtin_ctzll <- main.
-  Called from more_gcc_builtins.c:63.
-[eva] using specification for function __builtin_ctzll
-[eva:progress] more_gcc_builtins.c:63: 
-  function __builtin_ctzll: precondition 'x_nonzero' got status valid.
-[eva:progress] Done for function __builtin_ctzll
 [eva:progress] more_gcc_builtins.c:64: assertion got status valid.
 [eva:progress] 
   computing for function __builtin_popcount <- main.

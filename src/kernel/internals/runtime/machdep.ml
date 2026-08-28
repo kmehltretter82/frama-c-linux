@@ -78,6 +78,7 @@ type mach = {
   little_endian: bool;
   has__builtin_va_list: bool;
   compiler: string;
+  compiler_executable: string [@default ""];
   cpp_arch_flags: string list;
   version: string;
   weof: string;
@@ -159,6 +160,7 @@ let dummy = {
   little_endian = true;
   has__builtin_va_list = true;
   compiler = "none";
+  compiler_executable = "";
   cpp_arch_flags = [];
   version = "N/A";
   weof = "(-1)";
@@ -220,7 +222,8 @@ module Machdep = struct
        gcc_alignof_void=%d;gcc_alignof_fun=%d;gcc_alignof_aligned=%d;\
        gcc_alignof_max_align_t=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
-       compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
+       compiler=%s;compiler_executable=%s;cpp_arch_flags=%a;\
+       version=%s;weof=%s;wordsize=%s;\
        posix_c_source=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
        path_max=%s;tty_name_max=%s;host_name_max=%s;l_ctermid=%s;\
        l_tmpnam=%s;tmp_max=%s;\
@@ -283,6 +286,7 @@ module Machdep = struct
       mach.little_endian
       mach.has__builtin_va_list
       mach.compiler
+      mach.compiler_executable
       (pp_print_list pp_print_string) mach.cpp_arch_flags
       mach.version
       mach.weof

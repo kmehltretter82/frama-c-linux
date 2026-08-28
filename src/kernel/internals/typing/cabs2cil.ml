@@ -6669,9 +6669,20 @@ and doExp local_env
         | Var fv -> Cil_builtins.is_special_builtin fv.vname
         | _ -> false
       in
-      let hasPolymorphicArguments =
+      let isBuiltinConstantP =
         match f'' with
         | Var fv -> fv.vname = "__builtin_constant_p"
+        | _ -> false
+      in
+      let hasConstantFoldedArguments =
+        match f'' with
+        | Var fv ->
+          List.mem fv.vname
+            [ "__builtin_constant_p";
+              "__builtin_clz"; "__builtin_clzl"; "__builtin_clzll";
+              "__builtin_ctz"; "__builtin_ctzl"; "__builtin_ctzll";
+              "__builtin_bswap16"; "__builtin_bswap32";
+              "__builtin_bswap64" ]
         | _ -> false
       in
       let init_chunk = unspecified_chunk empty in
@@ -6707,13 +6718,21 @@ and doExp local_env
            * as an argument *)
           let (sa, a', att) =
             let local_env = add_ghost_to_local_env local_env are_ghost in
+            let argument_constness =
+              (* Preserve constant conditionals instead of lowering them
+                 through temporaries before a foldable builtin inspects its
+                 operand. Non-constant operands remain accepted. *)
+              if hasConstantFoldedArguments then CMayConst else CNoConst
+            in
             let (r, c, e, t) =
-              doExp (no_paren_local_env local_env) CNoConst a (AExp None)
+              doExp
+                (no_paren_local_env local_env)
+                argument_constness a (AExp None)
             in
             (add_reads ~ghost:local_env.is_ghost loc r c, e, t)
           in
           let (texpected, a'') =
-            if hasPolymorphicArguments then
+            if isBuiltinConstantP then
               (* The registered prototype is only a parser placeholder:
                  GCC accepts an expression of any type here. *)
               att, a'
@@ -7147,6 +7166,57 @@ and doExp local_env
                     ~once:true
                     ~current:true
                     "Invalid call to builtin_types_compatible_p"
+              end
+            | name when List.mem name
+                  [ "__builtin_clz"; "__builtin_clzl"; "__builtin_clzll";
+                    "__builtin_ctz"; "__builtin_ctzl"; "__builtin_ctzll" ] ->
+              let bits =
+                8 *
+                match name with
+                | "__builtin_clz" | "__builtin_ctz" -> Machine.Sizeof.int ()
+                | "__builtin_clzl" | "__builtin_ctzl" -> Machine.Sizeof.long ()
+                | "__builtin_clzll" | "__builtin_ctzll" ->
+                  Machine.Sizeof.longlong ()
+                | _ -> assert false
+              in
+              let count_bits value =
+                let value = Z.extract value 0 bits in
+                if Z.equal value Z.zero then None
+                else if name = "__builtin_clz"
+                     || name = "__builtin_clzl"
+                     || name = "__builtin_clzll"
+                then Some (bits - Z.numbits value)
+                else Some (Z.trailing_zeros value)
+              in
+              begin
+                match !pargs with
+                | [ arg ] -> begin
+                    match (Cil.constFold true arg).enode with
+                    | Const (CInt64 (value, _, _)) -> begin
+                        match count_bits value with
+                        | Some result ->
+                          piscall := false;
+                          pres := Cil.integer ~loc:e.expr_loc result;
+                          prestype := resType'
+                        | None when asconst = CConst ->
+                          piscall := false;
+                          Errorloc.abort_context
+                            "%s is undefined for a zero argument in constant."
+                            name
+                        | None -> ()
+                      end
+                    | _ when asconst = CConst ->
+                      piscall := false;
+                      Errorloc.abort_context
+                        "Non-constant argument to %s in constant." name
+                    | _ -> ()
+                  end
+                | _ when asconst = CConst ->
+                  piscall := false;
+                  Errorloc.abort_context
+                    "Invalid call to %s in constant." name
+                | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s" name
               end
             | name when name = "__builtin_bswap16"
                          || name = "__builtin_bswap32"

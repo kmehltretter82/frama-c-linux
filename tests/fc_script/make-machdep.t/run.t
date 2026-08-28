@@ -1,3 +1,16 @@
+An executable's name is not its compiler family. In particular, prefixed cross
+GCC commands must still enable Frama-C's GCC semantics.
+
+  $ ln -s "$(command -v gcc)" "$PWD/aarch64-linux-gnu-gcc"
+  $ frama-c-script make-machdep --compiler "$PWD/aarch64-linux-gnu-gcc" -o "$PWD/prefixed.yaml"
+  $ yq -r '.compiler' "$PWD/prefixed.yaml"
+  gcc
+  $ yq -r '.compiler_executable | endswith("/aarch64-linux-gnu-gcc")' "$PWD/prefixed.yaml"
+  true
+  $ frama-c-script make-machdep --from-file "$PWD/prefixed.yaml" -o "$PWD/roundtrip.yaml"
+  $ yq -r '.compiler' "$PWD/roundtrip.yaml"
+  gcc
+
   $ frama-c-script make-machdep --compiler clang --cpp-arch-flags='--target=x86_64' | yq -Y 'del(.version)|del(.custom_defs)|del(.posix_c_source)'
   alignof_aligned: 16
   alignof_double: 8
@@ -14,6 +27,7 @@
   bufsiz: '8192'
   char_is_unsigned: false
   compiler: clang
+  compiler_executable: clang
   cpp_arch_flags:
     - --target=x86_64
   eof: (-1)
