@@ -346,9 +346,14 @@ let () =
     [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
 
 let () =
+  (* GCC function attributes which are also accepted on labels. Statement
+     attributes are attached directly to CIL statements, independently of
+     the declaration-oriented class used here. *)
+  register_list (AttrFunType false) [ "hot"; "cold" ];
+
   (* GCC label and statement attributes. *)
   register_list AttrStmt
-    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
+    [ "fallthrough"; "assume"; "musttail" ]
 
 (* GCC 'malloc' attributes can refer to erased functions and make the code
    un-reparsable, so we keep them in the AST but not pretty-print them. *)
@@ -459,4 +464,3 @@ let () =
           register ?ignore ?print attr_class name
         )
     )
-
