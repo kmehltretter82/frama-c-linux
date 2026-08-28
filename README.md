@@ -37,7 +37,8 @@ properties. Plug-ins can also collaborate via their APIs.
 The fork includes `frama-c-script kernel-corpus`, which runs one Frama-C
 process per translation unit using exact Kbuild commands and records a
 machine-readable failure taxonomy. The initial pinned `x86_64` corpus improved
-from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST.
+from 1/21 to 21/21 unmodified Linux translation units reaching a typed AST;
+the follow-on DWC3 driver corpus now reaches 8/8, for 29/29 across both sets.
 See [KERNEL.md](KERNEL.md#current-measured-status) for the reproducible command,
 scope, caveats, and next work.
 

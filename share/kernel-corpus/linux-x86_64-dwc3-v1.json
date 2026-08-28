@@ -8,7 +8,7 @@
   "kbuild": {
     "base_configuration": "tinyconfig",
     "config_fragment": "configs/linux-x86_64-dwc3-v1.fragment",
-    "config_sha256": "564f939ba07257ef4518a424bb1b8e93601bb9e54e0f2cd470e80a88173fe25a"
+    "config_sha256": "59f7413e5eb8b3951af3f0a7fa56792626634447193e4cb1bf0e51e4df42226f"
   },
   "model_headers": [
     "../kernel-models/compiler_builtins.h"

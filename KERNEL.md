@@ -51,25 +51,39 @@ explicit semantics policy.
 
 ## Current measured status
 
-The first versioned corpus, `linux-x86_64-v1`, contains 21 unmodified
-translation units: Linux's architecture-neutral MPI library plus
-`lib/string.c`. It is pinned to Linux commit
-`388b607d107c07aaade04c7f22f344cab6bdccd3` and uses exact commands captured
-from an `x86_64` `tinyconfig` Kbuild with GCC 15.2.0.
+Two versioned `x86_64` corpora are pinned to Linux commit
+`388b607d107c07aaade04c7f22f344cab6bdccd3` and GCC 15.2.0:
 
-On 2026-08-28, the corpus moved from 1/21 translation units typed (4.8%) to
-21/21 typed (100%):
+- `linux-x86_64-v1` contains 21 architecture-neutral MPI and string-library
+  translation units from a `tinyconfig` build; and
+- `linux-x86_64-dwc3-v1` contains eight DWC3 core, dual-role, gadget, host,
+  tracing, ULPI, and debugfs translation units from the supplied Kconfig
+  fragment.
 
-| Front-end revision | Typed | First blocking failure |
-| --- | ---: | --- |
-| `ba238b329d8e9201ae28813281d2549d73192bdb` | 1/21 | 20 non-constant static assertions |
-| `c0dceb9138348f5fe04c53c8c553dfefcd96010e` | 21/21 | none |
+On 2026-08-28, all 29 translation units reached a typed AST from unmodified
+kernel sources and headers:
 
-The final measurement used a clean Linux tree at the pinned commit. Neither
-the kernel sources nor its headers were edited. The compilation database was
-copied from Kbuild and only its absolute source-root prefix was relocated to
-the clean checkout. The corresponding machine-readable snapshot is
-[`share/kernel-corpus/linux-x86_64-v1.status.json`](share/kernel-corpus/linux-x86_64-v1.status.json).
+| Front-end revision | Corpus | Typed | First blocking failure |
+| --- | --- | ---: | --- |
+| `ba238b329d8e9201ae28813281d2549d73192bdb` | library | 1/21 | 20 non-constant static assertions |
+| `c0dceb9138348f5fe04c53c8c553dfefcd96010e` | library | 21/21 | none |
+| `52d9f1ec9ee800f8ff2708d3c5665199659b7f31` | library | 21/21 | none |
+| `52d9f1ec9ee800f8ff2708d3c5665199659b7f31` | DWC3 | 8/8 | none |
+
+Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
+`clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
+by the kernel delay macros. On the 21-file corpus, enabling the model on the
+same revision reduces implicit-function-declaration warnings from 147 to 63
+and total warnings from 5,648 to 5,564. The remaining undeclared builtins are
+the add, multiply, and subtract overflow families.
+
+The measurements used clean Linux sources. The library compilation database
+was copied from Kbuild with only its absolute source-root prefix relocated; the
+DWC3 database was generated directly in an out-of-tree build. Reproduction
+metadata and warning inventories are in
+[`linux-x86_64-v1.status.json`](share/kernel-corpus/linux-x86_64-v1.status.json)
+and
+[`linux-x86_64-dwc3-v1.status.json`](share/kernel-corpus/linux-x86_64-dwc3-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -83,6 +97,12 @@ frama-c-script kernel-corpus \
   --output results.json
 ```
 
+Use `linux-x86_64-dwc3-v1.json` in the command above to run the DWC3 corpus
+against a compilation database generated with
+`configs/linux-x86_64-dwc3-v1.fragment`. Corpus manifests automatically load
+their declared model headers; pass `--no-manifest-models` for a controlled
+unmodeled comparison.
+
 From this repository's development tree, build `@install` and replace the
 command above with
 `opam exec --switch=fragma -- dune exec --no-build -- frama-c-script`.
@@ -91,13 +111,13 @@ and writes the exact compiler and Frama-C commands, first terminal diagnostic,
 failure stage and kind, warning keys, missing built-ins, unknown attributes,
 timings, and Metrics output to JSON.
 
-This 100% result establishes front-end compatibility for this small corpus;
-it does **not** establish that these files are bug-free or that every kernel
-operation is modeled accurately. The run still exposes a semantic-quality
-queue, notably overflow and bit-count built-ins, pointer and call-type
-warnings, unsupported attributes, library-model warnings, and conservative
-inline-assembly handling. Modeling those constructs, then expanding into
-`drivers/usb/dwc3`, is the next step.
+This 100% result establishes front-end compatibility for these small corpora;
+it does **not** establish that the files are bug-free or that every kernel
+operation is modeled accurately. The runs still expose a semantic-quality
+queue, notably overflow builtins, pointer and call-type warnings, unsupported
+attributes, library-model warnings, and conservative inline-assembly handling.
+Those models and diagnostics must improve before a typed AST is treated as a
+verification result.
 
 ## Architecture
 
