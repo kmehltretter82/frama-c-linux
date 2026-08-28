@@ -351,6 +351,10 @@ let () =
      the declaration-oriented class used here. *)
   register_list (AttrFunType false) [ "hot"; "cold" ];
 
+  (* Keep the flexible-array-to-counter association on the field declaration.
+     The typer uses it to implement __builtin_counted_by_ref. *)
+  register (AttrName false) "counted_by";
+
   (* GCC label and statement attributes. *)
   register_list AttrStmt
     [ "fallthrough"; "assume"; "musttail" ]

@@ -2806,6 +2806,61 @@ let builtinAttributeName expression =
   | Cabs.VARIABLE name -> Some (String.trim_underscores name)
   | _ -> None
 
+let counted_by_attribute_name = "counted_by"
+
+let countedByFieldName field =
+  match Ast_attributes.find_params counted_by_attribute_name field.fattr with
+  | [ ACons (name, []) ] -> Some name
+  | _ -> None
+
+let countedByCounterField field =
+  match countedByFieldName field, field.fcomp.cfields with
+  | Some name, Some fields ->
+    List.find_opt
+      (fun candidate ->
+         String.equal candidate.fname name ||
+         String.equal candidate.forig_name name)
+      fields
+  | None, _ | _, None -> None
+
+let rec countedByCounterOffset = function
+  | Field (field, NoOffset) ->
+    Option.map
+      (fun counter -> Field (counter, NoOffset), counter)
+      (countedByCounterField field)
+  | Field (field, remaining) ->
+    Option.map
+      (fun (remaining, counter) -> Field (field, remaining), counter)
+      (countedByCounterOffset remaining)
+  | Index (index, remaining) ->
+    Option.map
+      (fun (remaining, counter) -> Index (index, remaining), counter)
+      (countedByCounterOffset remaining)
+  | NoOffset -> None
+
+let countedByCounterLval (host, offset) =
+  Option.map
+    (fun (offset, counter) -> (host, offset), counter)
+    (countedByCounterOffset offset)
+
+let isCountedByArgument expression lval =
+  match expression.enode with
+  | StartOf _ -> true
+  | Lval (_, offset) ->
+    begin
+      match Ast_types.C.unroll_node (Cil.typeOfLval lval) with
+      | TArray _ -> true
+      | TPtr pointed ->
+        not (Ast_types.C.is_fun pointed) &&
+        begin
+          match Cil.lastOffset offset with
+          | Field _ -> true
+          | NoOffset | Index _ -> false
+        end
+      | _ -> false
+    end
+  | _ -> false
+
 let cabsStringLiteral expression =
   match (stripParen expression).expr_node with
   | Cabs.CONSTANT (Cabs.CONST_STRING value) -> Some value
@@ -5407,6 +5462,62 @@ and makeCompType loc ghost (isstruct: bool)
       (if comp.cstruct then "struct" else "union")
       (Machdep.allowed_machdep "GCC/MSVC");
   List.iter check flds;
+  let check_counted_by field =
+    let attributes =
+      Ast_attributes.filter counted_by_attribute_name field.fattr
+    in
+    let invalidate format =
+      Format.kasprintf
+        (fun message ->
+           Kernel.error ~source:field.floc "%s" message;
+           field.fattr <-
+             Ast_attributes.drop counted_by_attribute_name field.fattr)
+        format
+    in
+    match attributes with
+    | [] -> ()
+    | [ (_, [ ACons (counter_name, []) ]) ] ->
+      let source_type_is_supported =
+        match Ast_types.C.unroll_node field.ftype with
+        | TArray (_, None) -> true
+        | TPtr pointed ->
+          not (Ast_types.C.is_fun pointed) &&
+          (not (Cil.isCompleteType pointed) ||
+           not (Cil.has_flexible_array_member pointed))
+        | _ -> false
+      in
+      if not isstruct then
+        invalidate
+          "counted_by attribute on field '%s' requires a structure"
+          field.fname
+      else if not source_type_is_supported then
+        invalidate
+          "counted_by attribute on field '%s' requires a flexible array or \
+           supported pointer field"
+          field.fname
+      else begin
+        match List.find_opt
+                (fun candidate ->
+                   String.equal candidate.fname counter_name ||
+                   String.equal candidate.forig_name counter_name)
+                flds
+        with
+        | None ->
+          invalidate
+            "counted_by attribute on field '%s' names missing field '%s'"
+            field.fname counter_name
+        | Some counter when not (Ast_types.C.is_integral counter.ftype) ->
+          invalidate
+            "counted_by attribute on field '%s' names non-integral field '%s'"
+            field.fname counter_name
+        | Some _ -> ()
+      end
+    | _ ->
+      invalidate
+        "counted_by attribute on field '%s' expects one field name"
+        field.fname
+  in
+  List.iter check_counted_by flds;
   if comp.cfields <> None then begin
     let old_fields = Option.get comp.cfields in
     (* This appears to be a multiply defined structure. This can happen from
@@ -6450,6 +6561,59 @@ and doExp local_env
       finishExp [] (unspecified_chunk empty)
         (Cil.kinteger ~loc (Machine.sizeof_kind ()) length)
         (Machine.sizeof_type ())
+    | Cabs.CALL
+        ({ expr_node = VARIABLE "__builtin_counted_by_ref"},
+         [ argument ], [])
+      when Machine.gccMode() ->
+      let reads, chunk, argument', _ =
+        doExp
+          (no_paren_local_env local_env)
+          CNoConst
+          argument
+          AExpLeaveArrayFun
+      in
+      let argument_lval =
+        match argument'.enode with
+        | (Lval lval | StartOf lval) when
+            isCountedByArgument argument' lval -> lval
+        | _ ->
+          Errorloc.abort_context
+            "argument of __builtin_counted_by_ref must designate a structure \
+             array or pointer field"
+      in
+      begin
+        match countedByCounterLval argument_lval with
+        | Some (counter_lval, counter) ->
+          let counter_pointer_type = mk_tptr counter.ftype in
+          if what = AType then begin
+            full_clean_up_chunk_labels chunk;
+            full_clean_up_chunk_locals chunk;
+            finishExp
+              [] empty
+              (Cil.mkCast ~newt:counter_pointer_type (Cil.zero ~loc))
+              counter_pointer_type
+          end else begin
+            let reads =
+              List.filter
+                (fun read ->
+                   not (Cil_datatype.Lval.equal read argument_lval))
+                reads
+            in
+            finishExp
+              reads chunk
+              (mkAddrOfAndMark loc counter_lval)
+              counter_pointer_type
+          end
+        | None ->
+          if isNotEmpty chunk then
+            IgnoreSideEffectHook.apply (argument, argument');
+          full_clean_up_chunk_labels chunk;
+          full_clean_up_chunk_locals chunk;
+          let null =
+            Cil.mkCast ~newt:voidPtrType (Cil.zero ~loc)
+          in
+          finishExp [] empty null voidPtrType
+      end
     | Cabs.CALL({ expr_node = VARIABLE "__builtin_choose_expr"},
                 args, ghost_args)
       when Machine.gccMode() ->

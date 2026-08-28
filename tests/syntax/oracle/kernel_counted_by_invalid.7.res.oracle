@@ -1,0 +1,10 @@
+[kernel] Parsing kernel_counted_by_invalid.c (with preprocessing)
+[kernel] kernel_counted_by_invalid.c:70: User Error: 
+  argument of __builtin_counted_by_ref must designate a structure array or pointer field
+  68    void invalid_builtin_pointer(int *pointer)
+  69    {
+  70      (void)__builtin_counted_by_ref(pointer);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  71    }
+  72    #endif
+[kernel] Frama-C aborted: invalid user input.

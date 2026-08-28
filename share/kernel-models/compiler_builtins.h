@@ -27,11 +27,11 @@ typedef unsigned __int128 __uint128_t;
 #endif
 
 /*
- * Frama-C does not yet retain GCC's __counted_by__ association between a
- * flexible array and its counter field.  Model __builtin_counted_by_ref with
- * its documented unannotated-array type so Linux's _Generic wrappers select
- * their no-counter fallback.  This is a front-end compatibility model: it
- * deliberately does not model a counter-field update for annotated arrays.
+ * In GCC mode, the Frama-C typer intercepts __builtin_counted_by_ref and
+ * derives its result type and address from the counted_by field attribute.
+ * Keep a declaration here for preprocessing availability and for calls in
+ * modes where that GCC-specific typing rule is disabled.  The declaration's
+ * void-pointer result is the documented result for an unannotated field.
  */
 /*@ assigns \nothing; */
 void *__builtin_counted_by_ref(void *flexible_array);

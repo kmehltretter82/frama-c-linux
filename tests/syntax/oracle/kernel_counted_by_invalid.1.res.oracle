@@ -1,0 +1,6 @@
+[kernel] Parsing kernel_counted_by_invalid.c (with preprocessing)
+[kernel] kernel_counted_by_invalid.c:23: User Error: 
+  counted_by attribute on field 'data' names non-integral field 'count'
+[kernel] User Error: stopping on file "kernel_counted_by_invalid.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.
