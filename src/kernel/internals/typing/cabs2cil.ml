@@ -6661,6 +6661,11 @@ and doExp local_env
         | Var fv -> Cil_builtins.is_special_builtin fv.vname
         | _ -> false
       in
+      let hasPolymorphicArguments =
+        match f'' with
+        | Var fv -> fv.vname = "__builtin_constant_p"
+        | _ -> false
+      in
       let init_chunk = unspecified_chunk empty in
       (* Do the arguments. In REVERSE order !!! Both GCC and MSVC do this *)
       let rec loopArgs ?(are_ghost=false) = function
@@ -6700,7 +6705,12 @@ and doExp local_env
             (add_reads ~ghost:local_env.is_ghost loc r c, e, t)
           in
           let (texpected, a'') =
-            castTo ~context:ContravariantToplevel att at a'
+            if hasPolymorphicArguments then
+              (* The registered prototype is only a parser placeholder:
+                 GCC accepts an expression of any type here. *)
+              att, a'
+            else
+              castTo ~context:ContravariantToplevel att at a'
           in
           (* A posteriori check that the argument type was compatible,
              to generate a warning otherwise;
