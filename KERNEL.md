@@ -69,13 +69,18 @@ kernel sources and headers:
 | `c0dceb9138348f5fe04c53c8c553dfefcd96010e` | library | 21/21 | none |
 | `52d9f1ec9ee800f8ff2708d3c5665199659b7f31` | library | 21/21 | none |
 | `52d9f1ec9ee800f8ff2708d3c5665199659b7f31` | DWC3 | 8/8 | none |
+| `880d8ef6f5b4269b59db60c88e874ab026cf681c` | library | 21/21 | none |
+| `880d8ef6f5b4269b59db60c88e874ab026cf681c` | DWC3 | 8/8 | none |
 
 Revision `52d9f1ec9e` adds a force-included kernel compiler model for the
 `clz`/`ctz` builtin families and fixes GNU `void` conditional expressions used
 by the kernel delay macros. On the 21-file corpus, enabling the model on the
 same revision reduces implicit-function-declaration warnings from 147 to 63
-and total warnings from 5,648 to 5,564. The remaining undeclared builtins are
-the add, multiply, and subtract overflow families.
+and total warnings from 5,648 to 5,564. Revision `880d8ef6f5` adds typed ACSL
+contracts for matching signed and unsigned add, subtract, and multiply
+overflow builtins. Together, the models eliminate all 147 undeclared-builtin
+warnings in the 21-file corpus and all 24 in DWC3, reducing the respective
+warning totals to 5,501 and 2,892.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated; the
@@ -114,9 +119,9 @@ timings, and Metrics output to JSON.
 This 100% result establishes front-end compatibility for these small corpora;
 it does **not** establish that the files are bug-free or that every kernel
 operation is modeled accurately. The runs still expose a semantic-quality
-queue, notably overflow builtins, pointer and call-type warnings, unsupported
-attributes, library-model warnings, and conservative inline-assembly handling.
-Those models and diagnostics must improve before a typed AST is treated as a
+queue, notably pointer and call-type warnings, unsupported attributes,
+library-model warnings, and conservative inline-assembly handling. Those
+models and diagnostics must improve before a typed AST is treated as a
 verification result.
 
 ## Architecture

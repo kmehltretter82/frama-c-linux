@@ -16,7 +16,7 @@
     "model_headers": [
       {
         "path": "kernel-models/compiler_builtins.h",
-        "sha256": "4f769794dd59e97500d1a1ef3081babea4c617809333bc38f2b5cb5fce13484d"
+        "sha256": "67c29239a2440311fa461d95eaf89153ea585a732d12e224f03da38b75b3c671"
       }
     ],
     "source_policy": "Kernel source and headers are unmodified; only the absolute source-root prefix in the Kbuild compilation database was relocated to the clean checkout."
@@ -73,34 +73,56 @@
         "kernel:typing:incompatible-types-call": 2500,
         "kernel:typing:int-conversion": 340
       }
+    },
+    {
+      "name": "frontend-with-integer-compiler-models",
+      "frontend_revision": "880d8ef6f5b4269b59db60c88e874ab026cf681c",
+      "attempted": 21,
+      "typed": 21,
+      "success_rate": 1.0,
+      "by_stage": {
+        "typed": 21
+      },
+      "failures_by_kind": {},
+      "all_exit_zero": true,
+      "metrics_collected": 21,
+      "warning_count": 5501,
+      "warnings_by_key": {
+        "kernel:asm:clobber": 20,
+        "kernel:attrs": 2062,
+        "kernel:attrs:unknown": 185,
+        "kernel:libc:frama-c": 40,
+        "kernel:typing:implicit-conv-void-ptr": 354,
+        "kernel:typing:incompatible-types-call": 2500,
+        "kernel:typing:int-conversion": 340
+      }
     }
   ],
   "model_effect": {
-    "comparison_frontend_revision": "52d9f1ec9ee800f8ff2708d3c5665199659b7f31",
+    "comparison_frontend_revision": "880d8ef6f5b4269b59db60c88e874ab026cf681c",
     "without_manifest_models": {
       "warning_count": 5648,
       "implicit_function_declaration_warnings": 147
     },
     "with_manifest_models": {
-      "warning_count": 5564,
-      "implicit_function_declaration_warnings": 63
+      "warning_count": 5501,
+      "implicit_function_declaration_warnings": 0
     },
-    "removed_undeclared_builtin_warnings": 84,
+    "removed_undeclared_builtin_warnings": 147,
     "modeled_builtins": [
       "__builtin_clz",
       "__builtin_clzl",
       "__builtin_clzll",
       "__builtin_ctz",
       "__builtin_ctzl",
-      "__builtin_ctzll"
-    ]
-  },
-  "remaining_model_queue": {
-    "undeclared_builtins_seen_in_all_translation_units": [
+      "__builtin_ctzll",
       "__builtin_add_overflow",
       "__builtin_mul_overflow",
       "__builtin_sub_overflow"
-    ],
+    ]
+  },
+  "remaining_model_queue": {
+    "undeclared_builtins": [],
     "unknown_attributes": [
       "__alloc_size__",
       "__assume_aligned__",
