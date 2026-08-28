@@ -1,0 +1,73 @@
+[kernel] Parsing kernel_overflow_builtins.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva:progress] 
+  computing for function __builtin_uaddl_overflow <- main.
+  Called from kernel_overflow_builtins.c:11.
+[eva] using specification for function __builtin_uaddl_overflow
+[eva:progress] kernel_overflow_builtins.c:11: 
+  function __builtin_uaddl_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_uaddl_overflow
+[eva:progress] kernel_overflow_builtins.c:12: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_usubl_overflow <- main.
+  Called from kernel_overflow_builtins.c:14.
+[eva] using specification for function __builtin_usubl_overflow
+[eva:progress] kernel_overflow_builtins.c:14: 
+  function __builtin_usubl_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_usubl_overflow
+[eva:progress] kernel_overflow_builtins.c:15: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_umull_overflow <- main.
+  Called from kernel_overflow_builtins.c:17.
+[eva] using specification for function __builtin_umull_overflow
+[eva:progress] kernel_overflow_builtins.c:17: 
+  function __builtin_umull_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_umull_overflow
+[eva:progress] kernel_overflow_builtins.c:18: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_umull_overflow <- main.
+  Called from kernel_overflow_builtins.c:20.
+[eva:progress] kernel_overflow_builtins.c:20: 
+  function __builtin_umull_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_umull_overflow
+[eva:progress] kernel_overflow_builtins.c:21: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_sadd_overflow <- main.
+  Called from kernel_overflow_builtins.c:28.
+[eva] using specification for function __builtin_sadd_overflow
+[eva:progress] kernel_overflow_builtins.c:28: 
+  function __builtin_sadd_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_sadd_overflow
+[eva:progress] kernel_overflow_builtins.c:29: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_ssub_overflow <- main.
+  Called from kernel_overflow_builtins.c:31.
+[eva] using specification for function __builtin_ssub_overflow
+[eva:progress] kernel_overflow_builtins.c:31: 
+  function __builtin_ssub_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_ssub_overflow
+[eva:progress] kernel_overflow_builtins.c:32: assertion got status valid.
+[eva:progress] 
+  computing for function __builtin_smul_overflow <- main.
+  Called from kernel_overflow_builtins.c:34.
+[eva] using specification for function __builtin_smul_overflow
+[eva:progress] kernel_overflow_builtins.c:34: 
+  function __builtin_smul_overflow: precondition 'valid_res' got status valid.
+[eva:progress] Done for function __builtin_smul_overflow
+[eva:progress] kernel_overflow_builtins.c:35: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  umax ∈ {18446744073709551615}
+  ures ∈ {42}
+  overflow ∈ {1}
+  imax ∈ {2147483647}
+  smax ∈ {2147483647}
+  smin ∈ {-2147483648}
+  sres ∈ {-2}
+  __retres ∈ {0}
