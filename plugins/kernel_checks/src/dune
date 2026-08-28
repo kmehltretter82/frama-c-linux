@@ -1,0 +1,40 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  SPDX-License-Identifier LGPL-2.1                                      ;;
+;;  Copyright (C) 2026 Frama-C Linux contributors                         ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action
+  (progn
+   (echo "Kernel checks:" %{lib-available:frama-c-kernel-checks.core} "\n")
+   (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n"))))
+
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-kernel-checks.core})))
+ (action
+  (echo
+   "WARNING: Kernel checks disabled. Run 'dune build @frama-c-configure' for more details\n")))
+
+(library
+ (name Kernel_checks)
+ (optional)
+ (public_name frama-c-kernel-checks.core)
+ (private_modules register)
+ (flags -open Frama_c_kernel :standard)
+ (libraries frama-c.kernel frama-c-eva.core)
+ (instrumentation (backend landmarks))
+ (instrumentation (backend bisect_ppx)))
+
+(plugin
+ (optional)
+ (name kernel-checks)
+ (libraries frama-c-kernel-checks.core)
+ (site (frama-c plugins)))

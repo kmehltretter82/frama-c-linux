@@ -1,0 +1,2 @@
+opam-version: "2.0"
+synopsis: "Linux kernel protocol checks for Frama-C"

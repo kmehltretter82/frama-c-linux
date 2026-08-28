@@ -359,3 +359,11 @@ ptests_config header_spec=.ignore
 /share/_frama-c header_spec=CEA_LGPL
 
 /src/kernel/internals/runtime/system_config.ml.in header_spec=CEA_LGPL
+
+##################################
+# HEADER_SPEC: FRAMA_C_LINUX_LGPL #
+##################################
+
+/plugins/kernel_checks/dune-project header_spec=FRAMA_C_LINUX_LGPL
+/plugins/kernel_checks/src/dune header_spec=FRAMA_C_LINUX_LGPL
+/plugins/kernel_checks/src/*.ml header_spec=FRAMA_C_LINUX_LGPL
