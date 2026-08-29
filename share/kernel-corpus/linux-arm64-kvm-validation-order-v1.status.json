@@ -89,10 +89,11 @@
     "kernel_checks_ptest_suite": "passed"
   },
   "candidate_disposition": {
-    "confirmed_linux_bugs": 0,
-    "status": "automated exact-source static candidate; runtime and maintainer confirmation pending",
+    "confirmed_linux_bugs": 1,
+    "status": "automated exact-source finding with vulnerable-fail/fixed-pass ARM64 KVM runtime confirmation; maintainer confirmation pending",
+    "confirmation_scope": "runtime confirmed under QEMU TCG, not maintainer confirmed or upstream accepted",
     "fix": "contrib/linux-patches/arm64-kvm-vcpu-events-v1",
-    "runtime_execution": "not performed"
+    "runtime_execution": "contrib/linux-patches/arm64-kvm-vcpu-events-v1/runtime/result-v1.json"
   },
   "limitations": [
     "A behaviorally read-only pointer is only a candidate input object; the checker does not prove userspace provenance.",
@@ -100,7 +101,8 @@
     "Request dependence is variable-level and does not model memory aliases or control dependence.",
     "Only immediate -EINVAL branches are reported; cleanup paths and other errno values are deliberately out of scope.",
     "A zero result means this narrow source pattern was absent, not that a translation unit is correct or atomic.",
-    "The sole finding still requires ARM64 runtime reproduction and upstream KVM maintainer review."
+    "The runtime control uses QEMU TCG rather than physical ARM64 hardware.",
+    "The sole finding still requires upstream KVM maintainer review."
   ],
-  "interpretation": "The checker generalizes the custom vCPU-events assertion into an AST-wide rule and isolates the same candidate as the only report across all 83 exact KVM command contexts. The fixed-source zero result and independent Eva state differential strengthen the finding, but do not make it a confirmed upstream Linux bug."
+  "interpretation": "The checker generalizes the custom vCPU-events assertion into an AST-wide rule and isolates the same bug as the only report across all 83 exact KVM command contexts. The independent Eva state differential predicts the mutation, and the focused vulnerable-fail/fixed-pass KVM selftest confirms it at runtime under emulated ARM64 EL2. It is not yet maintainer confirmed or upstream accepted."
 }

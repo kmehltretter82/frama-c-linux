@@ -52,7 +52,13 @@ git am 0001-KVM-arm64-Validate-vCPU-events-before-committing-st.patch
 - A Sashiko-style source review checked the ioctl call chain, vCPU mutex,
   exception helpers, error paths, and selftest behavior. It found no remaining
   regression after correcting the draft's provenance tag and style issue.
+- A focused runner executed only the new regression test under QEMU ARM64 TCG
+  with all CPUs at EL2 and KVM in VHE mode. With the same test binary,
+  initramfs, QEMU command, and kernel configuration, baseline
+  `548e7bcd0c54` reaches `unexpected_dabt_handler()` and exits 254, while fixed
+  `fd918c259a80` exits 0. The compact evidence and reproduction helpers are in
+  [`runtime`](runtime/).
 
-No ARM64 KVM runtime execution has been performed yet. Maintainer review,
-runtime testing on ARM64, and upstream acceptance remain necessary before
-treating the bug or fix as closed.
+This is one runtime-confirmed Linux ARM64 KVM bug under an emulated EL2/KVM
+environment. Physical ARM64 coverage, maintainer review, and upstream
+acceptance remain necessary before treating the fix as closed.

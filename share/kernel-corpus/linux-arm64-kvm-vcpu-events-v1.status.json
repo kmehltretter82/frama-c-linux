@@ -97,19 +97,36 @@
     "validation_order_checker": "revision 3d8d9df6a6 reports one finding in the baseline complete guest.c and none in the fixed complete guest.c",
     "validation_order_full_corpus": "the final AST-only linux-arm64-kvm-v4 scan typed 83/83 exact command contexts and reported only this function",
     "linux_patch_checkpatch": "passed previously with zero errors, warnings, or checks",
-    "linux_guest_object_and_selftest_cross_build": "passed previously"
+    "linux_guest_object_and_selftest_cross_build": "passed previously",
+    "arm64_kvm_runtime_differential": "the vulnerable kernel reaches the regression test's unexpected data-abort handler; the fixed kernel passes under the identical QEMU ARM64 EL2/KVM environment"
+  },
+  "runtime_control": {
+    "artifact": "contrib/linux-patches/arm64-kvm-vcpu-events-v1/runtime/result-v1.json",
+    "environment": "QEMU 10.2.1 TCG, virt with virtualization enabled, max CPU, GICv3, two vCPUs, 1024 MiB; all CPUs start at EL2 and KVM initializes in VHE mode",
+    "vulnerable": {
+      "linux_revision": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+      "result": "FRAMA_KVM_RUNTIME_RESULT=FAIL exit=254",
+      "failure": "Unexpected data abort at PC: 400c6c"
+    },
+    "fixed": {
+      "linux_revision": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+      "result": "FRAMA_KVM_RUNTIME_RESULT=PASS exit=0"
+    },
+    "controlled_variables": "The focused selftest, initramfs, QEMU command, machine, CPU, memory, and kernel configuration were identical; only the vulnerable versus fixed kernel source differed."
   },
   "candidate_disposition": {
-    "status": "exact-source static violation; runtime and maintainer confirmation pending",
-    "confirmed_linux_bugs": 0,
+    "status": "runtime-confirmed under emulated ARM64 EL2/KVM; maintainer confirmation and upstream acceptance pending",
+    "confirmed_linux_bugs": 1,
+    "confirmation_scope": "runtime confirmed, not maintainer confirmed or upstream accepted",
     "fix": "contrib/linux-patches/arm64-kvm-vcpu-events-v1",
-    "runtime_execution": "not performed"
+    "runtime_execution": "vulnerable failed and fixed passed"
   },
   "limitations": [
     "The exception injection and HYP commit are bounded models of cross-translation-unit and privilege-boundary effects.",
     "The scenario proves one combined invalid request; it does not verify every KVM_SET_VCPU_EVENTS input or outcome.",
     "The UAPI documents -EINVAL for invalid SError fields but does not explicitly state transaction atomicity.",
-    "ARM64 runtime reproduction and upstream maintainer review remain necessary before treating the candidate as confirmed."
+    "The runtime control uses QEMU TCG rather than physical ARM64 hardware.",
+    "Upstream KVM maintainer review and acceptance remain pending."
   ],
-  "interpretation": "Unlike the earlier reduced replay, this differential executes the real baseline and patched __kvm_arm_vcpu_set_events implementations inside complete exact-Kbuild guest.c translation units. It materially strengthens the candidate but does not convert it into a confirmed upstream bug."
+  "interpretation": "The exact-source static differential predicted a rejected request that still commits an external abort. The focused Linux KVM selftest then reproduced that behavior on the vulnerable kernel and passed on the fixed kernel under identical emulated ARM64 EL2 conditions. This confirms the Linux bug at runtime, while maintainer confirmation and upstream acceptance remain separate milestones."
 }

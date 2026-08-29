@@ -243,8 +243,9 @@ types all 83 ARM64 and generic KVM v4 contexts and emits one diagnostic across
 the 77 distinct C sources: `__kvm_arm_vcpu_set_events()` can reach an
 input-derived `-EINVAL` after `commit_pending_events(vcpu)`. Running the same
 rule over the candidate patch's complete `guest.c` emits none. This isolates
-the independently modeled vCPU-events candidate; it is not a count of one
-confirmed upstream bug.
+the independently modeled vCPU-events bug. A later focused runtime control
+confirms it under emulated ARM64 EL2, but it is not yet a confirmed upstream
+bug.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
@@ -542,9 +543,11 @@ is AST-wide rather than Eva-reachability-based. A reduced Eva model separately
 marks the hugetlb folio-wide validity assertion invalid before whole-folio
 initialization and valid in a synthetic repaired control.
 
-These are source-level findings, not yet accepted upstream defects. The
-relevant code was unchanged in upstream commit `548e7bcd0c54` on 2026-08-28,
-and focused public searches found no existing report or fix.
+These began as source-level findings and none is yet an accepted upstream
+defect. The vCPU-events case is now additionally runtime-confirmed; the other
+four remain source candidates. The relevant code was unchanged in upstream
+commit `548e7bcd0c54` on 2026-08-28, and focused public searches found no
+existing report or fix.
 
 The three MTE-family candidates now have a four-patch v1 series under
 [`contrib/linux-patches/arm64-kvm-mte-v1`](contrib/linux-patches/arm64-kvm-mte-v1/).
@@ -575,8 +578,13 @@ refactor. The later `efa1368ba9f4` change commits injected exceptions
 immediately, making the rejected ioctl's mutation architectural rather than
 merely pending. The patch carries the identified `Fixes:` tag, passes strict
 `checkpatch`, and builds both `guest.o` and the ARM64 `external_aborts`
-selftest. Runtime ARM64 execution, maintainer review, and upstream acceptance
-remain open.
+selftest. A focused run under QEMU TCG starts both CPUs at EL2 and initializes
+KVM in VHE mode. With an identical selftest binary, initramfs, command line,
+and kernel configuration, baseline `548e7bcd0c54` reaches the test's
+unexpected data-abort handler and exits 254; fixed `fd918c259a80` passes and
+exits 0. This confirms the bug at runtime in an emulated ARM64 environment.
+Physical hardware coverage, maintainer review, and upstream acceptance remain
+open.
 
 Revision `3d8d9df6a6` now detects this source shape without the scenario-specific
 assertion. Its mutation summaries require a visible write, directly or through
@@ -642,6 +650,7 @@ for the first milestone.
    `irqchip.c` scenario validates sensitivity but finds no real-source violation.
    A new AST-only validation-order rule scans all 83 exact contexts and isolates
    the vCPU-events candidate as its sole finding, with zero on the fixed complete
-   source. Runtime reproducers, maintainer review, conservative architecture
-   models, and additional bounded scenarios now precede RISC-V and broader
-   subsystem coverage.
+   source. Its focused vulnerable-fail/fixed-pass ARM64 EL2 runtime control is
+   now established. Runtime work for the remaining candidates, maintainer
+   review, conservative architecture models, and additional bounded scenarios
+   now precede RISC-V and broader subsystem coverage.

@@ -118,9 +118,11 @@ invalidates the folio-wide MTE validity invariant when KVM initializes only one
 base page before publishing a hugetlb folio as tagged, while proving a
 whole-folio fixed control. A seven-lens source audit produced five
 high-confidence current candidates in total; the initialization-lock and
-vCPU validation-order findings are now automated. Runtime reproduction and
-Linux maintainer confirmation remain open. The three MTE-family candidates
-now have
+vCPU validation-order findings are now automated. The vCPU-events bug now has
+a vulnerable-fail/fixed-pass runtime confirmation under emulated ARM64 EL2;
+the other candidates still lack runtime confirmation, and Linux maintainer
+confirmation remains open for all of them. The three MTE-family candidates now
+have
 a [four-patch v1 fix series](contrib/linux-patches/arm64-kvm-mte-v1/): against
 Linux `548e7bcd0c54`, the exact Kbuild-mapped checker result changes from one
 ordering violation to none, and the affected ARM64 configurations compile with
@@ -136,8 +138,11 @@ assertion invalid; the complete patched `guest.c` proves both rejection and
 unchanged-state assertions. Linux history shows the original external-abort
 implementation validated SError first and `77ee70a07357` introduced the
 reordering. The patch and ARM64 selftest cross-build cleanly and pass strict
-`checkpatch`, but have not yet been executed on ARM64 hardware or accepted
-upstream.
+`checkpatch`. A focused QEMU ARM64 run starts the guest at EL2, initializes KVM
+in VHE mode, and executes the new regression test: the vulnerable kernel
+delivers the rejected request's external abort and exits 254, while the fixed
+kernel passes with exit 0 under the identical environment. This is one
+runtime-confirmed bug, not yet a maintainer-confirmed or upstream-accepted fix.
 
 Revision `3d8d9df6a6` generalizes that custom assertion into a low-noise
 validation-order checker. It tracks state writes through defined direct-call
@@ -147,8 +152,9 @@ chains, follows request-derived conditions, and reports an immediate
 Eva entry point. Across all 83 exact ARM64 and generic KVM v4 command contexts,
 83/83 type and exactly one diagnostic remains: the same
 `__kvm_arm_vcpu_set_events()` candidate. The candidate fixed `guest.c` produces
-zero. This automates and broadens detection; runtime and maintainer confirmation
-are still required before counting a confirmed Linux bug.
+zero. This automates and broadens detection and is cross-checked by the focused
+runtime differential above. Maintainer review and upstream acceptance remain
+required.
 
 ## Installation
 

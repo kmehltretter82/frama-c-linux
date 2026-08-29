@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "measured_on": "2026-08-29",
+  "classification": "runtime-confirmed Linux ARM64 KVM bug; not maintainer-confirmed or upstream-accepted",
+  "revisions": {
+    "linux_vulnerable": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+    "selftest_source": "fd918c259a8083237070aa4e8d4d9bdf80f4569c"
+  },
+  "environment": {
+    "host_architecture": "x86_64",
+    "emulator": "QEMU 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)",
+    "machine": "virt,virtualization=on,gic-version=3",
+    "cpu": "max",
+    "accelerator": "TCG multi-threaded",
+    "vcpus": 2,
+    "memory_mib": 1024,
+    "guest_kvm": "all CPUs started at EL2; KVM VHE mode initialized successfully",
+    "cross_compiler": "aarch64-linux-gnu-gcc 15.2.0",
+    "binutils": "2.46"
+  },
+  "shared_artifacts": {
+    "kernel_config_sha256": "c06c2f0924059ee962a14f96f0377190a86dc034a3f985116fd0dd918ea2b9bb",
+    "focused_selftest_sha256": "9407029dfde430200cf0ce1c2ae2550e09a0f102b0d5c5fdd73666aa7f9cec0b",
+    "init_sha256": "4856d99ea72c4a1acc3986217e70b8133e9531a2b2fd2856f4956ec215add6e2",
+    "initramfs_sha256": "ca1528216bcbf6123572b5c616d22ec4e57ff11872363312ae7c55362697227b",
+    "artifact_policy": "Generated kernels, binaries, initramfs, and full serial logs are intentionally not tracked."
+  },
+  "runs": [
+    {
+      "name": "vulnerable",
+      "kernel_image_sha256": "443484da28c174c4558bd7cec59e0fdc2810a0213514f6231088bbc91fe336a8",
+      "qemu_exit_status": 0,
+      "test_result": "fail",
+      "test_exit_status": 254,
+      "failure": "unexpected_dabt_handler: Unexpected data abort at PC: 400c6c",
+      "interpretation": "The ioctl returned EINVAL, but the next KVM_RUN delivered the external abort from that rejected request."
+    },
+    {
+      "name": "fixed",
+      "kernel_image_sha256": "48e1ca32727899bb2d2c3b42e7da741cef545fd84cc0c51b637228d1f466a649",
+      "qemu_exit_status": 0,
+      "test_result": "pass",
+      "test_exit_status": 0,
+      "interpretation": "The ioctl returned EINVAL and the MMIO instruction completed normally without delivering the rejected external abort."
+    }
+  ],
+  "control": "The focused selftest binary, init, initramfs, QEMU command, machine, CPU, memory, and kernel configuration were identical; only the vulnerable versus fixed kernel source differed.",
+  "limitations": [
+    "TCG exercises ARM64 EL2 and KVM behavior but is not physical ARM64 hardware coverage.",
+    "The focused runner executes one rejected combined-event scenario, not every KVM_SET_VCPU_EVENTS input.",
+    "Linux KVM maintainer review and upstream acceptance remain pending."
+  ]
+}
