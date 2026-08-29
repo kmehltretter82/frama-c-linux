@@ -29,14 +29,23 @@ git am 0001-KVM-arm64-Validate-vCPU-events-before-committing-st.patch
 
 ## Evidence recorded for v1
 
-- A bounded Frama-C/Eva replay proves that the vulnerable order returns
-  `-EINVAL` after changing PC from 256 to 512, PSTATE from 0 to 965, and the
-  committed-abort marker from 0 to 1. Its atomic-rejection assertion is invalid.
-- The validation-first replay proves both rejection and unchanged-state
-  assertions. Both runs report zero Eva runtime alarms.
+- The exact ARM64 Kbuild command maps the tracked
+  `arm64_kvm_vcpu_events.c` harness onto the complete baseline `guest.c`.
+  Eva evaluates the real `__kvm_arm_vcpu_set_events()` and proves that it
+  returns `-EINVAL` after changing PC from 256 to 512, PSTATE from 0 to 965,
+  and the committed-abort marker from 0 to 1. The rejected-request atomicity
+  assertion is invalid.
+- Mapping the same harness and command onto the patched complete `guest.c`
+  proves both the rejection and unchanged-state assertions. Both full-source
+  runs report zero Eva runtime alarms; the baseline reaches 73/103 selected
+  statements in 9/158 functions, while the fixed control reaches 37/60 in
+  4/158 functions.
+- Reduced before/fixed tests preserve the same differential in the ordinary
+  `kernel-checks` regression suite.
 - Linux history identifies `77ee70a07357` as the commit that moved SError
-  validation after external-abort injection; the patch carries that `Fixes:`
-  tag.
+  validation after external-abort injection. The original external-abort
+  implementation in `da345174ceca` validated SError first, so the patch
+  restores the earlier ordering and carries the corresponding `Fixes:` tag.
 - `scripts/checkpatch.pl --strict` reports zero errors, warnings, or checks.
 - ARM64 KVM `guest.o` builds with `W=1`, and the modified
   `arm64/external_aborts` KVM selftest cross-builds with GCC.

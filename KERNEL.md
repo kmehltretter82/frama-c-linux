@@ -258,7 +258,9 @@ and with counted-by semantics plus generic KVM coverage in
 [`linux-arm64-kvm-v4.status.json`](share/kernel-corpus/linux-arm64-kvm-v4.status.json).
 The first semantic consumer and its bounded IRQ-routing control are recorded
 separately in
-[`linux-arm64-kvm-counted-by-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-counted-by-v1.status.json).
+[`linux-arm64-kvm-counted-by-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-counted-by-v1.status.json),
+and the exact-source vCPU-events before/fixed differential is in
+[`linux-arm64-kvm-vcpu-events-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-vcpu-events-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -546,12 +548,23 @@ upstream acceptance remain before closure.
 
 The vCPU-events candidate has a separate one-patch v1 fix under
 [`contrib/linux-patches/arm64-kvm-vcpu-events-v1`](contrib/linux-patches/arm64-kvm-vcpu-events-v1/).
-The bounded Eva replay shows the vulnerable ordering returning `-EINVAL`
-after changing PC, PSTATE, and committed-abort state; the validation-first
-control proves rejection with all three unchanged. The patch carries the
-identified `Fixes:` tag, passes strict `checkpatch`, and builds both `guest.o`
-and the ARM64 `external_aborts` selftest. Runtime ARM64 execution, maintainer
-review, and upstream acceptance remain open.
+Revision `50bbaa81fb` maps an exact ARM64 Kbuild command onto a harness that
+includes the complete real `guest.c` and calls its unmodified
+`__kvm_arm_vcpu_set_events()`. Baseline Eva proves rejection after changing PC,
+PSTATE, and committed-abort state, so one of two assertions is invalid. The
+same harness over the complete patched `guest.c` proves both assertions. The
+baseline reaches 73/103 selected statements in 9/158 functions; the fixed
+control reaches 37/60 in 4/158, and both produce zero Eva runtime alarms.
+
+History strengthens the provenance: the original external-abort implementation
+in `da345174ceca` validated SError before injection, while `77ee70a07357` moved
+that validation after external-abort injection during the nested-SError
+refactor. The later `efa1368ba9f4` change commits injected exceptions
+immediately, making the rejected ioctl's mutation architectural rather than
+merely pending. The patch carries the identified `Fixes:` tag, passes strict
+`checkpatch`, and builds both `guest.o` and the ARM64 `external_aborts`
+selftest. Runtime ARM64 execution, maintainer review, and upstream acceptance
+remain open.
 
 The next candidates are:
 

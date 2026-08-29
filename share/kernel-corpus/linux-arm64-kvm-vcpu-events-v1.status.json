@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "name": "linux-arm64-kvm-vcpu-events-v1",
+  "measured_on": "2026-08-29",
+  "purpose": "Evaluate rejected KVM_SET_VCPU_EVENTS atomicity in the complete ARM64 KVM guest.c translation unit and compare it with the candidate fix.",
+  "revisions": {
+    "frama_c_linux_harness": "50bbaa81fb4bb195d32dd9ca786506d20b0b32b9",
+    "linux_baseline": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed_control": "fd918c259a8083237070aa4e8d4d9bdf80f4569c"
+  },
+  "environment": {
+    "machdep": "gcc_arm64",
+    "translation_unit": "arch/arm64/kvm/guest.c",
+    "harness": "kernel-harnesses/arm64_kvm_vcpu_events.c",
+    "entry_point": "frama_c_arm64_kvm_vcpu_events",
+    "command_policy": "A one-entry database derived from the exact successful ARM64 Kbuild guest.c command was mapped onto the harness. The harness includes the complete selected guest.c; __kvm_arm_vcpu_set_events and commit_pending_events are unmodified source."
+  },
+  "scenario": {
+    "request": {
+      "serror_pending": true,
+      "serror_has_esr": true,
+      "ext_dabt_pending": true,
+      "serror_esr": "BIT_ULL(63)"
+    },
+    "expected_return": "-EINVAL",
+    "property": "A rejected request leaves PC, PSTATE, and external-abort commit state unchanged."
+  },
+  "model_boundaries": [
+    "kvm_inject_sea marks PENDING_EXCEPTION and returns successful injection without using the fault address.",
+    "the modeled __kvm_adjust_pc HYP boundary changes PC to 512, PSTATE to 965, clears the pending flag, and records the commit",
+    "cpus_have_final_cap is true so rejection exercises the invalid ESR mask check rather than the unsupported-RAS check",
+    "the real commit_pending_events resets mmio_needed and invokes the modeled HYP boundary"
+  ],
+  "measurements": [
+    {
+      "name": "baseline-complete-guest-source",
+      "linux_revision": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+      "functions_analyzed": 9,
+      "functions_in_translation_unit": 158,
+      "statements_reached": 73,
+      "selected_statements": 103,
+      "eva_runtime_alarms": 0,
+      "eva_warnings": 2,
+      "valid_assertions": 1,
+      "invalid_assertions": 1,
+      "unknown_assertions": 0,
+      "return_value": -22,
+      "final_pc": 512,
+      "final_pstate": 965,
+      "final_abort_committed": 1,
+      "result": "rejected_input_is_atomic is invalid"
+    },
+    {
+      "name": "patched-complete-guest-source",
+      "linux_revision": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+      "functions_analyzed": 4,
+      "functions_in_translation_unit": 158,
+      "statements_reached": 37,
+      "selected_statements": 60,
+      "eva_runtime_alarms": 0,
+      "eva_warnings": 2,
+      "valid_assertions": 2,
+      "invalid_assertions": 0,
+      "unknown_assertions": 0,
+      "return_value": -22,
+      "final_pc": 256,
+      "final_pstate": 0,
+      "final_abort_committed": 0,
+      "result": "rejection and rejected_input_is_atomic are both valid"
+    }
+  ],
+  "history": [
+    {
+      "revision": "da345174ceca052469e4775e4ae263b5f27a9355",
+      "effect": "The original userspace external-abort implementation validated SError fields before injecting the external abort."
+    },
+    {
+      "revision": "77ee70a073575977b403e9add25f185d614217d8",
+      "effect": "The nested-SError refactor moved external-abort injection before SError validation; this is the candidate Fixes revision."
+    },
+    {
+      "revision": "efa1368ba9f4b6e081c0fdd73245b0ba6ef75bda",
+      "effect": "Pending exceptions from KVM_SET_VCPU_EVENTS began committing immediately to architectural state."
+    }
+  ],
+  "current_upstream_check": {
+    "checked_on": "2026-08-29",
+    "source": "https://raw.githubusercontent.com/torvalds/linux/master/arch/arm64/kvm/guest.c",
+    "result": "The commit-before-validation ordering was still present in the source crawled four days earlier.",
+    "public_search": "Focused lore.kernel.org and source searches found no matching report or fix; this is not an exhaustive absence proof."
+  },
+  "validation": {
+    "install_build": "passed",
+    "reduced_before_fixed_ptests": "passed in the complete kernel-checks suite before this measurement",
+    "exact_baseline_control": "passed with the expected invalid property",
+    "exact_fixed_control": "passed with both properties valid",
+    "linux_patch_checkpatch": "passed previously with zero errors, warnings, or checks",
+    "linux_guest_object_and_selftest_cross_build": "passed previously"
+  },
+  "candidate_disposition": {
+    "status": "exact-source static violation; runtime and maintainer confirmation pending",
+    "confirmed_linux_bugs": 0,
+    "fix": "contrib/linux-patches/arm64-kvm-vcpu-events-v1",
+    "runtime_execution": "not performed"
+  },
+  "limitations": [
+    "The exception injection and HYP commit are bounded models of cross-translation-unit and privilege-boundary effects.",
+    "The scenario proves one combined invalid request; it does not verify every KVM_SET_VCPU_EVENTS input or outcome.",
+    "The UAPI documents -EINVAL for invalid SError fields but does not explicitly state transaction atomicity.",
+    "ARM64 runtime reproduction and upstream maintainer review remain necessary before treating the candidate as confirmed."
+  ],
+  "interpretation": "Unlike the earlier reduced replay, this differential executes the real baseline and patched __kvm_arm_vcpu_set_events implementations inside complete exact-Kbuild guest.c translation units. It materially strengthens the candidate but does not convert it into a confirmed upstream bug."
+}

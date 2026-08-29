@@ -226,6 +226,54 @@ the staged `copy_from_user()`, so this fixed control remains sensitive to its
 placement. The series is not an upstream-accepted fix and has not yet had an
 ARM64 KVM runtime test.
 
+The `kernel-harnesses/arm64_kvm_vcpu_events.c` harness adds full-source
+evidence for the rejected-event atomicity candidate. It includes the complete
+`guest.c` and invokes the real `__kvm_arm_vcpu_set_events()`. Narrow definitions
+model successful external-abort injection and the HYP exception commit, select
+a RAS-capable host, and ignore the unused fault address. They change PC, PSTATE,
+and a commit marker exactly when the real `commit_pending_events()` reaches the
+modeled HYP boundary; validation order remains Linux source.
+
+At baseline `548e7bcd0c54`, Eva proves the invalid event returns `-EINVAL` but
+marks the rejected-request unchanged-state assertion invalid. It reaches
+73/103 selected statements in 9/158 functions and reports zero runtime alarms.
+Using the same command and harness with the candidate patch's complete
+`guest.c` proves both assertions, reaches 37/60 statements in 4/158 functions,
+and again reports zero runtime alarms. The shorter fixed path is expected
+because validation returns before injection. This is exact-source static
+evidence, not an ARM64 runtime execution or upstream confirmation.
+
+Create the baseline and fixed harness databases, then run either one:
+
+```sh
+share_path=$(frama-c -print-share-path)
+frama-c-script kernel-harness \
+  -p /path/to/compile_commands.json \
+  --source /path/to/linux/arch/arm64/kvm/guest.c \
+  --harness "$share_path/kernel-harnesses/arm64_kvm_vcpu_events.c" \
+  -o /tmp/arm64-kvm-vcpu-events.json
+
+frama-c-script kernel-harness \
+  -p /path/to/compile_commands.json \
+  --source /path/to/linux/arch/arm64/kvm/guest.c \
+  --source-override /path/to/patched/arch/arm64/kvm/guest.c \
+  --harness "$share_path/kernel-harnesses/arm64_kvm_vcpu_events.c" \
+  -o /tmp/arm64-kvm-vcpu-events-fixed.json
+
+database=/tmp/arm64-kvm-vcpu-events.json
+# For the patched control instead:
+# database=/tmp/arm64-kvm-vcpu-events-fixed.json
+frama-c \
+  -machdep gcc_arm64 \
+  -compilation-db "$database" \
+  "-cpp-extra-args=-include $share_path/kernel-models/compiler_builtins.h" \
+  -main frama_c_arm64_kvm_vcpu_events \
+  -eva \
+  -eva-slevel 20 \
+  -eva-verbose 1 \
+  "$share_path/kernel-harnesses/arm64_kvm_vcpu_events.c"
+```
+
 Map and scan `guest.c` with its exact Kbuild command:
 
 ```sh

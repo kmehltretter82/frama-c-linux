@@ -127,12 +127,16 @@ ordering violation to none, and the affected ARM64 configurations compile with
 confirmation.
 
 The vCPU-events candidate also has a
-[one-patch v1 fix](contrib/linux-patches/arm64-kvm-vcpu-events-v1/). A bounded
-Eva replay shows the vulnerable `KVM_SET_VCPU_EVENTS` ordering returning
-`-EINVAL` after committing an external abort and changing PC and PSTATE; the
-validation-first ordering proves rejection with unchanged state. The patch and
-ARM64 selftest cross-build cleanly and pass strict `checkpatch`, but have not
-yet been executed on ARM64 hardware or accepted upstream.
+[one-patch v1 fix](contrib/linux-patches/arm64-kvm-vcpu-events-v1/). Revision
+`50bbaa81fb` adds an exact-Kbuild harness over the complete real `guest.c`.
+Baseline Eva proves `KVM_SET_VCPU_EVENTS` returns `-EINVAL` after committing an
+external abort and changing PC and PSTATE, making its atomic-rejection
+assertion invalid; the complete patched `guest.c` proves both rejection and
+unchanged-state assertions. Linux history shows the original external-abort
+implementation validated SError first and `77ee70a07357` introduced the
+reordering. The patch and ARM64 selftest cross-build cleanly and pass strict
+`checkpatch`, but have not yet been executed on ARM64 hardware or accepted
+upstream.
 
 ## Installation
 
