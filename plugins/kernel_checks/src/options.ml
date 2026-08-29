@@ -128,6 +128,11 @@ let wkey_mte_init =
     ~help:"faultable user accesses while ARM64 MTE initialization is pending"
     "mte-init"
 
+let wkey_mte_helper_domain =
+  register_warn_category
+    ~help:"base-page ARM64 MTE helpers reachable for hugetlb folios"
+    "mte-helper-domain"
+
 let wkey_counted_by_bounds =
   register_warn_category
     ~help:"provably out-of-bounds accesses to GCC counted-by fields"

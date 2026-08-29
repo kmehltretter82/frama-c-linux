@@ -43,6 +43,11 @@ let main () =
       Options.result
         "MTE initialization: %d faultable access violation(s)"
         mte_violations;
+    let mte_domain_violations = Mte_domain.run () in
+    if mte_domain_violations > 0 then
+      Options.result
+        "MTE helper domain: %d hugetlb/base-page mismatch(es)"
+        mte_domain_violations;
     if not (Options.AstOnly.get ()) then begin
       let counted_by_violations = Counted_by.run () in
       if counted_by_violations > 0 then

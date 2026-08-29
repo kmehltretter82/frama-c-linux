@@ -1,0 +1,5 @@
+[kernel] Parsing helper_domain.c (with preprocessing)
+[kernel-checks] AST-only profile: skipping Eva-dependent ERR_PTR and counted-by checks
+[kernel-checks:mte-helper-domain] helper_domain.c:20: Warning:
+  ARM64 MTE helper-domain mismatch: page_mte_tagged may receive page 'page' while its related folio 'folio' is known to be hugetlb
+[kernel-checks] MTE helper domain: 1 hugetlb/base-page mismatch(es)

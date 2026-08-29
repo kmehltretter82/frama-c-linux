@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "measured_on": "2026-08-29",
+  "classification": "runtime-confirmed Linux ARM64 KVM bug; not maintainer-confirmed or upstream-accepted",
+  "finding": "KVM_ARM_MTE_COPY_TAGS reaches a base-page MTE helper for a fresh untagged hugetlb folio",
+  "revisions": {
+    "linux_vulnerable": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed_base": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "fix_patch": "../0004-KVM-arm64-Use-the-hugetlb-MTE-tagged-helper-exclusiv.patch",
+    "fix_patch_sha256": "ab19d56c774e27ed5052d1d350d656d55cb786b3973eee5448a5858375166a1a",
+    "fixed_source_diff_sha256": "afe24d3562b0ee788550e3946e5de58eb35288fe0bcaba44ed5910f32e78ad6d"
+  },
+  "static_detection": {
+    "checker": "kernel-checks:mte-helper-domain",
+    "full_source": "arch/arm64/kvm/guest.c",
+    "vulnerable_findings": 1,
+    "vulnerable_location": "guest.c:1036",
+    "fixed_findings": 0,
+    "control": "The fixed scan used the same Kbuild mapping and complete translation unit with only patch 4 changed."
+  },
+  "environment": {
+    "host_architecture": "x86_64",
+    "emulator": "QEMU 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)",
+    "machine": "virt,mte=on,virtualization=on,gic-version=3",
+    "cpu": "max",
+    "accelerator": "TCG multi-threaded",
+    "vcpus": 2,
+    "memory_mib": 1024,
+    "guest_features": "ARM64 MTE; all CPUs at EL2; KVM VHE; two preallocated 2 MiB hugepages",
+    "cross_compiler": "aarch64-linux-gnu-gcc 15.2.0",
+    "binutils": "2.46"
+  },
+  "shared_artifacts": {
+    "kernel_config_sha256": "898f98436130657dd920265c1375a349d0e596eb52f98a61e386c3c0e6746bd8",
+    "mte_hugetlb_read_sha256": "3805e1eb11079c2fc6330b0fd5bbde6a3e07fd53bc13d68e290a536cff878520",
+    "init_sha256": "6b94c7f5982801138d8540e2729faf43679e494fee5b78b4b6161f94c37ad707",
+    "initramfs_sha256": "894a9e4b7ecf78eafd9f130c758b5f222bcd7ced68cef8fb933d159f874eca99",
+    "artifact_policy": "Generated kernels, binaries, initramfs, and full serial logs are intentionally not tracked."
+  },
+  "runs": [
+    {
+      "name": "vulnerable",
+      "kernel_image_sha256": "77bcaebeaa267aff0e3da274c81a095e8805b2a89213341977a2b032337e1c3b",
+      "serial_log_sha256": "1bb2d4114b5671ed61b567952ce5d319ad7b5e65e23899aaabebe97e3154afc4",
+      "qemu_exit_status": 0,
+      "test_result": "host-panic",
+      "failure": "VM_WARN_ON_ONCE at arch/arm64/include/asm/mte.h:58 in kvm_vm_ioctl_mte_copy_tags; panic_on_warn then panics the host kernel",
+      "interpretation": "A valid tag-read ioctl on a fresh hugetlb memslot calls page_mte_tagged(), which is invalid for hugetlb pages."
+    },
+    {
+      "name": "fixed",
+      "kernel_image_sha256": "f5d059e1f4f5429a500193da87514d4c2e5784daaa9ee30ec1c4f9377aba04f0",
+      "serial_log_sha256": "73b163f21550bbf505a32cabcd5dcff569e5b2e25f9a97f880947a5a6461bd50",
+      "qemu_exit_status": 0,
+      "test_result": "pass",
+      "ioctl_bytes": 4096,
+      "test_exit_status": 0,
+      "interpretation": "The same ioctl selects only the hugetlb folio helper and completes without a warning or panic."
+    }
+  ],
+  "control": "The trigger, init, initramfs, QEMU command, machine, CPU, memory, and kernel configuration were identical; only patch 4 differed between kernels.",
+  "limitations": [
+    "TCG exercises ARM64 MTE, EL2, and KVM behavior but is not physical ARM64 hardware coverage.",
+    "The reproducer covers one fresh anonymous 2 MiB hugetlb memslot and one tag-read ioctl.",
+    "The other three patches in the adjacent MTE series remain static candidates without this runtime confirmation.",
+    "Linux KVM maintainer review and upstream acceptance remain pending."
+  ]
+}
