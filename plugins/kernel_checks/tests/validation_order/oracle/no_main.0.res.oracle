@@ -1,0 +1,5 @@
+[kernel] Parsing no_main.c (with preprocessing)
+[kernel-checks] AST-only profile: skipping Eva-dependent ERR_PTR and counted-by checks
+[kernel-checks:validation-order] no_main.c:31: Warning:
+  rejected-input atomicity risk in ioctl_without_program_entry: input-derived validation may return -EINVAL after state parameter(s) state may have been modified
+[kernel-checks] validation order: 1 rejected-input atomicity risk(s)

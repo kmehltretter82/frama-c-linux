@@ -15,7 +15,15 @@ include Plugin.Register
 module Enabled = False
     (struct
       let option_name = "-kernel-checks"
-      let help = "run Linux kernel semantic checks after Eva"
+      let help = "run Linux kernel semantic checks"
+    end)
+
+module AstOnly = False
+    (struct
+      let option_name = "-kernel-checks-ast-only"
+      let help =
+        "run whole-AST protocol checks without starting Eva; skips ERR_PTR \
+         and counted-by checks"
     end)
 
 module MaxErrno = Int
@@ -86,20 +94,29 @@ let restore_pointer_profile () =
     Kernel.PointerDowncast.set downcast;
     original_pointer_checks := None
 
-let configure_pointer_profile ~enabled ~preserve =
-  if enabled && preserve then apply_encoded_pointer_profile ()
+let configure_pointer_profile ~enabled ~ast_only ~preserve =
+  if enabled && not ast_only && preserve then apply_encoded_pointer_profile ()
   else restore_pointer_profile ()
 
 let () =
   Enabled.add_set_hook
     (fun _ enabled ->
        configure_pointer_profile
-         ~enabled ~preserve:(PreserveEncodedPointers.get ()))
+         ~enabled ~ast_only:(AstOnly.get ())
+         ~preserve:(PreserveEncodedPointers.get ()))
+
+let () =
+  AstOnly.add_set_hook
+    (fun _ ast_only ->
+       configure_pointer_profile
+         ~enabled:(Enabled.get ()) ~ast_only
+         ~preserve:(PreserveEncodedPointers.get ()))
 
 let () =
   PreserveEncodedPointers.add_set_hook
     (fun _ preserve ->
-       configure_pointer_profile ~enabled:(Enabled.get ()) ~preserve)
+       configure_pointer_profile
+         ~enabled:(Enabled.get ()) ~ast_only:(AstOnly.get ()) ~preserve)
 
 let wkey_err_ptr =
   register_warn_category
@@ -115,3 +132,8 @@ let wkey_counted_by_bounds =
   register_warn_category
     ~help:"provably out-of-bounds accesses to GCC counted-by fields"
     "counted-by-bounds"
+
+let wkey_validation_order =
+  register_warn_category
+    ~help:"input validation that may reject after externally visible mutation"
+    "validation-order"
