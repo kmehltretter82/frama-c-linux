@@ -67,6 +67,28 @@ at the tag import in `kvm_vm_ioctl_mte_copy_tags()`. Eva intentionally analyzes
 only the trivial bounded harness entry in this scan; the protocol result covers
 all 160 function definitions parsed from the translation unit.
 
+## `counted_by` bounds
+
+The third checker consumes the GCC `counted_by` field associations retained by
+the Linux front end. At each Eva-reached read or write through an annotated
+flexible array, or through a GCC 16 counted pointer field, it evaluates the
+index and associated counter immediately before the access. As specified by
+[GCC's attribute semantics](https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html),
+a negative count gives an effective extent of zero. The checker emits a
+diagnostic only when every represented state is outside that extent: the index
+is always negative, the signed counter is always nonpositive, the minimum index
+is at least the maximum count, or the direct index expression is the associated
+counter itself. The last case preserves a useful relation that joined interval
+values would otherwise lose.
+
+Mixed valid/invalid paths and unavailable Eva values are left inconclusive.
+The direct-expression rule does not erase integer casts, so a truncating cast
+cannot be mistaken for equality with the counter. Forming an address, including
+a one-past address, is not treated as a memory access. The checker currently
+follows direct field expressions only; it does not propagate associations
+through pointer copies or aliases, infer the backing allocation size, or report
+code that Eva did not reach from the selected entry point.
+
 ## Bounded callback and fault models
 
 `-kernel-checks-bounded-entry` supplies a conservative finite default for
@@ -133,6 +155,50 @@ from `ee30dd2909d8` reversed, it analyzes 30/251 functions, reaches 144/231
 statements, and reports exactly one violation at `kfree_skb(reply)`. Both runs
 have the same two unrelated Eva alarms.
 
+The focused `counted_by` tests produce six provable violations: an access at
+the exact extent, a negative index, zero and negative signed counts, a direct
+`entries[count]` relation across joined values, and a GCC 16 counted-pointer
+access. Separate safe and inconclusive suites produce no checker diagnostics;
+they cover valid boundary accesses, direct pointer dereference, one-past
+address formation, joined path values, and a value-changing index cast.
+
+The tracked `kernel-harnesses/arm64_kvm_irq_routing.c` harness includes the
+complete pinned `virt/kvm/irqchip.c` under its exact ARM64 Kbuild command. Its
+real-source control passes `UINT_MAX` through the signed `gsi` interface to
+`kvm_irq_map_gsi()`. The source guard is nevertheless safe: because
+`nr_rt_entries` is `u32`, the comparison converts `gsi` back to `u32`, so the
+value cannot reach `map[-1]`. That run analyzes 3/29 functions, reaches 11/37
+statements, and produces zero Eva alarms and zero `counted_by` findings. A
+separate harness-only sensitivity control deliberately reads `map[-1]`; it
+analyzes 2/29 functions, reaches all 6 selected statements, produces zero Eva
+alarms, and produces exactly one checker finding. The latter is synthetic code,
+not a Linux kernel bug.
+
+Reproduce either IRQ-routing control by mapping the exact `irqchip.c` command,
+then selecting one of the two harness entry points with `-main`:
+
+```sh
+share_path=$(frama-c -print-share-path)
+frama-c-script kernel-harness \
+  -p /path/to/compile_commands.json \
+  --source /path/to/linux/virt/kvm/irqchip.c \
+  --harness "$share_path/kernel-harnesses/arm64_kvm_irq_routing.c" \
+  -o /tmp/arm64-kvm-irq-routing.json
+
+main=frama_c_arm64_kvm_irqfd_gsi
+# For the synthetic sensitivity control instead:
+# main=frama_c_arm64_kvm_irq_routing_negative_control
+frama-c \
+  -machdep gcc_arm64 \
+  -compilation-db /tmp/arm64-kvm-irq-routing.json \
+  "-cpp-extra-args=-include $share_path/kernel-models/compiler_builtins.h" \
+  -main "$main" \
+  -eva-slevel 10 \
+  -kernel-checks \
+  -kernel-checks-bounded-entry \
+  "$share_path/kernel-harnesses/arm64_kvm_irq_routing.c"
+```
+
 The ARM64 KVM harness at
 `kernel-harnesses/arm64_kvm_fw_reg.c` includes the complete current
 `arch/arm64/kvm/hypercalls.c` translation unit and replays Linux fix
@@ -196,4 +262,7 @@ direct translation-unit run remains inconclusive. The KVM result likewise
 covers one oversized-register success path; it does not prove all ioctl inputs
 or model unrelated ARM64 architectural effects. The MTE protocol diagnostic
 establishes a hazardous source-level ordering; a runtime reproducer and
-upstream maintainer review are still required to close the kernel finding.
+upstream maintainer review are still required to close the kernel finding. The
+IRQ-routing result covers direct accesses to one retained `counted_by` field in
+one bounded scenario. Its zero real-source finding rejects the tested candidate;
+it is not a proof that `irqchip.c` or KVM IRQ routing is bug-free.

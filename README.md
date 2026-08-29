@@ -66,9 +66,14 @@ Frama-C retains and validates `counted_by` field associations, gives
 `__builtin_counted_by_ref` its field-dependent pointer type and address, and
 models GCC's unannotated null result without evaluating the operand. The exact
 `virt/kvm/irqchip.c` command now normalizes Linux's `kzalloc_flex()` counter
-update to the actual `nr_rt_entries` field. Eva does not yet use this metadata
-as a general flexible-array bounds invariant, so this is semantic plumbing and
-expanded frontend coverage rather than a proof or a new Linux bug finding.
+update to the actual `nr_rt_entries` field. Eva itself does not yet use this
+metadata as a universal flexible-array invariant, but revision `6e333cae29`
+adds a low-noise `kernel-checks` rule that consumes it at Eva-reached reads and
+writes. Focused tests report six provable violations and none in safe or mixed
+controls. An exact-Kbuild `irqchip.c` scenario reports zero findings on the
+real guarded path and one on an explicit harness-only `map[-1]` sensitivity
+control. This validates detection and rejects one suspected signed-GSI case;
+it is not a new Linux bug finding or a proof of IRQ-routing correctness.
 
 The first bounded semantic replay exercises
 the known 2023 `kvm_arm_set_fw_reg()` stack overflow: an Eva user-copy extent
@@ -93,6 +98,12 @@ upstream one-line fix is reversed and restored. Enable it with
 `-kernel-checks`. See
 [the plug-in README](plugins/kernel_checks/README.md) for the reproducible
 workflow, guarantees, and limitations.
+
+The same plug-in now also checks direct accesses to retained GCC `counted_by`
+flexible-array and counted-pointer fields. It reports only all-invalid Eva
+states and leaves mixed or unavailable states inconclusive. Its first full
+ARM64 KVM application is the bounded generic IRQ-routing control above; it
+found no defect in the tested real-source path.
 
 ARM64 KVM validation also includes a user-copy size model and reduced plus
 full-translation-unit replays of Linux fix `a25bc8486f9c0`. A userspace-selected

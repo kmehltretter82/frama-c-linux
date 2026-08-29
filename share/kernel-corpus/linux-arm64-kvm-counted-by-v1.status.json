@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "name": "linux-arm64-kvm-counted-by-v1",
+  "measured_on": "2026-08-29",
+  "purpose": "Validate a low-noise semantic consumer of retained GCC counted_by metadata against focused tests and the complete pinned KVM irqchip.c translation unit.",
+  "revisions": {
+    "frama_c_linux": "6e333cae296b7a05267ee3cdfdfcd10db1e493ea",
+    "counted_by_frontend": "d18e6fd3dcb0fd1d4f467bf79def9a8eae0e4bae",
+    "linux": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7"
+  },
+  "environment": {
+    "machdep": "gcc_arm64",
+    "kernel_source": "clean detached Linux worktree",
+    "translation_unit": "virt/kvm/irqchip.c",
+    "harness": "kernel-harnesses/arm64_kvm_irq_routing.c",
+    "command_policy": "The harness replaced only virt/kvm/irqchip.c in a one-entry compilation database derived from its exact successful ARM64 Kbuild command. The harness then included the complete source file."
+  },
+  "checker": {
+    "plugin": "kernel-checks",
+    "warning_key": "counted-by-bounds",
+    "supported_accesses": [
+      "reads and writes through annotated flexible-array fields",
+      "reads and writes through direct GCC 16 counted pointer fields"
+    ],
+    "proof_conditions": [
+      "the index is negative in every represented Eva state",
+      "the signed associated count is nonpositive in every represented Eva state",
+      "the minimum index is at least the maximum associated count",
+      "the uncast index expression is structurally the associated counter lvalue"
+    ],
+    "silence_policy": [
+      "mixed valid and invalid states",
+      "unavailable or bottom Eva values",
+      "address formation without a memory access",
+      "functions unreachable from the selected Eva entry point"
+    ]
+  },
+  "focused_validation": {
+    "suite": "plugins/kernel_checks/tests/counted_by",
+    "violation_cases": 6,
+    "violation_findings": 6,
+    "safe_findings": 0,
+    "inconclusive_findings": 0,
+    "eva_alarms": 0,
+    "cast_safety_control": "A value-changing unsigned-char cast of a count equal to 260 yields index 4 and is not treated as structural entries[count] equality."
+  },
+  "exact_kvm_controls": [
+    {
+      "name": "real-source signed-GSI control",
+      "entry_point": "frama_c_arm64_kvm_irqfd_gsi",
+      "scenario": "Set nr_rt_entries to 1 and call the real kvm_irq_map_gsi() with UINT_MAX converted through its signed int gsi parameter.",
+      "functions_analyzed": 3,
+      "functions_in_translation_unit": 29,
+      "statements_reached": 11,
+      "selected_statements": 37,
+      "eva_alarms": 0,
+      "counted_by_findings": 0,
+      "exit_zero": true,
+      "interpretation": "The comparison with u32 nr_rt_entries converts gsi back to u32. UINT_MAX fails the guard and cannot reach map[-1]."
+    },
+    {
+      "name": "synthetic sensitivity control",
+      "entry_point": "frama_c_arm64_kvm_irq_routing_negative_control",
+      "scenario": "Bypass the real guard in harness-only code and read map[-1] while nr_rt_entries is 1.",
+      "functions_analyzed": 2,
+      "functions_in_translation_unit": 29,
+      "statements_reached": 6,
+      "selected_statements": 6,
+      "eva_alarms": 0,
+      "counted_by_findings": 1,
+      "exit_zero": true,
+      "interpretation": "The checker recognizes the retained map/nr_rt_entries association in the complete translation unit. This access is not Linux source."
+    }
+  ],
+  "candidate_disposition": {
+    "result": "rejected",
+    "confirmed_linux_bugs": 0,
+    "reason": "The suspected negative signed GSI cannot pass the actual unsigned source guard."
+  },
+  "validation": {
+    "kernel_checks_plugin_build": "passed",
+    "complete_kernel_checks_ptests": "passed",
+    "exact_real_source_control": "passed",
+    "exact_sensitivity_control": "passed",
+    "optional_lint_wrappers": "not available in the opam switch: ocp-indent.dynlink and headache are missing"
+  },
+  "limitations": [
+    "The checker requires Eva reachability and currently follows direct field expressions rather than copied pointers or general aliases.",
+    "It proves violations relative to the associated count; it does not prove that the backing allocation is at least that large.",
+    "It intentionally leaves overlapping or mixed intervals inconclusive and does not model concurrent counter changes.",
+    "The KVM result is one bounded IRQ-routing scenario, not whole-function, whole-file, or whole-subsystem verification."
+  ],
+  "interpretation": "This milestone converts counted_by frontend compatibility into a tested bug-finding primitive and demonstrates sensitivity in a complete ARM64 Kbuild context. It found no violation in the tested Linux path and therefore makes no new Linux kernel bug claim."
+}

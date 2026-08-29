@@ -228,9 +228,14 @@ reports 7,042 defined functions, 109,658 source lines, 17,616 calls, and 18,439
 pointer dereferences across the separate ASTs. The run emits 6,902 classified
 warnings, no undeclared builtins, and no unknown counted-by attribute. The
 remaining warnings and repeated metrics include per-process headers and both
-VHE/nVHE contexts. Eva does not yet derive general FAM access bounds from the
-metadata; the immediate semantic gain is that Linux allocation macros now
-normalize their generated counter writes to the correct structure field.
+VHE/nVHE contexts. Eva does not itself derive a universal FAM invariant from
+the metadata. Revision `6e333cae29` adds a Linux-specific consumer instead: it
+reports only direct Eva-reached reads and writes that are provably outside an
+associated flexible-array or GCC 16 counted-pointer extent. Focused tests
+produce six violations and none for safe or mixed controls. The exact
+`virt/kvm/irqchip.c` scenario produces zero findings on its real guarded path
+and exactly one on an explicit harness-only `map[-1]` sensitivity control; no
+Linux bug is claimed from this measurement.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
@@ -251,6 +256,9 @@ with complete command-inventory evidence in
 [`linux-arm64-kvm-v3.status.json`](share/kernel-corpus/linux-arm64-kvm-v3.status.json),
 and with counted-by semantics plus generic KVM coverage in
 [`linux-arm64-kvm-v4.status.json`](share/kernel-corpus/linux-arm64-kvm-v4.status.json).
+The first semantic consumer and its bounded IRQ-routing control are recorded
+separately in
+[`linux-arm64-kvm-counted-by-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-counted-by-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -323,7 +331,10 @@ analyses in v2 by adding both exact commands for all six shared VHE/nVHE
 sources. Version 3 reaches 75/75 for the complete C command inventory from the
 pinned KVM build. Version 4 reaches 83/83 after adding the generic KVM core and
 preserves counted-by associations needed by Linux flexible-array allocation
-macros. ARM64 KVM work now continues in semantic layers:
+macros. The first consumer now proves all-invalid direct accesses from Eva
+values; its exact `irqchip.c` control is sensitive to an injected negative
+index but reports no violation on the tested Linux path. ARM64 KVM work now
+continues in semantic layers:
 
 1. keep the complete exact-Kbuild corpus as a gate and add every command
    context introduced by later Kbuild configurations or kernel revisions;
@@ -465,6 +476,27 @@ forces the copy-success outcome, assumes a valid 16-byte userspace source, and
 does not model concurrency or architecture side effects outside the selected
 path.
 
+Revision `6e333cae29` turns retained GCC `counted_by` metadata into a direct
+bounds check. For each Eva-reached read or write through an annotated flexible
+array or GCC 16 counted pointer, it reports only when all represented states
+are invalid: an always-negative index, an always-empty signed extent, a minimum
+index no smaller than the largest possible extent, or a direct
+`entries[counter]` relation. Unknown and mixed states remain silent, and
+address formation is excluded. Six focused violations are detected while the
+safe and inconclusive suites produce none.
+
+The first full ARM64 KVM application includes the complete pinned
+`virt/kvm/irqchip.c` with its exact Kbuild command. A suspected signedness path
+was tested by sending `UINT_MAX` through the signed `gsi` parameter of
+`kvm_irq_map_gsi()`. The typed source guard compares it with the `u32`
+`nr_rt_entries`, so the usual arithmetic conversions restore `UINT_MAX` and
+the guarded `map[gsi]` access is unreachable. The run analyzes 3/29 functions,
+reaches 11/37 selected statements, and emits zero Eva alarms and zero
+`counted_by` findings. An explicit harness-only `map[-1]` control emits exactly
+one finding with zero Eva alarms. This rejects the tested candidate and
+validates checker sensitivity; it is not a newly discovered Linux bug or a
+proof of the rest of IRQ routing.
+
 The first fresh ARM64 KVM audit against Linux `388b607d107c` produced five
 high-confidence current candidates, each surviving three independent
 adversarial review passes. One root cause occurs in both `guest.c` and
@@ -571,6 +603,9 @@ for the first milestone.
    survived adversarial review, the MTE lock ordering is detected in the full
    current translation unit, and the hugetlb publication invariant has an Eva
    before/fixed model. A compile-tested four-patch candidate now changes the
-   full-source MTE result from one violation to none. Runtime reproducers,
-   maintainer review, conservative architecture models, and additional bounded
-   scenarios now precede RISC-V and broader subsystem coverage.
+   full-source MTE result from one violation to none. The retained `counted_by`
+   metadata now also drives a low-noise bounds checker; its first exact
+   `irqchip.c` scenario validates sensitivity but finds no real-source violation.
+   Runtime reproducers, maintainer review, conservative architecture models,
+   and additional bounded scenarios now precede RISC-V and broader subsystem
+   coverage.
