@@ -118,16 +118,25 @@ invalidates the folio-wide MTE validity invariant when KVM initializes only one
 base page before publishing a hugetlb folio as tagged, while proving a
 whole-folio fixed control. A seven-lens source audit produced five
 high-confidence current candidates in total; the initialization-lock and
-vCPU validation-order findings are now automated. The vCPU-events bug now has
-a vulnerable-fail/fixed-pass runtime confirmation under emulated ARM64 EL2;
-the other candidates still lack runtime confirmation, and Linux maintainer
-confirmation remains open for all of them. The three MTE-family candidates now
-have
-a [four-patch v1 fix series](contrib/linux-patches/arm64-kvm-mte-v1/): against
-Linux `548e7bcd0c54`, the exact Kbuild-mapped checker result changes from one
-ordering violation to none, and the affected ARM64 configurations compile with
-`W=1`. This remains candidate source and compile evidence, not an upstream
-confirmation.
+vCPU validation-order findings are now automated. A second MTE helper-domain
+rule detects the fresh-hugetlb tag-read bug. Two findings now have controlled
+runtime confirmation under emulated ARM64 EL2/KVM: the vCPU-events case fails
+before and passes after its fix, while the MTE case panics the vulnerable host
+and completes after its fix. The other three candidates still lack runtime
+confirmation, and Linux maintainer confirmation remains open for all five.
+The three MTE-family candidates have a
+[four-patch v1 fix series](contrib/linux-patches/arm64-kvm-mte-v1/): against
+Linux `548e7bcd0c54`, the exact Kbuild-mapped initialization checker changes
+from one ordering violation to none after the full series, and the helper-domain
+checker changes from one finding to none with only patch 4. The affected ARM64
+configurations compile with `W=1`. A focused MTE/hugetlb ioctl reproducer turns
+the patch-4 finding into a vulnerable-panic/fixed-pass runtime differential;
+patches 1 through 3 remain candidate source and compile evidence.
+
+Project-wide status is therefore **two runtime-confirmed Linux bugs, zero
+maintainer-confirmed bugs, and zero upstream-accepted fixes**. Runtime
+confirmation here means a controlled QEMU ARM64 execution, not physical ARM64
+coverage or acceptance by Linux KVM maintainers.
 
 The vCPU-events candidate also has a
 [one-patch v1 fix](contrib/linux-patches/arm64-kvm-vcpu-events-v1/). Revision

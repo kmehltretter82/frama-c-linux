@@ -247,6 +247,16 @@ the independently modeled vCPU-events bug. A later focused runtime control
 confirms it under emulated ARM64 EL2, but it is not yet a confirmed upstream
 bug.
 
+Revision `0c078b7e6a` adds a path-sensitive ARM64 MTE helper-domain checker.
+The complete baseline `guest.c` emits one diagnostic at the
+`page_mte_tagged()` fall-through for a known hugetlb folio; the same exact
+Kbuild-mapped source with only MTE-series patch 4 emits zero. A focused
+`KVM_ARM_MTE_COPY_TAGS` control then panics the vulnerable kernel at the
+helper's debug warning and completes 4096 bytes on the fixed kernel under the
+identical QEMU ARM64 MTE/EL2/KVM environment. The project therefore has two
+runtime-confirmed Linux bugs, zero maintainer-confirmed bugs, and zero
+upstream-accepted fixes.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
 the DWC3, Open vSwitch, and ARM64 databases were generated directly in
@@ -274,6 +284,8 @@ and the exact-source vCPU-events before/fixed differential is in
 The AST-only 83-context validation-order scan and complete-source differential
 are recorded in
 [`linux-arm64-kvm-validation-order-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-validation-order-v1.status.json).
+The MTE helper-domain static and runtime differential is recorded in
+[`linux-arm64-kvm-mte-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-mte-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -534,20 +546,27 @@ adversarial review passes. One root cause occurs in both `guest.c` and
    `-ENOMEM` result as `WARN_ON_ONCE`; `panic_on_warn` turns allocation
    pressure into a host panic.
 
-The downstream MTE rule automates the first candidate. It performs a narrow
-intraprocedural CFG analysis over all typed definitions and reports exactly one
-faultable access in the complete pinned `guest.c`: the live call in
-`kvm_vm_ioctl_mte_copy_tags()`. The translation unit contains 160 defined
-functions; Eva analyzes only the trivial scan entry because checker coverage
-is AST-wide rather than Eva-reachability-based. A reduced Eva model separately
+The downstream MTE initialization rule automates the first candidate. It
+performs a narrow intraprocedural CFG analysis over all typed definitions and
+reports exactly one faultable access in the complete pinned `guest.c`: the
+live call in `kvm_vm_ioctl_mte_copy_tags()`. The translation unit contains 160
+defined functions; Eva analyzes only the trivial scan entry because checker
+coverage is AST-wide rather than Eva-reachability-based. A reduced Eva model separately
 marks the hugetlb folio-wide validity assertion invalid before whole-folio
 initialization and valid in a synthetic repaired control.
 
+The helper-domain rule automates the third candidate. It tracks
+`folio_test_hugetlb()` branch facts and direct page-to-folio relations through
+the normalized CFG. The complete baseline `guest.c` reports the invalid
+`page_mte_tagged()` path once at line 1036; the baseline plus only patch 4
+reports zero. A focused regression pairs the vulnerable boolean form with the
+safe ternary and likewise produces one and zero findings.
+
 These began as source-level findings and none is yet an accepted upstream
-defect. The vCPU-events case is now additionally runtime-confirmed; the other
-four remain source candidates. The relevant code was unchanged in upstream
-commit `548e7bcd0c54` on 2026-08-28, and focused public searches found no
-existing report or fix.
+defect. The vCPU-events and fresh-hugetlb helper-domain cases are now
+runtime-confirmed under QEMU ARM64; the other three remain source candidates.
+The relevant code was unchanged in upstream commit `548e7bcd0c54` on
+2026-08-28, and focused public searches found no existing report or fix.
 
 The three MTE-family candidates now have a four-patch v1 series under
 [`contrib/linux-patches/arm64-kvm-mte-v1`](contrib/linux-patches/arm64-kvm-mte-v1/).
@@ -556,10 +575,16 @@ initializes complete hugetlb folios before publishing their tagged state, and
 keeps fresh hugetlb reads out of the base-page tagged helper. With the exact
 Kbuild command, the checker reports one violation at baseline `guest.c:1051`
 and none after the series; both bounded Eva runs produce zero alarms. The
-affected ARM64 objects and complete KVM directory compile with `W=1`, including
+helper-domain checker independently reports one at baseline `guest.c:1036` and
+none after only patch 4. Under an identical QEMU ARM64 MTE/EL2/KVM setup, the
+baseline reaches the `page_mte_tagged()` debug warning and panics with
+`panic_on_warn`, while the patch-4 kernel completes the 4096-byte ioctl and
+exits zero. This runtime-confirms the patch-4 defect; patches 1 through 3 remain
+static candidates. The affected ARM64 objects and complete KVM directory
+compile with `W=1`, including
 focused no-hugetlb and no-MTE configurations, and all four patches pass strict
-`checkpatch`. Runtime reproducers, architecture testing, maintainer review, and
-upstream acceptance remain before closure.
+`checkpatch`. Physical architecture testing, maintainer review, and upstream
+acceptance remain before closure.
 
 The vCPU-events candidate has a separate one-patch v1 fix under
 [`contrib/linux-patches/arm64-kvm-vcpu-events-v1`](contrib/linux-patches/arm64-kvm-vcpu-events-v1/).
@@ -651,6 +676,9 @@ for the first milestone.
    A new AST-only validation-order rule scans all 83 exact contexts and isolates
    the vCPU-events candidate as its sole finding, with zero on the fixed complete
    source. Its focused vulnerable-fail/fixed-pass ARM64 EL2 runtime control is
-   now established. Runtime work for the remaining candidates, maintainer
+   now established. A path-sensitive MTE helper-domain rule also reports one
+   finding in complete baseline `guest.c` and zero with only patch 4; its
+   focused vulnerable-panic/fixed-pass ARM64 MTE/EL2 runtime control is now
+   established. Runtime work for the remaining three candidates, maintainer
    review, conservative architecture models, and additional bounded scenarios
    now precede RISC-V and broader subsystem coverage.

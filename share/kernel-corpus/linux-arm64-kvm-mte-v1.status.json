@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "name": "linux-arm64-kvm-mte-v1",
+  "measured_on": "2026-08-29",
+  "purpose": "Detect and execute the fresh-hugetlb KVM_ARM_MTE_COPY_TAGS helper-domain bug in complete ARM64 KVM guest.c, then compare only patch 4.",
+  "revisions": {
+    "frama_c_linux_checker": "0c078b7e6a2f0d9852193a26cea07bb8878e32b5",
+    "linux_baseline": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed_base": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "fix_patch": "contrib/linux-patches/arm64-kvm-mte-v1/0004-KVM-arm64-Use-the-hugetlb-MTE-tagged-helper-exclusiv.patch",
+    "fix_patch_sha256": "ab19d56c774e27ed5052d1d350d656d55cb786b3973eee5448a5858375166a1a"
+  },
+  "static_analysis": {
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "profile": [
+      "-kernel-checks",
+      "-kernel-checks-ast-only"
+    ],
+    "translation_unit": "arch/arm64/kvm/guest.c",
+    "harness": "kernel-harnesses/arm64_kvm_mte_scan.c",
+    "command_policy": "The complete guest.c was included through a one-entry database mapped from its exact successful ARM64 Kbuild command.",
+    "baseline": {
+      "mte_helper_domain_findings": 1,
+      "location": "guest.c:1036",
+      "function": "kvm_vm_ioctl_mte_copy_tags",
+      "diagnostic": "page_mte_tagged may receive page 'page' while its related folio 'folio' is known to be hugetlb"
+    },
+    "fixed": {
+      "source_change": "baseline plus only patch 4",
+      "mte_helper_domain_findings": 0
+    },
+    "specificity": "The separate mte-init finding remains because patch 4 intentionally does not change the tag-import ordering addressed by patches 1 and 2."
+  },
+  "checker_policy": {
+    "predicate": "track the true and false successors of direct folio_test_hugetlb results",
+    "page_folio_relation": "connect direct assignments and page_folio, compound_head, or _compound_head conversion results",
+    "reported_helpers": [
+      "page_mte_tagged",
+      "set_page_mte_tagged",
+      "try_page_mte_tagging"
+    ],
+    "report_condition": "a related folio may be hugetlb on the CFG path reaching a base-page MTE helper",
+    "scope": "intraprocedural source-shape analysis; not a general points-to or whole-kernel proof"
+  },
+  "focused_control": {
+    "test": "plugins/kernel_checks/tests/mte/helper_domain.c",
+    "vulnerable_boolean_form_findings": 1,
+    "safe_ternary_form_findings": 0,
+    "kernel_checks_ptest_suite": "passed",
+    "install_build": "passed"
+  },
+  "runtime_control": {
+    "artifact": "contrib/linux-patches/arm64-kvm-mte-v1/runtime/result-v1.json",
+    "environment": "QEMU 10.2.1 TCG; virt with MTE and virtualization; max CPU; GICv3; two vCPUs; 1024 MiB; all CPUs at EL2; KVM VHE; two preallocated 2 MiB hugepages",
+    "request": "KVM_ARM_MTE_COPY_TAGS tag read for one 4 KiB page in a fresh anonymous 2 MiB hugetlb memslot",
+    "vulnerable": {
+      "result": "host kernel panic",
+      "failure": "VM_WARN_ON_ONCE at arch/arm64/include/asm/mte.h:58 in kvm_vm_ioctl_mte_copy_tags followed by panic_on_warn"
+    },
+    "fixed": {
+      "result": "FRAMA_KVM_MTE_RUNTIME_RESULT=PASS exit=0",
+      "ioctl_bytes": 4096,
+      "target_warning": false,
+      "host_panic": false
+    },
+    "controlled_variables": "The trigger, initramfs, kernel configuration, and QEMU command were identical; only patch 4 differed between kernels."
+  },
+  "candidate_disposition": {
+    "status": "automated exact-source finding with vulnerable-panic/fixed-pass ARM64 MTE/KVM runtime confirmation; maintainer confirmation pending",
+    "confirmed_linux_bugs": 1,
+    "confirmation_scope": "runtime confirmed under QEMU TCG, not maintainer confirmed or upstream accepted",
+    "fix": "contrib/linux-patches/arm64-kvm-mte-v1 patch 4"
+  },
+  "project_totals_after_measurement": {
+    "runtime_confirmed_linux_bugs": 2,
+    "maintainer_confirmed_linux_bugs": 0,
+    "upstream_accepted_fixes": 0
+  },
+  "limitations": [
+    "Static aliasing is intentionally limited to direct local variable and known page-to-folio conversion shapes.",
+    "A zero checker result means this narrow helper-domain path was absent, not that MTE or KVM is correct.",
+    "The runtime control uses QEMU TCG rather than physical ARM64 hardware.",
+    "The other MTE series defects remain static candidates without vulnerable-fail/fixed-pass runtime confirmation.",
+    "Linux KVM maintainer review and upstream acceptance remain pending."
+  ],
+  "interpretation": "The checker reports the real vulnerable expression and becomes silent for the ternary helper selection. Independently, the vulnerable Linux kernel panics on the focused valid ioctl and the patch-4 kernel passes under identical emulated ARM64 MTE/EL2/KVM conditions. This is the project's second runtime-confirmed Linux bug, while upstream confirmation remains a separate milestone."
+}

@@ -67,9 +67,33 @@ at the tag import in `kvm_vm_ioctl_mte_copy_tags()`. Eva intentionally analyzes
 only the trivial bounded harness entry in this scan; the protocol result covers
 all 160 function definitions parsed from the translation unit.
 
+## ARM64 MTE helper domains
+
+The third checker recognizes a separate page-versus-folio helper protocol.
+On a CFG path where `folio_test_hugetlb(folio)` succeeded, a page related to
+that folio must not reach the base-page `page_mte_tagged()`,
+`set_page_mte_tagged()`, or `try_page_mte_tagging()` helpers. The analysis
+tracks true and false predicate successors and direct local relations formed by
+assignments and `page_folio()`/`compound_head()` conversions.
+
+This catches the short-circuit fall-through in the real ARM64 KVM tag-read
+expression: a hugetlb folio whose folio-wide tagged bit is clear can reach
+`page_mte_tagged()`. The safe ternary selects the folio helper on the hugetlb
+path and the page helper otherwise. The focused regression reports only the
+former. With the complete `guest.c` and its exact Kbuild mapping, baseline
+`548e7bcd0c54` reports one helper-domain mismatch at `guest.c:1036`; applying
+only MTE-series patch 4 reduces it to zero.
+
+This is a narrow intraprocedural source-shape analysis, not a general points-to
+proof. Indirect calls, field-sensitive aliases, interprocedural page-to-folio
+relations, and architecture behavior remain outside its inference. An
+independent QEMU ARM64 MTE/EL2/KVM control confirms this particular finding:
+the vulnerable kernel panics at the helper's debug warning, while the patch-4
+kernel completes the same ioctl.
+
 ## `counted_by` bounds
 
-The third checker consumes the GCC `counted_by` field associations retained by
+The fourth checker consumes the GCC `counted_by` field associations retained by
 the Linux front end. At each Eva-reached read or write through an annotated
 flexible array, or through a GCC 16 counted pointer field, it evaluates the
 index and associated counter immediately before the access. As specified by
@@ -91,7 +115,7 @@ code that Eva did not reach from the selected entry point.
 
 ## Rejected-input validation order
 
-The fourth checker finds a narrow partial-update pattern: a function has a
+The fifth checker finds a narrow partial-update pattern: a function has a
 mutable state pointer and a distinct behaviorally read-only pointer, a path
 modifies the state, and a later condition derived from the read-only object has
 an immediate `return -EINVAL` branch. It emits at most one diagnostic per
@@ -119,11 +143,11 @@ and call-site review.
 
 ## AST-only corpus scans
 
-Use `-kernel-checks-ast-only` with `-kernel-checks` to run the whole-AST MTE and
-validation-order checks without selecting an Eva entry point. This skips the
-Eva-dependent ERR_PTR and `counted_by` checks and leaves the encoded-pointer
-kernel profile unchanged. It is intended for isolated kernel translation units
-that do not define `main`:
+Use `-kernel-checks-ast-only` with `-kernel-checks` to run both whole-AST MTE
+checks and the validation-order check without selecting an Eva entry point.
+This skips the Eva-dependent ERR_PTR and `counted_by` checks and leaves the
+encoded-pointer kernel profile unchanged. It is intended for isolated kernel
+translation units that do not define `main`:
 
 ```sh
 frama-c \
@@ -288,20 +312,26 @@ before/after tests enforce the same result under `gcc_arm64`.
 The MTE protocol tests add one positive deadlock-shaped case and a non-faulting
 kernel-copy control. A staged-uaccess test also accepts `copy_from_user()`
 before initialization acquisition and reports the same call when deliberately
-moved after acquisition. The tracked `kernel-harnesses/arm64_kvm_mte_scan.c`
-harness includes the complete current `guest.c` and reports the one live
-faultable-user-access violation described above. A separate reduced hugetlb
-model captures the folio-wide validity invariant: Eva marks the assertion
-invalid when one base page is initialized before publishing a folio-wide bit,
-and proves it when all subpages are initialized first.
+moved after acquisition. The helper-domain regression contains the vulnerable
+`&&`/`||` form and a safe ternary control, producing exactly one diagnostic.
+The tracked `kernel-harnesses/arm64_kvm_mte_scan.c` harness includes the
+complete current `guest.c` and reports both the live faultable-user-access
+violation and the distinct fresh-hugetlb helper mismatch. A separate reduced
+hugetlb model captures the folio-wide validity invariant: Eva marks the
+assertion invalid when one base page is initialized before publishing a
+folio-wide bit, and proves it when all subpages are initialized first.
 
 The candidate Linux series in
 [`contrib/linux-patches/arm64-kvm-mte-v1`](../../contrib/linux-patches/arm64-kvm-mte-v1/)
 turns the exact Kbuild-mapped full-source result from one MTE ordering
 diagnostic at baseline `548e7bcd0c54` into none. The checker still recognizes
 the staged `copy_from_user()`, so this fixed control remains sensitive to its
-placement. The series is not an upstream-accepted fix and has not yet had an
-ARM64 KVM runtime test.
+placement. Independently, the helper-domain rule reports one baseline finding
+and zero after applying only patch 4. A focused QEMU ARM64 run with MTE,
+hugetlb, EL2, and KVM enabled turns that static result into a
+vulnerable-panic/fixed-pass differential. The runtime evidence confirms patch
+4's defect under emulation; patches 1 through 3 remain static candidates, and
+none of the series is upstream accepted.
 
 The `kernel-harnesses/arm64_kvm_vcpu_events.c` harness adds full-source
 evidence for the rejected-event atomicity candidate. It includes the complete
@@ -317,8 +347,9 @@ marks the rejected-request unchanged-state assertion invalid. It reaches
 Using the same command and harness with the candidate patch's complete
 `guest.c` proves both assertions, reaches 37/60 statements in 4/158 functions,
 and again reports zero runtime alarms. The shorter fixed path is expected
-because validation returns before injection. This is exact-source static
-evidence, not an ARM64 runtime execution or upstream confirmation.
+because validation returns before injection. A focused QEMU ARM64 EL2/KVM
+control later reproduced the rejected external abort on the vulnerable kernel
+and passed on the fixed kernel. Upstream confirmation remains pending.
 
 Create the baseline and fixed harness databases, then run either one:
 
@@ -385,9 +416,11 @@ fail. Generic callback entry states, other outcomes, concurrency, and full
 ownership semantics remain outside this result. A zero count from a shallow
 direct translation-unit run remains inconclusive. The KVM result likewise
 covers one oversized-register success path; it does not prove all ioctl inputs
-or model unrelated ARM64 architectural effects. The MTE protocol diagnostic
-establishes a hazardous source-level ordering; a runtime reproducer and
-upstream maintainer review are still required to close the kernel finding. The
-IRQ-routing result covers direct accesses to one retained `counted_by` field in
-one bounded scenario. Its zero real-source finding rejects the tested candidate;
-it is not a proof that `irqchip.c` or KVM IRQ routing is bug-free.
+or model unrelated ARM64 architectural effects. The MTE initialization
+diagnostic establishes a hazardous source-level ordering but still lacks a
+runtime differential. The separate helper-domain diagnostic has a controlled
+vulnerable-panic/fixed-pass QEMU result; physical hardware and upstream
+maintainer confirmation remain open. The IRQ-routing result covers direct
+accesses to one retained `counted_by` field in one bounded scenario. Its zero
+real-source finding rejects the tested candidate; it is not a proof that
+`irqchip.c` or KVM IRQ routing is bug-free.

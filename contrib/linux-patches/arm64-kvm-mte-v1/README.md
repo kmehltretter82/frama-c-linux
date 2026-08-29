@@ -30,6 +30,9 @@ git am /path/to/arm64-kvm-mte-v1/*.patch
 - The exact Kbuild-mapped checker run reports one MTE initialization ordering
   violation at baseline `guest.c:1051` and none after the series. Both bounded
   Eva runs complete with zero alarms.
+- The path-sensitive MTE helper-domain rule reports the fresh-hugetlb
+  `page_mte_tagged()` fall-through once in the complete baseline `guest.c` and
+  zero times with only patch 4 applied.
 - The Frama-C checker recognizes both the original MTE helper and ordinary
   direct user-copy helpers, so the fixed result still checks that the staged
   `copy_from_user()` remains before initialization acquisition.
@@ -42,7 +45,13 @@ git am /path/to/arm64-kvm-mte-v1/*.patch
   earlier draft; v1 preserves the existing zero-length no-op behavior.
 - The Frama-C plug-in build and focused test suite pass, including positive,
   fixed-order, and misplaced-staging controls.
+- A focused `KVM_ARM_MTE_COPY_TAGS` run under QEMU ARM64 MTE/EL2/KVM makes the
+  baseline kernel warn in `page_mte_tagged()` and panic under `panic_on_warn`.
+  With the identical trigger, initramfs, configuration, and QEMU command, the
+  baseline plus only patch 4 completes the 4096-byte ioctl and exits zero.
 
-No ARM64 hardware or KVM runtime reproducer has been run yet. Maintainer review,
-runtime testing, and upstream acceptance remain necessary before treating the
-kernel defects or fixes as closed.
+This runtime differential confirms the patch-4 Linux bug under QEMU TCG; it
+does not runtime-confirm the defects addressed by patches 1 through 3.
+Physical ARM64 testing, maintainer review, and upstream acceptance remain
+necessary before treating any fix as closed. Reproducer source and compact
+artifact identities are in [`runtime/`](runtime/).
