@@ -1,0 +1,38 @@
+From b1fb822b79eec2120ddc91a53807cd088e6f87d8 Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Sat, 29 Aug 2026 03:48:54 +0000
+Subject: [PATCH 2/2] KVM: arm64: selftests: Test empty SMCCC filter range at
+ base 0
+
+test_invalid_nr_functions() checks that KVM rejects zero-function
+ranges, but only uses PSCI_0_2_FN64_CPU_ON as the base. Unsigned
+arithmetic in KVM happens to reject that nonzero base through its
+wraparound check, leaving base zero uncovered.
+
+Add the base-zero case to exercise the boundary where a zero count
+would otherwise produce an inclusive end of U32_MAX.
+
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ tools/testing/selftests/kvm/arm64/smccc_filter.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/arm64/smccc_filter.c b/tools/testing/selftests/kvm/arm64/smccc_filter.c
+index 21e41880261b4..a41ed3e016ba3 100644
+--- a/tools/testing/selftests/kvm/arm64/smccc_filter.c
++++ b/tools/testing/selftests/kvm/arm64/smccc_filter.c
+@@ -140,6 +140,10 @@ static void test_invalid_nr_functions(void)
+ 	TEST_ASSERT(r < 0 && errno == EINVAL,
+ 		    "Attempt to filter 0 functions should return EINVAL");
+ 
++	r = __set_smccc_filter(vm, 0, 0, KVM_SMCCC_FILTER_DENY);
++	TEST_ASSERT(r < 0 && errno == EINVAL,
++		    "Attempt to filter 0 functions at base 0 should return EINVAL");
++
+ 	kvm_vm_free(vm);
+ }
+ 
+-- 
+2.53.0
+

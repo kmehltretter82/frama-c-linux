@@ -1,0 +1,46 @@
+From 1f56efe1e4a1af461693a13ef052c3179e75c07b Mon Sep 17 00:00:00 2001
+From: Karl Mehltretter <kmehltretter@gmail.com>
+Date: Sat, 29 Aug 2026 03:48:36 +0000
+Subject: [PATCH 1/2] KVM: arm64: Reject empty SMCCC filter ranges
+
+The SMCCC filter UAPI defines ranges as [base, base + nr_functions).
+An existing selftest expects a zero function count to fail with
+-EINVAL.
+
+The wrap check catches a zero count for every nonzero base, but base
+zero underflows the inclusive end to U32_MAX without satisfying
+end < start. KVM then attempts to insert the accidental full-ID range,
+which collides with the reserved architecture ranges, so the ioctl fails
+with -EEXIST instead of -EINVAL.
+
+Reject a zero function count explicitly.
+
+Verified with a small userspace reproducer on an arm64 KVM host using VHE
+under QEMU TCG: EEXIST before this change, EINVAL afterward.
+
+Fixes: 821d935c87bc ("KVM: arm64: Introduce support for userspace SMCCC filtering")
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ arch/arm64/kvm/hypercalls.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index b11b8821c9fbc..dfa25bb6f25d4 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -185,7 +185,8 @@ static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user
+ 	start = filter.base;
+ 	end = start + filter.nr_functions - 1;
+ 
+-	if (end < start || filter.action >= NR_SMCCC_FILTER_ACTIONS)
++	if (!filter.nr_functions || end < start ||
++	    filter.action >= NR_SMCCC_FILTER_ACTIONS)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm->arch.config_lock);
+
+base-commit: 548e7bcd0c5460ddcbca9600cea603ebeebf4da7
+-- 
+2.53.0
+
