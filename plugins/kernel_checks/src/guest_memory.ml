@@ -13,9 +13,10 @@ module VarSet = Cil_datatype.Varinfo.Set
 
 (** A deliberately narrow check for ignored KVM guest-memory transfer
     failures.  It reports only when a direct call to a known fallible helper
-    discards its result and a reachable return then advertises either zero or
-    the same guest-address value.  This avoids classifying void best-effort
-    updates and unrelated return protocols. *)
+    discards its result and a reachable return then advertises either the exact
+    simple guest-address value or, for a signed non-boolean integer protocol,
+    zero.  This avoids classifying void best-effort updates and common
+    non-status zero returns. *)
 
 type ignored_call = {
   statement_id : int;

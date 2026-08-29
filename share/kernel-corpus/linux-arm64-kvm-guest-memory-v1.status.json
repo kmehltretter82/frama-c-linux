@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "name": "linux-arm64-kvm-guest-memory-v1",
+  "measured_on": "2026-08-29",
+  "purpose": "Run the ignored KVM guest-memory result checker across every exact ARM64 and generic KVM C command context, compare the sole finding with the complete candidate fixed source, and execute a controlled before/fixed ARM64 KVM selftest.",
+  "revisions": {
+    "frama_c_linux": "c2295e69839ca565301af7ec554d711e09d45435",
+    "linux_baseline": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed_control": "0c1036e01880e881c4690d27a2f5ed612bab6370",
+    "linux_selftest_control": "701c2890c955bea204d57b993e35af1ababc3e07",
+    "corpus_manifest": "linux-arm64-kvm-v4.json"
+  },
+  "environment": {
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "profile": [
+      "-kernel-checks",
+      "-kernel-checks-ast-only"
+    ],
+    "jobs": 8,
+    "per_target_timeout_seconds": 180,
+    "metrics_enabled": false,
+    "model_header": "kernel-models/compiler_builtins.h"
+  },
+  "artifact_identity": {
+    "compilation_database_entries": 141,
+    "compilation_database_sha256": "f897232a109b94a6b90355415275c0cec47195d7512db131ddbfce99ba7c308d",
+    "corpus_manifest_sha256": "f77d4bee7232efa90e336ae914e39a53c1f2759f88f7a9bec7cf4fe386186e62",
+    "untracked_raw_report_sha256": "4d1812d2d8b5863b210570a893b5ee0dc8efb11fd22995dc48983dbd74b39560",
+    "raw_artifact_policy": "The raw report, per-file logs, generated kernels, binaries, and initramfs were retained only for validation and are not repository artifacts."
+  },
+  "measurement": {
+    "target_command_contexts": 83,
+    "distinct_c_sources": 77,
+    "typed": 83,
+    "failed": 0,
+    "timed_out": 0,
+    "success_rate": 1.0,
+    "aggregate_process_seconds": 2806.23,
+    "files_with_guest_memory_result_findings": 1,
+    "guest_memory_result_findings": 1
+  },
+  "finding": {
+    "file": "arch/arm64/kvm/pvtime.c",
+    "line": 65,
+    "function": "kvm_init_stolen_time",
+    "helper": "kvm_write_guest_lock",
+    "diagnostic": "ignored kvm_write_guest_lock() failure in kvm_init_stolen_time may be hidden by successful return __retres",
+    "source_behavior": "The function returns the configured stolen-time IPA even when KVM could not initialize the 16-byte guest structure at that address.",
+    "disposition": "runtime-confirmed low-severity guest-visible false-success candidate; maintainer confirmation pending"
+  },
+  "complete_source_differential": {
+    "baseline": {
+      "linux_revision": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+      "guest_memory_result_findings": 1
+    },
+    "fixed": {
+      "linux_revision": "0c1036e01880e881c4690d27a2f5ed612bab6370",
+      "guest_memory_result_findings": 0
+    },
+    "source_change": "Return INVALID_GPA when kvm_write_guest_lock() cannot initialize the stolen-time structure."
+  },
+  "runtime_confirmation": {
+    "host_architecture": "x86_64",
+    "emulator": "QEMU 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)",
+    "machine": "virt,virtualization=on,gic-version=3",
+    "cpu": "max",
+    "accelerator": "TCG multi-threaded",
+    "vcpus": 2,
+    "memory_mib": 1024,
+    "guest_kvm": "all CPUs started at EL2; KVM VHE mode initialized successfully",
+    "cross_compiler": "aarch64-linux-gnu-gcc 15.2.0",
+    "binutils": "2.46",
+    "kernel_config_sha256": "c06c2f0924059ee962a14f96f0377190a86dc034a3f985116fd0dd918ea2b9bb",
+    "focused_selftest_sha256": "fb3a04112e266f3a8bc4ecfa0d554aeef98cab8436cec4664d21b912424fe515",
+    "full_steal_time_selftest_sha256": "ef87255701e840dd75d574d8a05ce6d9f41d301c8bcc467224b1dd81bc46b886",
+    "init_sha256": "97937a248d688fce5759cd596194039e4c8b6943cfc1b73d9c29f7c5af32e446",
+    "focused_initramfs_sha256": "5f29606fd81fa1f2bdd17f245486ccb7d8147fc535f57a55ba9e835dbbbb1bde",
+    "full_initramfs_sha256": "d7b524b7b83507a2e0f16649a9db6b5bf9d22dceca6a5b66572d09e3da8093f0",
+    "vulnerable": {
+      "kernel_image_sha256": "f377eae4d33985027d06f5db3bcc3b93896243cf9d5c53c889a65bfcbb00a268",
+      "qemu_exit_status": 0,
+      "test_result": "fail",
+      "test_exit_status": 254,
+      "observed_hypercall_result": "0x40000000",
+      "expected_hypercall_result": "NOT_SUPPORTED (-1)"
+    },
+    "fixed": {
+      "kernel_image_sha256": "e5c05a771a41bd62b2eb08d97088d30fed9befd7f4737c073f41767b189337e9",
+      "qemu_exit_status": 0,
+      "focused_test_result": "pass",
+      "focused_test_exit_status": 0,
+      "complete_steal_time_result": "4/4 vCPUs passed"
+    },
+    "control": "The focused selftest binary, init, initramfs, QEMU command, machine, CPU, memory, and kernel configuration were identical; only the vulnerable versus fixed kernel source differed."
+  },
+  "checker_policy": {
+    "calls": "direct calls to recognized kvm read/write guest-memory helpers with no result destination",
+    "function_scope": "non-void definitions in the typed AST",
+    "successful_return": "a value propagated from the same simple guest-address variable passed as the helper's second argument, or zero for a signed non-boolean integer return protocol",
+    "flow": "forward CFG analysis with per-call pending state and direct local assignment propagation",
+    "deduplication": "at most one diagnostic per ignored call",
+    "composite_addresses": "not treated as one of their component variables"
+  },
+  "focused_controls": {
+    "positive": [
+      "ignored locked write followed by returning the guest address",
+      "ignored write followed by returning zero"
+    ],
+    "silent": [
+      "void best-effort update",
+      "checked transfer result",
+      "ignored call confined to an error-return path",
+      "unrelated nonzero status return",
+      "returning one component of a composite guest address",
+      "guest-address arithmetic",
+      "a zero local embedded in a nonzero expression",
+      "NULL from a pointer-returning function",
+      "false from a boolean-returning function"
+    ],
+    "kernel_checks_ptest_suite": "passed"
+  },
+  "candidate_disposition": {
+    "runtime_confirmed_candidates": 1,
+    "status": "automated exact-source finding with vulnerable-fail/fixed-pass ARM64 KVM runtime confirmation; maintainer confirmation pending",
+    "confirmation_scope": "runtime confirmed under QEMU TCG, not maintainer confirmed or upstream accepted",
+    "candidate_branch": "analysis/arm64-kvm-pvtime-write-result"
+  },
+  "limitations": [
+    "The checker recognizes direct helper names only; wrappers, indirect calls, assigned-but-unchecked results, and values copied before the transfer are outside its inference.",
+    "CFG joins do not preserve relational branch predicates, and opaque callees can invalidate address-taken locals without being modeled.",
+    "A zero or address-valued return is only a candidate success protocol until the API and caller are reviewed.",
+    "The deterministic reproducer removes a memslot under userspace control before first vCPU entry; this demonstrates false success but not a guest-to-host security boundary violation.",
+    "The PV-time ABI text expects the structure to remain present in reserved guest memory, so maintainer review must decide whether post-configuration memslot deletion is within the supported VMM contract.",
+    "The runtime control uses QEMU TCG rather than physical ARM64 hardware.",
+    "Linux KVM maintainer review and upstream acceptance remain pending."
+  ],
+  "interpretation": "The checker isolates one direct ignored guest-memory failure across all 83 exact KVM command contexts. The PV_TIME_ST contract promises an initialized structure address or NOT_SUPPORTED; the controlled memslot removal forces the write failure, the baseline kernel nevertheless returns the stale IPA, and the two-line fix changes the same execution to NOT_SUPPORTED while preserving the complete steal-time selftest. This establishes the implementation behavior but not whether the provoking VMM sequence is supported by the ABI."
+}

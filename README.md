@@ -133,7 +133,21 @@ configurations compile with `W=1`. A focused MTE/hugetlb ioctl reproducer turns
 the patch-4 finding into a vulnerable-panic/fixed-pass runtime differential;
 patches 1 through 3 remain candidate source and compile evidence.
 
-Project-wide status is therefore **two runtime-confirmed Linux bugs, zero
+Two later ARM64 KVM checks add controlled runtime findings. The sent SMCCC
+filter series rejects an empty `{ base = 0, nr_functions = 0 }` range before
+its unsigned end calculation can turn it into an accidental full-ID insertion;
+the same QEMU EL2/KVM reproducer observes `EEXIST` before and `EINVAL` after.
+Revision `c2295e6983` adds a low-noise checker for ignored KVM guest-memory
+transfer failures followed by a success-valued return. Across all 83 exact KVM
+command contexts it reports only `kvm_init_stolen_time()`. As a failure-path
+control, removing the configured PV-time memslot makes the baseline kernel
+return stale IPA `0x40000000` after initialization failed, while the two-line
+fixed control returns `NOT_SUPPORTED` and passes the complete `steal_time`
+selftest. This is a runtime-confirmed candidate: the ABI text expects the
+PV-time area to remain present in reserved guest memory, so maintainer review
+must decide whether post-configuration slot deletion is supported.
+
+Project-wide status is therefore **four runtime-confirmed Linux findings, zero
 maintainer-confirmed bugs, and zero upstream-accepted fixes**. Runtime
 confirmation here means a controlled QEMU ARM64 execution, not physical ARM64
 coverage or acceptance by Linux KVM maintainers.

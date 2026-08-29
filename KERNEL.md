@@ -253,9 +253,38 @@ The complete baseline `guest.c` emits one diagnostic at the
 Kbuild-mapped source with only MTE-series patch 4 emits zero. A focused
 `KVM_ARM_MTE_COPY_TAGS` control then panics the vulnerable kernel at the
 helper's debug warning and completes 4096 bytes on the fixed kernel under the
-identical QEMU ARM64 MTE/EL2/KVM environment. The project therefore has two
-runtime-confirmed Linux bugs, zero maintainer-confirmed bugs, and zero
-upstream-accepted fixes.
+identical QEMU ARM64 MTE/EL2/KVM environment. This brought the project to two
+runtime-confirmed Linux bugs.
+
+A follow-on SMCCC filter check found that `{ base = 0, nr_functions = 0 }`
+wraps into an accidental full-ID range. It collides with KVM's reserved
+architecture ranges and returns `-EEXIST` after changing filter state instead
+of rejecting the empty request with `-EINVAL`. A focused ARM64 EL2/KVM control
+reproduces `EEXIST` before the validation fix and `EINVAL` after it. The
+two-patch fix and selftest series was sent to the KVM lists on 2026-08-29;
+maintainer confirmation remains pending.
+
+Revision `c2295e6983` adds a separate whole-AST check for discarded KVM
+guest-memory transfer results followed by a success-valued return. Its policy
+requires an exact simple guest-address value, or zero from a signed non-boolean
+integer return protocol. Across all 83 exact ARM64 and generic KVM command
+contexts, it reports only `kvm_init_stolen_time()` at `pvtime.c:65`; the
+complete candidate fixed source reports zero. A deterministic QEMU ARM64
+EL2/KVM control configures a stolen-time IPA, removes its memslot, and invokes
+`PV_TIME_ST`. The vulnerable kernel returns stale IPA `0x40000000` after its
+initialization write failed; the fixed kernel returns `NOT_SUPPORTED`, and the
+complete four-vCPU `steal_time` selftest passes.
+
+The PV-time result is a runtime-confirmed candidate rather than a
+maintainer-confirmed bug. Its failure control removes the configured memslot,
+while the ABI text expects the PV-time structure to remain present in reserved
+guest memory. Maintainer review must therefore decide whether that slot
+lifetime is part of the supported VMM contract.
+
+Project-wide status is four runtime-confirmed Linux findings, zero
+maintainer-confirmed bugs, and zero upstream-accepted fixes. Runtime
+confirmation here is controlled QEMU ARM64 execution, not physical-hardware
+coverage or acceptance by Linux KVM maintainers.
 
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
@@ -286,6 +315,9 @@ are recorded in
 [`linux-arm64-kvm-validation-order-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-validation-order-v1.status.json).
 The MTE helper-domain static and runtime differential is recorded in
 [`linux-arm64-kvm-mte-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-mte-v1.status.json).
+The ignored guest-memory result scan and PV-time static/runtime differential
+are recorded in
+[`linux-arm64-kvm-guest-memory-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-guest-memory-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 

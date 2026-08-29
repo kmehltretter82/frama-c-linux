@@ -141,13 +141,40 @@ parameters, assembly, or callbacks; it also does not prove that a behaviorally
 read-only parameter is userspace-controlled. A diagnostic therefore needs API
 and call-site review.
 
+## KVM guest-memory result propagation
+
+The sixth checker looks for direct calls to fallible KVM guest-memory transfer
+helpers whose result is discarded. In a non-void function, it reports when a
+reachable return then advertises success as the same simple guest-address
+variable passed to the helper. For signed, non-boolean integer return
+protocols, constant zero is also treated as success. The forward CFG analysis
+follows direct local assignments, so it also recognizes Frama-C's normalized
+return variable.
+
+The recognized API surface is the direct `kvm_*read_guest*()` and
+`kvm_*write_guest*()` families, including the vCPU, page, atomic-read, and
+locked variants. Address-value matching deliberately requires a plain variable
+apart from casts; it does not treat one component of a composite address as the
+transferred address. Void functions are excluded because many periodic or
+best-effort guest updates intentionally have no caller-visible error channel.
+
+This rule detects a source-level error-propagation candidate, not an invalid
+memory access by itself. It does not infer wrappers or indirect calls, prove
+the meaning of a function's return protocol, track a value copied before the
+transfer, or model memslot lifetime. Calls whose result is assigned but never
+checked are also outside the direct-discard policy. CFG joins do not retain
+relational branch predicates, and opaque calls through an address-taken local
+can invalidate the tracked value without being modeled. Every diagnostic
+therefore requires helper-contract and caller review, followed by a
+failure-path control.
+
 ## AST-only corpus scans
 
-Use `-kernel-checks-ast-only` with `-kernel-checks` to run both whole-AST MTE
-checks and the validation-order check without selecting an Eva entry point.
-This skips the Eva-dependent ERR_PTR and `counted_by` checks and leaves the
-encoded-pointer kernel profile unchanged. It is intended for isolated kernel
-translation units that do not define `main`:
+Use `-kernel-checks-ast-only` with `-kernel-checks` to run the whole-AST MTE,
+validation-order, and guest-memory result checks without selecting an Eva entry
+point. This skips the Eva-dependent ERR_PTR and `counted_by` checks and leaves
+the encoded-pointer kernel profile unchanged. It is intended for isolated
+kernel translation units that do not define `main`:
 
 ```sh
 frama-c \
@@ -253,6 +280,28 @@ cases, including a translation unit with no program entry point. Validation
 first, a defined non-`const` observer, same-object state and condition, KVM
 fail-stop state, cleanup-derived rejection, a different errno, and an indirect
 result return all remain silent.
+
+The guest-memory result tests report an ignored locked write followed by an
+address return and an ignored write followed by zero. Checked results, void
+best-effort updates, a call confined to an error-return path, an unrelated
+status return, returning one component of a composite address, address
+arithmetic, a zero local inside a nonzero expression, `NULL`, and boolean false
+remain silent. Revision `c2295e6983` applied the rule to all 83 exact ARM64 and
+generic KVM command contexts at Linux `548e7bcd0c54`: all 83 typed, and the
+only diagnostic was the ignored `kvm_write_guest_lock()` in
+`kvm_init_stolen_time()` at `pvtime.c:65`. The complete source with candidate
+fix `0c1036e01880` emits none.
+
+The candidate failure path is independently runtime-confirmed under QEMU ARM64
+EL2/KVM. After userspace configures the stolen-time IPA and removes its
+memslot, the vulnerable kernel returns the stale IPA `0x40000000` even though
+initialization failed. The fixed kernel returns `NOT_SUPPORTED`; the complete
+four-vCPU `steal_time` selftest also passes. The PV-time ABI text expects the
+structure to remain present in reserved guest memory, however, so this control
+does not by itself establish that slot deletion is a supported VMM action. The
+compact measurement record is
+[`linux-arm64-kvm-guest-memory-v1.status.json`](../../share/kernel-corpus/linux-arm64-kvm-guest-memory-v1.status.json);
+generated kernels, binaries, raw reports, and serial logs are not tracked.
 
 Revision `3d8d9df6a6` applied the AST-only profile to all 83 exact command
 contexts in `linux-arm64-kvm-v4` at Linux `548e7bcd0c54`. All 83 produced typed
