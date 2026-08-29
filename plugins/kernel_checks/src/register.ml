@@ -36,7 +36,12 @@ let main () =
     if mte_violations > 0 then
       Options.result
         "MTE initialization: %d faultable access violation(s)"
-        mte_violations
+        mte_violations;
+    let counted_by_violations = Counted_by.run () in
+    if counted_by_violations > 0 then
+      Options.result
+        "counted_by bounds: %d provable violation(s)"
+        counted_by_violations
   end
 
 let () = Boot.Main.extend main

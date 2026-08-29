@@ -1,1 +1,1 @@
-DEFAULT_SUITES=arm64_kvm err_ptr historical models mte
+DEFAULT_SUITES=arm64_kvm counted_by err_ptr historical models mte

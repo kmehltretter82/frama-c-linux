@@ -110,3 +110,8 @@ let wkey_mte_init =
   register_warn_category
     ~help:"faultable user accesses while ARM64 MTE initialization is pending"
     "mte-init"
+
+let wkey_counted_by_bounds =
+  register_warn_category
+    ~help:"provably out-of-bounds accesses to GCC counted-by fields"
+    "counted-by-bounds"

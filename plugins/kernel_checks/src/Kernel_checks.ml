@@ -5,6 +5,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Counted_by = Counted_by
 module Err_ptr = Err_ptr
 module Mte = Mte
 module Models = Models
