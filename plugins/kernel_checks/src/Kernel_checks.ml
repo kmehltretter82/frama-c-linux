@@ -7,6 +7,7 @@
 
 module Counted_by = Counted_by
 module Err_ptr = Err_ptr
+module Guest_memory = Guest_memory
 module Mte = Mte
 module Mte_domain = Mte_domain
 module Models = Models

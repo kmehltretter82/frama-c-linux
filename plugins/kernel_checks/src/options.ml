@@ -142,3 +142,8 @@ let wkey_validation_order =
   register_warn_category
     ~help:"input validation that may reject after externally visible mutation"
     "validation-order"
+
+let wkey_guest_memory_result =
+  register_warn_category
+    ~help:"ignored KVM guest-memory failures followed by successful returns"
+    "guest-memory-result"

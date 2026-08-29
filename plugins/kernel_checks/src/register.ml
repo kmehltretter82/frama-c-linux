@@ -59,7 +59,12 @@ let main () =
     if validation_order_violations > 0 then
       Options.result
         "validation order: %d rejected-input atomicity risk(s)"
-        validation_order_violations
+        validation_order_violations;
+    let guest_memory_violations = Guest_memory.run () in
+    if guest_memory_violations > 0 then
+      Options.result
+        "guest memory: %d ignored transfer failure(s) reaching success"
+        guest_memory_violations
   end
 
 let () = Boot.Main.extend main

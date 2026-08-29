@@ -1,0 +1,7 @@
+[kernel] Parsing ignored_result.c (with preprocessing)
+[kernel-checks] AST-only profile: skipping Eva-dependent ERR_PTR and counted-by checks
+[kernel-checks:guest-memory-result] ignored_result.c:20: Warning:
+  ignored kvm_write_guest_lock() failure in ignored_result_returns_address may be hidden by successful return base
+[kernel-checks:guest-memory-result] ignored_result.c:27: Warning:
+  ignored kvm_write_guest() failure in ignored_result_returns_zero may be hidden by successful return __retres
+[kernel-checks] guest memory: 2 ignored transfer failure(s) reaching success
