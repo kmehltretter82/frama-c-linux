@@ -1,7 +1,7 @@
 # Linux kernel checks
 
-This plug-in contains Linux-specific semantic checks built on Frama-C Eva.
-Enable it with `-kernel-checks`.
+This plug-in contains Linux-specific semantic checks built on Frama-C's typed
+AST and Eva results. Enable it with `-kernel-checks`.
 
 ## ERR_PTR protocol
 
@@ -89,6 +89,68 @@ follows direct field expressions only; it does not propagate associations
 through pointer copies or aliases, infer the backing allocation size, or report
 code that Eva did not reach from the selected entry point.
 
+## Rejected-input validation order
+
+The fourth checker finds a narrow partial-update pattern: a function has a
+mutable state pointer and a distinct behaviorally read-only pointer, a path
+modifies the state, and a later condition derived from the read-only object has
+an immediate `return -EINVAL` branch. It emits at most one diagnostic per
+function.
+
+Mutation evidence is intentionally stronger than a non-`const` prototype. A
+fixed-point summary records direct writes through pointer formals and propagates
+them only through direct calls whose definitions are present in the typed
+translation unit. Opaque and indirect calls are not guessed to mutate their
+arguments. Linux tracepoints are observational, and KVM's `kvm_vm_bugged()` and
+`kvm_vm_dead()` fail-stop effects are outside transactional-state reporting.
+
+A forward CFG analysis propagates request dependence through assignments,
+local initializers, and direct call results. It recognizes both an ordinary
+immediate return and Frama-C's normalized result-assignment-plus-goto form. The
+rule is deliberately limited to `-EINVAL`; cleanup returns, other errno values,
+indirect rejection through a result variable, same-object state and input, and
+conditions not derived from the read-only parameter remain silent.
+
+This is a structural bug-candidate check, not a proof of ioctl atomicity. It
+does not infer mutation through opaque calls, pointer aliases, output
+parameters, assembly, or callbacks; it also does not prove that a behaviorally
+read-only parameter is userspace-controlled. A diagnostic therefore needs API
+and call-site review.
+
+## AST-only corpus scans
+
+Use `-kernel-checks-ast-only` with `-kernel-checks` to run the whole-AST MTE and
+validation-order checks without selecting an Eva entry point. This skips the
+Eva-dependent ERR_PTR and `counted_by` checks and leaves the encoded-pointer
+kernel profile unchanged. It is intended for isolated kernel translation units
+that do not define `main`:
+
+```sh
+frama-c \
+  -machdep gcc_arm64 \
+  -compilation-db /path/to/one-entry.json \
+  -kernel-checks \
+  -kernel-checks-ast-only \
+  /path/to/linux/arch/arm64/kvm/guest.c
+```
+
+The corpus runner can apply the same profile independently to every exact
+Kbuild command:
+
+```sh
+frama-c-script kernel-corpus \
+  -p /path/to/compile_commands.json \
+  --kernel-root /path/to/linux \
+  --corpus "$(frama-c -print-share-path)/kernel-corpus/linux-arm64-kvm-v4.json" \
+  --machdep gcc_arm64 \
+  --frama-c-arg=-kernel-checks \
+  --frama-c-arg=-kernel-checks-ast-only \
+  --no-metrics \
+  --jobs 8 \
+  --timeout 180 \
+  -o /tmp/linux-arm64-kvm-validation-order.json
+```
+
 ## Bounded callback and fault models
 
 `-kernel-checks-bounded-entry` supplies a conservative finite default for
@@ -161,6 +223,21 @@ the exact extent, a negative index, zero and negative signed counts, a direct
 access. Separate safe and inconclusive suites produce no checker diagnostics;
 they cover valid boundary accesses, direct pointer dereference, one-past
 address formation, joined path values, and a value-changing index cast.
+
+The validation-order tests report direct-write and defined-callee mutation
+cases, including a translation unit with no program entry point. Validation
+first, a defined non-`const` observer, same-object state and condition, KVM
+fail-stop state, cleanup-derived rejection, a different errno, and an indirect
+result return all remain silent.
+
+Revision `3d8d9df6a6` applied the AST-only profile to all 83 exact command
+contexts in `linux-arm64-kvm-v4` at Linux `548e7bcd0c54`. All 83 produced typed
+ASTs, and the checker emitted exactly one diagnostic: the post-commit
+`-EINVAL` in `__kvm_arm_vcpu_set_events()` at `guest.c:806`. The same checker
+over the candidate patch's complete `guest.c` emitted none. The compact
+measurement record is
+[`linux-arm64-kvm-validation-order-v1.status.json`](../../share/kernel-corpus/linux-arm64-kvm-validation-order-v1.status.json);
+raw per-file logs are deliberately not tracked.
 
 The tracked `kernel-harnesses/arm64_kvm_irq_routing.c` harness includes the
 complete pinned `virt/kvm/irqchip.c` under its exact ARM64 Kbuild command. Its

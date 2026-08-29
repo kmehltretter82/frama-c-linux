@@ -237,6 +237,15 @@ produce six violations and none for safe or mixed controls. The exact
 and exactly one on an explicit harness-only `map[-1]` sensitivity control; no
 Linux bug is claimed from this measurement.
 
+Revision `3d8d9df6a6` adds a whole-AST validation-order checker and an AST-only
+profile that does not require an Eva entry point. The final exact-command scan
+types all 83 ARM64 and generic KVM v4 contexts and emits one diagnostic across
+the 77 distinct C sources: `__kvm_arm_vcpu_set_events()` can reach an
+input-derived `-EINVAL` after `commit_pending_events(vcpu)`. Running the same
+rule over the candidate patch's complete `guest.c` emits none. This isolates
+the independently modeled vCPU-events candidate; it is not a count of one
+confirmed upstream bug.
+
 The measurements used clean Linux sources. The library compilation database
 was copied from Kbuild with only its absolute source-root prefix relocated;
 the DWC3, Open vSwitch, and ARM64 databases were generated directly in
@@ -261,6 +270,9 @@ separately in
 [`linux-arm64-kvm-counted-by-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-counted-by-v1.status.json),
 and the exact-source vCPU-events before/fixed differential is in
 [`linux-arm64-kvm-vcpu-events-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-vcpu-events-v1.status.json).
+The AST-only 83-context validation-order scan and complete-source differential
+are recorded in
+[`linux-arm64-kvm-validation-order-v1.status.json`](share/kernel-corpus/linux-arm64-kvm-validation-order-v1.status.json).
 
 Run the corpus against a matching kernel checkout with:
 
@@ -566,6 +578,15 @@ merely pending. The patch carries the identified `Fixes:` tag, passes strict
 selftest. Runtime ARM64 execution, maintainer review, and upstream acceptance
 remain open.
 
+Revision `3d8d9df6a6` now detects this source shape without the scenario-specific
+assertion. Its mutation summaries require a visible write, directly or through
+a defined direct-call chain; a CFG analysis then reports a later request-derived
+immediate `-EINVAL`. The AST-only profile checks every definition independently
+of Eva reachability. Across all 83 exact KVM command contexts it reports only
+this function, and the complete candidate fixed source reports zero. Focused
+controls keep validation-first code, observers, cleanup errors, KVM fail-stop
+state, different errno values, and indirect result returns silent.
+
 The next candidates are:
 
 1. lock and execution-context mistakes, including sleeping in atomic context;
@@ -619,6 +640,8 @@ for the first milestone.
    full-source MTE result from one violation to none. The retained `counted_by`
    metadata now also drives a low-noise bounds checker; its first exact
    `irqchip.c` scenario validates sensitivity but finds no real-source violation.
-   Runtime reproducers, maintainer review, conservative architecture models,
-   and additional bounded scenarios now precede RISC-V and broader subsystem
-   coverage.
+   A new AST-only validation-order rule scans all 83 exact contexts and isolates
+   the vCPU-events candidate as its sole finding, with zero on the fixed complete
+   source. Runtime reproducers, maintainer review, conservative architecture
+   models, and additional bounded scenarios now precede RISC-V and broader
+   subsystem coverage.

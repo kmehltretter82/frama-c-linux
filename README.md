@@ -117,9 +117,10 @@ the complete 160-function `guest.c` translation unit. A reduced Eva model also
 invalidates the folio-wide MTE validity invariant when KVM initializes only one
 base page before publishing a hugetlb folio as tagged, while proving a
 whole-folio fixed control. A seven-lens source audit produced five
-high-confidence current candidates in total; only the initialization-lock
-finding is currently automated by the checker. Runtime reproduction and Linux
-maintainer confirmation remain open. The three MTE-family candidates now have
+high-confidence current candidates in total; the initialization-lock and
+vCPU validation-order findings are now automated. Runtime reproduction and
+Linux maintainer confirmation remain open. The three MTE-family candidates
+now have
 a [four-patch v1 fix series](contrib/linux-patches/arm64-kvm-mte-v1/): against
 Linux `548e7bcd0c54`, the exact Kbuild-mapped checker result changes from one
 ordering violation to none, and the affected ARM64 configurations compile with
@@ -137,6 +138,17 @@ implementation validated SError first and `77ee70a07357` introduced the
 reordering. The patch and ARM64 selftest cross-build cleanly and pass strict
 `checkpatch`, but have not yet been executed on ARM64 hardware or accepted
 upstream.
+
+Revision `3d8d9df6a6` generalizes that custom assertion into a low-noise
+validation-order checker. It tracks state writes through defined direct-call
+chains, follows request-derived conditions, and reports an immediate
+`-EINVAL` only after a proved earlier mutation. The new
+`-kernel-checks-ast-only` profile scans translation units without requiring an
+Eva entry point. Across all 83 exact ARM64 and generic KVM v4 command contexts,
+83/83 type and exactly one diagnostic remains: the same
+`__kvm_arm_vcpu_set_events()` candidate. The candidate fixed `guest.c` produces
+zero. This automates and broadens detection; runtime and maintainer confirmation
+are still required before counting a confirmed Linux bug.
 
 ## Installation
 

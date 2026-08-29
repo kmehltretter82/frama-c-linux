@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "name": "linux-arm64-kvm-validation-order-v1",
+  "measured_on": "2026-08-29",
+  "purpose": "Run the rejected-input validation-order checker across every exact ARM64 and generic KVM C command context, then compare the sole finding with the candidate fixed source.",
+  "revisions": {
+    "frama_c_linux": "3d8d9df6a63990cb7d2db40ecc65a1bbf45549e3",
+    "linux_baseline": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+    "linux_fixed_control": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+    "corpus_manifest": "linux-arm64-kvm-v4.json"
+  },
+  "environment": {
+    "frama_c_version": "34.0~~dev (Selenium)",
+    "machdep": "gcc_arm64",
+    "profile": [
+      "-kernel-checks",
+      "-kernel-checks-ast-only"
+    ],
+    "jobs": 8,
+    "per_target_timeout_seconds": 180,
+    "metrics_enabled": false,
+    "model_header": "kernel-models/compiler_builtins.h"
+  },
+  "artifact_identity": {
+    "compilation_database_entries": 141,
+    "compilation_database_sha256": "f897232a109b94a6b90355415275c0cec47195d7512db131ddbfce99ba7c308d",
+    "corpus_manifest_sha256": "f77d4bee7232efa90e336ae914e39a53c1f2759f88f7a9bec7cf4fe386186e62",
+    "untracked_raw_report_sha256": "cd8a92d19ce8ab5faff462ee5350970038a05d35e9c4c8625a288820af469ae2",
+    "raw_artifact_policy": "The multi-megabyte report, one-entry databases, and per-file logs were retained only under /tmp and are not repository artifacts."
+  },
+  "measurement": {
+    "target_command_contexts": 83,
+    "distinct_c_sources": 77,
+    "typed": 83,
+    "failed": 0,
+    "timed_out": 0,
+    "success_rate": 1.0,
+    "aggregate_process_seconds": 2857.388,
+    "files_with_validation_order_findings": 1,
+    "validation_order_findings": 1
+  },
+  "finding": {
+    "file": "arch/arm64/kvm/guest.c",
+    "line": 806,
+    "function": "__kvm_arm_vcpu_set_events",
+    "state_parameter": "vcpu",
+    "diagnostic": "input-derived validation may return -EINVAL after vcpu may have been modified",
+    "source_behavior": "The external-abort path calls commit_pending_events(vcpu) before two SError validations can reject the same request.",
+    "disposition": "matches the existing exact-source vCPU-events atomicity candidate"
+  },
+  "complete_source_differential": {
+    "baseline": {
+      "linux_revision": "548e7bcd0c5460ddcbca9600cea603ebeebf4da7",
+      "validation_order_findings": 1
+    },
+    "fixed": {
+      "linux_revision": "fd918c259a8083237070aa4e8d4d9bdf80f4569c",
+      "validation_order_findings": 0
+    },
+    "eva_cross_check": "The separately tracked full-source harness proves that baseline rejection changes PC, PSTATE, and the commit marker, while the fixed complete source preserves all three."
+  },
+  "checker_policy": {
+    "state_role": "a pointer formal with a direct write in the typed translation unit, possibly propagated through a defined direct-call chain",
+    "input_role": "a distinct pointer formal with no mutation proved by that summary",
+    "request_dependence": "propagated through assignments, local initializers, and direct call results",
+    "rejection": "an immediate -EINVAL return branch, including Frama-C's normalized result-assignment and goto form",
+    "deduplication": "at most one diagnostic per function",
+    "opaque_calls": "not assumed to mutate",
+    "excluded_effects": [
+      "Linux tracepoints",
+      "KVM kvm_vm_bugged and kvm_vm_dead fail-stop state"
+    ]
+  },
+  "focused_controls": {
+    "positive": [
+      "direct state write before request-derived -EINVAL",
+      "state write propagated through a defined callee",
+      "AST-only translation unit without main"
+    ],
+    "silent": [
+      "validation before mutation",
+      "defined non-const observer",
+      "same object used for state and condition",
+      "KVM fail-stop state",
+      "cleanup error unrelated to request data",
+      "non-EINVAL rejection",
+      "indirect rejection through a result variable"
+    ],
+    "kernel_checks_ptest_suite": "passed"
+  },
+  "candidate_disposition": {
+    "confirmed_linux_bugs": 0,
+    "status": "automated exact-source static candidate; runtime and maintainer confirmation pending",
+    "fix": "contrib/linux-patches/arm64-kvm-vcpu-events-v1",
+    "runtime_execution": "not performed"
+  },
+  "limitations": [
+    "A behaviorally read-only pointer is only a candidate input object; the checker does not prove userspace provenance.",
+    "Mutation through opaque or indirect calls, pointer aliases, output parameters, callbacks, and assembly is not inferred.",
+    "Request dependence is variable-level and does not model memory aliases or control dependence.",
+    "Only immediate -EINVAL branches are reported; cleanup paths and other errno values are deliberately out of scope.",
+    "A zero result means this narrow source pattern was absent, not that a translation unit is correct or atomic.",
+    "The sole finding still requires ARM64 runtime reproduction and upstream KVM maintainer review."
+  ],
+  "interpretation": "The checker generalizes the custom vCPU-events assertion into an AST-wide rule and isolates the same candidate as the only report across all 83 exact KVM command contexts. The fixed-source zero result and independent Eva state differential strengthen the finding, but do not make it a confirmed upstream Linux bug."
+}

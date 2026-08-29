@@ -94,6 +94,8 @@
     "reduced_before_fixed_ptests": "passed in the complete kernel-checks suite before this measurement",
     "exact_baseline_control": "passed with the expected invalid property",
     "exact_fixed_control": "passed with both properties valid",
+    "validation_order_checker": "revision 3d8d9df6a6 reports one finding in the baseline complete guest.c and none in the fixed complete guest.c",
+    "validation_order_full_corpus": "the final AST-only linux-arm64-kvm-v4 scan typed 83/83 exact command contexts and reported only this function",
     "linux_patch_checkpatch": "passed previously with zero errors, warnings, or checks",
     "linux_guest_object_and_selftest_cross_build": "passed previously"
   },
