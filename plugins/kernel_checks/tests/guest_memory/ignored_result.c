@@ -69,3 +69,34 @@ gpa_t composite_address_component_is_not_the_written_address(
   kvm_write_guest_lock(kvm, base + offset, data, len);
   return offset;
 }
+
+gpa_t arithmetic_address_return_is_not_the_written_address(
+  struct kvm *kvm, gpa_t base, const void *data, unsigned long len)
+{
+  kvm_write_guest_lock(kvm, base, data, len);
+  return base + 64;
+}
+
+int zero_variable_in_nonzero_expression_is_not_success(
+  struct kvm *kvm, gpa_t base, const void *data, unsigned long len)
+{
+  int status;
+
+  kvm_write_guest_lock(kvm, base, data, len);
+  status = 0;
+  return status + 7;
+}
+
+void *pointer_null_is_not_assumed_to_be_success(
+  struct kvm *kvm, gpa_t base, const void *data, unsigned long len)
+{
+  kvm_write_guest_lock(kvm, base, data, len);
+  return (void *)0;
+}
+
+_Bool boolean_false_is_not_assumed_to_be_success(
+  struct kvm *kvm, gpa_t base, const void *data, unsigned long len)
+{
+  kvm_write_guest_lock(kvm, base, data, len);
+  return 0;
+}

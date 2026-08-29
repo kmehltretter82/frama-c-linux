@@ -20,6 +20,7 @@ module VarSet = Cil_datatype.Varinfo.Set
 type ignored_call = {
   statement_id : int;
   helper : string;
+  zero_is_success : bool;
   successful_variables : VarSet.t;
   source : Fileloc.t;
 }
@@ -41,7 +42,7 @@ let variable_of_expression expression =
   | Lval (Var variable, NoOffset) -> Some variable
   | _ -> None
 
-let ignored_call_of_statement statement =
+let ignored_call_of_statement ~zero_is_success statement =
   match statement.skind with
   | Instr (Call (None, Var function_info, arguments, source))
     when is_guest_memory_helper function_info.vname ->
@@ -57,17 +58,18 @@ let ignored_call_of_statement statement =
         Some {
           statement_id = statement.sid;
           helper = function_info.vname;
+          zero_is_success;
           successful_variables;
           source;
         }
     end
   | _ -> None
 
-let add_ignored_call statement = function
+let add_ignored_call ~zero_is_success statement = function
   | Unreachable -> Unreachable
   | Reachable pending ->
     begin
-      match ignored_call_of_statement statement with
+      match ignored_call_of_statement ~zero_is_success statement with
       | None -> Reachable pending
       | Some call ->
         Reachable (IntMap.add call.statement_id call pending)
@@ -110,12 +112,11 @@ let expression_is_zero expression =
   | None -> false
 
 let expression_is_successful call expression =
-  expression_is_zero expression
-  ||
-  not
-    (VarSet.is_empty
-       (VarSet.inter call.successful_variables
-          (Cil.extract_varinfos_from_exp expression)))
+  (call.zero_is_success && expression_is_zero expression)
+  || Option.fold
+       ~none:false
+       ~some:(fun variable -> VarSet.mem variable call.successful_variables)
+       (variable_of_expression expression)
 
 let update_successful_variable variable expression call =
   let successful_variables =
@@ -143,10 +144,11 @@ let update_pending statement pending =
     IntMap.map (clear_successful_variable variable) pending
   | _ -> pending
 
-let transfer_statement statement = function
+let transfer_statement ~zero_is_success statement = function
   | Unreachable -> Unreachable
   | Reachable pending ->
-    add_ignored_call statement (Reachable (update_pending statement pending))
+    add_ignored_call ~zero_is_success statement
+      (Reachable (update_pending statement pending))
 
 let successful_return call = function
   | { skind = Return (Some expression, _); _ }
@@ -154,15 +156,19 @@ let successful_return call = function
     Some expression
   | _ -> None
 
-let function_returns_void function_definition =
+let function_return_type function_definition =
   let return_type, _, _, _ = Cil.splitFunctionTypeVI function_definition.svar in
-  Ast_types.C.is_void return_type
+  return_type
 
 let analyze_function kernel_function =
   let function_definition = Kernel_function.get_definition kernel_function in
+  let return_type = function_return_type function_definition in
+  let zero_is_success =
+    Cil.isSignedInteger return_type && not (Ast_types.C.is_bool return_type)
+  in
   match function_definition.sbody.bstmts with
   | [] -> 0
-  | _ when function_returns_void function_definition -> 0
+  | _ when Ast_types.C.is_void return_type -> 0
   | first_statement :: _ ->
     let module Function_environment =
       (val Dataflows.function_env kernel_function : Dataflows.FUNCTION_ENV)
@@ -191,7 +197,7 @@ let analyze_function kernel_function =
             statement_ids
 
       let transfer_stmt statement state =
-        let state = transfer_statement statement state in
+        let state = transfer_statement ~zero_is_success statement state in
         List.map (fun successor -> successor, state) statement.succs
     end
     in
